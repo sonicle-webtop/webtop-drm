@@ -1,0 +1,9 @@
+.wtdrm-icon-service-xs { background-image: url('service_16.png') !important; }
+.wtdrm-icon-service-s { background-image: url('service_24.png') !important; }
+.wtdrm-icon-service-m { background-image: url('service_32.png') !important; }
+.wtdrm-icon-service-l { background-image: url('service_48.png') !important; }
+
+/* actions */
+.wtdrm-icon-configuration-xs { background-image: url('configuration_16.png') !important; }
+
+.wtdrm-icon-downloadAttachment-xs { background-image: url('file-download_16.png') !important; }
