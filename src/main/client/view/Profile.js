@@ -49,7 +49,8 @@ Ext.define('Sonicle.webtop.drm.view.Profile', {
 		var me = this;
 		me.callParent([cfg]);
 		WTU.applyFormulas(me.getVM(), {
-			foActiveCard: WTF.foDefaultIfEmpty('record', 'type', 'E')
+			foActiveCard: WTF.foDefaultIfEmpty('record', 'type', 'E'),
+			foHiddenCard: WTF.foIsEqual('record', 'type', 'E')
 		});
 	},
 	initComponent: function () {
@@ -82,7 +83,32 @@ Ext.define('Sonicle.webtop.drm.view.Profile', {
 					]
 				},
 				{
-					xtype: 'panel',
+					xtype: 'tabpanel',
+					items: [{
+							title: 'Foo'
+						}, {
+							title: 'Bar'
+						}]
+				},
+				/*{
+				 xtype: 'wtdrmusergrid',
+				 title: me.mys.res('profile.gpAssignedUsers.tit'),
+				 sid: me.mys.ID,
+				 actionsInToolbar: false,
+				 width: '100%',
+				 bind: {
+				 store: '{record.associatedUsers}' //record. nome proprietà con dentro gli utenti
+				 },
+				 listeners: {
+				 pick: function (s, vals, recs) {
+				 var mo = me.getModel();
+				 mo.associatedUsers().add({
+				 userId: vals
+				 });
+				 }
+				 }
+				 },*/
+				{xtype: 'panel',
 					layout: 'card',
 					width: '100%',
 					reference: 'pnlgrid',
@@ -96,7 +122,9 @@ Ext.define('Sonicle.webtop.drm.view.Profile', {
 							itemId: 'E',
 							sid: me.mys.ID,
 							bind: {
-								store: '{record.associatedCustomers}' //record. nome proprietà con dentro gli utenti
+								store: '{record.associatedCustomers}' //record. nome proprietà con dentro gli utenti,
+										//,hidden: '{foHiddenCard}',
+										//disabled: '{foHiddenCard}'
 							},
 							listeners: {
 								pick: function (s, vals, recs) {
@@ -119,6 +147,7 @@ Ext.define('Sonicle.webtop.drm.view.Profile', {
 							width: '100%',
 							bind: {
 								store: '{record.supervisedUsers}' //record. nome proprietà con dentro gli utenti
+										//	,hidden: '{foHiddenCard}'
 							},
 							listeners: {
 								pick: function (s, vals, recs) {
@@ -131,26 +160,27 @@ Ext.define('Sonicle.webtop.drm.view.Profile', {
 						}
 					]
 				}
-			/*	{
-					xtype: 'wtdrmusergrid',
-					title: me.mys.res('profile.gpAssignedUsers.tit'),
-					sid: me.mys.ID,
-					actionsInToolbar: false,
-					width: '100%',
-					bind: {
-						store: '{record.associatedUsers}' //record. nome proprietà con dentro gli utenti
-					},
-					listeners: {
-						pick: function (s, vals, recs) {
-							var mo = me.getModel();
-							mo.associatedUsers().add({
-								userId: vals
-							});
-						}
-					}
-				} */
 			]
-		});
+		}
+		/*	{
+		 xtype: 'wtdrmusergrid',
+		 title: me.mys.res('profile.gpAssignedUsers.tit'),
+		 sid: me.mys.ID,
+		 actionsInToolbar: false,
+		 width: '100%',
+		 bind: {
+		 store: '{record.associatedUsers}' //record. nome proprietà con dentro gli utenti
+		 },
+		 listeners: {
+		 pick: function (s, vals, recs) {
+		 var mo = me.getModel();
+		 mo.associatedUsers().add({
+		 userId: vals
+		 });
+		 }
+		 }
+		 } */
+		);
 	}
 });
 
