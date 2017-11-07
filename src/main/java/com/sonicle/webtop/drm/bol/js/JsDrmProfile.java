@@ -35,7 +35,7 @@ package com.sonicle.webtop.drm.bol.js;
 import com.sonicle.webtop.drm.model.DrmProfile;
 import com.sonicle.webtop.drm.model.ProfileMasterdata;
 import com.sonicle.webtop.drm.model.ProfileSupervisedUser;
-import com.sonicle.webtop.drm.model.ProfileUser;
+import com.sonicle.webtop.drm.model.ProfileMember;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +52,7 @@ public class JsDrmProfile {
 	public List<ProfileMasterdata> associatedCustomers = new ArrayList();
 	public List<ProfileSupervisedUser> supervisedUsers = new ArrayList();
 
-	public List<ProfileUser> associatedUsers = new ArrayList();
+	public List<ProfileMember> associatedUsers = new ArrayList();
 
 	public JsDrmProfile(DrmProfile profile) {
 		this.profileId = profile.getProfileId();

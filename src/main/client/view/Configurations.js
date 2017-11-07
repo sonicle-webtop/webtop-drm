@@ -39,8 +39,8 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		'Sonicle.webtop.drm.model.GridFolders'
 	],
 	dockableConfig: {
-		title: 'Configurations',
-		iconCls: 'wt-icon-activity-xs',
+		title: '{config.tit}',
+		iconCls: 'wtdrm-icon-configuration-xs',
 		width: 800,
 		height: 600
 	},
@@ -54,14 +54,14 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 			xtype: 'tabpanel',
 			tabPosition: 'left',
 			tabRotation: 0,
-			tabConfig: {
-				textAlign: 'left'
-			},
 			items: [
 				{
 					xtype: 'wtform',
 					title: me.mys.res('config.configGeneral.tit'),
-					iconCls: '',
+					iconCls: 'wtdrm-icon-configuration-generalconfiguration-xs',
+					tabConfig: {
+						textAlign: 'left'
+					},
 					items: [{
 							xtype: 'checkbox',
 							value: me.mys.getVar('useStatisticCustomer'),
@@ -78,10 +78,13 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 					xtype: 'grid',
 					reference: 'gpCompany',
 					title: me.mys.res('config.company.tit'), //da risorse localizzazione
-					iconCls: '',
+					iconCls: 'wtdrm-icon-configuration-companiesconfiguration-xs',
+					tabConfig: {
+						textAlign: 'left'
+					},
 					store: {
 						autoLoad: true,
-						//autoSync: true,
+						autoSync: true,
 						model: 'Sonicle.webtop.drm.model.GridCompany',
 						proxy: WTF.apiProxy(me.mys.ID, 'ManageCompanies', 'data', {
 							writer: {//con parametro a false invio sempre un array per l 'operazione di delete del server
@@ -120,6 +123,10 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 					xtype: 'panel',
 					title: me.mys.res('config.groups.tit'),
 					iconCls: '',
+					hidden: true,
+					tabConfig: {
+						textAlign: 'left'
+					},
 					items: [{
 							xtype: 'treepanel',
 							reference: 'treeGroup',
@@ -161,19 +168,39 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 					xtype: 'grid',
 					title: me.mys.res('config.profile.tit'),
 					reference: 'gpProfile',
+					iconCls: 'wtdrm-icon-configuration-profilesconfiguration-xs',
+					tabConfig: {
+						textAlign: 'left'
+					},
 					store: {
 						autoLoad: true,
+						autoSync: true,
 						modelName: 'Sonicle.webtop.drm.model.GridProfiles',
-						proxy: WTF.apiProxy(me.mys.ID, 'ManageGridProfiles')
+						proxy: WTF.apiProxy(me.mys.ID, 'ManageGridProfiles', null, {
+							writer: {
+								allowSingle: false
+							}
+						})
 					},
-					columns: [
-						{
+					columns: [{
+							xtype: 'rownumberer'
+						}, {
 							dataIndex: 'description',
-							header: me.mys.res('gpProfile.fld-description.lbl')
+							header: me.mys.res('gpProfile.fld-description.lbl'),
+							flex: 1
 						}
 					],
 					tbar: [
-						me.getAct('addProfile'),
+						Ext.create('Ext.button.Split', {
+							text: me.mys.res('gpProfile.btn-genericAdd.lbl'),
+							iconCls: 'wt-icon-add-xs',
+							menu: new Ext.menu.Menu({
+								items: [
+									me.getAct('addSupervisorProfile'),
+									me.getAct('addExternalProfile')
+								]
+							})
+						}),
 						'-',
 						me.getAct('editProfile'),
 						me.getAct('deleteProfile')
@@ -181,7 +208,8 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 					listeners: {
 						itemclick: function (s, rec, itm, i, e) {
 							me.updateDisabled('editProfile');
-							me.updateDisabled('addProfile');
+							me.updateDisabled('addSupervisorProfile');
+							me.updateDisabled('addExternalProfile');
 							me.updateDisabled('deleteProfile');
 						},
 						itemdblclick: function (s, rec, itm, i, e) {
@@ -194,7 +222,10 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 					xtype: 'grid',
 					reference: 'gpFolders',
 					title: me.mys.res('config.folders.tit'),
-					iconCls: '',
+					iconCls: 'wtdrm-icon-configuration-foldersconfiguration-xs',
+					tabConfig: {
+						textAlign: 'left'
+					},
 					store: {
 						autoLoad: true,
 						//autoSync: true,
@@ -206,13 +237,16 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 						})
 					},
 					columns: [{
+							xtype: 'rownumberer'
+						}, {
 							header: me.mys.res('config.gpFolders.name.lbl'), //localizzata
 							dataIndex: 'name',
-							flex: 1,
-							hideable: false
+							hideable: false,
+							flex: 1
 						}, {
 							header: me.mys.res('config.gpFolders.description.lbl'), //localizzata
-							dataIndex: 'description'
+							dataIndex: 'description',
+							flex: 2
 						}],
 					tbar: [
 						me.getAct('folder', 'add'),
@@ -234,7 +268,10 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 					xtype: 'grid',
 					reference: 'gpDocStatus',
 					title: me.mys.res('config.status.tit'),
-					iconCls: '',
+					iconCls: 'wtdrm-icon-configuration-statusconfiguration-xs',
+					tabConfig: {
+						textAlign: 'left'
+					},
 					store: {
 						autoLoad: true,
 						//autoSync: true,
@@ -246,13 +283,16 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 						})
 					},
 					columns: [{
+							xtype: 'rownumberer'
+						}, {
 							header: me.mys.res('config.gpdocStatus.name.lbl'), //localizzata
 							dataIndex: 'name',
 							flex: 1,
 							hideable: false
 						}, {
 							header: me.mys.res('config.gpdocStatus.description.lbl'), //localizzata
-							dataIndex: 'description'
+							dataIndex: 'description',
+							flex: 2
 						}],
 					tbar: [
 						me.getAct('docStatus', 'add'),
@@ -273,7 +313,10 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				{
 					xtype: 'panel',
 					title: me.mys.res('config.enabledProgram.tit'),
-					iconCls: ''
+					iconCls: 'wtdrm-icon-configuration-enabledprograms-xs',
+					tabConfig: {
+						textAlign: 'left'
+					}
 				}]
 		});
 	},
@@ -289,7 +332,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				me.addCompany({
 					callback: function (success) {
 						if (success) {
-							alert('success');
 							me.gpCompany().getStore().load();
 						}
 					}
@@ -330,7 +372,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				me.addGroup({
 					callback: function (success) {
 						if (success) {
-							alert('success');
 							me.treeGroup().getStore().load();
 						}
 					}
@@ -362,16 +403,28 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 			}
 		});
 		//-----------------------------------------
-		me.addAct('addProfile', {
-			text: WT.res('act-add.lbl'),
+		me.addAct('addSupervisorProfile', {
+			text: me.mys.res('act-addSupervisorProfile.lbl'),
 			tooltip: null,
 			iconCls: 'wt-icon-add-xs',
 			handler: function () {
-				//add la view
-				me.addProfile({
+				me.addProfile('S', {
 					callback: function (success) {
 						if (success) {
-							alert('success');
+							me.gpProfile().getStore().load();
+						}
+					}
+				});
+			}
+		});
+		me.addAct('addExternalProfile', {
+			text: me.mys.res('act-addExternalProfile.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-add-xs',
+			handler: function () {
+				me.addProfile('E', {
+					callback: function (success) {
+						if (success) {
 							me.gpProfile().getStore().load();
 						}
 					}
@@ -412,7 +465,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				me.addFolder({
 					callback: function (success) {
 						if (success) {
-							alert('success');
 							me.gpFolder().getStore().load();
 						}
 					}
@@ -453,7 +505,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				me.addDocStatus({
 					callback: function (success) {
 						if (success) {
-							alert('success');
 							me.gpDocStatus().getStore().load();
 						}
 					}
@@ -513,7 +564,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				dis = me.isDisabled(action);
 		if (action === 'editProfile' || action === 'deleteProfile') {
 			me.setActDisabled(action, dis);
-		} else if (action === 'addProfile') {
+		} else if (action === 'addSupervisorProfile' || action === 'addExternalProfile') {
 			me.setActDisabled(action, dis);
 		} else {
 			me.setActDisabled(action, dis);
@@ -586,16 +637,14 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 
 	addCompany: function (opts) {
 
-		opts = opts || {}; //se nullo controlla e lo seta a obj empty
+		opts = opts || {};
 
 		var me = this,
-				//viewcontainer => recupero la view di webtop => id del servizio, nome View
 				vct = WT.createView(me.mys.ID, 'view.Company');
-		vct.getView().on('viewsave', function (s, success, model) { //sender,success,modello
+		vct.getView().on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		//al caricamento della finestra inizio il begin edit data
-		vct.show(false, //mostro la view
+		vct.show(false,
 				function () {
 					vct.getView().begin('new');
 				});
@@ -605,8 +654,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		me.editCompany(rec.get('companyId'), {
 			callback: function (success, model) {
 				if (success) {
-					//rec.set('text', model.get('name')); //modifico il nodo a livello client senza ricaricare
-					//ottengo lo store del componente 
 					this.gpCompany().getStore().load();
 				} else {
 					alert('error');
@@ -616,16 +663,14 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 	},
 	editCompany: function (companyId, opts) {
 
-		opts = opts || {}; //se nullo controlla e lo seta a obj empty
+		opts = opts || {};
 
 		var me = this,
-				//viewcontainer => recupero la view di webtop => id del servizio, nome View
 				vct = WT.createView(me.mys.ID, 'view.Company');
-		vct.getView().on('viewsave', function (s, success, model) { //sender,success,modello
+		vct.getView().on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		//al caricamento della finestra inizio il begin edit data
-		vct.show(false, //mostro la view
+		vct.show(false,
 				function () {
 					vct.getView().begin('edit', {
 						data: {
@@ -687,7 +732,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 	},
 	addGroup: function (groupCategory, opts) {
 
-		opts = opts || {}; //se nullo controlla e lo seta a obj empty
+		opts = opts || {}; //se nullo controlla e lo setta a obj empty
 
 		var me = this,
 				//viewcontainer => recupero la view di webtop => id del servizio, nome View
@@ -763,20 +808,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 			}
 		});
 	},
-	deleteGroup: function (groupId, opts) {
-		opts = opts || {};
-		var me = this;
-		WT.ajaxReq(me.mys.ID, 'ManageGroup', {
-			params: {
-				crud: 'delete',
-				groupIds: WTU.arrayAsParam(groupId)
-			},
-			callback: function (success, json) {
-				Ext.callback(opts.callback, opts.scope || me, [success, json]);
-			}
-		});
-	},
-	//------------------------------------
 
 	addDocStatus: function (opts) {
 
@@ -866,7 +897,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 
 	addFolder: function (opts) {
 
-		opts = opts || {}; //se nullo controlla e lo seta a obj empty
+		opts = opts || {}; //se nullo controlla e lo setta a obj empty
 
 		var me = this,
 				//viewcontainer => recupero la view di webtop => id del servizio, nome View
@@ -949,22 +980,22 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 			}
 		});
 	},
-	//-------------------------------
-	addProfile: function (opts) {
-
-		opts = opts || {}; //se nullo controlla e lo seta a obj empty
-
+	
+	addProfile: function (type, opts) {
+		opts = opts || {};
 		var me = this,
-				//viewcontainer => recupero la view di webtop => id del servizio, nome View
-				vct = WT.createView(me.mys.ID, 'view.Profile');
-		vct.getView().on('viewsave', function (s, success, model) { //sender,success,modello
+			vct = WT.createView(me.mys.ID, 'view.Profile');
+	
+		vct.getView().on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});	
+		vct.show(false, function () {
+			vct.getView().begin('new', {
+				data: {
+					type: type
+				}
+			});
 		});
-		//al caricamento della finestra inizio il begin edit data
-		vct.show(false, //mostro la view
-				function () {
-					vct.getView().begin('new');
-				});
 	},
 	editProfileUI: function (rec) {
 		var me = this;
@@ -1002,23 +1033,15 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 	},
 	deleteProfileUI: function (rec) {
 		var me = this,
-				sto = me.gpProfile().getStore(),
-				msg;
+			sto = me.gpProfile().getStore(),
+			msg;
+	
 		if (rec) {
 			msg = me.mys.res('act.confirm.delete', Ext.String.ellipsis(rec.get('name'), 40));
-		} else {
-			alert('non cancellando');
-			//msg = me.mys.res('gptasks.confirm.delete.selection');
 		}
 		WT.confirm(msg, function (bid) {
 			if (bid === 'yes') {
-				me.deleteFolder(rec.get('profileId'), {
-					callback: function (success) {
-						if (success)
-							sto.remove(rec);
-						//me.reloadTasks();
-					}
-				});
+				sto.remove(rec);
 			}
 		});
 	},
@@ -1035,5 +1058,4 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 			}
 		});
 	}
-
 });

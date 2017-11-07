@@ -36,7 +36,7 @@ Ext.define('Sonicle.webtop.drm.model.Profile', {
 		'Sonicle.data.writer.Json',
 		'Sonicle.webtop.drm.model.ProfileMasterdata',
 		'Sonicle.webtop.drm.model.ProfileSupervisedUser',
-		'Sonicle.webtop.drm.model.ProfileUser'
+		'Sonicle.webtop.drm.model.ProfileMember'
 	],
 	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageProfile', 'data', {
 		writer: {
@@ -44,21 +44,18 @@ Ext.define('Sonicle.webtop.drm.model.Profile', {
 			writeAssociations: true
 		}
 	}),
-	//proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageProfile'),
-	//identifico come viene gestita la chiave primaria
 	identifier: 'negativestring',
-	//identifico la chiave primaria
 	idProperty: 'profileId',
 	fields: [
 		WTF.field('profileId', 'string', false),
-		WTF.field('domainId', 'string', false),
+		WTF.field('domainId', 'string', true),
 		WTF.field('description', 'string', false),
 		WTF.field('type', 'string', false)
 	],
 	hasMany: [
 		WTF.hasMany('associatedCustomers', 'Sonicle.webtop.drm.model.ProfileMasterdata'),
 		WTF.hasMany('supervisedUsers', 'Sonicle.webtop.drm.model.ProfileSupervisedUser'),
-		WTF.hasMany('associatedUsers', 'Sonicle.webtop.drm.model.ProfileUser')
+		WTF.hasMany('associatedUsers', 'Sonicle.webtop.drm.model.ProfileMember')
 	]
 
 });

@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Groups extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.GroupsRecord> {
 
-	private static final long serialVersionUID = -1426627125;
+	private static final long serialVersionUID = -1622769745;
 
 	/**
 	 * The reference instance of <code>drm.groups</code>
@@ -98,7 +98,7 @@ public class Groups extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.
 	 */
 	@Override
 	public org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.GroupsRecord> getPrimaryKey() {
-		return com.sonicle.webtop.drm.jooq.Keys.GROUPS_PKEY1;
+		return com.sonicle.webtop.drm.jooq.Keys.GROUPS_PKEY;
 	}
 
 	/**
@@ -106,7 +106,7 @@ public class Groups extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.
 	 */
 	@Override
 	public java.util.List<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.GroupsRecord>> getKeys() {
-		return java.util.Arrays.<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.GroupsRecord>>asList(com.sonicle.webtop.drm.jooq.Keys.GROUPS_PKEY1);
+		return java.util.Arrays.<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.GroupsRecord>>asList(com.sonicle.webtop.drm.jooq.Keys.GROUPS_PKEY);
 	}
 
 	/**

@@ -3,7 +3,19 @@
 .wtdrm-icon-service-m { background-image: url('service_32.png') !important; }
 .wtdrm-icon-service-l { background-image: url('service_48.png') !important; }
 
-/* actions */
-.wtdrm-icon-configuration-xs { background-image: url('configuration_16.png') !important; }
 
 .wtdrm-icon-downloadAttachment-xs { background-image: url('file-download_16.png') !important; }
+.wtdrm-icon-openAttachment-xs { background-image: url('file-open_16.png') !important; }
+.wtdrm-icon-deleteAttachment-xs { background-image: url('file-delete_16.png') !important; }
+
+.wtdrm-icon-workreport-xs { background-image: url('work_report_16.png') !important; }
+.wtdrm-icon-expensenote-xs { background-image: url('expense_note_16.png') !important; }
+.wtdrm-icon-timetable-xs { background-image: url('timetable_16.png') !important; }
+
+.wtdrm-icon-configuration-xs { background-image: url('configuration_16.png') !important; }
+.wtdrm-icon-configuration-generalconfiguration-xs { background-image: url('general_configurations_16.png') !important; }
+.wtdrm-icon-configuration-companiesconfiguration-xs { background-image: url('companies_configuration_16.png') !important; }
+.wtdrm-icon-configuration-profilesconfiguration-xs { background-image: url('profiles_configuration_16.png') !important; }
+.wtdrm-icon-configuration-foldersconfiguration-xs { background-image: url('folders_configuration_16.png') !important; }
+.wtdrm-icon-configuration-statusconfiguration-xs { background-image: url('status_configuration_16.png') !important; }
+.wtdrm-icon-configuration-enabledprograms-xs { background-image: url('enabledprograms_configuration_16.png') !important; }

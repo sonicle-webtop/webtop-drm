@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Drm extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = -1864591608;
+	private static final long serialVersionUID = 1179900374;
 
 	/**
 	 * The reference instance of <code>drm</code>
@@ -77,11 +77,11 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.tables.GroupsUsers.GROUPS_USERS,
 			com.sonicle.webtop.drm.jooq.tables.Profiles.PROFILES,
 			com.sonicle.webtop.drm.jooq.tables.ProfilesMasterdata.PROFILES_MASTERDATA,
+			com.sonicle.webtop.drm.jooq.tables.ProfilesMembers.PROFILES_MEMBERS,
 			com.sonicle.webtop.drm.jooq.tables.ProfilesSupervisedUsers.PROFILES_SUPERVISED_USERS,
-			com.sonicle.webtop.drm.jooq.tables.ProfilesUsers.PROFILES_USERS,
 			com.sonicle.webtop.drm.jooq.tables.WorkReports.WORK_REPORTS,
 			com.sonicle.webtop.drm.jooq.tables.WorkReportsAttachments.WORK_REPORTS_ATTACHMENTS,
-			com.sonicle.webtop.drm.jooq.tables.WorkReportsDetails.WORK_REPORTS_DETAILS,
+			com.sonicle.webtop.drm.jooq.tables.WorkReportsRows.WORK_REPORTS_ROWS,
 			com.sonicle.webtop.drm.jooq.tables.WorkReportsSettings.WORK_REPORTS_SETTINGS,
 			com.sonicle.webtop.drm.jooq.tables.WorkTypes.WORK_TYPES);
 	}

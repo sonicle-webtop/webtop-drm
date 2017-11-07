@@ -41,7 +41,7 @@ Ext.define('Sonicle.webtop.drm.model.Company', {
 			type: 'sojson',
 			writeAssociations: true
 		}
-	}), //NB: SE NN NECESSARIO USARE 'data' COME DEFAULT X IL JSON
+	}),
 	idProperty: 'companyId',
 	fields: [
 		WTF.field('companyId', 'int',true),

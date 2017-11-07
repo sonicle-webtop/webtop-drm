@@ -34,11 +34,11 @@ package com.sonicle.webtop.drm.dal;
 
 import com.sonicle.webtop.core.dal.BaseDAO;
 import com.sonicle.webtop.core.dal.DAOException;
-import com.sonicle.webtop.drm.bol.OWorkReportDetail;
+import com.sonicle.webtop.drm.bol.OWorkReportRow;
 import com.sonicle.webtop.drm.bol.OWorkType;
 import static com.sonicle.webtop.drm.jooq.Sequences.SEQ_WORK_TYPES;
 import static com.sonicle.webtop.drm.jooq.Tables.WORK_TYPES;
-import com.sonicle.webtop.drm.jooq.tables.records.WorkReportsDetailsRecord;
+import com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRowsRecord;
 import com.sonicle.webtop.drm.jooq.tables.records.WorkTypesRecord;
 import java.sql.Connection;
 import java.util.List;

@@ -35,7 +35,7 @@ package com.sonicle.webtop.drm.dal;
 import com.sonicle.webtop.core.dal.BaseDAO;
 import com.sonicle.webtop.core.dal.DAOException;
 import com.sonicle.webtop.drm.bol.OProfileSupervisedUser;
-import com.sonicle.webtop.drm.bol.OProfileUser;
+import com.sonicle.webtop.drm.bol.OProfileMember;
 import static com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_SUPERVISED_USERS;
 import static com.sonicle.webtop.drm.jooq.Tables.PROFILES_SUPERVISED_USERS;
 import com.sonicle.webtop.drm.jooq.tables.records.ProfilesSupervisedUsersRecord;

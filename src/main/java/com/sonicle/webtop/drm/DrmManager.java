@@ -59,10 +59,10 @@ import com.sonicle.webtop.drm.bol.ODrmGroupUser;
 import com.sonicle.webtop.drm.bol.ODrmProfile;
 import com.sonicle.webtop.drm.bol.OProfileMasterdata;
 import com.sonicle.webtop.drm.bol.OProfileSupervisedUser;
-import com.sonicle.webtop.drm.bol.OProfileUser;
+import com.sonicle.webtop.drm.bol.OProfileMember;
 import com.sonicle.webtop.drm.bol.OWorkReport;
 import com.sonicle.webtop.drm.bol.OWorkReportAttachment;
-import com.sonicle.webtop.drm.bol.OWorkReportDetail;
+import com.sonicle.webtop.drm.bol.OWorkReportRow;
 import com.sonicle.webtop.drm.bol.OWorkReportSetting;
 import com.sonicle.webtop.drm.bol.OWorkType;
 import com.sonicle.webtop.drm.dal.BusinessTripDao;
@@ -77,10 +77,10 @@ import com.sonicle.webtop.drm.dal.DrmGroupUserDAO;
 import com.sonicle.webtop.drm.dal.DrmProfileDAO;
 import com.sonicle.webtop.drm.dal.ProfileMasterdataDAO;
 import com.sonicle.webtop.drm.dal.ProfileSupervisedUserDAO;
-import com.sonicle.webtop.drm.dal.ProfileUserDAO;
+import com.sonicle.webtop.drm.dal.ProfileMemberDAO;
 import com.sonicle.webtop.drm.dal.WorkReportAttachmentDAO;
 import com.sonicle.webtop.drm.dal.WorkReportDAO;
-import com.sonicle.webtop.drm.dal.WorkReportDetailDAO;
+import com.sonicle.webtop.drm.dal.WorkReportRowDAO;
 import com.sonicle.webtop.drm.dal.WorkReportSettingDAO;
 import com.sonicle.webtop.drm.dal.WorkTypeDAO;
 import com.sonicle.webtop.drm.model.BusinessTrip;
@@ -96,10 +96,10 @@ import com.sonicle.webtop.drm.model.DrmProfile;
 import com.sonicle.webtop.drm.model.FileContent;
 import com.sonicle.webtop.drm.model.ProfileMasterdata;
 import com.sonicle.webtop.drm.model.ProfileSupervisedUser;
-import com.sonicle.webtop.drm.model.ProfileUser;
+import com.sonicle.webtop.drm.model.ProfileMember;
 import com.sonicle.webtop.drm.model.WorkReport;
 import com.sonicle.webtop.drm.model.WorkReportAttachment;
-import com.sonicle.webtop.drm.model.WorkReportDetail;
+import com.sonicle.webtop.drm.model.WorkReportRow;
 import com.sonicle.webtop.drm.model.WorkReportSetting;
 import com.sonicle.webtop.drm.model.WorkType;
 import java.io.File;
@@ -132,17 +132,33 @@ public class DrmManager extends BaseManager {
 		return DateTime.now(DateTimeZone.UTC);
 	}
 
-	//list, add, update, deleteById
-	public List<OCompany> listCompanies() throws WTException {
+	public List<OCompany> listCompaniesByDomainUser() throws WTException {
 		Connection con = null;
 		CompanyDAO compDao = CompanyDAO.getInstance();
 		List<OCompany> companies = null;
 		try {
-
 			con = WT.getConnection(SERVICE_ID);
 
-			companies = compDao.selectCompanies(con);
+			companies = compDao.selectCompaniesByDomainUser(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
+			
+			return companies;
 
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public List<OCompany> listCompaniesByDomain() throws WTException {
+		Connection con = null;
+		CompanyDAO compDao = CompanyDAO.getInstance();
+		List<OCompany> companies = null;
+		try {
+			con = WT.getConnection(SERVICE_ID);
+
+			companies = compDao.selectCompaniesByDomain(con, getTargetProfileId().getDomainId());
+			
 			return companies;
 
 		} catch (SQLException | DAOException ex) {
@@ -906,7 +922,7 @@ public class DrmManager extends BaseManager {
 		DrmProfileDAO pflDao = DrmProfileDAO.getInstance();
 		ProfileMasterdataDAO prfMasterDao = ProfileMasterdataDAO.getInstance();
 		ProfileSupervisedUserDAO prfSupervisedDao = ProfileSupervisedUserDAO.getInstance();
-		ProfileUserDAO prfUserDao = ProfileUserDAO.getInstance();
+		ProfileMemberDAO prfUserDao = ProfileMemberDAO.getInstance();
 
 		DrmProfile profile = null;
 		try {
@@ -925,8 +941,8 @@ public class DrmManager extends BaseManager {
 				}
 			}
 
-			for (OProfileUser oPrfUser : prfUserDao.selectByProfile(con, profileId)) {
-				profile.getAssociatedUsers().add(createProfileUser(oPrfUser));
+			for (OProfileMember oPrfUser : prfUserDao.selectByProfile(con, profileId)) {
+				profile.getAssociatedUsers().add(createProfileMember(oPrfUser));
 			}
 
 			return profile;
@@ -948,7 +964,7 @@ public class DrmManager extends BaseManager {
 			DrmProfileDAO pflDao = DrmProfileDAO.getInstance();
 			ProfileMasterdataDAO prfMastDao = ProfileMasterdataDAO.getInstance();
 			ProfileSupervisedUserDAO prfSupervisedDao = ProfileSupervisedUserDAO.getInstance();
-			ProfileUserDAO prfUserDao = ProfileUserDAO.getInstance();
+			ProfileMemberDAO prfUserDao = ProfileMemberDAO.getInstance();
 
 			ODrmProfile newDrmProfile = createODrmProfile(profile);
 			newDrmProfile.setProfileId(IdentifierUtils.getUUID());
@@ -976,14 +992,12 @@ public class DrmManager extends BaseManager {
 				}
 			}
 
-			OProfileUser newPrfUser = null;
-			for (ProfileUser prfUser : profile.getAssociatedUsers()) {
-
-				newPrfUser = createOProfileUser(prfUser);
-				newPrfUser.setId(prfMastDao.getSequence(con).intValue());
-				newPrfUser.setProfileId(newDrmProfile.getProfileId());
-
-				prfUserDao.insert(con, newPrfUser);
+			OProfileMember opmem = null;
+			for (ProfileMember pmem : profile.getAssociatedUsers()) {
+				opmem = fillOProfileMember(new OProfileMember(), pmem);
+				opmem.setId(prfMastDao.getSequence(con).intValue());
+				opmem.setProfileId(newDrmProfile.getProfileId());
+				prfUserDao.insert(con, opmem);
 			}
 
 			pflDao.insert(con, newDrmProfile);
@@ -1011,9 +1025,9 @@ public class DrmManager extends BaseManager {
 
 		Connection con = null;
 		DrmProfileDAO pflDao = DrmProfileDAO.getInstance();
-		ProfileMasterdataDAO prfMastDao = ProfileMasterdataDAO.getInstance();
-		ProfileSupervisedUserDAO prfSupervisedDao = ProfileSupervisedUserDAO.getInstance();
-		ProfileUserDAO prfUserDao = ProfileUserDAO.getInstance();
+		ProfileMasterdataDAO pmasDao = ProfileMasterdataDAO.getInstance();
+		ProfileSupervisedUserDAO psupDao = ProfileSupervisedUserDAO.getInstance();
+		ProfileMemberDAO pmemDao = ProfileMemberDAO.getInstance();
 
 		try {
 
@@ -1029,17 +1043,14 @@ public class DrmManager extends BaseManager {
 				LangUtils.CollectionChangeSet<ProfileMasterdata> changesSet1 = LangUtils.getCollectionChanges(oldDrmProfile.getAssociatedCustomers(), item.getAssociatedCustomers());
 
 				for (ProfileMasterdata prfMaster : changesSet1.inserted) {
-
 					OProfileMasterdata oGrpUsr = createOProfileMasterdata(prfMaster);
-
-					oGrpUsr.setId(prfMastDao.getSequence(con).intValue());
+					oGrpUsr.setId(pmasDao.getSequence(con).intValue());
 					oGrpUsr.setProfileId(item.getProfileId());
-
-					prfMastDao.insert(con, oGrpUsr);
+					pmasDao.insert(con, oGrpUsr);
 				}
 
 				for (ProfileMasterdata prfMaster : changesSet1.deleted) {
-					prfMastDao.deleteById(con, prfMaster.getId());
+					pmasDao.deleteById(con, prfMaster.getId());
 				}
 
 			} else if (profile.getType().equals(EnumUtils.toSerializedName(DrmProfile.Type.SUPERVISOR))) {
@@ -1047,34 +1058,27 @@ public class DrmManager extends BaseManager {
 				LangUtils.CollectionChangeSet<ProfileSupervisedUser> changesSet1 = LangUtils.getCollectionChanges(oldDrmProfile.getSupervisedUsers(), item.getSupervisedUsers());
 
 				for (ProfileSupervisedUser prfSupervised : changesSet1.inserted) {
-
 					OProfileSupervisedUser oPrfSupervised = createOProfileSupervisedUser(prfSupervised);
-
-					oPrfSupervised.setId(prfMastDao.getSequence(con).intValue());
+					oPrfSupervised.setId(pmasDao.getSequence(con).intValue());
 					oPrfSupervised.setProfileId(item.getProfileId());
-
-					prfSupervisedDao.insert(con, oPrfSupervised);
+					psupDao.insert(con, oPrfSupervised);
 				}
 
-				for (ProfileSupervisedUser prfSupervised : changesSet1.deleted) {
-					prfSupervisedDao.deleteById(con, prfSupervised.getId());
+				for (ProfileSupervisedUser psup : changesSet1.deleted) {
+					psupDao.deleteById(con, psup.getId());
 				}
 			}
 
-			LangUtils.CollectionChangeSet<ProfileUser> changesSet1 = LangUtils.getCollectionChanges(oldDrmProfile.getAssociatedUsers(), item.getAssociatedUsers());
-
-			for (ProfileUser prfUser : changesSet1.inserted) {
-
-				OProfileUser oPrfUsr = createOProfileUser(prfUser);
-
-				oPrfUsr.setId(prfMastDao.getSequence(con).intValue());
-				oPrfUsr.setProfileId(item.getProfileId());
-
-				prfUserDao.insert(con, oPrfUsr);
+			LangUtils.CollectionChangeSet<ProfileMember> changesSet1 = LangUtils.getCollectionChanges(oldDrmProfile.getAssociatedUsers(), item.getAssociatedUsers());
+			for (ProfileMember pmem : changesSet1.inserted) {
+				final OProfileMember opmem = fillOProfileMember(new OProfileMember(), pmem);
+				opmem.setId(pmasDao.getSequence(con).intValue());
+				opmem.setProfileId(item.getProfileId());
+				pmemDao.insert(con, opmem);
 			}
 
-			for (ProfileUser prfUser : changesSet1.deleted) {
-				prfUserDao.deleteById(con, prfUser.getId());
+			for (ProfileMember pmem : changesSet1.deleted) {
+				pmemDao.deleteById(con, pmem.getId());
 			}
 
 			DbUtils.commitQuietly(con);
@@ -1099,7 +1103,7 @@ public class DrmManager extends BaseManager {
 		DrmProfileDAO pflDao = DrmProfileDAO.getInstance();
 		ProfileMasterdataDAO prfMasterDao = ProfileMasterdataDAO.getInstance();
 		ProfileSupervisedUserDAO prfSupervisedDao = ProfileSupervisedUserDAO.getInstance();
-		ProfileUserDAO prfUserDao = ProfileUserDAO.getInstance();
+		ProfileMemberDAO prfUserDao = ProfileMemberDAO.getInstance();
 
 		try {
 			con = WT.getConnection(SERVICE_ID, false);
@@ -1208,33 +1212,27 @@ public class DrmManager extends BaseManager {
 
 		return oPrfSupervised;
 	}
-
-	private ProfileUser createProfileUser(OProfileUser oPrfUser) {
-
-		if (oPrfUser == null) {
-			return null;
-		}
-
-		ProfileUser prfUser = new ProfileUser();
-		prfUser.setId(oPrfUser.getId());
-		prfUser.setProfileId(oPrfUser.getProfileId());
-		prfUser.setUserId(oPrfUser.getUserId());
-
-		return prfUser;
+	
+	private ProfileMember createProfileMember(OProfileMember with) {
+		return fillProfileMember(new ProfileMember(), with);
 	}
 
-	private OProfileUser createOProfileUser(ProfileUser prfUser) {
-
-		if (prfUser == null) {
-			return null;
+	private ProfileMember fillProfileMember(ProfileMember fill, OProfileMember with) {
+		if ((fill != null) && (with != null)) {
+			fill.setId(with.getId());
+			fill.setProfileId(with.getProfileId());
+			fill.setUserId(with.getUserId());
 		}
+		return fill;
+	}
 
-		OProfileUser oPrfUser = new OProfileUser();
-		oPrfUser.setId(prfUser.getId());
-		oPrfUser.setProfileId(prfUser.getProfileId());
-		oPrfUser.setUserId(prfUser.getUserId());
-
-		return oPrfUser;
+	private OProfileMember fillOProfileMember(OProfileMember fill, ProfileMember with) {
+		if ((fill != null) && (with != null)) {
+			fill.setId(with.getId());
+			fill.setProfileId(with.getProfileId());
+			fill.setUserId(with.getUserId());
+		}
+		return fill;
 	}
 
 	//-----------------------------------------------------------------
@@ -1444,18 +1442,16 @@ public class DrmManager extends BaseManager {
 		return oFldGrp;
 	}
 
-	//----------------------------------------------------
 	public List<OWorkReport> listWorkReports(WorkReportQuery query) throws WTException {
 		Connection con = null;
 		WorkReportDAO wrkDao = WorkReportDAO.getInstance();
 		List<OWorkReport> workRpts = null;
 		try {
 			con = WT.getConnection(SERVICE_ID);
-
 			workRpts = wrkDao.selectWorkReports(con, query);
 
 			return workRpts;
-
+			
 		} catch (SQLException | DAOException ex) {
 			throw new WTException(ex, "DB error");
 		} finally {
@@ -1466,7 +1462,7 @@ public class DrmManager extends BaseManager {
 	public WorkReport getWorkReport(String workReportId) throws WTException {
 		Connection con = null;
 		WorkReportDAO wrkDao = WorkReportDAO.getInstance();
-		WorkReportDetailDAO wrkDDao = WorkReportDetailDAO.getInstance();
+		WorkReportRowDAO wrkDDao = WorkReportRowDAO.getInstance();
 		WorkReportAttachmentDAO attDao = WorkReportAttachmentDAO.getInstance();
 		WorkReport report = null;
 		try {
@@ -1475,8 +1471,8 @@ public class DrmManager extends BaseManager {
 
 			report = createWorkReport(wrkDao.selectById(con, workReportId));
 
-			for (OWorkReportDetail oWrkDetail : wrkDDao.selectByWorkReport(con, workReportId)) {
-				report.getDetails().add(createWorkReportDetail(oWrkDetail));
+			for (OWorkReportRow oWrkDetail : wrkDDao.selectByWorkReport(con, workReportId)) {
+				report.getDetails().add(createWorkReportRow(oWrkDetail));
 			}
 
 			for (OWorkReportAttachment oAtt : attDao.selectByWorkReport(con, workReportId)) {
@@ -1503,16 +1499,16 @@ public class DrmManager extends BaseManager {
 			String workReportPath = "";
 
 			WorkReportDAO wrkDao = WorkReportDAO.getInstance();
-			WorkReportDetailDAO wrkDDao = WorkReportDetailDAO.getInstance();
+			WorkReportRowDAO wrkDDao = WorkReportRowDAO.getInstance();
 			WorkReportAttachmentDAO attDao = WorkReportAttachmentDAO.getInstance();
 
 			OWorkReport newWorkReport = createOWorkReport(wrkRpt);
 			newWorkReport.setWorkReportId(IdentifierUtils.getUUID());
 			newWorkReport.setWorkReportNo(wrkDao.getWorkReportSequence(con) + "-" + newWorkReport.getFromDate().year().getAsText());
 
-			OWorkReportDetail newWrkDetail = null;
-			for (WorkReportDetail wrkDetail : wrkRpt.getDetails()) {
-				newWrkDetail = createOWorkReportDetail(wrkDetail);
+			OWorkReportRow newWrkDetail = null;
+			for (WorkReportRow wrkDetail : wrkRpt.getDetails()) {
+				newWrkDetail = createOWorkReportRow(wrkDetail);
 				newWrkDetail.setId(wrkDDao.getSequence(con).intValue());
 				newWrkDetail.setWorkReportId(newWorkReport.getWorkReportId());
 
@@ -1564,7 +1560,7 @@ public class DrmManager extends BaseManager {
 
 		Connection con = null;
 		WorkReportDAO wrkDao = WorkReportDAO.getInstance();
-		WorkReportDetailDAO detailDao = WorkReportDetailDAO.getInstance();
+		WorkReportRowDAO detailDao = WorkReportRowDAO.getInstance();
 		WorkReportAttachmentDAO attDao = WorkReportAttachmentDAO.getInstance();
 		try {
 			DateTime revisionTimestamp = createRevisionTimestamp();
@@ -1577,10 +1573,10 @@ public class DrmManager extends BaseManager {
 
 			wrkDao.update(con, report, revisionTimestamp);
 
-			LangUtils.CollectionChangeSet<WorkReportDetail> changesSet1 = LangUtils.getCollectionChanges(oldWorkReport.getDetails(), item.getDetails());
-			for (WorkReportDetail wrkDetail : changesSet1.inserted) {
+			LangUtils.CollectionChangeSet<WorkReportRow> changesSet1 = LangUtils.getCollectionChanges(oldWorkReport.getDetails(), item.getDetails());
+			for (WorkReportRow wrkDetail : changesSet1.inserted) {
 
-				OWorkReportDetail oWrkDetail = createOWorkReportDetail(wrkDetail);
+				OWorkReportRow oWrkDetail = createOWorkReportRow(wrkDetail);
 
 				oWrkDetail.setId(detailDao.getSequence(con).intValue());
 				oWrkDetail.setWorkReportId(item.getWorkReportId());
@@ -1588,12 +1584,12 @@ public class DrmManager extends BaseManager {
 				detailDao.insert(con, oWrkDetail);
 			}
 
-			for (WorkReportDetail wrkDetail : changesSet1.deleted) {
+			for (WorkReportRow wrkDetail : changesSet1.deleted) {
 				detailDao.deleteById(con, wrkDetail.getId());
 			}
 
-			for (WorkReportDetail wrkDetail : changesSet1.updated) {
-				OWorkReportDetail oWrkDetail = createOWorkReportDetail(wrkDetail);
+			for (WorkReportRow wrkDetail : changesSet1.updated) {
+				OWorkReportRow oWrkDetail = createOWorkReportRow(wrkDetail);
 				oWrkDetail.setWorkReportId(item.getWorkReportId());
 
 				detailDao.update(con, oWrkDetail);
@@ -1649,7 +1645,7 @@ public class DrmManager extends BaseManager {
 
 		Connection con = null;
 		WorkReportDAO wrkDao = WorkReportDAO.getInstance();
-		//WorkReportDetailDAO wrkDDao = WorkReportDetailDAO.getInstance();
+		//WorkReportRowDAO wrkDDao = WorkReportRowDAO.getInstance();
 
 		try {
 			con = WT.getConnection(SERVICE_ID, false);
@@ -1678,7 +1674,7 @@ public class DrmManager extends BaseManager {
 		wrkRpt.setWorkReportId(oWrkRpt.getWorkReportId());
 		wrkRpt.setWorkReportNo(oWrkRpt.getWorkReportNo());
 		wrkRpt.setCompanyId(oWrkRpt.getCompanyId());
-		wrkRpt.setUserId(oWrkRpt.getUserId());
+		wrkRpt.setOperatorId(oWrkRpt.getOperatorId());
 		wrkRpt.setRevisionStatus(EnumUtils.forSerializedName(oWrkRpt.getRevisionStatus(), WorkReport.RevisionStatus.class));
 		wrkRpt.setRevisionTimestamp(oWrkRpt.getRevisionTimestamp());
 		wrkRpt.setRevisionSequence(oWrkRpt.getRevisionSequence());
@@ -1689,7 +1685,6 @@ public class DrmManager extends BaseManager {
 		wrkRpt.setFromDate(oWrkRpt.getFromDate());
 		wrkRpt.setToDate(oWrkRpt.getToDate());
 		wrkRpt.setReferenceNo(oWrkRpt.getReferenceNo());
-		wrkRpt.setCausal(oWrkRpt.getCausal());
 		wrkRpt.setCausalId(oWrkRpt.getCausalId());
 		wrkRpt.setDdtNo(oWrkRpt.getDdtNo());
 		wrkRpt.setDdtDate(oWrkRpt.getDdtDate());
@@ -1712,7 +1707,7 @@ public class DrmManager extends BaseManager {
 		oWrkRpt.setWorkReportId(wrkRpt.getWorkReportId());
 		oWrkRpt.setWorkReportNo(wrkRpt.getWorkReportNo());
 		oWrkRpt.setCompanyId(wrkRpt.getCompanyId());
-		oWrkRpt.setUserId(wrkRpt.getUserId());
+		oWrkRpt.setOperatorId(wrkRpt.getOperatorId());
 		oWrkRpt.setRevisionStatus(EnumUtils.toSerializedName(wrkRpt.getRevisionStatus()));
 		oWrkRpt.setRevisionTimestamp(wrkRpt.getRevisionTimestamp());
 		oWrkRpt.setRevisionSequence(wrkRpt.getRevisionSequence());
@@ -1723,7 +1718,6 @@ public class DrmManager extends BaseManager {
 		oWrkRpt.setFromDate(wrkRpt.getFromDate());
 		oWrkRpt.setToDate(wrkRpt.getToDate());
 		oWrkRpt.setReferenceNo(wrkRpt.getReferenceNo());
-		oWrkRpt.setCausal(wrkRpt.getCausal());
 		oWrkRpt.setCausalId(wrkRpt.getCausalId());
 		oWrkRpt.setDdtNo(wrkRpt.getDdtNo());
 		oWrkRpt.setDdtDate(wrkRpt.getDdtDate());
@@ -1738,13 +1732,13 @@ public class DrmManager extends BaseManager {
 		return oWrkRpt;
 	}
 
-	private WorkReportDetail createWorkReportDetail(OWorkReportDetail oWrkDetail) {
+	private WorkReportRow createWorkReportRow(OWorkReportRow oWrkDetail) {
 
 		if (oWrkDetail == null) {
 			return null;
 		}
 
-		WorkReportDetail wrkDetail = new WorkReportDetail();
+		WorkReportRow wrkDetail = new WorkReportRow();
 		wrkDetail.setId(oWrkDetail.getId());
 		wrkDetail.setWorkReportId(oWrkDetail.getWorkReportId());
 		wrkDetail.setRowNo(oWrkDetail.getRowNo().intValue());
@@ -1755,13 +1749,13 @@ public class DrmManager extends BaseManager {
 		return wrkDetail;
 	}
 
-	private OWorkReportDetail createOWorkReportDetail(WorkReportDetail wrkDetail) {
+	private OWorkReportRow createOWorkReportRow(WorkReportRow wrkDetail) {
 
 		if (wrkDetail == null) {
 			return null;
 		}
 
-		OWorkReportDetail oWrkDetail = new OWorkReportDetail();
+		OWorkReportRow oWrkDetail = new OWorkReportRow();
 		oWrkDetail.setId(wrkDetail.getId());
 		oWrkDetail.setWorkReportId(wrkDetail.getWorkReportId());
 		oWrkDetail.setRowNo(wrkDetail.getRowNo().shortValue());
@@ -2144,6 +2138,55 @@ public class DrmManager extends BaseManager {
 
 			return trips;
 
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	Iterable<String> listOperators() throws WTException {
+		Connection con = null;
+		com.sonicle.webtop.drm.dal.UserDAO userDao = com.sonicle.webtop.drm.dal.UserDAO.getInstance();
+		List<String> users = null;
+		try {			
+			con = WT.getConnection(SERVICE_ID);
+			users = userDao.selectUserSupervisedByDomain(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
+			users.add(0, getTargetProfileId().getUserId());
+			
+			return users;
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	Iterable<String> listCustomersByProfileUser() throws WTException {
+		Connection con = null;
+		ProfileMasterdataDAO pmDao = ProfileMasterdataDAO.getInstance();
+		List<String> idCustomers = null;
+		try {			
+			con = WT.getConnection(SERVICE_ID);
+			idCustomers = pmDao.selectCustomersByProfileUser(con, getTargetProfileId().getUserId());
+			
+			return idCustomers;
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	boolean checkCustomersByProfileUser(String realCustomerId) throws WTException {
+		Connection con = null;
+		ProfileMasterdataDAO pmDao = ProfileMasterdataDAO.getInstance();
+		String opmId = null;
+		try {			
+			con = WT.getConnection(SERVICE_ID);
+			opmId = pmDao.checkCustomersByProfileUser(con, realCustomerId, getTargetProfileId().getUserId());
+			
+			return (opmId == null) ? false : true;
 		} catch (SQLException | DAOException ex) {
 			throw new WTException(ex, "DB error");
 		} finally {

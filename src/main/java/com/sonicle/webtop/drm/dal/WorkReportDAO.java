@@ -43,6 +43,7 @@ import java.sql.Connection;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.DatePart;
@@ -106,7 +107,7 @@ public class WorkReportDAO extends BaseDAO {
 				.update(WORK_REPORTS)
 				.set(WORK_REPORTS.WORK_REPORT_NO, item.getWorkReportNo())
 				.set(WORK_REPORTS.COMPANY_ID, item.getCompanyId())
-				.set(WORK_REPORTS.USER_ID, item.getUserId())
+				.set(WORK_REPORTS.OPERATOR_ID, item.getOperatorId())
 				.set(WORK_REPORTS.REVISION_STATUS, item.getRevisionStatus())
 				.set(WORK_REPORTS.REVISION_TIMESTAMP, item.getRevisionTimestamp())
 				.set(WORK_REPORTS.REVISION_SEQUENCE, item.getRevisionSequence())
@@ -118,7 +119,6 @@ public class WorkReportDAO extends BaseDAO {
 				.set(WORK_REPORTS.FROM_DATE, item.getFromDate())
 				.set(WORK_REPORTS.TO_DATE, item.getToDate())
 				.set(WORK_REPORTS.REFERENCE_NO, item.getReferenceNo())
-				.set(WORK_REPORTS.CAUSAL, item.getCausal())
 				.set(WORK_REPORTS.CAUSAL_ID, item.getCausalId())
 				.set(WORK_REPORTS.DDT_NO, item.getDdtNo())
 				.set(WORK_REPORTS.DDT_DATE, item.getDdtDate())
@@ -164,58 +164,63 @@ public class WorkReportDAO extends BaseDAO {
 	}
 
 	private Condition ensureCondition(WorkReportQuery query) {
-
-		Condition searchCndt = WORK_REPORTS.COMPANY_ID.equal(query.companyId);
+								
+		Condition searchCndt = WORK_REPORTS.OPERATOR_ID.equal(query.operatorId);
 		
-		if (!StringUtils.isEmpty(query.userId)) {
-			searchCndt = searchCndt.and(WORK_REPORTS.USER_ID.like(query.userId));
+		if (query.companyId != null) {
+			searchCndt = searchCndt.and(WORK_REPORTS.COMPANY_ID.equal(query.companyId));
 		}
 		
-		if (!StringUtils.isEmpty(query.workReportNo)) {
-			searchCndt = searchCndt.and(WORK_REPORTS.WORK_REPORT_NO.like(query.workReportNo));
-		}
-
-		if (query.year != null) {
-			searchCndt = searchCndt.and(WORK_REPORTS.FROM_DATE.extract(DatePart.YEAR).equal(query.year));
-		}
-
 		if (!StringUtils.isEmpty(query.customerId)) {
-			searchCndt = searchCndt.and(WORK_REPORTS.CUSTOMER_ID.like(query.customerId));
+			searchCndt = searchCndt.and(WORK_REPORTS.CUSTOMER_ID.equal(query.customerId));
 		}
-
+		
+		if (!StringUtils.isEmpty(query.customerStatId)) {
+			searchCndt = searchCndt.and(WORK_REPORTS.CUSTOMER_STAT_ID.equal(query.customerStatId));
+		}
+		
 		if (query.fromDate != null) {
-			searchCndt = searchCndt.and(WORK_REPORTS.FROM_DATE.equal(query.fromDate));
+			searchCndt = searchCndt.and(WORK_REPORTS.FROM_DATE.greaterOrEqual(query.fromDate));
 		}
 
 		if (query.toDate != null) {
-			searchCndt = searchCndt.and(WORK_REPORTS.TO_DATE.equal(query.toDate));
+			searchCndt = searchCndt.and(WORK_REPORTS.TO_DATE.lessOrEqual(query.toDate));
 		}
-
+		
+		if (!StringUtils.isEmpty(query.referenceNo)) {
+			searchCndt = searchCndt.and(WORK_REPORTS.REFERENCE_NO.like("%" + query.referenceNo + "%"));
+		}
+		
 		if (query.causalId != null) {
 			searchCndt = searchCndt.and(WORK_REPORTS.CAUSAL_ID.equal(query.causalId));
 		}
-
-		if (!StringUtils.isEmpty(query.referenceNo)) {
-			searchCndt = searchCndt.and(WORK_REPORTS.REFERENCE_NO.like(query.referenceNo));
-		}
-
+		
 		if (query.businessTripId != null) {
 			searchCndt = searchCndt.and(WORK_REPORTS.BUSINESS_TRIP_ID.equal(query.businessTripId));
 		}
-
+		
 		if (!StringUtils.isEmpty(query.description)) {
-			searchCndt = searchCndt.and(WORK_REPORTS.DESCRIPTION.like(query.description));
+			searchCndt = searchCndt.and(WORK_REPORTS.DESCRIPTION.like("%" + query.description + "%"));
 		}
-
+		
 		if (!StringUtils.isEmpty(query.notes)) {
-			searchCndt = searchCndt.and(WORK_REPORTS.NOTES.like(query.notes));
+			searchCndt = searchCndt.and(WORK_REPORTS.NOTES.like("%" + query.notes + "%"));
 		}
+		
 		if (query.docStatusId != null) {
 			searchCndt = searchCndt.and(WORK_REPORTS.DOC_STATUS_ID.equal(query.docStatusId));
 		}
-
+		
 		if (query.chargeTo != null) {
 			searchCndt = searchCndt.and(WORK_REPORTS.CHARGE_TO.equal(query.chargeTo));
+		}
+		
+		if (query.year != null) {
+			searchCndt = searchCndt.and(WORK_REPORTS.FROM_DATE.extract(DatePart.YEAR).equal(query.year));
+		}
+		
+		if (!StringUtils.isEmpty(query.workReportNo)) {
+			searchCndt = searchCndt.and(WORK_REPORTS.WORK_REPORT_NO.like("%" + query.workReportNo + "%"));
 		}
 
 		return searchCndt;

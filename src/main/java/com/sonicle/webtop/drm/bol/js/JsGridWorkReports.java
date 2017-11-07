@@ -45,20 +45,19 @@ public class JsGridWorkReports {
 	public String workReportId;
 	public String workReportNo;
 	public Integer companyId;
-	public String userId;
+	public String operatorId;
 	public Integer docStatusId;
 	public String customerId;
 	public String customerStatId;
 	public String fromDate;
 	public String toDate;
 	public String referenceNo;
-	public String causal;
 	public Integer causalId;
 	public String notes;
 	public String description;
 	public Boolean chargeTo;
-	public Boolean freeSupport;
 	public Integer businessTripId;
+	public Boolean freeSupport;
 
 	// Read-only fields
 	public String _profileId;
@@ -67,19 +66,19 @@ public class JsGridWorkReports {
 		this.workReportId = report.getWorkReportId();
 		this.workReportNo = report.getWorkReportNo();
 		this.companyId = report.getCompanyId();
-		this.userId = report.getUserId();
+		this.operatorId = report.getOperatorId();
 		this.customerId = report.getCustomerId();
 		this.customerStatId = report.getCustomerStatId();
 		this.docStatusId = report.getDocStatusId();
-		this.fromDate = DateTimeUtils.printYmdHmsWithZone(report.getFromDate(), profileTz);
-		this.toDate = DateTimeUtils.printYmdHmsWithZone(report.getToDate(), profileTz);
+		this.fromDate = report.getFromDate().toString();
+		this.toDate = report.getToDate().toString();
 		this.referenceNo = report.getReferenceNo();
 		this.causalId = report.getCausalId();
 		this.notes = report.getNotes();
 		this.description = report.getDescription();
 		this.chargeTo = report.getChargeTo();
-		this.freeSupport = report.getFreeSupport();
 		this.businessTripId = report.getBusinessTripId();
+		this.freeSupport = report.getFreeSupport();
 
 		this._profileId = ownerPid;
 

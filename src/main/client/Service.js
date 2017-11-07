@@ -6,15 +6,16 @@
 Ext.define('Sonicle.webtop.drm.Service', {
 	extend: 'WTA.sdk.Service',
 	requires: [
-		'Sonicle.webtop.drm.model.TreeNode',
 		'Sonicle.grid.column.Icon',
 		'Sonicle.grid.column.Color',
 		'Sonicle.grid.column.Lookup',
 		'WTA.ux.data.EmptyModel',
 		'WTA.ux.data.SimpleModel',
-		'Sonicle.webtop.core.ux.panel.Fields',
+		'WTA.ux.panel.Fields',
 		'Sonicle.webtop.drm.model.GridWorkReports',
-		'Sonicle.webtop.drm.ux.WrSearchPanel'
+		'Sonicle.webtop.drm.ux.WorkReportSearch',
+		'Sonicle.webtop.drm.view.WorkReport',
+		'Sonicle.webtop.drm.model.TreeNode'
 	],
 	needsReload: true,
 	init: function () {
@@ -69,14 +70,13 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					xtype: 'container',
 					itemId: 'wr',
 					layout: 'border',
-					//referenceHolder: true,
 					items: [
 						{
 							region: 'north',
-							xtype: 'wtdrmwrsearchpanel',
-							title: 'Search',
+							xtype: 'wtdrmworkreportsearch',
+							title: me.res('gpWorkReport.tit.lbl'),
+							iconCls: 'wtdrm-icon-workreport-xs',
 							titleCollapse: true,
-							//reference: 'searchPanel',
 							collapsible: true,
 							sid: me.ID,
 							listeners: {
@@ -90,7 +90,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							xtype: 'grid',
 							reference: 'gpWorkReport',
 							store: {
-								autoLoad: true,
+								autoLoad: false,
 								model: 'Sonicle.webtop.drm.model.GridWorkReports',
 								proxy: WTF.apiProxy(me.ID, 'ManageGridWorkReport')
 							},
@@ -101,71 +101,72 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									flex: 1
 								},
 								{
+									dataIndex: 'referenceNo',
+									header: me.res('gpWorkReport.reference.lbl'),
+									flex: 1
+								},
+								{
 									xtype: 'solookupcolumn',
 									dataIndex: 'companyId',
 									store: {
 										autoLoad: true,
 										model: 'WTA.model.Simple',
-										proxy: WTF.proxy(me.ID, 'LookupCompanies')
+										proxy: WTF.proxy(me.ID, 'LookupAllCompanies')
 									},
-									//campo db
 									header: me.res('gpWorkReport.company.lbl'),
 									displayField: 'desc',
-									flex: 1
+									flex: 1,
+									hidden: true
 								},
 								{
 									xtype: 'solookupcolumn',
-									//campo db
-									dataIndex: 'userId',
+									dataIndex: 'operatorId',
 									store: {
 										autoLoad: true,
 										model: 'WTA.model.Simple',
-										proxy: WTF.proxy(me.ID, 'LookupUsers')
+										proxy: WTF.proxy(WT.ID, 'LookupDomainUsers')
 									},
-									header: me.res('gpWorkReport.user.lbl'), //localizzata
+									header: me.res('gpWorkReport.user.lbl'),
 									displayField: 'desc',
 									flex: 1
 								},
 								{
 									xtype: 'solookupcolumn',
-									//campo db
 									dataIndex: 'customerId',
 									store: {
 										autoLoad: true,
 										model: 'WTA.model.Simple',
 										proxy: WTF.proxy(WT.ID, 'LookupCustomersSuppliers')
 									},
-									header: me.res('gpWorkReport.realcustomer.lbl'), //localizzata
+									header: me.res('gpWorkReport.realcustomer.lbl'),
 									displayField: 'desc',
 									flex: 1
 								},
 								{
 									xtype: 'solookupcolumn',
-									//campo db
 									dataIndex: 'customerStatId',
 									store: {
 										autoLoad: true,
 										model: 'WTA.model.Simple',
-										proxy: WTF.proxy(WT.ID, 'LookupStatisticCustomersSuppliers')
+										proxy: WTF.proxy(me.ID, 'LookupAllStatisticCustomers')
 									},
-									header: me.res('gpWorkReport.statcustomer.lbl'), //localizzata
+									header: me.res('gpWorkReport.statcustomer.lbl'),
 									displayField: 'desc',
 									flex: 1
 								},
 								{
 									xtype: 'solookupcolumn',
-									//campo db
 									dataIndex: 'causalId',
 									store: {
 										autoLoad: true,
 										model: 'WTA.model.CausalLkp',
-										proxy: WTF.proxy(WT.ID, 'LookupCausals'),
+										proxy: WTF.proxy(me.ID, 'LookupCausals'),
 										listeners: {
 											beforeload: {
 												fn: function (s) {
 													var mo = me.gpWorkReport().getView().getStore().getProxy().getModel();
 													WTU.applyExtraParams(s, {
-														profileId: WT.getVar('profileId'), //mo.get('_profileId'),
+														profileId: WT.getVar('profileId'),
 														masterDataId: mo.getField('customerId')
 													});
 												},
@@ -173,7 +174,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											}
 										}
 									},
-									header: me.res('gpWorkReport.causal.lbl'), //localizzata
+									header: me.res('gpWorkReport.causal.lbl'),
 									displayField: 'desc',
 									flex: 1
 								},
@@ -192,13 +193,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									flex: 1
 								},
 								{
-									dataIndex: 'referenceNo',
-									header: me.res('gpWorkReport.reference.lbl'),
-									flex: 1
-								},
-								{
 									xtype: 'solookupcolumn',
-									//campo db
 									dataIndex: 'businessTripId',
 									store: {
 										autoLoad: true,
@@ -206,57 +201,49 @@ Ext.define('Sonicle.webtop.drm.Service', {
 										proxy: WTF.proxy(me.ID, 'LookupBusinessTrip')
 									},
 									displayField: 'desc',
-									header: me.res('gpWorkReport.trasfert.lbl'), //localizzata
-									flex: 1
-								},
-								{
-									dataIndex: 'description',
-									header: me.res('gpWorkReport.description.lbl'),
-									flex: 1
-								},
-								{
-									dataIndex: 'notes',
-									header: me.res('gpWorkReport.notes.lbl'),
+									header: me.res('gpWorkReport.trasfert.lbl'),
 									flex: 1
 								},
 								{
 									xtype: 'solookupcolumn',
-									//campo db
 									dataIndex: 'docStatusId',
 									store: {
 										autoLoad: true,
 										model: 'WTA.model.Simple',
 										proxy: WTF.proxy(me.ID, 'LookupDocStatuses')
 									},
-									header: me.res('gpWorkReport.docstatus.lbl'), //localizzata
+									header: me.res('gpWorkReport.docstatus.lbl'),
 									displayField: 'desc',
-									flex: 1
+									flex: 1,
+									hidden: true
 								},
 								{
 									xtype: 'checkcolumn',
 									dataIndex: 'freeSupport',
 									header: me.res('gpWorkReport.freesupport.lbl'),
 									disabled: true,
-									flex: 1
+									flex: 1,
+									hidden: true
 								},
 								{
 									xtype: 'checkcolumn',
 									dataIndex: 'chargeTo',
 									header: me.res('gpWorkReport.chargeTo.lbl'),
 									disabled: true,
-									flex: 1
+									flex: 1,
+									hidden: true
 								}
 							],
 							tbar: [
-								me.getAct('report', 'add'),
+								me.getAct('workReport', 'add'),
 								'-',
-								me.getAct('report', 'edit'),
-								me.getAct('report', 'remove')
+								me.getAct('workReport', 'edit'),
+								me.getAct('workReport', 'remove')
 							],
 							listeners: {
 								rowclick: function (s, rec) {
-									me.getAct('report', 'edit').setDisabled(false);
-									me.getAct('report', 'remove').setDisabled(false);
+									me.getAct('workReport', 'edit').setDisabled(false);
+									me.getAct('workReport', 'remove').setDisabled(false);
 								},
 								rowdblclick: function (s, rec) {
 									me.editWorkReportUI(rec);
@@ -348,23 +335,21 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				me.expenseNoteSetting();
 			}
 		});
-		me.addAct('report', 'add', {
+		me.addAct('workReport', 'add', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
 			iconCls: 'wt-icon-add-xs',
 			handler: function () {
-
-				me.addReport({
+				me.addWorkReport({
 					callback: function (success) {
 						if (success) {
-							alert('success');
 							me.gpWorkReport().getStore().load();
 						}
 					}
 				});
 			}
 		});
-		me.addAct('report', 'edit', {
+		me.addAct('workReport', 'edit', {
 			text: WT.res('act-edit.lbl'),
 			tooltip: null,
 			iconCls: 'wt-icon-edit-xs',
@@ -374,7 +359,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				me.editWorkReportUI(sel);
 			}
 		});
-		me.addAct('report', 'remove', {
+		me.addAct('workReport', 'remove', {
 			text: WT.res('act-remove.lbl'),
 			tooltip: null,
 			iconCls: 'wt-icon-remove-xs',
@@ -432,20 +417,18 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	},
 	//--------------------------------------------------------------
 
-	addReport: function (opts) {
-		opts = opts || {}; //se nullo controlla e lo seta a obj empty
+	addWorkReport: function (opts) {
+		opts = opts || {};
 
 		var me = this,
-				//viewcontainer => recupero la view di webtop => id del servizio, nome View
-				vct = WT.createView(me.ID, 'view.WorkReport');
+			vct = WT.createView(me.ID, 'view.WorkReport');
 		vct.getView().on('viewsave', function (s, success, model) { //sender,success,modello
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		//al caricamento della finestra inizio il begin edit data
-		vct.show(false, //mostro la view
-				function () {
-					vct.getView().begin('new');
-				});
+		vct.show(false,
+			function () {
+				vct.getView().begin('new');
+			});
 	},
 	editWorkReportUI: function (rec) {
 		var me = this;
@@ -462,17 +445,13 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		});
 	},
 	editWorkReport: function (workReportId, opts) {
-
-		opts = opts || {}; //se nullo controlla e lo seta a obj empty
-
+		opts = opts || {};
 		var me = this,
-				//viewcontainer => recupero la view di webtop => id del servizio, nome View
 				vct = WT.createView(me.ID, 'view.WorkReport');
-		vct.getView().on('viewsave', function (s, success, model) { //sender,success,modello
+		vct.getView().on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		//al caricamento della finestra inizio il begin edit data
-		vct.show(false, //mostro la view
+		vct.show(false,
 				function () {
 					vct.getView().begin('edit', {
 						data: {
@@ -534,28 +513,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					});
 				});
 	},
-	queryWorkReport: function () {
-		var me = this,
-				main = me.getMainComponent();
-
-		var query = {
-			companyId: me.itemActive().lookupReference('fldcompany').getValue(),
-			userId: me.itemActive().lookupReference('flduser').getValue(),
-			workReportNo: main.lookupReference('fldworkreportno').getValue(),
-			year: main.lookupReference('fldyear').getValue(),
-			customerId: main.lookupReference('fldmasterdata').getValue(),
-			from: main.lookupReference('fldfrom').getValue(),
-			to: main.lookupReference('fldto').getValue(),
-			causalId: main.lookupReference('fldcausal').getValue(),
-			referenceNo: main.lookupReference('fldreference').getValue(),
-			businessTripId: main.lookupReference('fldbusinesstrip').getValue(),
-			description: main.lookupReference('flddescription').getValue(),
-			notes: main.lookupReference('fldnotes').getValue(),
-			docStatusId: main.lookupReference('flddocstatus').getValue(),
-			chargeTo: main.lookupReference('fldchargeto').getValue()
-		};
-		me.reloadWorkReport(query);
-	},
+	
 	reloadWorkReport: function (query) {
 		var me = this,
 				pars = {},
@@ -569,7 +527,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			me.needsReload = true;
 		}
 	},
-	//---------------------------------------------------------
 
 	addExpenseNote: function (opts) {
 		opts = opts || {}; //se nullo controlla e lo seta a obj empty

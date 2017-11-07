@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WorkReportsAttachments extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsAttachmentsRecord> {
 
-	private static final long serialVersionUID = -459513073;
+	private static final long serialVersionUID = 1360547663;
 
 	/**
 	 * The reference instance of <code>drm.work_reports_attachments</code>
@@ -93,7 +93,7 @@ public class WorkReportsAttachments extends org.jooq.impl.TableImpl<com.sonicle.
 	 */
 	@Override
 	public org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsAttachmentsRecord> getPrimaryKey() {
-		return com.sonicle.webtop.drm.jooq.Keys.WORK_REPORTS_DOCUMENTS_PKEY;
+		return com.sonicle.webtop.drm.jooq.Keys.WORK_REPORTS_ATTACHMENTS_PKEY;
 	}
 
 	/**
@@ -101,7 +101,7 @@ public class WorkReportsAttachments extends org.jooq.impl.TableImpl<com.sonicle.
 	 */
 	@Override
 	public java.util.List<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsAttachmentsRecord>> getKeys() {
-		return java.util.Arrays.<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsAttachmentsRecord>>asList(com.sonicle.webtop.drm.jooq.Keys.WORK_REPORTS_DOCUMENTS_PKEY);
+		return java.util.Arrays.<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsAttachmentsRecord>>asList(com.sonicle.webtop.drm.jooq.Keys.WORK_REPORTS_ATTACHMENTS_PKEY);
 	}
 
 	/**

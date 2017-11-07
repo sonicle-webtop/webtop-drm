@@ -76,19 +76,18 @@ Ext.define('Sonicle.webtop.drm.ux.UserGrid', {
 				}];
 
 			if (!me.actionsInToolbar) {
-				me.columns.push(
-						{
-							xtype: 'actioncolumn',
-							align: 'center',
-							width: 50,
-							items: [{
-									iconCls: 'fa fa-minus-circle',
-									tooltip: WT.res('act-remove.lbl'),
-									handler: function (gp, ri) {
-										gp.getStore().removeAt(ri);
-									}
-								}]
-						});
+				me.columns.push({
+					xtype: 'actioncolumn',
+					align: 'center',
+					width: 50,
+					items: [{
+							iconCls: 'fa fa-minus-circle',
+							tooltip: WT.res('act-remove.lbl'),
+							handler: function (gp, ri) {
+								gp.getStore().removeAt(ri);
+							}
+						}]
+				});
 			}
 		}
 
@@ -140,7 +139,7 @@ Ext.define('Sonicle.webtop.drm.ux.UserGrid', {
 					valueField: 'id', //sempre 'id' poiche arriva dal SimpleModel
 					displayField: 'desc',
 					searchField: 'desc',
-					emptyText: WT.res('grid.emptyText'),
+					emptyText: WT.res('grid.empty'),
 					searchText: WT.res(me.sid, 'groupusers.picker.search'),
 					okText: WT.res('act-ok.lbl'),
 					cancelText: WT.res('act-cancel.lbl'),

@@ -34,10 +34,10 @@ package com.sonicle.webtop.drm.dal;
 
 import com.sonicle.webtop.core.dal.BaseDAO;
 import com.sonicle.webtop.core.dal.DAOException;
-import com.sonicle.webtop.drm.bol.OProfileUser;
-import static com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_USERS;
-import static com.sonicle.webtop.drm.jooq.Tables.PROFILES_USERS;
-import com.sonicle.webtop.drm.jooq.tables.records.ProfilesUsersRecord;
+import com.sonicle.webtop.drm.bol.OWorkReportRow;
+import static com.sonicle.webtop.drm.jooq.Sequences.SEQ_WORK_REPORT_DETAILS;
+import static com.sonicle.webtop.drm.jooq.Tables.WORK_REPORTS_ROWS;
+import com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRowsRecord;
 import java.sql.Connection;
 import java.util.List;
 import org.jooq.DSLContext;
@@ -46,38 +46,53 @@ import org.jooq.DSLContext;
  *
  * @author stfnnvl
  */
-public class ProfileUserDAO extends BaseDAO {
+public class WorkReportRowDAO extends BaseDAO {
 
-	private final static ProfileUserDAO INSTANCE = new ProfileUserDAO();
+	private final static WorkReportRowDAO INSTANCE = new WorkReportRowDAO();
 
-	public static ProfileUserDAO getInstance() {
+	public static WorkReportRowDAO getInstance() {
 		return INSTANCE;
 	}
 
 	public Long getSequence(Connection con) throws DAOException {
 		DSLContext dsl = getDSL(con);
-		Long nextID = dsl.nextval(SEQ_PROFILES_USERS);
+		Long nextID = dsl.nextval(SEQ_WORK_REPORT_DETAILS);
 		return nextID;
 	}
 
-	public List<OProfileUser> selectByProfile(Connection con, String profileId) throws DAOException {
+	public List<OWorkReportRow> selectByWorkReport(Connection con, String workReportId) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		return dsl
 				.select()
-				.from(PROFILES_USERS)
+				.from(WORK_REPORTS_ROWS)
 				.where(
-						PROFILES_USERS.PROFILE_ID.equal(profileId)
+						WORK_REPORTS_ROWS.WORK_REPORT_ID.equal(workReportId)
 				)
-				.fetchInto(OProfileUser.class);
+				.fetchInto(OWorkReportRow.class);
 	}
 
-	public int insert(Connection con, OProfileUser item) throws DAOException {
+	public int insert(Connection con, OWorkReportRow item) throws DAOException {
 		DSLContext dsl = getDSL(con);
-		ProfilesUsersRecord record = dsl.newRecord(PROFILES_USERS, item);
+
+		WorkReportsRowsRecord record = dsl.newRecord(WORK_REPORTS_ROWS, item);
 
 		return dsl
-				.insertInto(PROFILES_USERS)
+				.insertInto(WORK_REPORTS_ROWS)
 				.set(record)
+				.execute();
+	}
+
+	public int update(Connection con, OWorkReportRow item) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.update(WORK_REPORTS_ROWS)
+				.set(WORK_REPORTS_ROWS.ROW_NO, item.getRowNo())
+				.set(WORK_REPORTS_ROWS.WORK_TYPE_ID, item.getWorkTypeId())
+				.set(WORK_REPORTS_ROWS.DURATION, item.getDuration())
+				.set(WORK_REPORTS_ROWS.ROW_FLAG, item.getRowFlag())
+				.where(
+						WORK_REPORTS_ROWS.ID.equal(item.getId())
+				)
 				.execute();
 	}
 
@@ -85,20 +100,20 @@ public class ProfileUserDAO extends BaseDAO {
 		DSLContext dsl = getDSL(con);
 
 		return dsl
-				.delete(PROFILES_USERS)
+				.delete(WORK_REPORTS_ROWS)
 				.where(
-						PROFILES_USERS.ID.equal(id)
+						WORK_REPORTS_ROWS.ID.equal(id)
 				)
 				.execute();
 	}
 
-	public int deleteByProfile(Connection con, String profileId) {
+	public int deleteByWorkReport(Connection con, String workReportId) {
 		DSLContext dsl = getDSL(con);
 
 		return dsl
-				.delete(PROFILES_USERS)
+				.delete(WORK_REPORTS_ROWS)
 				.where(
-						PROFILES_USERS.PROFILE_ID.equal(profileId)
+						WORK_REPORTS_ROWS.WORK_REPORT_ID.equal(workReportId)
 				)
 				.execute();
 	}

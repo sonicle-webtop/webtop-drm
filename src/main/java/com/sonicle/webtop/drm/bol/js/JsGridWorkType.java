@@ -32,7 +32,7 @@
  */
 package com.sonicle.webtop.drm.bol.js;
 
-import com.sonicle.webtop.drm.model.WorkReportDetail;
+import com.sonicle.webtop.drm.model.WorkReportRow;
 import com.sonicle.webtop.drm.model.WorkType;
 import org.apache.commons.lang3.StringUtils;
 

@@ -35,8 +35,8 @@ Ext.define('Sonicle.webtop.drm.model.WorkReportAttachment', {
 	identifier: 'negative',
 	idProperty: 'id',
 	fields: [
-		WTF.field('id', 'string', false), //nome,tipo,allowBlank
-		WTF.field('workReportId', 'string', false), //nome,tipo,allowBlank
+		WTF.field('id', 'string', false),
+		WTF.field('workReportId', 'string', false),
 		WTF.field('revisionTimestamp', 'date', false, {dateFormat: 'Y-m-d H:i:s'}),
 		WTF.field('revisionSequence', 'int', true),
 		WTF.field('fileName', 'string', true),

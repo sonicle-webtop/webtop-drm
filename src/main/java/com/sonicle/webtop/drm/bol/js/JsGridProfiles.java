@@ -33,6 +33,7 @@
 package com.sonicle.webtop.drm.bol.js;
 
 import com.sonicle.webtop.drm.bol.ODrmProfile;
+import java.util.ArrayList;
 
 /**
  *
@@ -48,5 +49,11 @@ public class JsGridProfiles {
 		this.profileId = profile.getProfileId();
 		this.description = profile.getDescription();
 		this.type = profile.getType();
+	}
+	
+	public static class List extends ArrayList<JsGridProfiles> {
+		public List() {
+			super();
+		}
 	}
 }

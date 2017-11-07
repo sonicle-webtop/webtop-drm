@@ -34,7 +34,7 @@ Ext.define('Sonicle.webtop.drm.model.WorkReport', {
 	extend: 'WTA.ux.data.BaseModel',
 	requires: [
 		'Sonicle.data.writer.Json',
-		'Sonicle.webtop.drm.model.WorkReportDetail',
+		'Sonicle.webtop.drm.model.WorkReportRow',
 		'Sonicle.webtop.drm.model.WorkReportAttachment'
 	],
 	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageWorkReport', 'data', {
@@ -43,25 +43,23 @@ Ext.define('Sonicle.webtop.drm.model.WorkReport', {
 			writeAssociations: true
 		}
 	}),
-	//NB: SE NN NECESSARIO USARE 'data' COME DEFAULT X IL JSON
 	identifier: 'negative',
 	idProperty: 'workReportId',
 	fields: [
 		WTF.field('workReportId', 'string', true),
 		WTF.field('workReportNo', 'string', true),
-		WTF.field('companyId', 'int', true),
-		WTF.field('userId', 'string', false),
-		WTF.field('docStatusId', 'int', true),
+		WTF.field('operatorId', 'string', false),
+		WTF.field('companyId', 'int', false),
 		WTF.field('contactId', 'int', true),
-		WTF.field('customerId', 'string', true),
-		WTF.field('customerStatId', 'string', true),
-		WTF.field('fromDate', 'date', false, {dateFormat: 'Y-m-d H:i:s'}),
-		WTF.field('toDate', 'date', false, {dateFormat: 'Y-m-d H:i:s'}),
+		WTF.field('customerId', 'string', false),
+		WTF.field('customerStatId', 'string', false),
+		WTF.field('docStatusId', 'int', false),
+		WTF.field('fromDate', 'date', false, {dateFormat: 'Y-m-d', defaultValue: new Date()}),
+		WTF.field('toDate', 'date', false, {dateFormat: 'Y-m-d', defaultValue: new Date()}),
 		WTF.field('referenceNo', 'string', true),
-		WTF.field('causal', 'string', true),
 		WTF.field('causalId', 'int', false),
 		WTF.field('ddtNo', 'string', true),
-		WTF.field('ddtDate', 'date', true, {dateFormat: 'Y-m-d H:i:s'}),
+		WTF.field('ddtDate', 'date', true, {dateFormat: 'Y-m-d'}),
 		WTF.field('notes', 'string', true),
 		WTF.field('description', 'string', true),
 		WTF.field('applySignature', 'bool', true, {
@@ -82,7 +80,7 @@ Ext.define('Sonicle.webtop.drm.model.WorkReport', {
 
 	],
 	hasMany: [
-		WTF.hasMany('details', 'Sonicle.webtop.drm.model.WorkReportDetail'),
+		WTF.hasMany('details', 'Sonicle.webtop.drm.model.WorkReportRow'),
 		WTF.hasMany('attachments', 'Sonicle.webtop.drm.model.WorkReportAttachment')
 	]
 });

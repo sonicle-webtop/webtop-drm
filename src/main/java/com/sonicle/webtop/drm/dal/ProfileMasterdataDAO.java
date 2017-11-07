@@ -38,6 +38,7 @@ import com.sonicle.webtop.drm.bol.OCompanyUser;
 import com.sonicle.webtop.drm.bol.OProfileMasterdata;
 import static com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_MASTERDATA;
 import static com.sonicle.webtop.drm.jooq.Tables.PROFILES_MASTERDATA;
+import static com.sonicle.webtop.drm.jooq.Tables.PROFILES_MEMBERS;
 import com.sonicle.webtop.drm.jooq.tables.records.ProfilesMasterdataRecord;
 import java.sql.Connection;
 import java.util.List;
@@ -102,5 +103,37 @@ public class ProfileMasterdataDAO extends BaseDAO {
 						PROFILES_MASTERDATA.PROFILE_ID.equal(profileId)
 				)
 				.execute();
+	}
+	
+	public List<String> selectCustomersByProfileUser(Connection con, String userId) {
+		DSLContext dsl = getDSL(con);
+		
+		return dsl
+			.select(PROFILES_MASTERDATA.MASTER_DATA_ID)
+			.from(PROFILES_MASTERDATA)
+			.join(PROFILES_MEMBERS).on(
+				PROFILES_MASTERDATA.PROFILE_ID.equal(PROFILES_MEMBERS.PROFILE_ID)
+			)
+			.where(
+					PROFILES_MEMBERS.USER_ID.equal(userId)
+			)
+			.fetchInto(String.class);
+	}
+	
+	public String checkCustomersByProfileUser(Connection con, String realCustomerId, String userId) {
+		DSLContext dsl = getDSL(con);
+		
+		return dsl
+			.select(PROFILES_MASTERDATA.ID)
+			.from(PROFILES_MASTERDATA)
+			.join(PROFILES_MEMBERS).on(
+				PROFILES_MASTERDATA.PROFILE_ID.equal(PROFILES_MEMBERS.PROFILE_ID)
+			)
+			.where(
+				PROFILES_MASTERDATA.MASTER_DATA_ID.equal(realCustomerId)
+			).and(
+				PROFILES_MEMBERS.USER_ID.equal(userId)
+			)
+			.fetchOneInto(String.class);
 	}
 }

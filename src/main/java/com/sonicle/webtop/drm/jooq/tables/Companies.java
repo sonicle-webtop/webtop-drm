@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Companies extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.CompaniesRecord> {
 
-	private static final long serialVersionUID = -2007325897;
+	private static final long serialVersionUID = 1715774307;
 
 	/**
 	 * The reference instance of <code>drm.companies</code>
@@ -156,7 +156,7 @@ public class Companies extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jo
 	 */
 	@Override
 	public org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.CompaniesRecord> getPrimaryKey() {
-		return com.sonicle.webtop.drm.jooq.Keys.COMPANIES_PKEY1;
+		return com.sonicle.webtop.drm.jooq.Keys.COMPANIES_PKEY;
 	}
 
 	/**
@@ -164,7 +164,7 @@ public class Companies extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jo
 	 */
 	@Override
 	public java.util.List<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.CompaniesRecord>> getKeys() {
-		return java.util.Arrays.<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.CompaniesRecord>>asList(com.sonicle.webtop.drm.jooq.Keys.COMPANIES_PKEY1);
+		return java.util.Arrays.<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.CompaniesRecord>>asList(com.sonicle.webtop.drm.jooq.Keys.COMPANIES_PKEY);
 	}
 
 	/**

@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.records;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WorkReportsRecord extends org.jooq.impl.UpdatableRecordImpl<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord> {
 
-	private static final long serialVersionUID = 1124055809;
+	private static final long serialVersionUID = -924560715;
 
 	/**
 	 * Setter for <code>drm.work_reports.work_report_id</code>.
@@ -61,16 +61,16 @@ public class WorkReportsRecord extends org.jooq.impl.UpdatableRecordImpl<com.son
 	}
 
 	/**
-	 * Setter for <code>drm.work_reports.user_id</code>.
+	 * Setter for <code>drm.work_reports.operator_id</code>.
 	 */
-	public void setUserId(java.lang.String value) {
+	public void setOperatorId(java.lang.String value) {
 		setValue(3, value);
 	}
 
 	/**
-	 * Getter for <code>drm.work_reports.user_id</code>.
+	 * Getter for <code>drm.work_reports.operator_id</code>.
 	 */
-	public java.lang.String getUserId() {
+	public java.lang.String getOperatorId() {
 		return (java.lang.String) getValue(3);
 	}
 
@@ -175,29 +175,29 @@ public class WorkReportsRecord extends org.jooq.impl.UpdatableRecordImpl<com.son
 	/**
 	 * Setter for <code>drm.work_reports.from_date</code>.
 	 */
-	public void setFromDate(org.joda.time.DateTime value) {
+	public void setFromDate(org.joda.time.LocalDate value) {
 		setValue(11, value);
 	}
 
 	/**
 	 * Getter for <code>drm.work_reports.from_date</code>.
 	 */
-	public org.joda.time.DateTime getFromDate() {
-		return (org.joda.time.DateTime) getValue(11);
+	public org.joda.time.LocalDate getFromDate() {
+		return (org.joda.time.LocalDate) getValue(11);
 	}
 
 	/**
 	 * Setter for <code>drm.work_reports.to_date</code>.
 	 */
-	public void setToDate(org.joda.time.DateTime value) {
+	public void setToDate(org.joda.time.LocalDate value) {
 		setValue(12, value);
 	}
 
 	/**
 	 * Getter for <code>drm.work_reports.to_date</code>.
 	 */
-	public org.joda.time.DateTime getToDate() {
-		return (org.joda.time.DateTime) getValue(12);
+	public org.joda.time.LocalDate getToDate() {
+		return (org.joda.time.LocalDate) getValue(12);
 	}
 
 	/**
@@ -215,157 +215,143 @@ public class WorkReportsRecord extends org.jooq.impl.UpdatableRecordImpl<com.son
 	}
 
 	/**
-	 * Setter for <code>drm.work_reports.causal</code>.
-	 */
-	public void setCausal(java.lang.String value) {
-		setValue(14, value);
-	}
-
-	/**
-	 * Getter for <code>drm.work_reports.causal</code>.
-	 */
-	public java.lang.String getCausal() {
-		return (java.lang.String) getValue(14);
-	}
-
-	/**
 	 * Setter for <code>drm.work_reports.causal_id</code>.
 	 */
 	public void setCausalId(java.lang.Integer value) {
-		setValue(15, value);
+		setValue(14, value);
 	}
 
 	/**
 	 * Getter for <code>drm.work_reports.causal_id</code>.
 	 */
 	public java.lang.Integer getCausalId() {
-		return (java.lang.Integer) getValue(15);
+		return (java.lang.Integer) getValue(14);
 	}
 
 	/**
 	 * Setter for <code>drm.work_reports.ddt_no</code>.
 	 */
 	public void setDdtNo(java.lang.String value) {
-		setValue(16, value);
+		setValue(15, value);
 	}
 
 	/**
 	 * Getter for <code>drm.work_reports.ddt_no</code>.
 	 */
 	public java.lang.String getDdtNo() {
-		return (java.lang.String) getValue(16);
+		return (java.lang.String) getValue(15);
 	}
 
 	/**
 	 * Setter for <code>drm.work_reports.ddt_date</code>.
 	 */
-	public void setDdtDate(org.joda.time.DateTime value) {
-		setValue(17, value);
+	public void setDdtDate(org.joda.time.LocalDate value) {
+		setValue(16, value);
 	}
 
 	/**
 	 * Getter for <code>drm.work_reports.ddt_date</code>.
 	 */
-	public org.joda.time.DateTime getDdtDate() {
-		return (org.joda.time.DateTime) getValue(17);
+	public org.joda.time.LocalDate getDdtDate() {
+		return (org.joda.time.LocalDate) getValue(16);
 	}
 
 	/**
 	 * Setter for <code>drm.work_reports.notes</code>.
 	 */
 	public void setNotes(java.lang.String value) {
-		setValue(18, value);
+		setValue(17, value);
 	}
 
 	/**
 	 * Getter for <code>drm.work_reports.notes</code>.
 	 */
 	public java.lang.String getNotes() {
-		return (java.lang.String) getValue(18);
+		return (java.lang.String) getValue(17);
 	}
 
 	/**
 	 * Setter for <code>drm.work_reports.description</code>.
 	 */
 	public void setDescription(java.lang.String value) {
-		setValue(19, value);
+		setValue(18, value);
 	}
 
 	/**
 	 * Getter for <code>drm.work_reports.description</code>.
 	 */
 	public java.lang.String getDescription() {
-		return (java.lang.String) getValue(19);
+		return (java.lang.String) getValue(18);
 	}
 
 	/**
 	 * Setter for <code>drm.work_reports.apply_signature</code>.
 	 */
 	public void setApplySignature(java.lang.Boolean value) {
-		setValue(20, value);
+		setValue(19, value);
 	}
 
 	/**
 	 * Getter for <code>drm.work_reports.apply_signature</code>.
 	 */
 	public java.lang.Boolean getApplySignature() {
-		return (java.lang.Boolean) getValue(20);
+		return (java.lang.Boolean) getValue(19);
 	}
 
 	/**
 	 * Setter for <code>drm.work_reports.charge_to</code>.
 	 */
 	public void setChargeTo(java.lang.Boolean value) {
-		setValue(21, value);
+		setValue(20, value);
 	}
 
 	/**
 	 * Getter for <code>drm.work_reports.charge_to</code>.
 	 */
 	public java.lang.Boolean getChargeTo() {
-		return (java.lang.Boolean) getValue(21);
+		return (java.lang.Boolean) getValue(20);
 	}
 
 	/**
 	 * Setter for <code>drm.work_reports.free_support</code>.
 	 */
 	public void setFreeSupport(java.lang.Boolean value) {
-		setValue(22, value);
+		setValue(21, value);
 	}
 
 	/**
 	 * Getter for <code>drm.work_reports.free_support</code>.
 	 */
 	public java.lang.Boolean getFreeSupport() {
-		return (java.lang.Boolean) getValue(22);
+		return (java.lang.Boolean) getValue(21);
 	}
 
 	/**
 	 * Setter for <code>drm.work_reports.business_trip_id</code>.
 	 */
 	public void setBusinessTripId(java.lang.Integer value) {
-		setValue(23, value);
+		setValue(22, value);
 	}
 
 	/**
 	 * Getter for <code>drm.work_reports.business_trip_id</code>.
 	 */
 	public java.lang.Integer getBusinessTripId() {
-		return (java.lang.Integer) getValue(23);
+		return (java.lang.Integer) getValue(22);
 	}
 
 	/**
 	 * Setter for <code>drm.work_reports.day_trasfert</code>.
 	 */
 	public void setDayTrasfert(java.lang.Short value) {
-		setValue(24, value);
+		setValue(23, value);
 	}
 
 	/**
 	 * Getter for <code>drm.work_reports.day_trasfert</code>.
 	 */
 	public java.lang.Short getDayTrasfert() {
-		return (java.lang.Short) getValue(24);
+		return (java.lang.Short) getValue(23);
 	}
 
 	// -------------------------------------------------------------------------
@@ -394,13 +380,13 @@ public class WorkReportsRecord extends org.jooq.impl.UpdatableRecordImpl<com.son
 	/**
 	 * Create a detached, initialised WorkReportsRecord
 	 */
-	public WorkReportsRecord(java.lang.String workReportId, java.lang.String workReportNo, java.lang.Integer companyId, java.lang.String userId, java.lang.String revisionStatus, org.joda.time.DateTime revisionTimestamp, java.lang.Integer revisionSequence, java.lang.Integer docStatusId, java.lang.Integer contactId, java.lang.String customerId, java.lang.String customerStatId, org.joda.time.DateTime fromDate, org.joda.time.DateTime toDate, java.lang.String referenceNo, java.lang.String causal, java.lang.Integer causalId, java.lang.String ddtNo, org.joda.time.DateTime ddtDate, java.lang.String notes, java.lang.String description, java.lang.Boolean applySignature, java.lang.Boolean chargeTo, java.lang.Boolean freeSupport, java.lang.Integer businessTripId, java.lang.Short dayTrasfert) {
+	public WorkReportsRecord(java.lang.String workReportId, java.lang.String workReportNo, java.lang.Integer companyId, java.lang.String operatorId, java.lang.String revisionStatus, org.joda.time.DateTime revisionTimestamp, java.lang.Integer revisionSequence, java.lang.Integer docStatusId, java.lang.Integer contactId, java.lang.String customerId, java.lang.String customerStatId, org.joda.time.LocalDate fromDate, org.joda.time.LocalDate toDate, java.lang.String referenceNo, java.lang.Integer causalId, java.lang.String ddtNo, org.joda.time.LocalDate ddtDate, java.lang.String notes, java.lang.String description, java.lang.Boolean applySignature, java.lang.Boolean chargeTo, java.lang.Boolean freeSupport, java.lang.Integer businessTripId, java.lang.Short dayTrasfert) {
 		super(com.sonicle.webtop.drm.jooq.tables.WorkReports.WORK_REPORTS);
 
 		setValue(0, workReportId);
 		setValue(1, workReportNo);
 		setValue(2, companyId);
-		setValue(3, userId);
+		setValue(3, operatorId);
 		setValue(4, revisionStatus);
 		setValue(5, revisionTimestamp);
 		setValue(6, revisionSequence);
@@ -411,16 +397,15 @@ public class WorkReportsRecord extends org.jooq.impl.UpdatableRecordImpl<com.son
 		setValue(11, fromDate);
 		setValue(12, toDate);
 		setValue(13, referenceNo);
-		setValue(14, causal);
-		setValue(15, causalId);
-		setValue(16, ddtNo);
-		setValue(17, ddtDate);
-		setValue(18, notes);
-		setValue(19, description);
-		setValue(20, applySignature);
-		setValue(21, chargeTo);
-		setValue(22, freeSupport);
-		setValue(23, businessTripId);
-		setValue(24, dayTrasfert);
+		setValue(14, causalId);
+		setValue(15, ddtNo);
+		setValue(16, ddtDate);
+		setValue(17, notes);
+		setValue(18, description);
+		setValue(19, applySignature);
+		setValue(20, chargeTo);
+		setValue(21, freeSupport);
+		setValue(22, businessTripId);
+		setValue(23, dayTrasfert);
 	}
 }

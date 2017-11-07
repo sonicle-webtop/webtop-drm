@@ -37,6 +37,7 @@ import com.sonicle.webtop.core.dal.DAOException;
 import com.sonicle.webtop.drm.bol.OCompany;
 import static com.sonicle.webtop.drm.jooq.Sequences.SEQ_COMPANIES;
 import static com.sonicle.webtop.drm.jooq.Tables.COMPANIES;
+import static com.sonicle.webtop.drm.jooq.Tables.COMPANIES_USERS;
 import com.sonicle.webtop.drm.jooq.tables.records.CompaniesRecord;
 import java.sql.Connection;
 import java.util.List;
@@ -70,11 +71,25 @@ public class CompanyDAO extends BaseDAO{
 				.execute();
 	}
 
-	public List<OCompany> selectCompanies(Connection con) throws DAOException{
-			DSLContext dsl = getDSL(con);
+	public List<OCompany> selectCompaniesByDomainUser(Connection con, String domain, String user) throws DAOException{
+		DSLContext dsl = getDSL(con);
 		return dsl
 				.select()
 				.from(COMPANIES)
+				.join(COMPANIES_USERS).on(
+					COMPANIES.COMPANY_ID.equal(COMPANIES_USERS.COMPANY_ID)
+				)
+				.where(COMPANIES.DOMAIN_ID.equal(domain))
+				.and(COMPANIES_USERS.USER_ID.equal(user))
+				.fetchInto(OCompany.class);
+	}
+	
+	public List<OCompany> selectCompaniesByDomain(Connection con, String domain) throws DAOException{
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.select()
+				.from(COMPANIES)
+				.where(COMPANIES.DOMAIN_ID.equal(domain))
 				.fetchInto(OCompany.class);
 	}
 

@@ -33,12 +33,13 @@
 package com.sonicle.webtop.drm.bol.js;
 
 import com.sonicle.commons.time.DateTimeUtils;
-import com.sonicle.webtop.drm.model.WorkReportDetail;
+import com.sonicle.webtop.drm.model.WorkReportRow;
 import com.sonicle.webtop.drm.model.WorkReport;
 import com.sonicle.webtop.drm.model.WorkReportAttachment;
 import java.util.ArrayList;
 import java.util.List;
 import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDate;
 
 /**
  *
@@ -49,7 +50,7 @@ public class JsWorkReport {
 	public String workReportId;
 	public String workReportNo;
 	public Integer companyId;
-	public String userId;
+	public String operatorId;
 	public Integer docStatusId;
 	public Integer contactId;
 	public String customerId;
@@ -57,7 +58,6 @@ public class JsWorkReport {
 	public String fromDate;
 	public String toDate;
 	public String referenceNo;
-	public String causal;
 	public Integer causalId;
 	public String ddtNo;
 	public String ddtDate;
@@ -69,7 +69,7 @@ public class JsWorkReport {
 	public Integer businessTripId;
 	public Integer dayTrasfert;
 
-	public List<JsGridWorkReportDetail> details = new ArrayList();
+	public List<JsGridWorkReportRow> details = new ArrayList();
 	public List<JsGridWorkReportAttachment> attachments = new ArrayList();
 
 	// Read-only fields
@@ -79,18 +79,17 @@ public class JsWorkReport {
 		this.workReportId = report.getWorkReportId();
 		this.workReportNo = report.getWorkReportNo();
 		this.companyId = report.getCompanyId();
-		this.userId = report.getUserId();
+		this.operatorId = report.getOperatorId();
 		this.docStatusId = report.getDocStatusId();
 		this.contactId = report.getContactId();
 		this.customerId = report.getCustomerId();
 		this.customerStatId = report.getCustomerStatId();
-		this.fromDate = DateTimeUtils.printYmdHmsWithZone(report.getFromDate(), profileTz);
-		this.toDate = DateTimeUtils.printYmdHmsWithZone(report.getToDate(), profileTz);
+		this.fromDate = report.getFromDate().toString();
+		this.toDate = report.getToDate().toString();
 		this.referenceNo = report.getReferenceNo();
-		this.causal = report.getCausal();
 		this.causalId = report.getCausalId();
 		this.ddtNo = report.getDdtNo();
-		this.ddtDate = DateTimeUtils.printYmdHmsWithZone(report.getDdtDate(), profileTz);
+		this.ddtDate = report.getDdtDate().toString();
 		this.notes = report.getNotes();
 		this.description = report.getDescription();
 		this.applySignature = report.getApplySignature();
@@ -99,8 +98,8 @@ public class JsWorkReport {
 		this.businessTripId = report.getBusinessTripId();
 		this.dayTrasfert = report.getDayTrasfert();
 
-		for (WorkReportDetail wrkDetail : report.getDetails()) {
-			this.details.add(new JsGridWorkReportDetail(wrkDetail));
+		for (WorkReportRow wrkDetail : report.getDetails()) {
+			this.details.add(new JsGridWorkReportRow(wrkDetail));
 		}
 		
 		for (WorkReportAttachment wrkAttachment : report.getAttachments()) {
@@ -117,7 +116,7 @@ public class JsWorkReport {
 		rw.setWorkReportId(js.workReportId);
 		rw.setWorkReportNo(js.workReportNo);
 		rw.setCompanyId(js.companyId);
-		rw.setUserId(js.userId);
+		rw.setOperatorId(js.operatorId);
 //		rw.setRevisionStatus(js.revisionStatus);
 //		rw.setRevisionTimestamp(DateTimeUtils.parseYmdHmsWithZone(js.revisionTimestamp, profileTz));
 //		rw.setRevisionSequence(js.revisionSequence);
@@ -125,13 +124,12 @@ public class JsWorkReport {
 		rw.setContactId(js.contactId);
 		rw.setCustomerId(js.customerId);
 		rw.setCustomerStatId(js.customerStatId);
-		rw.setFromDate(DateTimeUtils.parseYmdHmsWithZone(js.fromDate, DateTimeZone.UTC));
-		rw.setToDate(DateTimeUtils.parseYmdHmsWithZone(js.toDate, DateTimeZone.UTC));
+		rw.setFromDate(new LocalDate(js.fromDate));
+		rw.setToDate(new LocalDate(js.toDate));
 		rw.setReferenceNo(js.referenceNo);
-		rw.setCausal(js.causal);
 		rw.setCausalId(js.causalId);
 		rw.setDdtNo(js.ddtNo);
-		rw.setDdtDate(DateTimeUtils.parseYmdHmsWithZone(js.ddtDate, DateTimeZone.UTC));
+		rw.setDdtDate(new LocalDate(js.ddtDate));
 		rw.setNotes(js.notes);
 		rw.setDescription(js.description);
 		rw.setApplySignature(js.applySignature);
@@ -140,9 +138,9 @@ public class JsWorkReport {
 		rw.setBusinessTripId(js.businessTripId);
 		rw.setDayTrasfert(js.dayTrasfert);
 
-		for (JsGridWorkReportDetail jsWrkDetail : js.details) {
+		for (JsGridWorkReportRow jsWrkDetail : js.details) {
 
-			rw.getDetails().add(JsGridWorkReportDetail.createWorkReportDetail(jsWrkDetail));
+			rw.getDetails().add(JsGridWorkReportRow.createWorkReportRow(jsWrkDetail));
 
 		}
 		

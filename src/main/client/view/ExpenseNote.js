@@ -33,7 +33,7 @@
 Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 	extend: 'WTA.sdk.ModelView',
 	dockableConfig: {
-		title: '{expenseNote.tit}', //localizzato
+		title: '{expenseNote.tit}',
 		iconCls: 'wtdrm-icon-company-xs',
 		width: 700,
 		height: 500

@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WorkReports extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord> {
 
-	private static final long serialVersionUID = -79102490;
+	private static final long serialVersionUID = 717417627;
 
 	/**
 	 * The reference instance of <code>drm.work_reports</code>
@@ -44,22 +44,22 @@ public class WorkReports extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.
 	/**
 	 * The column <code>drm.work_reports.company_id</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.Integer> COMPANY_ID = createField("company_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.Integer> COMPANY_ID = createField("company_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
-	 * The column <code>drm.work_reports.user_id</code>.
+	 * The column <code>drm.work_reports.operator_id</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.String> USER_ID = createField("user_id", org.jooq.impl.SQLDataType.VARCHAR.length(36), this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.String> OPERATOR_ID = createField("operator_id", org.jooq.impl.SQLDataType.VARCHAR.length(36).nullable(false), this, "");
 
 	/**
 	 * The column <code>drm.work_reports.revision_status</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.String> REVISION_STATUS = createField("revision_status", org.jooq.impl.SQLDataType.VARCHAR.length(1), this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.String> REVISION_STATUS = createField("revision_status", org.jooq.impl.SQLDataType.VARCHAR.length(1).nullable(false), this, "");
 
 	/**
 	 * The column <code>drm.work_reports.revision_timestamp</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, org.joda.time.DateTime> REVISION_TIMESTAMP = createField("revision_timestamp", org.jooq.impl.SQLDataType.TIMESTAMP, this, "", new com.sonicle.webtop.core.jooq.DateTimeConverter());
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, org.joda.time.DateTime> REVISION_TIMESTAMP = createField("revision_timestamp", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "", new com.sonicle.webtop.core.jooq.DateTimeConverter());
 
 	/**
 	 * The column <code>drm.work_reports.revision_sequence</code>.
@@ -69,7 +69,7 @@ public class WorkReports extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.
 	/**
 	 * The column <code>drm.work_reports.doc_status_id</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.Integer> DOC_STATUS_ID = createField("doc_status_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.Integer> DOC_STATUS_ID = createField("doc_status_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
 	 * The column <code>drm.work_reports.contact_id</code>.
@@ -79,22 +79,22 @@ public class WorkReports extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.
 	/**
 	 * The column <code>drm.work_reports.customer_id</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.String> CUSTOMER_ID = createField("customer_id", org.jooq.impl.SQLDataType.VARCHAR.length(15), this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.String> CUSTOMER_ID = createField("customer_id", org.jooq.impl.SQLDataType.VARCHAR.length(15).nullable(false), this, "");
 
 	/**
 	 * The column <code>drm.work_reports.customer_stat_id</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.String> CUSTOMER_STAT_ID = createField("customer_stat_id", org.jooq.impl.SQLDataType.VARCHAR.length(15), this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.String> CUSTOMER_STAT_ID = createField("customer_stat_id", org.jooq.impl.SQLDataType.VARCHAR.length(15).nullable(false), this, "");
 
 	/**
 	 * The column <code>drm.work_reports.from_date</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, org.joda.time.DateTime> FROM_DATE = createField("from_date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "", new com.sonicle.webtop.core.jooq.DateTimeConverter());
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, org.joda.time.LocalDate> FROM_DATE = createField("from_date", org.jooq.impl.SQLDataType.DATE.nullable(false), this, "", new com.sonicle.webtop.core.jooq.LocalDateConverter());
 
 	/**
 	 * The column <code>drm.work_reports.to_date</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, org.joda.time.DateTime> TO_DATE = createField("to_date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "", new com.sonicle.webtop.core.jooq.DateTimeConverter());
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, org.joda.time.LocalDate> TO_DATE = createField("to_date", org.jooq.impl.SQLDataType.DATE.nullable(false), this, "", new com.sonicle.webtop.core.jooq.LocalDateConverter());
 
 	/**
 	 * The column <code>drm.work_reports.reference_no</code>.
@@ -102,14 +102,9 @@ public class WorkReports extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.String> REFERENCE_NO = createField("reference_no", org.jooq.impl.SQLDataType.VARCHAR.length(30), this, "");
 
 	/**
-	 * The column <code>drm.work_reports.causal</code>.
-	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.String> CAUSAL = createField("causal", org.jooq.impl.SQLDataType.VARCHAR.length(100), this, "");
-
-	/**
 	 * The column <code>drm.work_reports.causal_id</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.Integer> CAUSAL_ID = createField("causal_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.Integer> CAUSAL_ID = createField("causal_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
 	 * The column <code>drm.work_reports.ddt_no</code>.
@@ -119,7 +114,7 @@ public class WorkReports extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.
 	/**
 	 * The column <code>drm.work_reports.ddt_date</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, org.joda.time.DateTime> DDT_DATE = createField("ddt_date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "", new com.sonicle.webtop.core.jooq.DateTimeConverter());
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, org.joda.time.LocalDate> DDT_DATE = createField("ddt_date", org.jooq.impl.SQLDataType.DATE, this, "", new com.sonicle.webtop.core.jooq.LocalDateConverter());
 
 	/**
 	 * The column <code>drm.work_reports.notes</code>.
@@ -183,7 +178,7 @@ public class WorkReports extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.
 	 */
 	@Override
 	public org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord> getPrimaryKey() {
-		return com.sonicle.webtop.drm.jooq.Keys.REPORTS_PKEY;
+		return com.sonicle.webtop.drm.jooq.Keys.WORK_REPORTS_PKEY;
 	}
 
 	/**
@@ -191,7 +186,7 @@ public class WorkReports extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.
 	 */
 	@Override
 	public java.util.List<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord>> getKeys() {
-		return java.util.Arrays.<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord>>asList(com.sonicle.webtop.drm.jooq.Keys.REPORTS_PKEY);
+		return java.util.Arrays.<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord>>asList(com.sonicle.webtop.drm.jooq.Keys.WORK_REPORTS_PKEY);
 	}
 
 	/**

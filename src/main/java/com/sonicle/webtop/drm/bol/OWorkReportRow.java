@@ -32,12 +32,12 @@
  */
 package com.sonicle.webtop.drm.bol;
 
-import com.sonicle.webtop.drm.jooq.tables.pojos.WorkReportsDetails;
+import com.sonicle.webtop.drm.jooq.tables.pojos.WorkReportsRows;
 
 /**
  *
  * @author stfnnvl
  */
-public class OWorkReportDetail extends WorkReportsDetails{
+public class OWorkReportRow extends WorkReportsRows{
 	
 }

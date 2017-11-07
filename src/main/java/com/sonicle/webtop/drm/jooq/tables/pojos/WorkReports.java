@@ -16,67 +16,65 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WorkReports implements java.io.Serializable {
 
-	private static final long serialVersionUID = -252263157;
+	private static final long serialVersionUID = -745962805;
 
-	private java.lang.String       workReportId;
-	private java.lang.String       workReportNo;
-	private java.lang.Integer      companyId;
-	private java.lang.String       userId;
-	private java.lang.String       revisionStatus;
-	private org.joda.time.DateTime revisionTimestamp;
-	private java.lang.Integer      revisionSequence;
-	private java.lang.Integer      docStatusId;
-	private java.lang.Integer      contactId;
-	private java.lang.String       customerId;
-	private java.lang.String       customerStatId;
-	private org.joda.time.DateTime fromDate;
-	private org.joda.time.DateTime toDate;
-	private java.lang.String       referenceNo;
-	private java.lang.String       causal;
-	private java.lang.Integer      causalId;
-	private java.lang.String       ddtNo;
-	private org.joda.time.DateTime ddtDate;
-	private java.lang.String       notes;
-	private java.lang.String       description;
-	private java.lang.Boolean      applySignature;
-	private java.lang.Boolean      chargeTo;
-	private java.lang.Boolean      freeSupport;
-	private java.lang.Integer      businessTripId;
-	private java.lang.Short        dayTrasfert;
+	private java.lang.String        workReportId;
+	private java.lang.String        workReportNo;
+	private java.lang.Integer       companyId;
+	private java.lang.String        operatorId;
+	private java.lang.String        revisionStatus;
+	private org.joda.time.DateTime  revisionTimestamp;
+	private java.lang.Integer       revisionSequence;
+	private java.lang.Integer       docStatusId;
+	private java.lang.Integer       contactId;
+	private java.lang.String        customerId;
+	private java.lang.String        customerStatId;
+	private org.joda.time.LocalDate fromDate;
+	private org.joda.time.LocalDate toDate;
+	private java.lang.String        referenceNo;
+	private java.lang.Integer       causalId;
+	private java.lang.String        ddtNo;
+	private org.joda.time.LocalDate ddtDate;
+	private java.lang.String        notes;
+	private java.lang.String        description;
+	private java.lang.Boolean       applySignature;
+	private java.lang.Boolean       chargeTo;
+	private java.lang.Boolean       freeSupport;
+	private java.lang.Integer       businessTripId;
+	private java.lang.Short         dayTrasfert;
 
 	public WorkReports() {}
 
 	public WorkReports(
-		java.lang.String       workReportId,
-		java.lang.String       workReportNo,
-		java.lang.Integer      companyId,
-		java.lang.String       userId,
-		java.lang.String       revisionStatus,
-		org.joda.time.DateTime revisionTimestamp,
-		java.lang.Integer      revisionSequence,
-		java.lang.Integer      docStatusId,
-		java.lang.Integer      contactId,
-		java.lang.String       customerId,
-		java.lang.String       customerStatId,
-		org.joda.time.DateTime fromDate,
-		org.joda.time.DateTime toDate,
-		java.lang.String       referenceNo,
-		java.lang.String       causal,
-		java.lang.Integer      causalId,
-		java.lang.String       ddtNo,
-		org.joda.time.DateTime ddtDate,
-		java.lang.String       notes,
-		java.lang.String       description,
-		java.lang.Boolean      applySignature,
-		java.lang.Boolean      chargeTo,
-		java.lang.Boolean      freeSupport,
-		java.lang.Integer      businessTripId,
-		java.lang.Short        dayTrasfert
+		java.lang.String        workReportId,
+		java.lang.String        workReportNo,
+		java.lang.Integer       companyId,
+		java.lang.String        operatorId,
+		java.lang.String        revisionStatus,
+		org.joda.time.DateTime  revisionTimestamp,
+		java.lang.Integer       revisionSequence,
+		java.lang.Integer       docStatusId,
+		java.lang.Integer       contactId,
+		java.lang.String        customerId,
+		java.lang.String        customerStatId,
+		org.joda.time.LocalDate fromDate,
+		org.joda.time.LocalDate toDate,
+		java.lang.String        referenceNo,
+		java.lang.Integer       causalId,
+		java.lang.String        ddtNo,
+		org.joda.time.LocalDate ddtDate,
+		java.lang.String        notes,
+		java.lang.String        description,
+		java.lang.Boolean       applySignature,
+		java.lang.Boolean       chargeTo,
+		java.lang.Boolean       freeSupport,
+		java.lang.Integer       businessTripId,
+		java.lang.Short         dayTrasfert
 	) {
 		this.workReportId = workReportId;
 		this.workReportNo = workReportNo;
 		this.companyId = companyId;
-		this.userId = userId;
+		this.operatorId = operatorId;
 		this.revisionStatus = revisionStatus;
 		this.revisionTimestamp = revisionTimestamp;
 		this.revisionSequence = revisionSequence;
@@ -87,7 +85,6 @@ public class WorkReports implements java.io.Serializable {
 		this.fromDate = fromDate;
 		this.toDate = toDate;
 		this.referenceNo = referenceNo;
-		this.causal = causal;
 		this.causalId = causalId;
 		this.ddtNo = ddtNo;
 		this.ddtDate = ddtDate;
@@ -124,12 +121,12 @@ public class WorkReports implements java.io.Serializable {
 		this.companyId = companyId;
 	}
 
-	public java.lang.String getUserId() {
-		return this.userId;
+	public java.lang.String getOperatorId() {
+		return this.operatorId;
 	}
 
-	public void setUserId(java.lang.String userId) {
-		this.userId = userId;
+	public void setOperatorId(java.lang.String operatorId) {
+		this.operatorId = operatorId;
 	}
 
 	public java.lang.String getRevisionStatus() {
@@ -188,19 +185,19 @@ public class WorkReports implements java.io.Serializable {
 		this.customerStatId = customerStatId;
 	}
 
-	public org.joda.time.DateTime getFromDate() {
+	public org.joda.time.LocalDate getFromDate() {
 		return this.fromDate;
 	}
 
-	public void setFromDate(org.joda.time.DateTime fromDate) {
+	public void setFromDate(org.joda.time.LocalDate fromDate) {
 		this.fromDate = fromDate;
 	}
 
-	public org.joda.time.DateTime getToDate() {
+	public org.joda.time.LocalDate getToDate() {
 		return this.toDate;
 	}
 
-	public void setToDate(org.joda.time.DateTime toDate) {
+	public void setToDate(org.joda.time.LocalDate toDate) {
 		this.toDate = toDate;
 	}
 
@@ -210,14 +207,6 @@ public class WorkReports implements java.io.Serializable {
 
 	public void setReferenceNo(java.lang.String referenceNo) {
 		this.referenceNo = referenceNo;
-	}
-
-	public java.lang.String getCausal() {
-		return this.causal;
-	}
-
-	public void setCausal(java.lang.String causal) {
-		this.causal = causal;
 	}
 
 	public java.lang.Integer getCausalId() {
@@ -236,11 +225,11 @@ public class WorkReports implements java.io.Serializable {
 		this.ddtNo = ddtNo;
 	}
 
-	public org.joda.time.DateTime getDdtDate() {
+	public org.joda.time.LocalDate getDdtDate() {
 		return this.ddtDate;
 	}
 
-	public void setDdtDate(org.joda.time.DateTime ddtDate) {
+	public void setDdtDate(org.joda.time.LocalDate ddtDate) {
 		this.ddtDate = ddtDate;
 	}
 

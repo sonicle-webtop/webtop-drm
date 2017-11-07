@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ProfilesSupervisedUsers extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.ProfilesSupervisedUsersRecord> {
 
-	private static final long serialVersionUID = 2097566931;
+	private static final long serialVersionUID = -285123219;
 
 	/**
 	 * The reference instance of <code>drm.profiles_supervised_users</code>
@@ -81,7 +81,7 @@ public class ProfilesSupervisedUsers extends org.jooq.impl.TableImpl<com.sonicle
 	 */
 	@Override
 	public org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.ProfilesSupervisedUsersRecord> getPrimaryKey() {
-		return com.sonicle.webtop.drm.jooq.Keys.PROFILES_MASTERDATA_COPY_PKEY;
+		return com.sonicle.webtop.drm.jooq.Keys.PROFILES_SUPERVISED_USERS_PKEY;
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class ProfilesSupervisedUsers extends org.jooq.impl.TableImpl<com.sonicle
 	 */
 	@Override
 	public java.util.List<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.ProfilesSupervisedUsersRecord>> getKeys() {
-		return java.util.Arrays.<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.ProfilesSupervisedUsersRecord>>asList(com.sonicle.webtop.drm.jooq.Keys.PROFILES_MASTERDATA_COPY_PKEY);
+		return java.util.Arrays.<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.ProfilesSupervisedUsersRecord>>asList(com.sonicle.webtop.drm.jooq.Keys.PROFILES_SUPERVISED_USERS_PKEY);
 	}
 
 	/**

@@ -30,14 +30,39 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm.bol;
+package com.sonicle.webtop.drm.bol.js;
 
-import com.sonicle.webtop.drm.jooq.tables.pojos.ProfilesUsers;
-
+import com.sonicle.webtop.drm.model.WorkReportRow;
+import org.apache.commons.lang3.StringUtils;
 /**
  *
  * @author stfnnvl
  */
-public class OProfileUser extends ProfilesUsers{
-	
+public class JsGridWorkReportRow {
+
+	public Integer id;
+	public Integer rowNo;
+	public Integer workTypeId;
+	public Float duration;
+	public Boolean specialFlag;
+
+	public JsGridWorkReportRow(WorkReportRow wrkDetail) {
+		this.id = wrkDetail.getId();
+		this.rowNo = wrkDetail.getRowNo();
+		this.workTypeId = wrkDetail.getWorkTypeId();
+		this.duration = ((float)wrkDetail.getDuration() / 60);
+		this.specialFlag = StringUtils.equals(wrkDetail.getRowFlag(), "Y");
+	}
+
+	public static WorkReportRow createWorkReportRow(JsGridWorkReportRow js) {
+
+		WorkReportRow wrkDet = new WorkReportRow();
+		wrkDet.setId(js.id);
+		wrkDet.setRowNo(js.rowNo);
+		wrkDet.setWorkTypeId(js.workTypeId);
+		wrkDet.setDuration((int)(js.duration * 60));
+		wrkDet.setRowFlag(js.specialFlag ? "Y" : null);
+
+		return wrkDet;
+	}
 }

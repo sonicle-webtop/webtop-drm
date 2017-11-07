@@ -77,14 +77,14 @@ public class Tables {
 	public static final com.sonicle.webtop.drm.jooq.tables.ProfilesMasterdata PROFILES_MASTERDATA = com.sonicle.webtop.drm.jooq.tables.ProfilesMasterdata.PROFILES_MASTERDATA;
 
 	/**
+	 * The table drm.profiles_members
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.ProfilesMembers PROFILES_MEMBERS = com.sonicle.webtop.drm.jooq.tables.ProfilesMembers.PROFILES_MEMBERS;
+
+	/**
 	 * The table drm.profiles_supervised_users
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.ProfilesSupervisedUsers PROFILES_SUPERVISED_USERS = com.sonicle.webtop.drm.jooq.tables.ProfilesSupervisedUsers.PROFILES_SUPERVISED_USERS;
-
-	/**
-	 * The table drm.profiles_users
-	 */
-	public static final com.sonicle.webtop.drm.jooq.tables.ProfilesUsers PROFILES_USERS = com.sonicle.webtop.drm.jooq.tables.ProfilesUsers.PROFILES_USERS;
 
 	/**
 	 * The table drm.work_reports
@@ -97,9 +97,9 @@ public class Tables {
 	public static final com.sonicle.webtop.drm.jooq.tables.WorkReportsAttachments WORK_REPORTS_ATTACHMENTS = com.sonicle.webtop.drm.jooq.tables.WorkReportsAttachments.WORK_REPORTS_ATTACHMENTS;
 
 	/**
-	 * The table drm.work_reports_details
+	 * The table drm.work_reports_rows
 	 */
-	public static final com.sonicle.webtop.drm.jooq.tables.WorkReportsDetails WORK_REPORTS_DETAILS = com.sonicle.webtop.drm.jooq.tables.WorkReportsDetails.WORK_REPORTS_DETAILS;
+	public static final com.sonicle.webtop.drm.jooq.tables.WorkReportsRows WORK_REPORTS_ROWS = com.sonicle.webtop.drm.jooq.tables.WorkReportsRows.WORK_REPORTS_ROWS;
 
 	/**
 	 * The table drm.work_reports_settings

@@ -38,7 +38,7 @@ Ext.define('Sonicle.webtop.drm.view.DocStatus', {
 	],
 	dockableConfig: {
 		title: '{docStatus.tit}', //localizzato
-		iconCls: 'wtdrm-icon-docStatus-xs',
+		iconCls: 'wtdrm-icon-configuration-statusconfiguration-xs',
 		width: 500,
 		height: 500
 	},

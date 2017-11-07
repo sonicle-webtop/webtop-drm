@@ -62,7 +62,7 @@ Ext.define('Sonicle.webtop.drm.ux.GroupGrid', {
 		if(!me.viewConfig) {
 			me.viewConfig = {
 				deferEmptyText: false,
-				emptyText: WT.res(me.sid, 'groupgrid.emp')
+				emptyText: WT.res(me.sid, 'grid.empty')
 			};
 		}
 		
@@ -118,7 +118,7 @@ Ext.define('Sonicle.webtop.drm.ux.GroupGrid', {
 				valueField: 'id', //sempre 'id' poiche arriva dal SimpleModel
 				displayField: 'desc', 
 				searchField: 'desc', 
-				emptyText: WT.res('grid.emptyText'),
+				emptyText: WT.res('grid.empty'),
 				searchText: WT.res(me.sid, 'groupgrid.picker.search'),
 				okText: WT.res('act-ok.lbl'),
 				cancelText: WT.res('act-cancel.lbl'),

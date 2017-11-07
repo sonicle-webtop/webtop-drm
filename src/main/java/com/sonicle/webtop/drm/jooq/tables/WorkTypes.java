@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WorkTypes extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.WorkTypesRecord> {
 
-	private static final long serialVersionUID = -178275593;
+	private static final long serialVersionUID = -896031493;
 
 	/**
 	 * The reference instance of <code>drm.work_types</code>
@@ -91,7 +91,7 @@ public class WorkTypes extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jo
 	 */
 	@Override
 	public org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.WorkTypesRecord> getPrimaryKey() {
-		return com.sonicle.webtop.drm.jooq.Keys.RATES_PKEY;
+		return com.sonicle.webtop.drm.jooq.Keys.WORK_TYPES_PKEY;
 	}
 
 	/**
@@ -99,7 +99,7 @@ public class WorkTypes extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jo
 	 */
 	@Override
 	public java.util.List<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.WorkTypesRecord>> getKeys() {
-		return java.util.Arrays.<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.WorkTypesRecord>>asList(com.sonicle.webtop.drm.jooq.Keys.RATES_PKEY);
+		return java.util.Arrays.<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.WorkTypesRecord>>asList(com.sonicle.webtop.drm.jooq.Keys.WORK_TYPES_PKEY);
 	}
 
 	/**

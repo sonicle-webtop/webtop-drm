@@ -32,7 +32,7 @@
  */
 Ext.define('Sonicle.webtop.drm.ux.CustomerGrid', {
 	extend: 'Ext.grid.Panel',
-	alias: 'widget.wtdrmcustomergrid', //widget parola chiave di Extjs
+	alias: 'widget.wtdrmcustomergrid',
 	requires: [
 		'Sonicle.picker.List',
 		'WTA.ux.PickerWindow',
@@ -108,7 +108,7 @@ Ext.define('Sonicle.webtop.drm.ux.CustomerGrid', {
 					valueField: 'id', //sempre 'id' poiche arriva dal SimpleModel
 					displayField: 'desc',
 					searchField: 'desc',
-					emptyText: WT.res('grid.emptyText'),
+					emptyText: WT.res(me.sid, 'grid.empty'),
 					searchText: WT.res(me.sid, 'associatedcustomer.picker.search'),
 					okText: WT.res('act-ok.lbl'),
 					cancelText: WT.res('act-cancel.lbl'),

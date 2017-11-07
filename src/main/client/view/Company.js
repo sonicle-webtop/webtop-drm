@@ -38,7 +38,7 @@ Ext.define('Sonicle.webtop.drm.view.Company', {
 	],
 	dockableConfig: {
 		title: '{company.tit}', //localizzato
-		iconCls: 'wtdrm-icon-company-xs',
+		iconCls: 'wtdrm-icon-configuration-companiesconfiguration-xs',
 		width: 500,
 		height: 500
 	},
@@ -55,17 +55,14 @@ Ext.define('Sonicle.webtop.drm.view.Company', {
 			items: [{
 					xtype: 'wtdrmusergrid',
 					title: me.mys.res('company.tab-users.tit'),
-					//iconCls: '',
 					sid: me.mys.ID,
 					bind: {
-						store: '{record.associatedUsers}' //record. nome proprietà con dentro gli utenti
+						store: '{record.associatedUsers}'
 					},
 					listeners: {
 						pick: function (s, vals, recs) {
-							//evento della griglia che restituisce l'out put del picker
-							var mo = me.getModel(); //modello
+							var mo = me.getModel(); 
 
-							//proprieta del modello che contiene lo store dei dati interessati
 							mo.associatedUsers().add({
 								userId: vals
 							});

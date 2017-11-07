@@ -33,8 +33,8 @@
 Ext.define('Sonicle.webtop.drm.view.WorkReportSetting', {
 	extend: 'WTA.sdk.ModelView',
 	dockableConfig: {
-		title: 'Work Report Settings', //localizzato
-		iconCls: 'wtdrm-icon-setting-xs',
+		title: '{workreport.config.tit}', //localizzato
+		iconCls: 'wtdrm-icon-configuration-generalconfiguration-xs',
 		width: 500,
 		height: 500
 	},

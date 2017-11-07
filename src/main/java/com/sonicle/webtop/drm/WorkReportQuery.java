@@ -33,8 +33,7 @@
 package com.sonicle.webtop.drm;
 
 import com.sonicle.commons.web.json.JsonResult;
-import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 /**
  *
@@ -43,12 +42,13 @@ import org.joda.time.DateTime;
 public class WorkReportQuery {
 
 	public Integer companyId;
-	public String userId;
+	public String operatorId;
 	public String workReportNo;
 	public Integer year;
 	public String customerId;
-	public DateTime fromDate;
-	public DateTime toDate;
+	public String customerStatId;
+	public LocalDate fromDate;
+	public LocalDate toDate;
 	public Integer causalId;
 	public String referenceNo;
 	public Integer businessTripId;

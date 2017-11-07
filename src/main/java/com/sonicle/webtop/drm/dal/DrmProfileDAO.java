@@ -37,8 +37,8 @@ import com.sonicle.webtop.core.dal.DAOException;
 import com.sonicle.webtop.drm.bol.ODrmGroup;
 import com.sonicle.webtop.drm.bol.ODrmProfile;
 import static com.sonicle.webtop.drm.jooq.Tables.PROFILES;
-import static com.sonicle.webtop.drm.jooq.Tables.PROFILES_USERS;
-import com.sonicle.webtop.drm.jooq.tables.ProfilesUsers;
+import static com.sonicle.webtop.drm.jooq.Tables.PROFILES_MEMBERS;
+import com.sonicle.webtop.drm.jooq.tables.ProfilesMembers;
 import com.sonicle.webtop.drm.jooq.tables.records.ProfilesRecord;
 import java.sql.Connection;
 import java.util.List;
@@ -83,13 +83,13 @@ public class DrmProfileDAO extends BaseDAO {
 		return dsl
 				.select()
 				.from(PROFILES)
-				.join(PROFILES_USERS)
+				.join(PROFILES_MEMBERS)
 				.on(
-						PROFILES_USERS.PROFILE_ID.equal(PROFILES.PROFILE_ID)
+						PROFILES_MEMBERS.PROFILE_ID.equal(PROFILES.PROFILE_ID)
 				).where(
 						PROFILES.DOMAIN_ID.equal(domainId)
 						.and(
-								PROFILES_USERS.USER_ID.like(userId)
+								PROFILES_MEMBERS.USER_ID.like(userId)
 						)
 				)
 				.fetchOneInto(ODrmProfile.class);
@@ -118,11 +118,11 @@ public class DrmProfileDAO extends BaseDAO {
 	public int deleteById(Connection con, String profileId) {
 		DSLContext dsl = getDSL(con);
 		return dsl
-				.delete(PROFILES)
-				.where(
-						PROFILES.PROFILE_ID.equal(profileId)
-				)
-				.execute();
+			.delete(PROFILES)
+			.where(
+					PROFILES.PROFILE_ID.equal(profileId)
+			)
+			.execute();
 	}
 
 }

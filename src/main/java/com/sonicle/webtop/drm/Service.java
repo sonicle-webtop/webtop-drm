@@ -40,17 +40,27 @@ import com.sonicle.commons.web.ServletUtils.StringArray;
 import com.sonicle.commons.web.json.JsonResult;
 import com.sonicle.commons.web.json.MapItem;
 import com.sonicle.commons.web.json.Payload;
+import com.sonicle.commons.web.json.PayloadAsList;
 import com.sonicle.commons.web.json.extjs.ExtTreeNode;
 import com.sonicle.commons.web.json.extjs.LookupMeta;
 import com.sonicle.commons.web.json.extjs.ResultMeta;
 import com.sonicle.webtop.contacts.IContactsManager;
 import com.sonicle.webtop.contacts.model.Contact;
+import com.sonicle.webtop.contacts.model.ContactEx;
+import com.sonicle.webtop.contacts.model.FolderContacts;
+import com.sonicle.webtop.core.CoreManager;
 import com.sonicle.webtop.core.app.WT;
 import com.sonicle.webtop.core.app.WebTopSession;
 import com.sonicle.webtop.core.app.WebTopSession.UploadedFile;
 import com.sonicle.webtop.core.bol.OGroup;
 import com.sonicle.webtop.core.bol.OUser;
+import com.sonicle.webtop.core.bol.js.JsCausalLkp;
+import com.sonicle.webtop.core.bol.js.JsCustomerSupplierLkp;
 import com.sonicle.webtop.core.bol.js.JsSimple;
+import com.sonicle.webtop.core.bol.js.JsSimpleSource;
+import com.sonicle.webtop.core.model.Causal;
+import com.sonicle.webtop.core.model.CausalExt;
+import com.sonicle.webtop.core.model.MasterData;
 import com.sonicle.webtop.core.sdk.BaseService;
 import com.sonicle.webtop.core.sdk.UserProfileId;
 import com.sonicle.webtop.core.sdk.WTException;
@@ -92,6 +102,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -127,13 +138,13 @@ public class Service extends BaseService {
 
 		RootProgramNode prog = null;
 
-		prog = new RootProgramNode(DrmTreeNode.WORK_REPORT, "");
+		prog = new RootProgramNode(DrmTreeNode.WORK_REPORT, "wtdrm-icon-workreport-xs");
 		programs.put(prog.getId(), prog);
 
-		prog = new RootProgramNode(DrmTreeNode.EXPENSE_NOTE, "");
+		prog = new RootProgramNode(DrmTreeNode.EXPENSE_NOTE, "wtdrm-icon-expensenote-xs");
 		programs.put(prog.getId(), prog);
 
-		prog = new RootProgramNode(DrmTreeNode.TIMETABLE, "");
+		prog = new RootProgramNode(DrmTreeNode.TIMETABLE, "wtdrm-icon-timetable-xs");
 		programs.put(prog.getId(), prog);
 
 		groupCategories.put(EnumUtils.toSerializedName(GroupCategory.IDENTITY), lookupResource("groupCategory.I"));
@@ -164,86 +175,144 @@ public class Service extends BaseService {
 
 	public void processLookupUsers(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
-
-			//TODO Filtrare utenti per Azienda e per Permessi
 			List<JsSimple> jsUser = new ArrayList();
+			ResultMeta meta = null;
 
 			for (OUser usr : WT.getCoreManager().listUsers(true)) {
 				jsUser.add(new JsSimple(usr.getUserId(), usr.getDisplayName()));
+				if(getEnv().getProfileId().getUserId().equals(usr.getUserId())) meta = new LookupMeta().setSelected(getEnv().getProfileId().getUserId());
 			}
-
-			//TODO registrare i metadati (vd. LookupCompanies)
-			//TODO ciclare gli utenti e selezionare utente locale
-			new JsonResult(jsUser).printTo(out); //trasformo i dati in json e li stampo  a console
+			
+			new JsonResult(jsUser, meta, jsUser.size()).printTo(out);
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
-		} finally {
-			//chiudo la connession con il metodo apposito
 		}
 	}
-
-	public void processLookupProfileCompanyUsers(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+	
+	public void processLookupOperators(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
-
-			//TODO Filtrare utenti per Azienda e per Permessi
 			List<JsSimple> jsUser = new ArrayList();
-
-			Integer companyId = ServletUtils.getIntParameter(request, "companyId", true);
-
-			for (OUser usr : manager.listCompanyProfileUsers(companyId)) {
-				jsUser.add(new JsSimple(usr.getUserId(), usr.getDisplayName()));
+			
+			for (String usr : manager.listOperators()) {
+				jsUser.add(new JsSimple(usr, WT.getUserData(new UserProfileId(getEnv().getProfileId().getDomain(), usr)).getDisplayName()));
 			}
-
-			//TODO registrare i metadati (vd. LookupCompanies)
-			//TODO ciclare gli utenti e selezionare utente locale
-			new JsonResult(jsUser).printTo(out); //trasformo i dati in json e li stampo  a console
+			
+			ResultMeta meta = new LookupMeta().setSelected(jsUser.get(0).id);
+			
+			new JsonResult(jsUser, meta, jsUser.size()).printTo(out);
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
-		} finally {
-			//chiudo la connession con il metodo apposito
-		}
-	}
-
-	public void processLookupCompanyUsers(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
-		try {
-
-			//TODO Filtrare utenti per Azienda e per Permessi
-			List<JsSimple> jsUser = new ArrayList();
-
-			Integer companyId = ServletUtils.getIntParameter(request, "companyId", true);
-
-			for (OUser usr : manager.listCompanyUsers(companyId)) {
-				jsUser.add(new JsSimple(usr.getUserId(), usr.getDisplayName()));
-			}
-
-			//TODO registrare i metadati (vd. LookupCompanies)
-			//TODO ciclare gli utenti e selezionare utente locale
-			new JsonResult(jsUser).printTo(out); //trasformo i dati in json e li stampo  a console
-		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
-		} finally {
-			//chiudo la connession con il metodo apposito
+			new JsonResult(ex).printTo(out);
 		}
 	}
 
 	public void processLookupCompanies(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
-
+			String operator = ServletUtils.getStringParameter(request, "operator", null);
 			List<JsSimple> companies = new ArrayList();
+			
+			if(operator != null){
+				DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID, new UserProfileId(getEnv().getProfileId().getDomain(), operator));
 
-			for (OCompany com : manager.listCompanies()) {
-				companies.add(new JsSimple(com.getCompanyId(), com.getName()));
+				for (OCompany com : manager.listCompaniesByDomainUser()) {
+					companies.add(new JsSimple(com.getCompanyId(), com.getName()));
+				}
 			}
-
 			Integer selected = companies.isEmpty() ? null : (Integer) companies.get(0).id;
-
 			ResultMeta meta = new LookupMeta().setSelected(selected);
-
-			new JsonResult(companies, meta, companies.size()).printTo(out); //trasformo i dati in json e li stampo  a console
+				
+			new JsonResult(companies, meta, companies.size()).printTo(out);
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
-		} finally {
-			//chiudo la connession con il metodo apposito
+			new JsonResult(ex).printTo(out);
+		}
+	}
+	
+	public void processLookupAllCompanies(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			List<JsSimple> companies = new ArrayList();
+			
+			for (OCompany com : manager.listCompaniesByDomain()) {
+				companies.add(new JsSimple(com.getCompanyId(), com.getName()));
+			}
+			
+			Integer selected = companies.isEmpty() ? null : (Integer) companies.get(0).id;
+			ResultMeta meta = new LookupMeta().setSelected(selected);
+				
+			new JsonResult(companies, meta, companies.size()).printTo(out);
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
+			new JsonResult(ex).printTo(out);
+		}
+	}
+	
+	public void processLookupRealCustomers(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String operator = ServletUtils.getStringParameter(request, "operator", null);
+			List<String> idCustomers = new ArrayList();
+			List<MasterData> items = new ArrayList<>();
+			List<JsSimple> customers = new ArrayList();
+			
+			if(operator != null){
+				DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID, new UserProfileId(getEnv().getProfileId().getDomain(), operator));
+
+				for (String id : manager.listCustomersByProfileUser()) {
+					idCustomers.add(id);
+				}
+				
+				items = WT.getCoreManager().listMasterDataIn(idCustomers);
+				
+				for(MasterData customer : items) {
+					customers.add(new JsSimple(customer.getMasterDataId(), customer.getDescription()));
+				}
+			}
+				
+			new JsonResult(customers, customers.size()).printTo(out);
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
+		}
+	}
+	
+	public void processLookupStatisticCustomers(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String realCustomerId = ServletUtils.getStringParameter(request, "realCustomer", null);
+			String operator = ServletUtils.getStringParameter(request, "operator", null);
+			boolean chek = false;
+			List<MasterData> items = new ArrayList<>();
+			List<JsSimple> customers = new ArrayList();
+			
+			if(realCustomerId != null && operator != null){
+				DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID, new UserProfileId(getEnv().getProfileId().getDomain(), operator));
+
+				chek = manager.checkCustomersByProfileUser(realCustomerId);
+				if(chek) items = WT.getCoreManager().listChildrenMasterData(realCustomerId, Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER)));
+				
+				for(MasterData customer : items) {
+					customers.add(new JsSimple(customer.getMasterDataId(), customer.getDescription()));
+				}
+			}
+				
+			new JsonResult(customers, customers.size()).printTo(out);
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
+		}
+	}
+	
+	public void processLookupAllStatisticCustomers(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			
+			List<MasterData> items = new ArrayList<>();
+			List<JsSimple> customers = new ArrayList();
+			
+			items = WT.getCoreManager().listChildrenMasterData(Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER)));
+
+			for(MasterData customer : items) {
+				customers.add(new JsSimple(customer.getMasterDataId(), customer.getDescription()));
+			}
+				
+			new JsonResult(customers, customers.size()).printTo(out);
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
 		}
 	}
 
@@ -255,29 +324,31 @@ public class Service extends BaseService {
 			for (ODocStatus doc : manager.listDocStatuses()) {
 				docStatuses.add(new JsSimple(doc.getDocStatusId(), doc.getName()));
 			}
+			
+			Integer selected = docStatuses.isEmpty() ? null : (Integer) docStatuses.get(0).id;
+			ResultMeta meta = new LookupMeta().setSelected(selected);
 
-			new JsonResult(docStatuses).printTo(out); //trasformo i dati in json e li stampo  a console
+			new JsonResult(docStatuses, meta, docStatuses.size()).printTo(out);
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
-		} finally {
-			//chiudo la connession con il metodo apposito
 		}
 	}
 
 	public void processLookupWorkType(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 
-			List<JsSimple> docStatuses = new ArrayList();
+			List<JsSimple> workTypes = new ArrayList();
 
-			for (OWorkType type : manager.listWorkType()) {
-				docStatuses.add(new JsSimple(type.getWorkTypeId(), type.getDescription()));
+			for (OWorkType wt : manager.listWorkType()) {
+				workTypes.add(new JsSimple(wt.getWorkTypeId(), wt.getDescription()));
 			}
+			
+			Integer selected = workTypes.isEmpty() ? null : (Integer) workTypes.get(0).id;
+			ResultMeta meta = new LookupMeta().setSelected(selected);
 
-			new JsonResult(docStatuses).printTo(out); //trasformo i dati in json e li stampo  a console
+			new JsonResult(workTypes, meta, workTypes.size()).printTo(out);
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
-		} finally {
-			//chiudo la connession con il metodo apposito
 		}
 	}
 
@@ -290,36 +361,49 @@ public class Service extends BaseService {
 				trips.add(new JsSimple(type.getBusinessTripId(), type.getDescription()));
 			}
 
-			new JsonResult(trips).printTo(out); //trasformo i dati in json e li stampo  a console
+			new JsonResult(trips).printTo(out);
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
-		} finally {
-			//chiudo la connession con il metodo apposito
 		}
 	}
 
 	public void processLookupContacts(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
-
-			List<JsSimple> contacts = new ArrayList();
-
+			List<JsSimpleSource> contacts = new ArrayList();
+			List<Integer> categoryIds = new ArrayList();
+					
 			IContactsManager contactManager = (IContactsManager) WT.getServiceManager("com.sonicle.webtop.contacts", getEnv().getProfileId());
-			//TODO lista di contatti ancora da sviluppare
-//			for (Contact contact : contactManager.getContact(1)) {
-//				contacts.add(new JsSimple(contact.getContactId(), contact.getTitle()));
-//			}
-			Contact contact = contactManager.getContact(1);
-			contacts.add(new JsSimple(contact.getContactId(), contact.getTitle()));
+			categoryIds = contactManager.listCategoryIds();
+			for(FolderContacts fc : contactManager.listFolderContacts(categoryIds, "", null)){
+				String owner = WT.getUserData(fc.folder.getProfileId()).getDisplayName();
+				for(ContactEx c : fc.contacts){
+					contacts.add(new JsSimpleSource(c.getContactId(), c.getFirstName() + " " + c.getLastName(), "[" + owner + " / " + fc.folder.getName() + "]"));
+				}
+			}
 
-			new JsonResult(contacts).printTo(out); //trasformo i dati in json e li stampo  a console
+			new JsonResult(contacts).printTo(out);
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
-		} finally {
-			//chiudo la connession con il metodo apposito
+		}
+	}
+	
+	public void processLookupCausals(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		List<JsSimple> items = new ArrayList<>();
+		
+		try {
+			List<CausalExt> caus = null;
+			caus = WT.getCoreManager().listAllLiveCausals();
+			
+			for(Causal cau : caus) {
+				items.add(new JsSimple(cau.getCausalId(), cau.getDescription()));
+			}
+			new JsonResult(items, items.size()).printTo(out);
+		} catch (Exception ex) {
+			logger.error("Error in LookupCausals", ex);
+			new JsonResult(ex).printTo(out);
 		}
 	}
 
-	//--------------------------------------------------------------
 	public void processLoadEnabledProgramTree(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 
 		String node = "";
@@ -336,16 +420,13 @@ public class Service extends BaseService {
 					treeNode.add(new ExtTreeNode(subProg.getId(), subProg.getId(), true, subProg.getIconClass()));
 				}
 			}
-			new JsonResult(treeNode).printTo(out); //trasformo i dati in json e li stampo  a console
+			new JsonResult(treeNode).printTo(out);
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
-		} finally {
-			//chiudo la connession con il metodo apposito
 		}
 
 	}
 
-	//---------------------------------------------------------------
 	public void processManageCompanies(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			String crud = ServletUtils.getStringParameter(request, "crud", true);
@@ -353,7 +434,7 @@ public class Service extends BaseService {
 
 				List<JsGridCompanies> jsCompanies = new ArrayList();
 
-				for (OCompany com : manager.listCompanies()) {
+				for (OCompany com : manager.listCompaniesByDomain()) {
 
 					jsCompanies.add(new JsGridCompanies(com));
 				}
@@ -418,7 +499,6 @@ public class Service extends BaseService {
 		} finally {
 		}
 	}
-//-----------------------------------------------------------------------------------------------------------------------------------------
 
 	public void processLoadGroupsTree(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 
@@ -442,11 +522,9 @@ public class Service extends BaseService {
 					treeNode.add(extNode);
 				}
 			}
-			new JsonResult(treeNode).printTo(out); //trasformo i dati in json e li stampo  a console
+			new JsonResult(treeNode).printTo(out);
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
-		} finally {
-			//chiudo la connession con il metodo apposito
 		}
 
 	}
@@ -499,14 +577,11 @@ public class Service extends BaseService {
 				groups.add(new JsSimple(grp.getGroupId(), grp.getDisplayName()));
 			}
 
-			new JsonResult(groups).printTo(out); //trasformo i dati in json e li stampo  a console
+			new JsonResult(groups).printTo(out);
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
-		} finally {
-			//chiudo la connession con il metodo apposito
 		}
 	}
-//-----------------------------------------------------------------------------------------------------------------------------------------
 
 	public void processManageGridProfiles(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
@@ -522,6 +597,12 @@ public class Service extends BaseService {
 
 				new JsonResult(jsGridProfiles).printTo(out);
 
+			} else if (crud.equals(Crud.DELETE)) {
+				PayloadAsList <JsGridProfiles.List> pl = ServletUtils.getPayloadAsList(request, JsGridProfiles.List.class);
+				
+				manager.deleteDrmProfile(pl.data.get(0).profileId);
+
+				new JsonResult().printTo(out);
 			}
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
@@ -553,7 +634,7 @@ public class Service extends BaseService {
 				new JsonResult().printTo(out);
 			} else if (crud.equals(Crud.DELETE)) {
 
-				StringArray ids = ServletUtils.getObjectParameter(request, "folderIds", StringArray.class, true);
+				StringArray ids = ServletUtils.getObjectParameter(request, "profileIds", StringArray.class, true);
 				manager.deleteDrmProfile(ids.get(0));
 
 				new JsonResult().printTo(out);
@@ -679,29 +760,21 @@ public class Service extends BaseService {
 		}
 	}
 
-	//-------------------------------------------------------------------------------------------------------------------------------------------------
 	public void processManageGridWorkReport(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			String crud = ServletUtils.getStringParameter(request, "crud", true);
 			DateTimeZone ptz = getEnv().getProfile().getTimeZone();
 			if (crud.equals(Crud.READ)) {
 
-				WorkReportQuery query = ServletUtils.getObjectParameter(request, "query", new WorkReportQuery(), WorkReportQuery.class);
-				//TODO - ricerca iniziale? con quali parametr?
-				/*
-					all'inizio o tt i MIEI rapportini o TUTTI QUELLI CHE POSSO VEDERE
-				
-					il campo NOMINATIVO dovrà essere valorizzato con il primo che posso vedere
-				 */
+				String query = ServletUtils.getStringParameter(request, "query", null);
+				WorkReportQuery wrQuery = WorkReportQuery.fromJson(query);
 				List<JsGridWorkReports> jsGridWorkReports = new ArrayList();
 
-				for (OWorkReport wr : manager.listWorkReports(query)) {
-
+				for (OWorkReport wr : manager.listWorkReports(wrQuery)) {
 					jsGridWorkReports.add(new JsGridWorkReports(wr, ptz, ""));
 				}
 
 				new JsonResult(jsGridWorkReports).printTo(out);
-
 			}
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);

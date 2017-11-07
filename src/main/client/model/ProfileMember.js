@@ -30,16 +30,14 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.WorkReportDetail', {
+Ext.define('Sonicle.webtop.drm.model.ProfileMember', {
 	extend: 'WTA.ux.data.BaseModel',
 	identifier: 'negative',
 	idProperty: 'id',
 	fields: [
 		WTF.field('id', 'int', false), //nome,tipo,allowBlank
-		WTF.field('rowNo', 'int', false),
-		WTF.field('workTypeId', 'int', false),
-		WTF.field('duration', 'float', false),
-		WTF.field('specialFlag', 'bool', false)
+		WTF.field('profileId', 'string', false),
+		WTF.field('userId', 'string', false)
 	]
 });
 
