@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Companies implements java.io.Serializable {
 
-	private static final long serialVersionUID = 2118282426;
+	private static final long serialVersionUID = 1681022008;
 
 	private java.lang.Integer companyId;
 	private java.lang.String  domainId;
@@ -35,7 +35,6 @@ public class Companies implements java.io.Serializable {
 	private java.lang.String  footerColumns;
 	private java.lang.String  footerColumnLeft;
 	private java.lang.String  footerColumnRight;
-	private java.lang.String  logoUploadId;
 
 	public Companies() {}
 
@@ -56,8 +55,7 @@ public class Companies implements java.io.Serializable {
 		java.lang.String  revisionStatus,
 		java.lang.String  footerColumns,
 		java.lang.String  footerColumnLeft,
-		java.lang.String  footerColumnRight,
-		java.lang.String  logoUploadId
+		java.lang.String  footerColumnRight
 	) {
 		this.companyId = companyId;
 		this.domainId = domainId;
@@ -76,7 +74,6 @@ public class Companies implements java.io.Serializable {
 		this.footerColumns = footerColumns;
 		this.footerColumnLeft = footerColumnLeft;
 		this.footerColumnRight = footerColumnRight;
-		this.logoUploadId = logoUploadId;
 	}
 
 	public java.lang.Integer getCompanyId() {
@@ -213,13 +210,5 @@ public class Companies implements java.io.Serializable {
 
 	public void setFooterColumnRight(java.lang.String footerColumnRight) {
 		this.footerColumnRight = footerColumnRight;
-	}
-
-	public java.lang.String getLogoUploadId() {
-		return this.logoUploadId;
-	}
-
-	public void setLogoUploadId(java.lang.String logoUploadId) {
-		this.logoUploadId = logoUploadId;
 	}
 }

@@ -528,6 +528,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		}
 	},
 
+	printWorkReport: function(ids) {
+		var me = this, url;
+		url = WTF.processBinUrl(me.ID, 'PrintWorkReport', {ids: WTU.arrayAsParam(ids)});
+		Sonicle.URLMgr.openFile(url, {filename: 'workreport', newWindow: true});
+	},
+	
 	addExpenseNote: function (opts) {
 		opts = opts || {}; //se nullo controlla e lo seta a obj empty
 

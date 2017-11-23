@@ -19,3 +19,6 @@
 .wtdrm-icon-configuration-foldersconfiguration-xs { background-image: url('folders_configuration_16.png') !important; }
 .wtdrm-icon-configuration-statusconfiguration-xs { background-image: url('status_configuration_16.png') !important; }
 .wtdrm-icon-configuration-enabledprograms-xs { background-image: url('enabledprograms_configuration_16.png') !important; }
+
+.wtdrm-trash-trigger { background-image: url('trash-trigger.png') !important; }
+.wtdrm-add-trigger { background-image: url('add-trigger.png') !important; }

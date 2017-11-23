@@ -27,6 +27,11 @@ public class Tables {
 	public static final com.sonicle.webtop.drm.jooq.tables.Companies COMPANIES = com.sonicle.webtop.drm.jooq.tables.Companies.COMPANIES;
 
 	/**
+	 * The table drm.companies_pictures
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.CompaniesPictures COMPANIES_PICTURES = com.sonicle.webtop.drm.jooq.tables.CompaniesPictures.COMPANIES_PICTURES;
+
+	/**
 	 * The table drm.companies_users
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.CompaniesUsers COMPANIES_USERS = com.sonicle.webtop.drm.jooq.tables.CompaniesUsers.COMPANIES_USERS;

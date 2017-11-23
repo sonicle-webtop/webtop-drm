@@ -47,8 +47,10 @@ import com.sonicle.webtop.core.sdk.BaseManager;
 import com.sonicle.webtop.core.sdk.UserProfileId;
 import com.sonicle.webtop.core.sdk.WTException;
 import com.sonicle.webtop.core.util.IdentifierUtils;
+import static com.sonicle.webtop.drm.Service.logger;
 import com.sonicle.webtop.drm.bol.OBusinessTrip;
 import com.sonicle.webtop.drm.bol.OCompany;
+import com.sonicle.webtop.drm.bol.OCompanyPicture;
 import com.sonicle.webtop.drm.bol.OCompanyUser;
 import com.sonicle.webtop.drm.bol.ODocStatus;
 import com.sonicle.webtop.drm.bol.ODocStatusGroup;
@@ -65,8 +67,10 @@ import com.sonicle.webtop.drm.bol.OWorkReportAttachment;
 import com.sonicle.webtop.drm.bol.OWorkReportRow;
 import com.sonicle.webtop.drm.bol.OWorkReportSetting;
 import com.sonicle.webtop.drm.bol.OWorkType;
+import com.sonicle.webtop.drm.bol.model.RBWorkReportRows;
 import com.sonicle.webtop.drm.dal.BusinessTripDao;
 import com.sonicle.webtop.drm.dal.CompanyDAO;
+import com.sonicle.webtop.drm.dal.CompanyPictureDAO;
 import com.sonicle.webtop.drm.dal.CompanyUserDAO;
 import com.sonicle.webtop.drm.dal.DocStatusDAO;
 import com.sonicle.webtop.drm.dal.DocStausGroupDAO;
@@ -85,6 +89,7 @@ import com.sonicle.webtop.drm.dal.WorkReportSettingDAO;
 import com.sonicle.webtop.drm.dal.WorkTypeDAO;
 import com.sonicle.webtop.drm.model.BusinessTrip;
 import com.sonicle.webtop.drm.model.Company;
+import com.sonicle.webtop.drm.model.CompanyPicture;
 import com.sonicle.webtop.drm.model.CompanyUserAssociation;
 import com.sonicle.webtop.drm.model.DocStatus;
 import com.sonicle.webtop.drm.model.DocStatusGroupAssociation;
@@ -102,6 +107,10 @@ import com.sonicle.webtop.drm.model.WorkReportAttachment;
 import com.sonicle.webtop.drm.model.WorkReportRow;
 import com.sonicle.webtop.drm.model.WorkReportSetting;
 import com.sonicle.webtop.drm.model.WorkType;
+import eu.medsea.mimeutil.MimeType;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -112,11 +121,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import javax.imageio.ImageIO;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.imgscalr.Scalr;
 
 /**
  *
@@ -239,6 +251,7 @@ public class DrmManager extends BaseManager {
 	public Company getCompany(int companyId) throws WTException {
 		Connection con = null;
 		CompanyDAO compDao = CompanyDAO.getInstance();
+		CompanyPictureDAO cmpPicDao = CompanyPictureDAO.getInstance();
 		CompanyUserDAO comUsrDao = CompanyUserDAO.getInstance();
 
 		Company company = null;
@@ -246,7 +259,8 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID);
 
-			company = createCompany(compDao.selectById(con, companyId));
+			boolean hasPicture = cmpPicDao.hasPicture(con, companyId);
+			company = createCompany(compDao.selectById(con, companyId), hasPicture);
 
 			for (OCompanyUser oComUsr : comUsrDao.selectByCompany(con, companyId)) {
 				company.getAssociatedUsers().add(createCompanyUser(oComUsr));
@@ -260,8 +274,12 @@ public class DrmManager extends BaseManager {
 			DbUtils.closeQuietly(con);
 		}
 	}
-
+	
 	public OCompany addCompany(Company company) throws WTException {
+		return addCompany(company, null);
+	}
+
+	public OCompany addCompany(Company company, CompanyPicture picture) throws WTException {
 
 		Connection con = null;
 
@@ -284,6 +302,12 @@ public class DrmManager extends BaseManager {
 			}
 
 			compDao.insertCompany(con, newCompany);
+			
+			if (company.getHasPicture()) {
+				if (picture != null) {
+					doInsertCompanyPicture(con, newCompany.getCompanyId(), picture);
+				}
+			}
 
 			DbUtils.commitQuietly(con);
 
@@ -303,8 +327,12 @@ public class DrmManager extends BaseManager {
 			DbUtils.closeQuietly(con);
 		}
 	}
+	
+	public OCompany updateCompany(Company company) throws WTException, IOException {
+		return updateCompany(company, null);
+	}
 
-	public OCompany updateCompany(Company item) throws WTException {
+	public OCompany updateCompany(Company item, CompanyPicture picture) throws WTException, IOException {
 
 		Connection con = null;
 		CompanyDAO compDao = CompanyDAO.getInstance();
@@ -335,6 +363,14 @@ public class DrmManager extends BaseManager {
 			for (CompanyUserAssociation compUsrs : changesSet1.deleted) {
 				compUsrDao.deleteById(con, compUsrs.getAssociationId());
 			}
+			
+			if (item.getHasPicture()) {
+				if (picture != null) {
+					doUpdateCompanyPicture(con, company.getCompanyId(), picture);
+				}
+			} else {
+				doDeleteCompanyPicture(con, company.getCompanyId());
+			}
 
 			DbUtils.commitQuietly(con);
 
@@ -358,6 +394,8 @@ public class DrmManager extends BaseManager {
 			compDao.deleteById(con, companyId);
 
 			comUsrDao.deleteByCompany(con, companyId);
+			
+			doDeleteCompanyPicture(con, companyId);
 
 			DbUtils.commitQuietly(con);
 
@@ -389,7 +427,7 @@ public class DrmManager extends BaseManager {
 		ocom.setVat(com.getVat());
 		ocom.setTaxCode(com.getTaxCode());
 		ocom.setBusinessRegister(com.getBusinessRegister());
-		ocom.setLogoUploadId(com.getLogoUploadId());
+		ocom.setRea(com.getRea());
 		ocom.setFooterColumns(com.getFooterColumns());
 		ocom.setFooterColumnLeft(com.getFooterColumnLeft());
 		ocom.setFooterColumnRight(com.getFooterColumnRight());
@@ -397,11 +435,11 @@ public class DrmManager extends BaseManager {
 		return ocom;
 	}
 
-	//qnd arrica dall'api
-	private Company createCompany(OCompany oCom) {
+	private Company createCompany(OCompany oCom, boolean hasPicture) {
 		if (oCom == null) {
 			return null;
 		}
+		
 		Company com = new Company();
 		com.setCompanyId(oCom.getCompanyId());
 		com.setDomainId(oCom.getDomainId());
@@ -415,10 +453,12 @@ public class DrmManager extends BaseManager {
 		com.setVat(oCom.getVat());
 		com.setTaxCode(oCom.getTaxCode());
 		com.setBusinessRegister(oCom.getBusinessRegister());
-		com.setLogoUploadId(oCom.getLogoUploadId());
+		com.setRea(oCom.getRea());
 		com.setFooterColumns(oCom.getFooterColumns());
 		com.setFooterColumnLeft(oCom.getFooterColumnLeft());
 		com.setFooterColumnRight(oCom.getFooterColumnRight());
+		com.setHasPicture(hasPicture);
+		
 		return com;
 	}
 
@@ -666,8 +706,26 @@ public class DrmManager extends BaseManager {
 
 		return odocS;
 	}
+	
+	public OWorkType getWorkType(int workTypeId) throws WTException {
+		Connection con = null;
+		WorkTypeDAO wtDao = WorkTypeDAO.getInstance();
+		OWorkType wt = null;
+		
+		try {
+			con = WT.getConnection(SERVICE_ID);
 
-	//------------------------------------------------------------------------------------------
+			wt = wtDao.selectById(con, getTargetProfileId().getDomainId(), workTypeId);
+
+			return wt;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
 	public List<ODrmGroup> listGroups(String groupCategory) throws WTException {
 		Connection con = null;
 		DrmGroupDAO grpDao = DrmGroupDAO.getInstance();
@@ -1846,8 +1904,7 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	//--------------------------------------------------------
-	public WorkReportSetting getWorkReportSetting(String type) throws WTException {
+	public WorkReportSetting getWorkReportSetting() throws WTException {
 		Connection con = null;
 		WorkReportSettingDAO wSettDao = WorkReportSettingDAO.getInstance();
 		WorkTypeDAO wrkTDao = WorkTypeDAO.getInstance();
@@ -1939,7 +1996,7 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID, false);
 
-			WorkReportSetting oldWorkReportSetting = getWorkReportSetting("wr");
+			WorkReportSetting oldWorkReportSetting = getWorkReportSetting();
 
 			OWorkReportSetting setting = createOWorkReportSetting(item);
 
@@ -2144,6 +2201,25 @@ public class DrmManager extends BaseManager {
 			DbUtils.closeQuietly(con);
 		}
 	}
+	
+	public OBusinessTrip getBusinessTripById(Integer businessTripId) throws WTException {
+		Connection con = null;
+		BusinessTripDao tripDao = BusinessTripDao.getInstance();
+		OBusinessTrip trip = null;
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			trip = tripDao.selectById(con, getTargetProfileId().getDomainId(), businessTripId);
+
+			return trip;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
 
 	Iterable<String> listOperators() throws WTException {
 		Connection con = null;
@@ -2192,5 +2268,110 @@ public class DrmManager extends BaseManager {
 		} finally {
 			DbUtils.closeQuietly(con);
 		}
+	}
+	
+	public CompanyPicture getCompanyPicture(int companyId) throws WTException {
+		CompanyDAO cmpDao = CompanyDAO.getInstance();
+		CompanyPictureDAO cpicDao = CompanyPictureDAO.getInstance();
+		Connection con = null;
+		
+		try {
+			con = WT.getConnection(SERVICE_ID);
+			
+			OCompany cmp = cmpDao.selectById(con, companyId);
+			if(cmp == null) throw new WTException("Unable to retrieve company [{0}]", companyId);
+			
+			OCompanyPicture pic = cpicDao.select(con, companyId);
+			return createCompanyPicture(pic);
+			
+		} catch(SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} catch(Throwable t) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(t);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public void updateCompanyPicture(int companyId, CompanyPicture picture) throws WTException {
+		CompanyDAO cmpDao = CompanyDAO.getInstance();
+		Connection con = null;
+		
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			if (picture == null) throw new WTException("Specified picture is null");
+			OCompany ocmp = cmpDao.selectById(con, companyId);
+			if (ocmp == null) throw new WTException("Unable to retrieve company [{0}]", companyId);
+			
+			doUpdateCompanyPicture(con, companyId, picture);
+			DbUtils.commitQuietly(con);
+			writeLog("COMPANY_UPDATE", String.valueOf(companyId));
+			
+		} catch(SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch(Throwable t) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(t);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	private CompanyPicture createCompanyPicture(OCompanyPicture with) {
+		return fillContactPicture(new CompanyPicture(), with);
+	}
+	
+	private CompanyPicture fillContactPicture(CompanyPicture fill, OCompanyPicture with) {
+		if ((fill != null) && (with != null)) {
+			fill.setWidth(with.getWidth());
+			fill.setHeight(with.getHeight());
+			fill.setMediaType(with.getMediaType());
+			fill.setBytes(with.getBytes());
+		}
+		return fill;
+	}
+	
+	public void doUpdateCompanyPicture(Connection con, int companyId, CompanyPicture picture) throws IOException, DAOException {
+		doDeleteCompanyPicture(con, companyId);
+		doInsertCompanyPicture(con, companyId, picture);
+	}
+	
+	private void doDeleteCompanyPicture(Connection con, int companyId) throws DAOException {
+		CompanyPictureDAO cpicDao = CompanyPictureDAO.getInstance();
+		cpicDao.delete(con, companyId);
+	}
+	
+	private void doInsertCompanyPicture(Connection con, int companyId, CompanyPicture picture) throws IOException, DAOException {
+		CompanyPictureDAO cpicDao = CompanyPictureDAO.getInstance();
+		
+		OCompanyPicture ocpic = new OCompanyPicture();
+		ocpic.setCompanyId(companyId);
+		ocpic.setMediaType(picture.getMediaType());
+
+		BufferedImage bi = ImageIO.read(new ByteArrayInputStream(picture.getBytes()));
+		if((bi.getWidth() > 720) || (bi.getHeight() > 720)) {
+			bi = Scalr.resize(bi, Scalr.Method.QUALITY, Scalr.Mode.AUTOMATIC, 720);
+			ocpic.setWidth(bi.getWidth());
+			ocpic.setHeight(bi.getHeight());
+			String formatName = new MimeType(picture.getMediaType()).getSubType();
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			try {
+				ImageIO.write(bi, formatName, baos);
+				baos.flush();
+				ocpic.setBytes(baos.toByteArray());
+			} catch(IOException ex1) {
+				logger.warn("Error resizing image", ex1);
+			} finally {
+				IOUtils.closeQuietly(baos);
+			}
+		} else {
+			ocpic.setWidth(bi.getWidth());
+			ocpic.setHeight(bi.getHeight());
+			ocpic.setBytes(picture.getBytes());
+		}
+		cpicDao.insert(con, ocpic);
 	}
 }

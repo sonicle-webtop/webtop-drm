@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WorkReportsSettings extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsSettingsRecord> {
 
-	private static final long serialVersionUID = -9420109;
+	private static final long serialVersionUID = 1038312856;
 
 	/**
 	 * The reference instance of <code>drm.work_reports_settings</code>
@@ -44,7 +44,7 @@ public class WorkReportsSettings extends org.jooq.impl.TableImpl<com.sonicle.web
 	/**
 	 * The column <code>drm.work_reports_settings.warranty_text</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsSettingsRecord, java.lang.String> WARRANTY_TEXT = createField("warranty_text", org.jooq.impl.SQLDataType.VARCHAR.length(1024), this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsSettingsRecord, java.lang.String> WARRANTY_TEXT = createField("warranty_text", org.jooq.impl.SQLDataType.CLOB, this, "");
 
 	/**
 	 * Create a <code>drm.work_reports_settings</code> table reference

@@ -118,7 +118,6 @@ public class CompanyDAO extends BaseDAO{
 			.set(COMPANIES.TAX_CODE,item.getTaxCode())
 			.set(COMPANIES.REA,item.getRea())	
 			.set(COMPANIES.BUSINESS_REGISTER,item.getBusinessRegister())
-			.set(COMPANIES.LOGO_UPLOAD_ID,item.getLogoUploadId())
 			.set(COMPANIES.FOOTER_COLUMNS,item.getFooterColumns())
 			.set(COMPANIES.FOOTER_COLUMN_LEFT,item.getFooterColumnLeft())
 			.set(COMPANIES.FOOTER_COLUMN_RIGHT,item.getFooterColumnRight())

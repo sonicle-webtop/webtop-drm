@@ -58,89 +58,93 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 		});
 
 		Ext.apply(me, {
-			dockedItems: [{
-				xtype: 'toolbar',
-				dock: 'top',
-				reference: 'toolbar',
-				modelValidation: true,
-				items: [
-					'->',
-					WTF.localCombo('id', 'desc', {
-						reference: 'flduser',
-						bind: '{record.operatorId}',
-						store: {
-							autoLoad: true,
-							model: 'WTA.model.Simple',
-							proxy: WTF.proxy(me.mys.ID, 'LookupOperators'),
-							listeners: {
-								load: function (s) {
-									if (me.isMode('new')) {
-										var meta = s.getProxy().getReader().metaData;
-										if (meta.selected) {
-											me.lookupReference('flduser').setValue(meta.selected);
-										}
-										if (s.loadCount === 1) {
-											me.lref('fldcompany').getStore().load();
-											me.lref('fldmasterdata').getStore().load();
-											//me.lref('fldstatmasterdata').getStore().load();
-											me.lref('fldcausal').getStore().load();
-										}
-									}
-									
-									/*
-									if (s.loadCount === 1) {
-										var meta = s.getProxy().getReader().metaData;
-										if (meta.selected) {
-											me.lref('flduser').setValue(meta.selected);
-											WTU.loadWithExtraParams(me.lref('fldcompany').getStore(), {
-												operator: meta.selected
-											});
-											WTU.loadWithExtraParams(me.lref('fldmasterdata').getStore(), {
-												operator: meta.selected
-											});
-											WTU.loadWithExtraParams(me.lref('fldstatmasterdata').getStore(), {
-												operator: meta.selected,
-												realCustomer: null
-											});
-											WTU.loadWithExtraParams(me.lref('fldcausal').getStore(), {
-												profileId: WT.toPid(WT.getVar('domainId'), meta.selected),
-												masterDataId: null
-											});
-										}
-									}
-									*/
-								}
-							}
-						},
+			tbar: [
+				me.addAct('printWorkReport', {
+					text: null,
+					tooltip: WT.res('act-print.lbl'),
+					iconCls: 'wt-icon-print-xs',
+					//disabled: me.isMode(me.MODE_NEW),
+					handler: function() {
+						//TODO: aggiungere l'azione 'salva' permettendo così la stampa senza chiudere la form
+						me.printWorkReport(me.getModel().getId());
+					}
+				}),
+				'->',
+				WTF.localCombo('id', 'desc', {
+					reference: 'flduser',
+					bind: '{record.operatorId}',
+					store: {
+						autoLoad: true,
+						model: 'WTA.model.Simple',
+						proxy: WTF.proxy(me.mys.ID, 'LookupOperators'),
 						listeners: {
-							select: function (s, r) {
-								me.lref('fldcompany').getStore().load();
-								me.lref('fldmasterdata').getStore().load();
-								me.lref('fldstatmasterdata').getStore().load();
-								me.lref('fldcausal').getStore().load();
-								
-								
+							load: function (s) {
+								if (me.isMode('new')) {
+									var meta = s.getProxy().getReader().metaData;
+									if (meta.selected) {
+										me.lookupReference('flduser').setValue(meta.selected);
+									}
+									if (s.loadCount === 1) {
+										me.lref('fldcompany').getStore().load();
+										me.lref('fldmasterdata').getStore().load();
+										//me.lref('fldstatmasterdata').getStore().load();
+										me.lref('fldcausal').getStore().load();
+									}
+								}
+
 								/*
-								WTU.loadWithExtraParams(me.lref('fldcompany').getStore(), {
-									operator: r.id
-								});
-								
-								WTU.loadWithExtraParams(me.lref('fldmasterdata').getStore(), {
-									operator: r.id
-								});
-								WTU.loadWithExtraParams(me.lref('fldstatmasterdata').getStore(), {
-									operator: r.id
-								});
-								WTU.loadWithExtraParams(me.lref('fldcausal').getStore(), {
-									profileId: WT.toPid(WT.getVar('domainId'), r.id)
-								});
+								if (s.loadCount === 1) {
+									var meta = s.getProxy().getReader().metaData;
+									if (meta.selected) {
+										me.lref('flduser').setValue(meta.selected);
+										WTU.loadWithExtraParams(me.lref('fldcompany').getStore(), {
+											operator: meta.selected
+										});
+										WTU.loadWithExtraParams(me.lref('fldmasterdata').getStore(), {
+											operator: meta.selected
+										});
+										WTU.loadWithExtraParams(me.lref('fldstatmasterdata').getStore(), {
+											operator: meta.selected,
+											realCustomer: null
+										});
+										WTU.loadWithExtraParams(me.lref('fldcausal').getStore(), {
+											profileId: WT.toPid(WT.getVar('domainId'), meta.selected),
+											masterDataId: null
+										});
+									}
+								}
 								*/
 							}
-						},
-						fieldLabel: me.mys.res('workReport.fld-nominative.lbl')
-					})
-				]
-			}]
+						}
+					},
+					listeners: {
+						select: function (s, r) {
+							me.lref('fldcompany').getStore().load();
+							me.lref('fldmasterdata').getStore().load();
+							me.lref('fldstatmasterdata').getStore().load();
+							me.lref('fldcausal').getStore().load();
+
+
+							/*
+							WTU.loadWithExtraParams(me.lref('fldcompany').getStore(), {
+								operator: r.id
+							});
+
+							WTU.loadWithExtraParams(me.lref('fldmasterdata').getStore(), {
+								operator: r.id
+							});
+							WTU.loadWithExtraParams(me.lref('fldstatmasterdata').getStore(), {
+								operator: r.id
+							});
+							WTU.loadWithExtraParams(me.lref('fldcausal').getStore(), {
+								profileId: WT.toPid(WT.getVar('domainId'), r.id)
+							});
+							*/
+						}
+					},
+					fieldLabel: me.mys.res('workReport.fld-nominative.lbl')
+				})
+			]
 		});
 
 		me.callParent(arguments);
@@ -587,13 +591,13 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 									reference: 'description',
 									bind: '{record.description}',
 									maxLength: 2048,
-									enableKeyEvents: true,
-									style: {textTransform: 'uppercase', overflow: 'scroll', fontFamily: 'courier new'},
-									listeners: {
-										change: function (field, newValue) {
-											field.setValue(newValue.toUpperCase());
-										}
-									}
+									enableKeyEvents: true
+//									style: {textTransform: 'uppercase', overflow: 'scroll', fontFamily: 'courier new'},
+//									listeners: {
+//										change: function (field, newValue) {
+//											field.setValue(newValue.toUpperCase());
+//										}
+//									}
 								}
 							]
 						}
@@ -745,6 +749,14 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 			raw: 1,
 			attachmentIds: WTU.arrayAsParam(attachmentIds)
 		}));
+	},
+	printWorkReport: function(contactId) {
+		var me = this;
+		if(me.getModel().isDirty()) {
+			WT.warn(WT.res('warn.print.notsaved'));
+		} else {
+			me.mys.printWorkReport([contactId]);
+		}
 	},
 	initActions: function () {
 		var me = this;

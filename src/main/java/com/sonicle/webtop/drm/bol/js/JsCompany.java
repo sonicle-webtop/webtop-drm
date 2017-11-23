@@ -38,6 +38,7 @@ import com.sonicle.webtop.drm.model.CompanyUserAssociation;
 import com.sonicle.webtop.drm.model.DocStatusGroupAssociation;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -62,6 +63,7 @@ public class JsCompany {
 	public String footerColumns;
 	public String footerColumnLeft;
 	public String footerColumnRight;
+	public String picture;
 
 	public List<CompanyUserAssociation> associatedUsers = new ArrayList();
 
@@ -85,6 +87,8 @@ public class JsCompany {
 		this.footerColumnRight = company.getFooterColumnRight();
 		
 		this.associatedUsers = company.getAssociatedUsers();
+		
+		this.picture = (company.getHasPicture()) ? String.valueOf(this.companyId) : null;
 	}
 
 	public static Company createCompany(JsCompany js) {
@@ -110,6 +114,8 @@ public class JsCompany {
 		newCompany.setFooterColumnRight(js.footerColumnRight);
 
 		newCompany.setAssociatedUsers(js.associatedUsers);
+		
+		newCompany.setHasPicture(!StringUtils.isEmpty(js.picture));
 		
 		return newCompany;
 	}

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.3.0.final using JasperReports Library version 6.3.0  -->
+<!-- 2017-11-23T14:41:36 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="workreport_sub" pageWidth="291" pageHeight="320" columnWidth="291" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="b8bcf21f-ad61-4bc9-88ab-9bca2c77f4f8">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<subDataset name="Dataset1" uuid="8a31f723-a7f0-4aa2-802b-ef499dbbe311">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+	</subDataset>
+	<parameter name="wrRows" class="java.util.ArrayList"/>
+	<parameter name="dayTransfert" class="java.lang.Integer"/>
+	<parameter name="businessTripDescription" class="java.lang.String"/>
+	<parameter name="printTransfertDescription" class="java.lang.Boolean"/>
+	<parameter name="printDaysTransfert" class="java.lang.Boolean"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="id" class="java.lang.Integer"/>
+	<field name="workReportId" class="java.lang.String"/>
+	<field name="workTypeId" class="java.lang.Integer"/>
+	<field name="workTypeDescription" class="java.lang.String"/>
+	<field name="duration" class="java.lang.Integer"/>
+	<field name="rowFlag" class="java.lang.String"/>
+	<field name="workTypeExternalId" class="java.lang.String"/>
+	<field name="rowNo" class="java.lang.Integer"/>
+	<sortField name="rowNo"/>
+	<variable name="totalDuration" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{duration}]]></variableExpression>
+	</variable>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<rectangle>
+				<reportElement x="0" y="0" width="30" height="16" backcolor="rgba(255, 255, 255, 0.0)" uuid="42e1391d-53f6-41e7-a116-70ba217f82cf"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="30" y="0" width="176" height="16" backcolor="rgba(255, 255, 255, 0.0)" uuid="5f512fd9-99d5-4aae-8b36-688918f3db7d">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="206" y="0" width="55" height="16" backcolor="rgba(255, 255, 255, 0.0)" uuid="39161cdf-58c1-401a-97ea-e40eb00413dc"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="261" y="0" width="29" height="16" backcolor="rgba(255, 255, 255, 0.0)" uuid="838b0b2e-7870-4671-9cc7-3d8ca385b995"/>
+			</rectangle>
+			<textField>
+				<reportElement x="0" y="0" width="30" height="15" uuid="5437193c-2bbd-417a-af09-d8f79003763e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{rowNo} != null) ? (($F{rowNo} != 999) ? $F{rowNo} : "") : ""]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="33" y="0" width="165" height="15" uuid="75e4b10e-c97a-4a1c-8a5b-8068bb171530"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{workTypeDescription} == null) ? "" : $F{workTypeDescription}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="206" y="0" width="55" height="15" uuid="69c52938-6e9d-4272-8e97-92e7aaa5c30e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{workTypeDescription} != null) ? (REPLACE($F{workTypeDescription},2,LEN($F{workTypeDescription})-1,new String())) : ""]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="261" y="0" width="28" height="15" uuid="5ad59a1d-efb1-4c62-b1d4-1dcea4055ede"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{duration} == null) ? "" : (new Float($F{duration})/new Float(60))]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="32">
+			<rectangle>
+				<reportElement x="0" y="0" width="261" height="16" backcolor="rgba(255, 255, 255, 0.0)" uuid="43f6c4dc-cef0-46e7-8656-fc5655095145">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="cm"/>
+				</reportElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="4" y="0" width="257" height="16" uuid="f395f7c5-eceb-47e1-8586-c13829351e71"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[TEMPO COMPLESSIVO IMPIEGATO ORE]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="261" y="0" width="29" height="16" backcolor="rgba(255, 255, 255, 0.0)" uuid="300faf1e-6518-419d-b435-67ebb0dac783"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="16" width="261" height="16" backcolor="rgba(255, 255, 255, 0.0)" uuid="488c4d7a-bdb5-43a8-91b8-11ceee2ad65b">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="cm"/>
+				</reportElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="261" y="16" width="29" height="16" backcolor="rgba(255, 255, 255, 0.0)" uuid="f02e211d-1009-41f7-8241-4b98e4ef1c2d"/>
+			</rectangle>
+			<textField>
+				<reportElement x="4" y="17" width="257" height="15" uuid="ad6cfb4a-b483-48e6-b381-d23f0d394461"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($P{printTransfertDescription}) ? (($P{businessTripDescription} != null) ? $P{businessTripDescription} : "") : "TRASFERTA"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="261" y="17" width="28" height="15" uuid="39b72294-b57e-4deb-a9a7-c5ece5ff6dc5">
+					<printWhenExpression><![CDATA[$P{printDaysTransfert}]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($P{dayTransfert} != null) ? (new String($P{dayTransfert} + " GG"))  : ""]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="261" y="0" width="28" height="16" uuid="68a6c91d-6500-4c99-9ea3-03ac7e33a014"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($V{totalDuration} != 0) ? (new Float($V{totalDuration})/new Float(60) ) : 0]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

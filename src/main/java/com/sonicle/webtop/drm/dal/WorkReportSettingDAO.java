@@ -71,7 +71,7 @@ public class WorkReportSettingDAO extends BaseDAO {
 				.execute();
 	}
 
-	public List<OWorkReportSetting> selectWorkReports(Connection con) throws DAOException {
+	public List<OWorkReportSetting> selectWorkReportSettings(Connection con) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		return dsl
 				.select()

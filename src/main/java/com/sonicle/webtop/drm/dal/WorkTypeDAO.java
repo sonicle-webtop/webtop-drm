@@ -75,6 +75,21 @@ public class WorkTypeDAO extends BaseDAO {
 				)
 				.fetchInto(OWorkType.class);
 	}
+	
+	public OWorkType selectById(Connection con, String domainId, int workTypeId) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		
+		return dsl
+			.select()
+			.from(WORK_TYPES)
+			.where(
+				WORK_TYPES.DOMAIN_ID.equal(domainId)
+				.and(
+						WORK_TYPES.WORK_TYPE_ID.equal(workTypeId)
+				)
+			)
+			.fetchOneInto(OWorkType.class);
+	}
 
 	public int insert(Connection con, OWorkType item) throws DAOException {
 		DSLContext dsl = getDSL(con);

@@ -33,6 +33,7 @@
 Ext.define('Sonicle.webtop.drm.view.Company', {
 	extend: 'WTA.sdk.ModelView',
 	requires: [
+		'Sonicle.form.field.Image',
 		'Sonicle.webtop.drm.model.Company',
 		'Sonicle.webtop.drm.ux.UserGrid'
 	],
@@ -40,7 +41,7 @@ Ext.define('Sonicle.webtop.drm.view.Company', {
 		title: '{company.tit}', //localizzato
 		iconCls: 'wtdrm-icon-configuration-companiesconfiguration-xs',
 		width: 500,
-		height: 500
+		height: 530
 	},
 	fieldTitle: 'name',
 	modelName: 'Sonicle.webtop.drm.model.Company',
@@ -82,7 +83,7 @@ Ext.define('Sonicle.webtop.drm.view.Company', {
 							fieldLabel: me.mys.res('company.fld-address.lbl')
 						}, {
 							xtype: 'textfield',
-							bind: '{record.zip}',
+							bind: '{record.postalCode}',
 							fieldLabel: me.mys.res('company.fld-postalcode.lbl')
 						}, {
 							xtype: 'textfield',
@@ -116,6 +117,37 @@ Ext.define('Sonicle.webtop.drm.view.Company', {
 							xtype: 'textfield',
 							bind: '{record.businessRegister}',
 							fieldLabel: me.mys.res('company.fld-businessRegister.lbl')
+						},{
+							xtype: 'soimagefield',
+							reference: 'fldpic',
+							bind: '{record.picture}',
+							fieldLabel: me.mys.res('company.fld-picture.lbl'),
+							imageWidth: 250,
+							imageHeight: 60,
+							geometry: 'square',
+							imageUrl: WTF.processBinUrl(me.mys.ID, 'GetCompanyPicture'),
+							clearTriggerCls: 'wtcon-trash-trigger',
+							uploadTriggerCls: 'wtcon-add-trigger',
+							uploaderConfig: WTF.uploader(me.mys.ID, 'CompanyPicture', {
+								extraParams: {tag: me.getId()},
+								mimeTypes: [
+									{title: 'Image files', extensions: 'jpeg,jpg,png'}
+								]
+							}),
+							listeners: {
+								uploadstarted: function() {
+									me.wait();
+								},
+								uploadcomplete: function() {
+									me.unwait();
+								},
+								uploaderror: function() {
+									me.unwait();
+								},
+								fileuploaded: function(s, file, json) {
+									me.getModel().set('picture', json.data.uploadId);
+								}
+							}
 						}]
 				}, {
 					xtype: 'wtform',

@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Companies extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.CompaniesRecord> {
 
-	private static final long serialVersionUID = 1715774307;
+	private static final long serialVersionUID = -958382326;
 
 	/**
 	 * The reference instance of <code>drm.companies</code>
@@ -109,17 +109,12 @@ public class Companies extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jo
 	/**
 	 * The column <code>drm.companies.footer_column_left</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.CompaniesRecord, java.lang.String> FOOTER_COLUMN_LEFT = createField("footer_column_left", org.jooq.impl.SQLDataType.VARCHAR.length(100), this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.CompaniesRecord, java.lang.String> FOOTER_COLUMN_LEFT = createField("footer_column_left", org.jooq.impl.SQLDataType.CLOB, this, "");
 
 	/**
 	 * The column <code>drm.companies.footer_column_right</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.CompaniesRecord, java.lang.String> FOOTER_COLUMN_RIGHT = createField("footer_column_right", org.jooq.impl.SQLDataType.VARCHAR.length(100), this, "");
-
-	/**
-	 * The column <code>drm.companies.logo_upload_id</code>.
-	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.CompaniesRecord, java.lang.String> LOGO_UPLOAD_ID = createField("logo_upload_id", org.jooq.impl.SQLDataType.VARCHAR.length(36), this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.CompaniesRecord, java.lang.String> FOOTER_COLUMN_RIGHT = createField("footer_column_right", org.jooq.impl.SQLDataType.CLOB, this, "");
 
 	/**
 	 * Create a <code>drm.companies</code> table reference

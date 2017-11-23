@@ -511,3 +511,24 @@ ALTER TABLE "drm"."work_reports"
 ALTER COLUMN "from_date" TYPE date,
 ALTER COLUMN "to_date" TYPE date,
 ALTER COLUMN "ddt_date" TYPE date;
+
+ALTER TABLE "drm"."companies"
+ALTER COLUMN "footer_column_left" TYPE text,
+ALTER COLUMN "footer_column_right" TYPE text;
+
+ALTER TABLE "drm"."work_reports_settings"
+ALTER COLUMN "warranty_text" TYPE text;
+
+CREATE TABLE "drm"."companies_pictures" (
+"company_id" int4 NOT NULL,
+"width" int4,
+"height" int4,
+"media_type" varchar(50),
+"bytes" bytea
+);
+
+
+ALTER TABLE "drm"."companies_pictures" ADD PRIMARY KEY ("company_id");
+
+ALTER TABLE "drm"."companies"
+DROP COLUMN "logo_upload_id";

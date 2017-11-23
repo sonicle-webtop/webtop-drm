@@ -41,6 +41,7 @@ public class Keys {
 
 	public static final org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.BusinessTripsRecord> BUSINESS_TRIPS_PKEY = UniqueKeys0.BUSINESS_TRIPS_PKEY;
 	public static final org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.CompaniesRecord> COMPANIES_PKEY = UniqueKeys0.COMPANIES_PKEY;
+	public static final org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.CompaniesPicturesRecord> COMPANIES_PICTURES_PKEY = UniqueKeys0.COMPANIES_PICTURES_PKEY;
 	public static final org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.CompaniesUsersRecord> COMPANIES_USERS_PKEY = UniqueKeys0.COMPANIES_USERS_PKEY;
 	public static final org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.DocStatusesRecord> DOC_STATUSES_PKEY = UniqueKeys0.DOC_STATUSES_PKEY;
 	public static final org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.DocStatusesGroupsRecord> DOC_STATUSES_GROUPS_PKEY = UniqueKeys0.DOC_STATUSES_GROUPS_PKEY;
@@ -87,6 +88,7 @@ public class Keys {
 	private static class UniqueKeys0 extends org.jooq.impl.AbstractKeys {
 		public static final org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.BusinessTripsRecord> BUSINESS_TRIPS_PKEY = createUniqueKey(com.sonicle.webtop.drm.jooq.tables.BusinessTrips.BUSINESS_TRIPS, com.sonicle.webtop.drm.jooq.tables.BusinessTrips.BUSINESS_TRIPS.BUSINESS_TRIP_ID);
 		public static final org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.CompaniesRecord> COMPANIES_PKEY = createUniqueKey(com.sonicle.webtop.drm.jooq.tables.Companies.COMPANIES, com.sonicle.webtop.drm.jooq.tables.Companies.COMPANIES.COMPANY_ID);
+		public static final org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.CompaniesPicturesRecord> COMPANIES_PICTURES_PKEY = createUniqueKey(com.sonicle.webtop.drm.jooq.tables.CompaniesPictures.COMPANIES_PICTURES, com.sonicle.webtop.drm.jooq.tables.CompaniesPictures.COMPANIES_PICTURES.COMPANY_ID);
 		public static final org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.CompaniesUsersRecord> COMPANIES_USERS_PKEY = createUniqueKey(com.sonicle.webtop.drm.jooq.tables.CompaniesUsers.COMPANIES_USERS, com.sonicle.webtop.drm.jooq.tables.CompaniesUsers.COMPANIES_USERS.ASSOCIATION_ID);
 		public static final org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.DocStatusesRecord> DOC_STATUSES_PKEY = createUniqueKey(com.sonicle.webtop.drm.jooq.tables.DocStatuses.DOC_STATUSES, com.sonicle.webtop.drm.jooq.tables.DocStatuses.DOC_STATUSES.DOC_STATUS_ID);
 		public static final org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.DocStatusesGroupsRecord> DOC_STATUSES_GROUPS_PKEY = createUniqueKey(com.sonicle.webtop.drm.jooq.tables.DocStatusesGroups.DOC_STATUSES_GROUPS, com.sonicle.webtop.drm.jooq.tables.DocStatusesGroups.DOC_STATUSES_GROUPS.ASSOCIATION_ID);

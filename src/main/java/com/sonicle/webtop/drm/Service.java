@@ -45,23 +45,23 @@ import com.sonicle.commons.web.json.extjs.ExtTreeNode;
 import com.sonicle.commons.web.json.extjs.LookupMeta;
 import com.sonicle.commons.web.json.extjs.ResultMeta;
 import com.sonicle.webtop.contacts.IContactsManager;
-import com.sonicle.webtop.contacts.model.Contact;
 import com.sonicle.webtop.contacts.model.ContactEx;
 import com.sonicle.webtop.contacts.model.FolderContacts;
-import com.sonicle.webtop.core.CoreManager;
+import com.sonicle.webtop.core.CoreUserSettings;
 import com.sonicle.webtop.core.app.WT;
 import com.sonicle.webtop.core.app.WebTopSession;
 import com.sonicle.webtop.core.app.WebTopSession.UploadedFile;
 import com.sonicle.webtop.core.bol.OGroup;
 import com.sonicle.webtop.core.bol.OUser;
-import com.sonicle.webtop.core.bol.js.JsCausalLkp;
-import com.sonicle.webtop.core.bol.js.JsCustomerSupplierLkp;
 import com.sonicle.webtop.core.bol.js.JsSimple;
 import com.sonicle.webtop.core.bol.js.JsSimpleSource;
+import com.sonicle.webtop.core.io.output.AbstractReport;
+import com.sonicle.webtop.core.io.output.ReportConfig;
 import com.sonicle.webtop.core.model.Causal;
 import com.sonicle.webtop.core.model.CausalExt;
 import com.sonicle.webtop.core.model.MasterData;
 import com.sonicle.webtop.core.sdk.BaseService;
+import com.sonicle.webtop.core.sdk.UserProfile;
 import com.sonicle.webtop.core.sdk.UserProfileId;
 import com.sonicle.webtop.core.sdk.WTException;
 import com.sonicle.webtop.drm.bol.OBusinessTrip;
@@ -84,7 +84,9 @@ import com.sonicle.webtop.drm.bol.js.JsGridProfiles;
 import com.sonicle.webtop.drm.bol.js.JsGridWorkReports;
 import com.sonicle.webtop.drm.bol.js.JsWorkReport;
 import com.sonicle.webtop.drm.bol.js.JsWorkReportSetting;
+import com.sonicle.webtop.drm.bol.model.RBWorkReport;
 import com.sonicle.webtop.drm.model.Company;
+import com.sonicle.webtop.drm.model.CompanyPicture;
 import com.sonicle.webtop.drm.model.DocStatus;
 import com.sonicle.webtop.drm.model.DrmFolder;
 import com.sonicle.webtop.drm.model.DrmGroup;
@@ -94,9 +96,12 @@ import com.sonicle.webtop.drm.model.GroupCategory;
 import com.sonicle.webtop.drm.model.WorkReport;
 import com.sonicle.webtop.drm.model.WorkReportAttachment;
 import com.sonicle.webtop.drm.model.WorkReportSetting;
+import com.sonicle.webtop.drm.rpt.RptWorkReport;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -458,17 +463,35 @@ public class Service extends BaseService {
 
 				new JsonResult(new JsCompany(company)).printTo(out);
 			} else if (crud.equals(Crud.CREATE)) {
-
 				Payload<MapItem, JsCompany> pl = ServletUtils.getPayload(request, JsCompany.class);
-				//new company
-				manager.addCompany(JsCompany.createCompany(pl.data));
+				
+				Company company = JsCompany.createCompany(pl.data);
+				CompanyPicture picture = null;
+				if(company.getHasPicture() && hasUploadedFile(pl.data.picture)) {
+					picture = getUploadedCompanyPicture(pl.data.picture);
+				}
+				
+				if(picture != null) {
+					manager.addCompany(company, picture);
+				} else {
+					manager.addCompany(company);
+				}
 
 				new JsonResult().printTo(out);
 			} else if (crud.equals(Crud.UPDATE)) {
 
 				Payload<MapItem, JsCompany> pl = ServletUtils.getPayload(request, JsCompany.class);
-
-				manager.updateCompany(JsCompany.createCompany(pl.data));
+				Company company = JsCompany.createCompany(pl.data);
+				CompanyPicture picture = null;
+				if(company.getHasPicture() && hasUploadedFile(pl.data.picture)) {
+					picture = getUploadedCompanyPicture(pl.data.picture);
+				}
+				
+				if(picture != null) {
+					manager.updateCompany(company, picture);
+				} else {
+					manager.updateCompany(company);
+				}
 
 				new JsonResult().printTo(out);
 			} else if (crud.equals(Crud.DELETE)) {
@@ -483,6 +506,48 @@ public class Service extends BaseService {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action ManageCompany", ex);
 		}
+	}
+	
+	public void processGetCompanyPicture(HttpServletRequest request, HttpServletResponse response) {
+		
+		try {
+			String id = ServletUtils.getStringParameter(request, "id", true);
+			
+			CompanyPicture picture = null;
+			if(hasUploadedFile(id)) {
+				picture = getUploadedCompanyPicture(id);
+			} else {
+				int contactId = Integer.parseInt(id);
+				picture = manager.getCompanyPicture(contactId);
+			}
+			
+			if(picture != null) {
+				try(ByteArrayInputStream bais = new ByteArrayInputStream(picture.getBytes())) {
+					ServletUtils.writeContent(response, bais, picture.getMediaType());
+				}
+			}			
+		} catch(Exception ex) {
+			logger.error("Error in action GetCompanyPicture", ex);
+		}
+	}
+	
+	private CompanyPicture getUploadedCompanyPicture(String id) throws WTException {
+		UploadedFile upl = getUploadedFile(id);
+		if(upl == null) throw new WTException("Uploaded file not found [{0}]", id);
+		
+		CompanyPicture pic = null;
+		FileInputStream fis = null;
+		try {
+			fis = new FileInputStream(upl.getFile());
+			pic = new CompanyPicture("image/png", IOUtils.toByteArray(fis));
+		} catch (FileNotFoundException ex) {
+			throw new WTException(ex, "File not found {0}");
+		} catch (IOException ex) {
+			throw new WTException(ex, "Unable to read file {0}");
+		} finally {
+			IOUtils.closeQuietly(fis);
+		}
+		return pic;
 	}
 
 	public void processUpdateConfiguration(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
@@ -917,7 +982,7 @@ public class Service extends BaseService {
 				String id = ServletUtils.getStringParameter(request, "id", false);
 
 				//TODO ENUM PER TIPOLOGIA DI SETTING PER I VARI PROGRAMMI ES: wr(Work report), en(Expense Note), tt(Timetable)
-				WorkReportSetting wrkRptSetting = manager.getWorkReportSetting(id);
+				WorkReportSetting wrkRptSetting = manager.getWorkReportSetting();
 
 				if (wrkRptSetting != null) {
 					item = new JsWorkReportSetting(wrkRptSetting);
@@ -980,5 +1045,51 @@ public class Service extends BaseService {
 		}
 	}
 
-	//-------------------------------------------------------
+	public void processPrintWorkReport(HttpServletRequest request, HttpServletResponse response) {
+		ArrayList<RBWorkReport> itemsWr = new ArrayList<>();
+		
+		try {
+			IContactsManager contactManager = (IContactsManager) WT.getServiceManager("com.sonicle.webtop.contacts", getEnv().getProfileId());
+			
+			String filename = ServletUtils.getStringParameter(request, "filename", "print");
+			StringArray ids = ServletUtils.getObjectParameter(request, "ids", StringArray.class, true);
+			
+			WorkReport wr = null;
+			CompanyPicture picture = null;
+			Company company = null;
+			
+			for(String id : ids) {
+				picture = null;
+				wr = manager.getWorkReport(id);
+				company = manager.getCompany(wr.getCompanyId());
+				if(company.getHasPicture()) picture = manager.getCompanyPicture(company.getCompanyId());
+				itemsWr.add(new RBWorkReport(WT.getCoreManager(), manager, contactManager, wr, ss, picture));
+			}
+			
+			ReportConfig.Builder builder = reportConfigBuilder();
+			RptWorkReport rpt = new RptWorkReport(builder.build());
+			rpt.setDataSource(itemsWr);
+			
+			ServletUtils.setFileStreamHeaders(response, filename + ".pdf");
+			WT.generateReportToStream(rpt, AbstractReport.OutputType.PDF, response.getOutputStream());
+			
+		} catch(Exception ex) {
+			logger.error("Error in action PrintWorkReport", ex);
+			ServletUtils.writeErrorHandlingJs(response, ex.getMessage());
+		}
+	}
+	
+	private ReportConfig.Builder reportConfigBuilder() {
+		UserProfile.Data ud = getEnv().getProfile().getData();
+		CoreUserSettings cus = getEnv().getCoreUserSettings();
+		return new ReportConfig.Builder()
+				.useLocale(ud.getLocale())
+				.useTimeZone(ud.getTimeZone().toTimeZone())
+				.dateFormatShort(cus.getShortDateFormat())
+				.dateFormatLong(cus.getLongDateFormat())
+				.timeFormatShort(cus.getShortTimeFormat())
+				.timeFormatLong(cus.getLongTimeFormat())
+				.generatedBy(WT.getPlatformName() + " " + lookupResource(WorkReportLocale.SERVICE_NAME))
+				.printedBy(ud.getDisplayName());
+	}
 }

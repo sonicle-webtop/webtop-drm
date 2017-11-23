@@ -74,6 +74,20 @@ public class BusinessTripDao extends BaseDAO {
 				)
 				.fetchInto(OBusinessTrip.class);
 	}
+	
+	public OBusinessTrip selectById(Connection con, String domainId, Integer businessTripId) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.select()
+				.from(BUSINESS_TRIPS)
+				.where(
+						BUSINESS_TRIPS.DOMAIN_ID.equal(domainId)
+						.and(
+								BUSINESS_TRIPS.BUSINESS_TRIP_ID.equal(businessTripId)
+						)
+				)
+				.fetchOneInto(OBusinessTrip.class);
+	}
 
 	public int insert(Connection con, OBusinessTrip item) throws DAOException {
 		DSLContext dsl = getDSL(con);

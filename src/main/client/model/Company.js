@@ -57,10 +57,10 @@ Ext.define('Sonicle.webtop.drm.model.Company', {
 		WTF.field('taxCode', 'string',true),
 		WTF.field('rea', 'string',true),
 		WTF.field('businessRegister', 'string',true),
-		WTF.field('logoUploadId', 'string',true),
 		WTF.field('footerColumns', 'string',true),
 		WTF.field('footerColumnLeft', 'string',true),
-		WTF.field('footerColumnRight', 'string',true)
+		WTF.field('footerColumnRight', 'string',true),
+		WTF.field('picture', 'string', true)
 	],
 	
 	hasMany: [

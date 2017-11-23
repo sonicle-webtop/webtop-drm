@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Drm extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = 1179900374;
+	private static final long serialVersionUID = 1025760874;
 
 	/**
 	 * The reference instance of <code>drm</code>
@@ -67,6 +67,7 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 		return java.util.Arrays.<org.jooq.Table<?>>asList(
 			com.sonicle.webtop.drm.jooq.tables.BusinessTrips.BUSINESS_TRIPS,
 			com.sonicle.webtop.drm.jooq.tables.Companies.COMPANIES,
+			com.sonicle.webtop.drm.jooq.tables.CompaniesPictures.COMPANIES_PICTURES,
 			com.sonicle.webtop.drm.jooq.tables.CompaniesUsers.COMPANIES_USERS,
 			com.sonicle.webtop.drm.jooq.tables.DocStatuses.DOC_STATUSES,
 			com.sonicle.webtop.drm.jooq.tables.DocStatusesGroups.DOC_STATUSES_GROUPS,
