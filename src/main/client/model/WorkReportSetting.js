@@ -51,14 +51,14 @@ Ext.define('Sonicle.webtop.drm.model.WorkReportSetting', {
 		WTF.field('domainId', 'string', true),
 		WTF.field('workReportSequence', 'int', true),
 		WTF.field('warranty', 'string', true),
-		WTF.field('printDaysTransfert', 'bool', true),
-		WTF.field('printTransfertDescription', 'bool', true),
-		WTF.field('printSignature', 'bool', true),
-		WTF.field('manageHours', 'bool', true),
+		WTF.field('printDaysTransfert', 'bool', true, {defaultValue: false}),
+		WTF.field('printTransfertDescription', 'bool', true, {defaultValue: false}),
+		WTF.field('printSignature', 'bool', true, {defaultValue: false}),
+		WTF.field('manageHours', 'bool', true, {defaultValue: false}),
 		WTF.field('roundingHour', 'int', true), //nomeCampo,tipo,allowBlank//nomeCampo,tipo,allowBlank
-		WTF.field('tracking', 'bool', true), //nomeCampo,tipo,allowBlank//nomeCampo,tipo,allowBlank
-		WTF.field('trackingMail', 'bool', true), //nomeCampo,tipo,allowBlank//nomeCampo,tipo,allowBlank
-		WTF.field('trackingCloud', 'bool', true) //nomeCampo,tipo,allowBlank//nomeCampo,tipo,allowBlank
+		WTF.field('tracking', 'bool', true, {defaultValue: false}), //nomeCampo,tipo,allowBlank//nomeCampo,tipo,allowBlank
+		WTF.field('trackingMail', 'bool', true, {defaultValue: false}), //nomeCampo,tipo,allowBlank//nomeCampo,tipo,allowBlank
+		WTF.field('trackingCloud', 'bool', true, {defaultValue: false}) //nomeCampo,tipo,allowBlank//nomeCampo,tipo,allowBlank
 	],
 	hasMany: [
 		WTF.hasMany('types', 'Sonicle.webtop.drm.model.WorkType'),

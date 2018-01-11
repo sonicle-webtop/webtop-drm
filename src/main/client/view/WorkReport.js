@@ -73,6 +73,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 				WTF.localCombo('id', 'desc', {
 					reference: 'flduser',
 					bind: '{record.operatorId}',
+					anyMatch: true,
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -138,6 +139,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											reference: 'fldcompany',
 											bind: '{record.companyId}',
 											autoLoadOnValue: true,
+											tabIndex: 101,
 											store: {
 												model: 'WTA.model.Simple',
 												proxy: WTF.proxy(me.mys.ID, 'LookupCompanies', null, {
@@ -165,6 +167,8 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 										WTF.localCombo('id', 'desc', {
 											xtype: 'sosourcecombo',
 											bind: '{record.contactId}',
+											anyMatch: true,
+											tabIndex: 102,
 											store: {
 												autoLoad: true,
 												model: 'WTA.ux.data.SimpleSourceModel',
@@ -178,6 +182,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											reference: 'fldmasterdata',
 											bind: '{record.customerId}',
 											autoLoadOnValue: true,
+											tabIndex: 103,
 											store: {
 												model: 'WTA.model.Simple',
 												proxy: WTF.proxy(me.mys.ID, 'LookupRealCustomers', null, {
@@ -224,6 +229,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											reference: 'fldfromdate',
 											bind: '{record.fromDate}',
 											format: WT.getShortDateFmt(),
+											tabIndex: 105,
 											listeners: {
 												select: function (s, v) {
 													if (me.lref('fldtodate').getValue() === null || v > me.lref('fldtodate').getValue()) {
@@ -240,12 +246,14 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											xtype: 'textfield',
 											bind: '{record.referenceNo}',
 											fieldLabel: me.mys.res('workReport.fld-reference.lbl'),
-											width: '420px'
+											width: '420px',
+											tabIndex: 107
 										}, {
 											xtype: 'textfield',
 											bind: '{record.ddtNo}',
 											fieldLabel: me.mys.res('workReport.fld-ddt.lbl'),
-											width: '420px'
+											width: '420px',
+											tabIndex: 109
 										}
 									]
 								}, {
@@ -264,6 +272,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											reference: 'fldstatmasterdata',
 											bind: '{record.customerStatId}',
 											autoLoadOnValue: true,
+											tabIndex: 104,
 											store: {
 												model: 'WTA.model.Simple',
 												proxy: WTF.proxy(me.mys.ID, 'LookupStatisticCustomers', null, {
@@ -288,6 +297,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											xtype: 'datefield',
 											reference: 'fldtodate',
 											bind: '{record.toDate}',
+											tabIndex: 106,
 											listeners: {
 												select: function (s, rec) {
 													var days = Sonicle.Date.diffDays(me.lref('fldfromdate').getValue(),
@@ -303,6 +313,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											reference: 'fldcausal',
 											bind: '{record.causalId}',
 											autoLoadOnValue: true,
+											tabIndex: 108,
 											store: {
 												model: 'WTA.model.CausalLkp',
 												proxy: WTF.proxy(WT.ID, 'LookupCausals', null, {
@@ -341,7 +352,8 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											bind: '{record.ddtDate}',
 											format: WT.getShortDateFmt(),
 											fieldLabel: me.mys.res('workReport.fld-ddtToDate.lbl'),
-											width: '420px'
+											width: '420px',
+											tabIndex: 110
 										}
 									]
 								}
@@ -436,7 +448,8 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											ftype: 'summary'
 										}
 									],
-									columns: [{
+									columns: [
+										{
 											dataIndex: 'rowNo',
 											width: '25',
 											header: me.mys.res('gpReportRows.rif.lbl')
@@ -455,18 +468,19 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											dataIndex: 'duration',
 											xtype: 'numbercolumn',
 											flex: 1,
+											format: '0.0',
 											editor: {
 												xtype: 'numberfield',
 												allowBlank: false,
 												minValue: 0,
 												allowDecimals: true,
-												decimalSeparator: ',',
-												decimalPrecision: 2,
+												decimalSeparator: '.',
+												decimalPrecision: 1,
 												step: 0.5
 											},
 											summaryType: 'sum',
 											summaryRenderer: function (value, summaryData, dataIndex) {
-												return Ext.String.format('Total Hour{0}: {1}', value > 1 ? 's' : '', value);
+												return Ext.String.format(me.mys.res('gpReportRows.totalHours.lbl') + ' {0}', value);
 											},
 											header: me.mys.res('gpReportRows.duration.lbl')
 										}, {

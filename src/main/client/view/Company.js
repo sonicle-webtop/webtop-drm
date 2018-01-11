@@ -53,23 +53,7 @@ Ext.define('Sonicle.webtop.drm.view.Company', {
 		me.add({
 			region: 'center',
 			xtype: 'tabpanel',
-			items: [{
-					xtype: 'wtdrmusergrid',
-					title: me.mys.res('company.tab-users.tit'),
-					sid: me.mys.ID,
-					bind: {
-						store: '{record.associatedUsers}'
-					},
-					listeners: {
-						pick: function (s, vals, recs) {
-							var mo = me.getModel(); 
-
-							mo.associatedUsers().add({
-								userId: vals
-							});
-						}
-					}
-				},
+			items: [
 				{
 					xtype: 'wtform',
 					title: me.mys.res('company.tab-company.tit'),
@@ -169,7 +153,24 @@ Ext.define('Sonicle.webtop.drm.view.Company', {
 							fieldLabel: me.mys.res('company.fld-footerColumnsRight.lbl'),
 							bind: '{record.footerColumnRight}'
 						}]
-				}]
+				}, {
+					xtype: 'wtdrmusergrid',
+					title: me.mys.res('company.tab-users.tit'),
+					sid: me.mys.ID,
+					bind: {
+						store: '{record.associatedUsers}'
+					},
+					listeners: {
+						pick: function (s, vals, recs) {
+							var mo = me.getModel(); 
+
+							mo.associatedUsers().add({
+								userId: vals
+							});
+						}
+					}
+				}
+			]
 		});
 	}
 });

@@ -39,7 +39,7 @@ Ext.define('Sonicle.webtop.drm.view.Profile', {
 	],
 	dockableConfig: {
 		title: '{profile.tit}', //localizzato
-		iconCls: 'wtdrm-icon-company-xs',
+		iconCls: 'wtdrm-icon-configuration-profilesconfiguration-xs',
 		width: 500,
 		height: 500
 	},
@@ -85,7 +85,7 @@ Ext.define('Sonicle.webtop.drm.view.Profile', {
 				},
 				{
 					xtype: 'wtdrmusergrid',
-					title: me.mys.res('profile.gpAssignedUsers.tit'),
+					title: me.mys.res('profile.gpUsers.tit'),
 					sid: me.mys.ID,
 					actionsInToolbar: false,
 					width: '100%',
