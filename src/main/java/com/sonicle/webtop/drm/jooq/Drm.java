@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Drm extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = 1025760874;
+	private static final long serialVersionUID = -1351077907;
 
 	/**
 	 * The reference instance of <code>drm</code>
@@ -72,6 +72,16 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.tables.DocStatuses.DOC_STATUSES,
 			com.sonicle.webtop.drm.jooq.tables.DocStatusesGroups.DOC_STATUSES_GROUPS,
 			com.sonicle.webtop.drm.jooq.tables.EnabledPrograms.ENABLED_PROGRAMS,
+			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteCostTypes.EXPENSE_NOTE_COST_TYPES,
+			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteCosts.EXPENSE_NOTE_COSTS,
+			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteDocumentLinks.EXPENSE_NOTE_DOCUMENT_LINKS,
+			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteDocuments.EXPENSE_NOTE_DOCUMENTS,
+			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteRowDetails.EXPENSE_NOTE_ROW_DETAILS,
+			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteRowDocumentLinks.EXPENSE_NOTE_ROW_DOCUMENT_LINKS,
+			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteRowDocuments.EXPENSE_NOTE_ROW_DOCUMENTS,
+			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteRows.EXPENSE_NOTE_ROWS,
+			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteSettings.EXPENSE_NOTE_SETTINGS,
+			com.sonicle.webtop.drm.jooq.tables.ExpenseNotes.EXPENSE_NOTES,
 			com.sonicle.webtop.drm.jooq.tables.Folders.FOLDERS,
 			com.sonicle.webtop.drm.jooq.tables.FoldersGroups.FOLDERS_GROUPS,
 			com.sonicle.webtop.drm.jooq.tables.Groups.GROUPS,

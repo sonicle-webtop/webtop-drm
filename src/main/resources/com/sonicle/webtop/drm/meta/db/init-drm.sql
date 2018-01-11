@@ -532,3 +532,153 @@ ALTER TABLE "drm"."companies_pictures" ADD PRIMARY KEY ("company_id");
 
 ALTER TABLE "drm"."companies"
 DROP COLUMN "logo_upload_id";
+
+-- ----------------------------
+-- 14/12/2017
+-- ----------------------------
+
+CREATE TABLE "drm"."expense_notes" (
+"expense_note_id" numeric(38) NOT NULL,
+"currency" varchar(10) NOT NULL,
+"amountkm" numeric NOT NULL,
+"subtotal" numeric,
+"advance" numeric,
+"total" numeric,
+"operator_id" varchar(100),
+"status" varchar(38),
+"domain_id" varchar(20),
+"sign" varchar(5),
+"from_date" timestamp(6),
+"to_date" timestamp(6),
+"company_id" numeric(38) DEFAULT 1,
+"description" varchar(150),
+"statusd" varchar(3)
+);
+
+CREATE TABLE "drm"."expense_note_documents" (
+"expense_note_document_id" numeric(38) NOT NULL,
+"file" oid,
+"filename" varchar(1024),
+"expense_note_id" numeric(38),
+"revision" timestamp(6) NOT NULL,
+"operator_id_lock_file" varchar(100)
+);
+
+CREATE TABLE "drm"."expense_note_document_links" (
+"expense_note_id" numeric(38) NOT NULL,
+"expense_note_document_id" numeric(38) NOT NULL,
+"operator_id" varchar(100),
+"domain_id" varchar(20)
+);
+
+CREATE TABLE "drm"."expense_note_costs" (
+"type_id" numeric(38) NOT NULL,
+"description" varchar(30),
+"max_import" varchar(15),
+"type_cost" numeric(38),
+"type_cost_present" varchar(5),
+"type_cost_km" varchar(5),
+"domain_id" varchar(30),
+"consumption" varchar(5),
+"type_cost_advance" varchar(5) DEFAULT 'false'::character varying,
+"type_cost_unlock_change" varchar(5) DEFAULT 'false'::character varying,
+"type_cost_person" varchar(5) DEFAULT 'false'::character varying
+);
+
+CREATE TABLE "drm"."expense_note_cost_types" (
+"cost_type_id" numeric(38) NOT NULL,
+"description" varchar(30),
+"domain_id" varchar(30)
+);
+
+CREATE TABLE "drm"."expense_note_rows" (
+"expense_note_row_id" numeric(38) NOT NULL,
+"expense_note_id" numeric(38),
+"revision" timestamp(6),
+"description" varchar(150),
+"km" numeric,
+"stay" numeric,
+"highway" numeric,
+"park" numeric,
+"meals" numeric,
+"amount_km" numeric,
+"other" numeric,
+"total" numeric,
+"date" timestamp(6),
+"operator_id" varchar(100),
+"domain_id" varchar(20),
+"customer_id" varchar(15),
+"payment_company" varchar(5),
+"invoice" varchar(5),
+"invoice_number" varchar(20),
+"point_of_sale" varchar(15)
+);
+
+CREATE TABLE "drm"."expense_note_row_details" (
+"expense_note_row_detail_id" numeric(38) NOT NULL,
+"expense_note_id" numeric(38),
+"revision" timestamp(6),
+"type_id" numeric(38),
+"total" numeric,
+"date" timestamp(6),
+"operator_id" varchar(100),
+"domain_id" varchar(20),
+"payment_company" varchar(5),
+"invoice" varchar(5),
+"invoice_number" varchar(20),
+"present" varchar(300),
+"customer_id" varchar(15),
+"point_of_sale" varchar(15),
+"km" numeric,
+"total_doc" numeric,
+"consumptive" varchar(5),
+"currency" varchar(10),
+"change" varchar(10),
+"currency_cost_doc" varchar(10) DEFAULT 'EUR'::character varying,
+"description" varchar(150)
+);
+
+CREATE TABLE "drm"."expense_note_row_documents" (
+"expense_note_row_document_id" numeric(38) NOT NULL,
+"expense_note_row_detail_id" numeric(38) NOT NULL,
+"revision" timestamp(6) NOT NULL,
+"file" oid,
+"filename" varchar(60),
+"expense_note_id" numeric(38),
+"operator_id" varchar(100),
+"domain_id" varchar(20),
+"operator_id_lock_file" varchar(100)
+);
+
+CREATE TABLE "drm"."expense_note_row_document_links" (
+"expense_note_row_detail_id" numeric(38) NOT NULL,
+"expense_note_id" numeric(38),
+"expense_note_row_document_id" numeric(38) NOT NULL,
+"operator_id" varchar(100),
+"domain_id" varchar(20)
+);
+
+CREATE TABLE "drm"."expense_note_settings" (
+"integrate_tracking" varchar(5),
+"integrate_mail" varchar(5),
+"integrate_cloud" varchar(5),
+"domain_id" varchar(30),
+"operator_id" varchar(100),
+"integrate_calendar" varchar(5)
+);
+
+
+ALTER TABLE "drm"."expense_notes" ADD PRIMARY KEY ("expense_note_id");
+ALTER TABLE "drm"."expense_note_documents" ADD PRIMARY KEY ("expense_note_document_id");
+ALTER TABLE "drm"."expense_note_costs" ADD PRIMARY KEY ("type_id");
+ALTER TABLE "drm"."expense_note_cost_types" ADD PRIMARY KEY ("cost_type_id");
+ALTER TABLE "drm"."expense_note_rows" ADD PRIMARY KEY ("expense_note_row_id");
+ALTER TABLE "drm"."expense_note_row_details" ADD PRIMARY KEY ("expense_note_row_detail_id");
+ALTER TABLE "drm"."expense_note_row_documents" ADD PRIMARY KEY ("expense_note_row_document_id");
+
+CREATE SEQUENCE "drm"."seq_expense_note_documents";
+CREATE SEQUENCE "drm"."seq_expense_notes";
+CREATE SEQUENCE "drm"."seq_expense_note_costs";
+CREATE SEQUENCE "drm"."seq_expense_note_rows";
+CREATE SEQUENCE "drm"."seq_expense_note_row_details";
+CREATE SEQUENCE "drm"."seq_expense_note_row_documents";

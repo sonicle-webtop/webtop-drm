@@ -30,52 +30,16 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.view.ExpenseNoteSetting', {
-	extend: 'WTA.sdk.DockableView',
-	dockableConfig: {
-		title: '{expensenote.config.tit}',
-		iconCls: 'wtdrm-icon-configuration-generalconfiguration-xs',
-		width: 500,
-		height: 500
-	},
-	fieldTitle: 'name',
-	modelName: 'Sonicle.webtop.drm.model.ExpenseNoteSetting',
-	initComponent: function () {
-		var me = this;
-		me.callParent(arguments);
-		me.add({
-			region: 'center',
-			xtype: 'tabpanel',
-			items: [
-				{
-					title: me.mys.res('expenseNote.settings.tit'),
-					xtype: 'wtform',
-					tbar: [
-					],
-					items: [
-						{
-							xtype: 'checkbox',
-							boxLabel: me.mys.res('expenseNote.settings.fld-average.lbl')
-						},
-						{
-							xtype: 'checkbox',
-							boxLabel: me.mys.res('expenseNote.settings.fld-tracking.lbl')
-						},
-						{
-							xtype: 'checkbox',
-							boxLabel: me.mys.res('expenseNote.settings.fld-mail.lbl')
-						},
-						{
-							xtype: 'checkbox',
-							boxLabel: me.mys.res('expenseNote.settings.fld-cloud.lbl')
-						},
-						{
-							xtype: 'checkbox',
-							boxLabel: me.mys.res('expenseNote.settings.fld-calendar.lbl')
-						}
-					]
-				}
-			]
-		});
-	}
+
+Ext.define('Sonicle.webtop.drm.model.GridExpenseNotes', {
+	extend: 'WTA.ux.data.BaseModel',
+	idProperty: 'expenseNotesId',
+	fields: [
+		WTF.roField('expenseNotesId', 'string'),
+		WTF.roField('companyId', 'int'),
+		WTF.roField('operatorId', 'string'),
+		WTF.roField('fromDate', 'date', {dateFormat: 'Y-m-d'}),
+		WTF.roField('toDate', 'date', {dateFormat: 'Y-m-d'}),		
+		WTF.roField('statusId', 'string')
+	]
 });

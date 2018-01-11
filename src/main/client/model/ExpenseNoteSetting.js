@@ -30,52 +30,37 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.view.ExpenseNoteSetting', {
-	extend: 'WTA.sdk.DockableView',
-	dockableConfig: {
-		title: '{expensenote.config.tit}',
-		iconCls: 'wtdrm-icon-configuration-generalconfiguration-xs',
-		width: 500,
-		height: 500
-	},
-	fieldTitle: 'name',
-	modelName: 'Sonicle.webtop.drm.model.ExpenseNoteSetting',
-	initComponent: function () {
-		var me = this;
-		me.callParent(arguments);
-		me.add({
-			region: 'center',
-			xtype: 'tabpanel',
-			items: [
-				{
-					title: me.mys.res('expenseNote.settings.tit'),
-					xtype: 'wtform',
-					tbar: [
-					],
-					items: [
-						{
-							xtype: 'checkbox',
-							boxLabel: me.mys.res('expenseNote.settings.fld-average.lbl')
-						},
-						{
-							xtype: 'checkbox',
-							boxLabel: me.mys.res('expenseNote.settings.fld-tracking.lbl')
-						},
-						{
-							xtype: 'checkbox',
-							boxLabel: me.mys.res('expenseNote.settings.fld-mail.lbl')
-						},
-						{
-							xtype: 'checkbox',
-							boxLabel: me.mys.res('expenseNote.settings.fld-cloud.lbl')
-						},
-						{
-							xtype: 'checkbox',
-							boxLabel: me.mys.res('expenseNote.settings.fld-calendar.lbl')
-						}
-					]
-				}
-			]
-		});
-	}
+Ext.define('Sonicle.webtop.drm.model.ExpenseNoteSetting', {
+	extend: 'WTA.ux.data.BaseModel',
+	requires: [
+		'Sonicle.data.writer.Json',
+		'Sonicle.webtop.drm.model.WorkType',
+		'Sonicle.webtop.drm.model.BusinessTrip'
+	],
+	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageWorkReportSetting', 'data', {
+		writer: {
+			type: 'sojson',
+			writeAssociations: true
+		}
+	}),
+	identifier: 'negative',
+	idProperty: 'id',
+	fields: [
+		WTF.field('id', 'string', true),
+		WTF.field('domainId', 'string', true),
+		WTF.field('workReportSequence', 'int', true),
+		WTF.field('warranty', 'string', true),
+		WTF.field('printDaysTransfert', 'bool', true),
+		WTF.field('printTransfertDescription', 'bool', true),
+		WTF.field('printSignature', 'bool', true),
+		WTF.field('manageHours', 'bool', true),
+		WTF.field('roundingHour', 'int', true),
+		WTF.field('tracking', 'bool', true),
+		WTF.field('trackingMail', 'bool', true),
+		WTF.field('trackingCloud', 'bool', true)
+	],
+	hasMany: [
+		WTF.hasMany('types', 'Sonicle.webtop.drm.model.WorkType'),
+		WTF.hasMany('trips', 'Sonicle.webtop.drm.model.BusinessTrip')
+	]
 });

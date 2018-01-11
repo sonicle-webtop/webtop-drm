@@ -15,25 +15,25 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		'Sonicle.webtop.drm.model.GridWorkReports',
 		'Sonicle.webtop.drm.ux.WorkReportSearch',
 		'Sonicle.webtop.drm.view.WorkReport',
+		'Sonicle.webtop.drm.model.GridExpenseNotes',
+		'Sonicle.webtop.drm.ux.ExpenseNoteSearch',
+		'Sonicle.webtop.drm.view.ExpenseNote',
 		'Sonicle.webtop.drm.model.TreeNode'
 	],
 	needsReload: true,
 	init: function () {
 
 		var me = this;
-		//inizializzo le azioni
 		me.initAction();
-		//inizializzo i menu contestuali
 		me.initCxm();
-		//me.on('activate', me.onActivate, me);
-		//creo toolbar
+		
 		me.setToolbar(Ext.create({
 			xtype: 'toolbar',
 			referenceHolder: true, //riferimento alla toolbar
 			items: [
 			]
 		}));
-		//creo sidebar
+		
 		me.setToolComponent(Ext.create({
 			xtype: 'panel',
 			referenceHolder: true,
@@ -41,15 +41,15 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			items: [{
 					xtype: 'treepanel',
 					reference: 'tree',
-					rootVisible: false, //nn mostra il primo nodo
+					rootVisible: false,
 					store: {
-						autoLoad: true, //carica automaticamente tramite il proxy i dati
-						model: 'Sonicle.webtop.drm.model.TreeNode', //modello dei dati => Ext.data.Model modello di dati di default
-						proxy: WTF.proxy(me.ID, 'LoadEnabledProgramTree')   //da dove carico i dati
+						autoLoad: true,
+						model: 'Sonicle.webtop.drm.model.TreeNode',
+						proxy: WTF.proxy(me.ID, 'LoadEnabledProgramTree')
 					},
-					root: {//radice dell'albero e id per capire ql effettivamente è la root
+					root: {
 						id: 'root',
-						expanded: false //tt l'ablero chiuso
+						expanded: false
 					},
 					listeners: {
 						itemclick: function (s, rec, itm, i, e) {
@@ -58,7 +58,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					}
 				}]
 		}));
-		//creo maincontent
 		me.setMainComponent(Ext.create({
 			xtype: 'panel',
 			layout: 'card',
@@ -249,66 +248,134 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									me.editWorkReportUI(rec);
 								}
 							}
-						}]
-				},
-				{
-					xtype: 'grid',
-					title: 'Expense Note',
+						}
+					]
+				},{
+					xtype: 'container',
 					itemId: 'en',
-					referenceHolder: true,
-					store: {
-						fields: ['id', 'desc'],
-						data: [
-							{id: 1, desc: 'prova'}, {id: 2, desc: 'prova'}
-						]
-					},
-					columns: [
+					layout: 'border',
+					items: [
 						{
-							text: 'ID',
-							dataIndex: 'id'
+							region: 'north',
+							xtype: 'wtdrmexpensenotesearch',
+							title: me.res('expenseNote.tit.lbl'),
+							iconCls: 'wtdrm-icon-expensenote-xs',
+							titleCollapse: true,
+							collapsible: true,
+							sid: me.ID,
+							listeners: {
+								search: function(s, query){
+									me.reloadExpenseNote(query);
+								}
+							}
 						}, {
-							text: 'Desc',
-							dataIndex: 'desc'
+							region: 'center',
+							xtype: 'grid',
+							reference: 'gpExpenseNote',
+							store: {
+								autoLoad: false,
+								model: 'Sonicle.webtop.drm.model.GridExpenseNotes',
+								proxy: WTF.apiProxy(me.ID, 'ManageGridExpenseNote')
+							},
+							columns: [
+								{
+									header: me.res('gpExpenseNote.company.lbl'),
+									dataIndex: 'company',
+									flex: 1
+								}, {
+									header: me.res('gpExpenseNote.description.lbl'),
+									dataIndex: 'description',
+									flex: 1
+								}, {
+									header: me.res('gpExpenseNote.fromDate.lbl'),
+									dataIndex: 'fromDate',
+									xtype: 'datecolumn',
+									format: WT.getShortDateFmt(),
+									flex: 1
+								}, {
+									header: me.res('gpExpenseNote.toDate.lbl'),
+									dataIndex: 'toDate',
+									xtype: 'datecolumn',
+									format: WT.getShortDateFmt(),
+									flex: 1
+								}, {
+									header: me.res('gpExpenseNote.operator.lbl'),
+									dataIndex: 'operator',
+									flex: 1
+								}, {
+									header: me.res('gpExpenseNote.currency.lbl'),
+									dataIndex: 'currency',
+									flex: 1
+								}, {
+									header: me.res('gpExpenseNote.kmAmount.lbl'),
+									dataIndex: 'kmAmount',
+									flex: 1
+								}, {
+									header: me.res('gpExpenseNote.total.lbl'),
+									dataIndex: 'total',
+									flex: 1
+								}, {
+									header: me.res('gpExpenseNote.status.lbl'),
+									dataIndex: 'status',
+									flex: 1
+								}, {
+									header: me.res('gpExpenseNote.attachments.lbl'),
+									dataIndex: 'attachments',
+									flex: 1
+								}
+							],
+							tbar: [
+								me.getAct('expenseNote', 'add'),
+								'-',
+								me.getAct('expenseNote', 'edit'),
+								me.getAct('expenseNote', 'remove')
+							],
+							listeners: {
+								rowclick: function (s, rec) {
+									me.getAct('expenseNote', 'edit').setDisabled(false);
+									me.getAct('expenseNote', 'remove').setDisabled(false);
+								},
+								rowdblclick: function (s, rec) {
+									me.editExpenseNoteUI(rec);
+								}
+							}
 						}
-					],
-					tbar: [
-						me.getAct('expenseNote', 'add'),
-						'-',
-						me.getAct('expenseNote', 'edit'),
-						me.getAct('expenseNote', 'remove')
-					],
-					listeners: {
-						rowclick: function (s, rec) {
-							me.getAct('expenseNote', 'edit').setDisabled(false);
-							me.getAct('expenseNote', 'remove').setDisabled(false);
-						},
-						rowdblclick: function (s, rec) {
-							me.editExpenseNoteUI(rec);
-						}
-					}
+					]
 				},
 				{xtype: 'panel'}
 			]
 		}));
 	},
-	//-------------------------------
+	
 	//Getter
 	gpWorkReport: function () {
 		return this.getMainComponent().lookupReference('gpWorkReport');
 	},
+	
 	gpWorkReportSelected: function () {
 		return this.getMainComponent().lookupReference('gpWorkReport').getSelection()[0];
 	},
+	
+	gpExpenseNote: function () {
+		return this.getMainComponent().lookupReference('gpExpenseNote');
+	},
+	
+	gpExpenseNoteSelected: function () {
+		return this.getMainComponent().lookupReference('gpExpenseNote').getSelection()[0];
+	},
+	
 	itemActive: function () {
 		return this.getMainComponent().getLayout().getActiveItem();
 	},
+	
 	itemActiveId: function () {
 		return this.itemActive().getItemId();
 	},
+	
 	activeSearchPanel: function(){
 		this.itemActive().lookupReference('searchPanel');
 	},
-	//----------------------------------------------------
+	
 	initAction: function () {
 		var me = this;
 		me.addAct('toolbox', 'configurations', {
@@ -369,53 +436,51 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				me.deleteWorkReportUI(sel);
 			}
 		});
-		//-------------------------------------------
 
 		me.addAct('expenseNote', 'add', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
 			iconCls: 'wt-icon-add-xs',
 			handler: function () {
-
 				me.addExpenseNote({
 					callback: function (success) {
 						if (success) {
 							alert('success');
-							//me.gpWorkReport().getStore().load();
+							me.gpExpenseNote().getStore().load();
 						}
 					}
 				});
 			}
 		});
+		
 		me.addAct('expenseNote', 'edit', {
 			text: WT.res('act-edit.lbl'),
 			tooltip: null,
 			iconCls: 'wt-icon-edit-xs',
 			disabled: true,
 			handler: function () {
-
-
+				var sel = me.gpExpenseNoteSelected();
+				me.editExpenseNoteUI(sel);
 			}
 		});
+		
 		me.addAct('expenseNote', 'remove', {
 			text: WT.res('act-remove.lbl'),
 			tooltip: null,
 			iconCls: 'wt-icon-remove-xs',
 			disabled: true,
 			handler: function () {
-
-				//me.addReport();
-
+				var sel = me.gpExpenseNoteSelected();
+				me.deleteExpenseNoteUI(sel);
 			}
 		});
-		//-------------------------------------------
 
 	},
+	
 	//inizializ	zo il menu Contestuale
 	initCxm: function () {
 		var me = this;
 	},
-	//--------------------------------------------------------------
 
 	addWorkReport: function (opts) {
 		opts = opts || {};
@@ -527,7 +592,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			me.needsReload = true;
 		}
 	},
-
+	
 	printWorkReport: function(ids) {
 		var me = this, url;
 		url = WTF.processBinUrl(me.ID, 'PrintWorkReport', {ids: WTU.arrayAsParam(ids)});
@@ -535,32 +600,110 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	},
 	
 	addExpenseNote: function (opts) {
-		opts = opts || {}; //se nullo controlla e lo seta a obj empty
+		opts = opts || {};
 
 		var me = this,
-				//viewcontainer => recupero la view di webtop => id del servizio, nome View
 				vct = WT.createView(me.ID, 'view.ExpenseNote');
-		vct.getView().on('viewsave', function (s, success, model) { //sender,success,modello
+		vct.getView().on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		//al caricamento della finestra inizio il begin edit data
 		vct.show(false, //mostro la view
 				function () {
 					vct.getView().begin('new');
 				});
 	},
+	
+	editExpenseNoteUI: function (rec) {
+		var me = this;
+		me.editWorkReport(rec.get('expenseNoteId'), {
+			callback: function (success, model) {
+				if (success) {
+					this.gpExpenseNote().getStore().load();
+				} else {
+					alert('error');
+				}
+			}
+		});
+	},
+	
+	editExpenseNote: function (expenseNoteId, opts) {
+		opts = opts || {};
+		var me = this,
+				vct = WT.createView(me.ID, 'view.ExpenseNote');
+		vct.getView().on('viewsave', function (s, success, model) {
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vct.show(false,
+				function () {
+					vct.getView().begin('edit', {
+						data: {
+							expenseNoteId: expenseNoteId
+						}
+					});
+				});
+	},
+	
+	deleteExpenseNoteUI: function (rec) {
+		var me = this,
+				sto = me.gpExpenseNote().getStore(),
+				msg;
+		if (rec) {
+			msg = me.res('act.confirm.delete', Ext.String.ellipsis(rec.get('expenseNoteId'), 40));
+		} else {
+			msg = me.res('gpWorkReport.confirm.delete.selection');
+		}
+		WT.confirm(msg, function (bid) {
+			if (bid === 'yes') {
+				me.deleteExpenseNote(rec.get('expenseNoteId'), {
+					callback: function (success) {
+						if (success)
+							sto.remove(rec);
+					}
+				});
+			}
+		});
+	},
+	
+	deleteExpenseNote: function (expenseNoteId, opts) {
+		opts = opts || {};
+		var me = this;
+		WT.ajaxReq(me.ID, 'ManageExpenseNote', {
+			params: {
+				crud: 'delete',
+				reportIds: WTU.arrayAsParam(expenseNoteId)
+			},
+			callback: function (success, json) {
+				Ext.callback(opts.callback, opts.scope || me, [success, json]);
+			}
+		});
+	},
+	
 	expenseNoteSetting: function (opts) {
 		var me = this,
 				vw = WT.createView(me.ID, 'view.ExpenseNoteSetting');
 		vw.show(false);
 	},
-	//---------------------------------------------------------
+	
+	reloadExpenseNote: function (query) {
+		var me = this,
+				pars = {},
+				sto;
+		if (me.isActive() && me.itemActiveId() === 'en') {
+			sto = me.gpExpenseNote().getStore();
+			if (query !== undefined)
+				Ext.apply(pars, {query: Ext.JSON.encode(query)});
+			WTU.loadWithExtraParams(sto, pars);
+		} else {
+			me.needsReload = true;
+		}
+	},
+	
 	configurationView: function () {
 		var me = this,
 				vw = WT.createView(me.ID, 'view.Configurations');
 		vw.show(false);
 	},
-//-----------------------------------------------------
+	
 	onActivate: function () {
 		var me = this,
 				gp = me.gpWorkReport();
