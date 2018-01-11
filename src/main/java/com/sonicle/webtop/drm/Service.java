@@ -291,7 +291,8 @@ public class Service extends BaseService {
 				DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID, new UserProfileId(getEnv().getProfileId().getDomain(), operator));
 
 				chek = manager.checkCustomersByProfileUser(realCustomerId);
-				if(chek) items = WT.getCoreManager().listChildrenMasterData(realCustomerId, Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER)));
+				//if(chek) items = WT.getCoreManager().listChildrenMasterData(realCustomerId, Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER)));
+				items = WT.getCoreManager().listChildrenMasterData(realCustomerId, Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER)));
 				
 				for(MasterData customer : items) {
 					customers.add(new JsSimple(customer.getMasterDataId(), customer.getDescription()));

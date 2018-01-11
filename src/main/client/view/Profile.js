@@ -84,32 +84,25 @@ Ext.define('Sonicle.webtop.drm.view.Profile', {
 					]
 				},
 				{
-					xtype: 'tabpanel',
-					items: [{
-							title: 'Foo'
-						}, {
-							title: 'Bar'
-						}]
+					xtype: 'wtdrmusergrid',
+					title: me.mys.res('profile.gpAssignedUsers.tit'),
+					sid: me.mys.ID,
+					actionsInToolbar: false,
+					width: '100%',
+					bind: {
+						store: '{record.associatedUsers}' //record. nome proprietà con dentro gli utenti
+					},
+					listeners: {
+						pick: function (s, vals, recs) {
+							var mo = me.getModel();
+							mo.associatedUsers().add({
+								userId: vals
+							});
+						}
+					}
 				},
-				/*{
-				 xtype: 'wtdrmusergrid',
-				 title: me.mys.res('profile.gpAssignedUsers.tit'),
-				 sid: me.mys.ID,
-				 actionsInToolbar: false,
-				 width: '100%',
-				 bind: {
-				 store: '{record.associatedUsers}' //record. nome proprietà con dentro gli utenti
-				 },
-				 listeners: {
-				 pick: function (s, vals, recs) {
-				 var mo = me.getModel();
-				 mo.associatedUsers().add({
-				 userId: vals
-				 });
-				 }
-				 }
-				 },*/
-				{xtype: 'panel',
+				{
+					xtype: 'panel',
 					layout: 'card',
 					width: '100%',
 					reference: 'pnlgrid',
