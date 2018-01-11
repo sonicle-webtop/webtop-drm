@@ -77,6 +77,7 @@ Ext.define('Sonicle.webtop.drm.view.Profile', {
 							store: Ext.create('Sonicle.webtop.drm.store.ProfileType', {
 								autoLoad: true
 							}),
+							readOnly: true,
 							fieldLabel: me.mys.res('profile.type.lbl'),
 							width: 250
 						})

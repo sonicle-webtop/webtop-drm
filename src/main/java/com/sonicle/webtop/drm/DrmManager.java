@@ -2221,7 +2221,7 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	Iterable<String> listOperators() throws WTException {
+	List<String> listOperators() throws WTException {
 		Connection con = null;
 		com.sonicle.webtop.drm.dal.UserDAO userDao = com.sonicle.webtop.drm.dal.UserDAO.getInstance();
 		List<String> users = null;
@@ -2238,7 +2238,7 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
-	Iterable<String> listCustomersByProfileUser() throws WTException {
+	List<String> listCustomersByProfileUser() throws WTException {
 		Connection con = null;
 		ProfileMasterdataDAO pmDao = ProfileMasterdataDAO.getInstance();
 		List<String> idCustomers = null;

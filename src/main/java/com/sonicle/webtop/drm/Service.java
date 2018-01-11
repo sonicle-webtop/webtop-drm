@@ -261,11 +261,12 @@ public class Service extends BaseService {
 			if(operator != null){
 				DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID, new UserProfileId(getEnv().getProfileId().getDomain(), operator));
 
-				for (String id : manager.listCustomersByProfileUser()) {
-					idCustomers.add(id);
-				}
+				idCustomers = manager.listCustomersByProfileUser();
 				
-				items = WT.getCoreManager().listMasterDataIn(idCustomers);
+				if(idCustomers.size() > 0)
+					items = WT.getCoreManager().listMasterDataIn(idCustomers);
+				else
+					items = WT.getCoreManager().listMasterData(Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER)));
 				
 				for(MasterData customer : items) {
 					customers.add(new JsSimple(customer.getMasterDataId(), customer.getDescription()));
