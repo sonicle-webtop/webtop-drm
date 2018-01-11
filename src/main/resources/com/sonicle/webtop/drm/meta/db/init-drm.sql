@@ -48,9 +48,9 @@ CREATE SEQUENCE "drm"."seq_profiles_masterdata";
 CREATE SEQUENCE "drm"."seq_profiles_supervised_users";
 
 -- ----------------------------
--- Sequence structure for "drm"."seq_PROFILES_MEMBERS"
+-- Sequence structure for "drm"."seq_seq_profiles_members"
 -- ----------------------------
-CREATE SEQUENCE "drm"."seq_PROFILES_MEMBERS";
+CREATE SEQUENCE "drm"."seq_seq_profiles_members";
 
 -- ----------------------------
 -- Sequence structure for "drm"."seq_work_report_details"
@@ -262,10 +262,10 @@ WITH (OIDS=FALSE)
 ;
 
 -- ----------------------------
--- Table structure for "drm"."PROFILES_MEMBERS"
+-- Table structure for "drm"."profiles_members"
 -- ----------------------------
-CREATE TABLE "drm"."PROFILES_MEMBERS" (
-"id" int4 DEFAULT nextval('"drm".seq_PROFILES_MEMBERS'::regclass) NOT NULL,
+CREATE TABLE "drm"."profiles_members" (
+"id" int4 DEFAULT nextval('"drm".seq_profiles_members'::regclass) NOT NULL,
 "profile_id" varchar(36) NOT NULL,
 "user_id" varchar(36) NOT NULL
 )
@@ -445,9 +445,9 @@ ALTER TABLE "drm"."profiles_masterdata" ADD PRIMARY KEY ("id");
 ALTER TABLE "drm"."profiles_supervised_users" ADD PRIMARY KEY ("id");
 
 -- ----------------------------
--- Primary Key structure for table "drm"."PROFILES_MEMBERS"
+-- Primary Key structure for table "drm"."profiles_members"
 -- ----------------------------
-ALTER TABLE "drm"."PROFILES_MEMBERS" ADD PRIMARY KEY ("id");
+ALTER TABLE "drm"."profiles_members" ADD PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Primary Key structure for table "drm"."work_reports"
