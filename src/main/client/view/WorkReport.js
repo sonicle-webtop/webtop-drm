@@ -91,29 +91,6 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 										me.lref('fldcausal').getStore().load();
 									}
 								}
-
-								/*
-								if (s.loadCount === 1) {
-									var meta = s.getProxy().getReader().metaData;
-									if (meta.selected) {
-										me.lref('flduser').setValue(meta.selected);
-										WTU.loadWithExtraParams(me.lref('fldcompany').getStore(), {
-											operator: meta.selected
-										});
-										WTU.loadWithExtraParams(me.lref('fldmasterdata').getStore(), {
-											operator: meta.selected
-										});
-										WTU.loadWithExtraParams(me.lref('fldstatmasterdata').getStore(), {
-											operator: meta.selected,
-											realCustomer: null
-										});
-										WTU.loadWithExtraParams(me.lref('fldcausal').getStore(), {
-											profileId: WT.toPid(WT.getVar('domainId'), meta.selected),
-											masterDataId: null
-										});
-									}
-								}
-								*/
 							}
 						}
 					},
@@ -123,23 +100,6 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 							me.lref('fldmasterdata').getStore().load();
 							me.lref('fldstatmasterdata').getStore().load();
 							me.lref('fldcausal').getStore().load();
-
-
-							/*
-							WTU.loadWithExtraParams(me.lref('fldcompany').getStore(), {
-								operator: r.id
-							});
-
-							WTU.loadWithExtraParams(me.lref('fldmasterdata').getStore(), {
-								operator: r.id
-							});
-							WTU.loadWithExtraParams(me.lref('fldstatmasterdata').getStore(), {
-								operator: r.id
-							});
-							WTU.loadWithExtraParams(me.lref('fldcausal').getStore(), {
-								profileId: WT.toPid(WT.getVar('domainId'), r.id)
-							});
-							*/
 						}
 					},
 					fieldLabel: me.mys.res('workReport.fld-nominative.lbl')
@@ -663,9 +623,9 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 						}
 					},
 					plugins: [{
-							ptype: 'sofiledrop',
-							text: WT.res('sofiledrop.text')
-						}]
+						ptype: 'sofiledrop',
+						text: WT.res('sofiledrop.text')
+					}]
 				}
 			]
 		});

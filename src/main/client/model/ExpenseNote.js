@@ -30,52 +30,35 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.view.ExpenseNoteSetting', {
-	extend: 'WTA.sdk.DockableView',
-	dockableConfig: {
-		title: '{expensenote.config.tit}',
-		iconCls: 'wtdrm-icon-configuration-generalconfiguration-xs',
-		width: 500,
-		height: 500
-	},
-	fieldTitle: 'name',
-	modelName: 'Sonicle.webtop.drm.model.ExpenseNoteSetting',
-	initComponent: function () {
-		var me = this;
-		me.callParent(arguments);
-		me.add({
-			region: 'center',
-			xtype: 'tabpanel',
-			items: [
-				{
-					title: me.mys.res('expenseNote.settings.tit'),
-					xtype: 'wtform',
-					tbar: [
-					],
-					items: [
-						{
-							xtype: 'checkbox',
-							boxLabel: me.mys.res('expenseNote.settings.fld-average.lbl')
-						},
-						{
-							xtype: 'checkbox',
-							boxLabel: me.mys.res('expenseNote.settings.fld-tracking.lbl')
-						},
-						{
-							xtype: 'checkbox',
-							boxLabel: me.mys.res('expenseNote.settings.fld-mail.lbl')
-						},
-						{
-							xtype: 'checkbox',
-							boxLabel: me.mys.res('expenseNote.settings.fld-cloud.lbl')
-						},
-						{
-							xtype: 'checkbox',
-							boxLabel: me.mys.res('expenseNote.settings.fld-calendar.lbl')
-						}
-					]
-				}
-			]
-		});
-	}
+Ext.define('Sonicle.webtop.drm.model.ExpenseNote', {
+	extend: 'WTA.ux.data.BaseModel',
+	requires: [
+		'Sonicle.data.writer.Json',
+		'Sonicle.webtop.drm.model.ExpenseNoteDocument',
+		'Sonicle.webtop.drm.model.ExpenseNoteRow'
+	],
+	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageExpenseNote', 'data', {
+		writer: {
+			type: 'sojson',
+			writeAssociations: true
+		}
+	}),
+	identifier: 'negative',
+	idProperty: 'expenseNoteId',
+	fields: [
+		WTF.field('expenseNoteId', 'string', true),
+		WTF.field('operatorId', 'string', false),
+		WTF.field('companyId', 'int', false),
+		WTF.field('fromDate', 'date', false, {dateFormat: 'Y-m-d', defaultValue: new Date()}),
+		WTF.field('toDate', 'date', false, {dateFormat: 'Y-m-d', defaultValue: new Date()}),
+		WTF.field('totCurrency', 'string', false),
+		WTF.field('currency', 'string', false),
+		WTF.field('description', 'string', true),
+		WTF.field('status', 'string', true)
+	],
+	hasMany: [
+		WTF.hasMany('attachments', 'Sonicle.webtop.drm.model.ExpenseNoteDocument'),
+		WTF.hasMany('attachments', 'Sonicle.webtop.drm.model.ExpenseNoteRow'),
+		WTF.hasMany('attachments', 'Sonicle.webtop.drm.model.ExpenseNoteRowDetail')
+	]
 });
