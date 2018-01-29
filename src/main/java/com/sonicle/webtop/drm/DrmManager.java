@@ -2011,7 +2011,12 @@ public class DrmManager extends BaseManager {
 				wkrSDao.update(con, setting);
 			}
 
-			wkrSDao.setWorkReportSequence(con, item.getWorkReportSequence());
+			if(null == item.getWorkReportSequence()){
+				Long value = wkrSDao.getWorkReportSequence(con);
+				wkrSDao.setWorkReportSequence(con, value.intValue());
+			}else{
+				wkrSDao.setWorkReportSequence(con, item.getWorkReportSequence());
+			}
 
 			List<WorkType> types = oldWorkReportSetting == null ? new ArrayList() : oldWorkReportSetting.getTypes();
 
@@ -2022,7 +2027,7 @@ public class DrmManager extends BaseManager {
 				OWorkType oType = createOWorkType(type);
 
 				oType.setWorkTypeId(typeDao.getSequence(con).intValue());
-				oType.setDomainId(item.getDomainId());
+				oType.setDomainId(getTargetProfileId().getDomainId());
 
 				typeDao.insert(con, oType);
 			}
@@ -2047,7 +2052,7 @@ public class DrmManager extends BaseManager {
 				OBusinessTrip oTrip = createOBusinessTrip(trip);
 
 				oTrip.setBusinessTripId(typeDao.getSequence(con).intValue());
-				oTrip.setDomainId(item.getDomainId());
+				oTrip.setDomainId(getTargetProfileId().getDomainId());
 
 				tripDao.insert(con, oTrip);
 			}

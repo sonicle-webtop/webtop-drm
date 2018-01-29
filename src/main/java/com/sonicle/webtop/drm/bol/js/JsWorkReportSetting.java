@@ -74,6 +74,13 @@ public class JsWorkReportSetting {
 		for (BusinessTrip trip : setting.getTrips()) {
 			this.trips.add(new JsGridBusinessTrip(trip));
 		}
+		
+		this.printDaysTransfert = false;
+		this.printTransfertDescription = false;
+		this.printSignature = false;
+		this.tracking = false;
+		this.trackingMail = false;
+		this.trackingCloud = false;
 
 	}
 

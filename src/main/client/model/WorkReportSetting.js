@@ -43,7 +43,6 @@ Ext.define('Sonicle.webtop.drm.model.WorkReportSetting', {
 			writeAssociations: true
 		}
 	}),
-	//NB: SE NN NECESSARIO USARE 'data' COME DEFAULT X IL JSON
 	identifier: 'negative',
 	idProperty: 'id',
 	fields: [
@@ -55,10 +54,10 @@ Ext.define('Sonicle.webtop.drm.model.WorkReportSetting', {
 		WTF.field('printTransfertDescription', 'bool', true, {defaultValue: false}),
 		WTF.field('printSignature', 'bool', true, {defaultValue: false}),
 		WTF.field('manageHours', 'bool', true, {defaultValue: false}),
-		WTF.field('roundingHour', 'int', true), //nomeCampo,tipo,allowBlank//nomeCampo,tipo,allowBlank
-		WTF.field('tracking', 'bool', true, {defaultValue: false}), //nomeCampo,tipo,allowBlank//nomeCampo,tipo,allowBlank
-		WTF.field('trackingMail', 'bool', true, {defaultValue: false}), //nomeCampo,tipo,allowBlank//nomeCampo,tipo,allowBlank
-		WTF.field('trackingCloud', 'bool', true, {defaultValue: false}) //nomeCampo,tipo,allowBlank//nomeCampo,tipo,allowBlank
+		WTF.field('roundingHour', 'int', true), 
+		WTF.field('tracking', 'bool', true, {defaultValue: false}), 
+		WTF.field('trackingMail', 'bool', true, {defaultValue: false}), 
+		WTF.field('trackingCloud', 'bool', true, {defaultValue: false})
 	],
 	hasMany: [
 		WTF.hasMany('types', 'Sonicle.webtop.drm.model.WorkType'),

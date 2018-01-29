@@ -216,6 +216,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											width: '420px',
 											listeners: {
 												select: function (s, r) {
+													me.getViewModel().set('customerStatId', null);
 													WTU.loadWithExtraParams(me.lref('fldstatmasterdata').getStore(), {
 														realCustomer: r.id
 													});
@@ -282,6 +283,16 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 													}
 												}),
 												listeners: {
+													load: function (s) {
+														if (me.isMode('new')) {
+															var meta = s.getProxy().getReader().metaData;
+															if(meta){
+																if (meta.selected) {
+																	me.lookupReference('fldstatmasterdata').setValue(meta.selected);
+																}
+															}
+														}
+													},
 													beforeload: function(s,op) {
 														WTU.applyExtraParams(op.getProxy(), {
 															operator: me.getModel().get('operatorId'),

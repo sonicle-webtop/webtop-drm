@@ -50,14 +50,6 @@ Ext.define('Sonicle.webtop.drm.view.WorkReportSetting', {
 					xtype: 'wtform',
 					title: me.mys.res('workReport.settings.tit'),
 					items: [
-						/*						WTF.lookupCombo('id', 'desc', {
-						 bind: '',
-						 store: Ext.create('Sonicle.webtop.drm.store.UserGroupType', {
-						 autoLoad: true
-						 }),
-						 fieldLabel: me.mys.res('workReport.settings.fld-reportProfile.lbl'),
-						 width: 250
-						 }),*/
 						{
 							xtype: 'textfield',
 							bind: '{record.workReportSequence}',

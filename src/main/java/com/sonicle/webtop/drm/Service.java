@@ -286,6 +286,7 @@ public class Service extends BaseService {
 			boolean chek = false;
 			List<MasterData> items = new ArrayList<>();
 			List<JsSimple> customers = new ArrayList();
+			ResultMeta meta = null;
 			
 			if(realCustomerId != null && operator != null){
 				DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID, new UserProfileId(getEnv().getProfileId().getDomain(), operator));
@@ -297,9 +298,16 @@ public class Service extends BaseService {
 				for(MasterData customer : items) {
 					customers.add(new JsSimple(customer.getMasterDataId(), customer.getDescription()));
 				}
+				
+				Integer selected = customers.isEmpty() ? null : Integer.parseInt(customers.get(0).id.toString());
+				meta = new LookupMeta().setSelected(selected);
 			}
 				
-			new JsonResult(customers, customers.size()).printTo(out);
+			if(meta == null)
+				new JsonResult(customers, customers.size()).printTo(out); 
+			else 
+				new JsonResult(customers, meta, customers.size()).printTo(out);
+			
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
 		}

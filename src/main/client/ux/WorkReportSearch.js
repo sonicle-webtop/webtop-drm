@@ -146,6 +146,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 					width: '420px',
 					listeners: {
 						select: function (s, r) {
+							me.getViewModel().set('statisticCustomerId', null);
 							WTU.loadWithExtraParams(me.lookupReference('fldstatmasterdata').getStore(), {
 								realCustomer: r.id
 							});
@@ -280,7 +281,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 				WTF.remoteCombo('id', 'desc', {
 					reference: 'fldstatmasterdata',
 					bind: '{statisticCustomerId}',
-					autoLoadOnValue: false,
+					autoLoadOnValue: true,
 					tabIndex: 4,
 					store: {
 						model: 'WTA.model.Simple',
@@ -289,7 +290,17 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 								realCustomer: null,
 								operator: null
 							}
-						})
+						}),
+						listeners: {
+							load: function (s) {
+								var meta = s.getProxy().getReader().metaData;
+								if(meta){
+									if (meta.selected) {
+										me.getViewModel().set('statisticCustomerId', meta.selected);
+									}
+								}
+							}
+						}
 					},
 					triggers: {
 						clear: WTF.clearTrigger()
