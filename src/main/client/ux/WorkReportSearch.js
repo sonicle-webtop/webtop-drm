@@ -414,5 +414,30 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 		};
 		
 		me.fireEvent('search', me, query);
+	},
+	
+	getData: function () {
+		var me = this,
+			SoDate = Sonicle.Date;
+
+		var query = {
+			companyId: me.lookupReference('fldcompany').getValue(),
+			operatorId: me.lookupReference('flduser').getValue(),
+			customerId: me.lookupReference('fldmasterdata').getValue(),
+			customerStatId: me.lookupReference('fldstatmasterdata').getValue(),
+			fromDate: SoDate.format(me.lookupReference('fldfrom').getValue(), 'Y-m-d'),
+			toDate: SoDate.format(me.lookupReference('fldto').getValue(), 'Y-m-d'),
+			referenceNo: me.lookupReference('fldreference').getValue(),
+			workReportNo: me.lookupReference('fldworkreportno').getValue(),
+			businessTripId: me.lookupReference('fldbusinesstrip').getValue(),
+			description: me.lookupReference('flddescription').getValue(),
+			notes: me.lookupReference('fldnotes').getValue(),
+			docStatusId: me.lookupReference('flddocstatus').getValue(),
+			chargeTo: me.lookupReference('fldchargeto').getValue(),
+			year: me.lookupReference('fldyear').getValue(),
+			causalId: me.lookupReference('fldcausal').getValue()			
+		};
+		
+		return query;
 	}
 });

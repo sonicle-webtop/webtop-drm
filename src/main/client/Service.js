@@ -38,7 +38,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			xtype: 'panel',
 			referenceHolder: true,
 			title: me.getName(),
-			items: [{
+			items: [
+				{
 					xtype: 'treepanel',
 					reference: 'tree',
 					rootVisible: false,
@@ -54,6 +55,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					listeners: {
 						itemclick: function (s, rec, itm, i, e) {
 							me.getMainComponent().getLayout().setActiveItem(i + 1);
+							me.onActivate(i + 1);
 						}
 					}
 				}]
@@ -73,6 +75,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 						{
 							region: 'north',
 							xtype: 'wtdrmworkreportsearch',
+							reference: 'filtersWorkReport',
 							title: me.res('gpWorkReport.tit.lbl'),
 							iconCls: 'wtdrm-icon-workreport-xs',
 							titleCollapse: true,
@@ -348,6 +351,10 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	},
 	
 	//Getter
+	filtersWorkReport: function () {
+		return this.getMainComponent().lookupReference('filtersWorkReport');
+	},
+	
 	gpWorkReport: function () {
 		return this.getMainComponent().lookupReference('gpWorkReport');
 	},
@@ -410,7 +417,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				me.addWorkReport({
 					callback: function (success) {
 						if (success) {
-							me.gpWorkReport().getStore().load();
+							me.filtersWorkReport().extractData();
 						}
 					}
 				});
@@ -560,7 +567,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		});
 	},
 	workReportSetting: function (opts) {
-		opts = opts || {}; //se nullo controlla e lo seta a obj empty
+		opts = opts || {};
 
 		var me = this,
 				//viewcontainer => recupero la view di webtop => id del servizio, nome View
@@ -704,12 +711,15 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		vw.show(false);
 	},
 	
-	onActivate: function () {
-		var me = this,
-				gp = me.gpWorkReport();
-		if (me.needsReload) {
-			me.needsReload = false;
-			me.reloadWorkReport();
+	onActivate: function (tabIndex) {
+		var me = this;
+		
+		switch (tabIndex){
+			case 1:
+				me.reloadWorkReport(me.filtersWorkReport().getData());
+				break;
+			case 2:
+				break;
 		}
 	}
 });

@@ -315,11 +315,20 @@ public class Service extends BaseService {
 	
 	public void processLookupAllStatisticCustomers(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
+			DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID, new UserProfileId(getEnv().getProfileId().getDomain(), getEnv().getProfileId().getUserId()));
 			
 			List<MasterData> items = new ArrayList<>();
 			List<JsSimple> customers = new ArrayList();
+			List<String> idCustomers = new ArrayList();
 			
-			items = WT.getCoreManager().listChildrenMasterData(Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER)));
+			idCustomers = manager.listCustomersByProfileUser();
+				
+			if(idCustomers.size() > 0)
+				items = WT.getCoreManager().listMasterDataIn(idCustomers);
+			else
+				items = WT.getCoreManager().listMasterData(Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER)));
+			
+			items.addAll(WT.getCoreManager().listChildrenMasterData(Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER))));
 
 			for(MasterData customer : items) {
 				customers.add(new JsSimple(customer.getMasterDataId(), customer.getDescription()));
