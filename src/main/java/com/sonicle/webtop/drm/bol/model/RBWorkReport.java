@@ -41,9 +41,11 @@ import com.sonicle.webtop.core.sdk.WTException;
 import com.sonicle.webtop.drm.DrmManager;
 import com.sonicle.webtop.drm.DrmServiceSettings;
 import static com.sonicle.webtop.drm.Service.logger;
+import com.sonicle.webtop.drm.bol.OBusinessTrip;
 import com.sonicle.webtop.drm.model.CompanyPicture;
 import com.sonicle.webtop.drm.model.WorkReport;
 import com.sonicle.webtop.drm.model.WorkReportRow;
+import com.sonicle.webtop.drm.model.WorkReportSetting;
 import java.awt.Image;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -133,7 +135,9 @@ public class RBWorkReport {
 		this.chargeTo = wr.getChargeTo();
 		this.freeSupport = wr.getFreeSupport();
 		this.businessTripId = wr.getBusinessTripId();
-		this.businessTripDescription = drmMgr.getBusinessTripById(wr.getBusinessTripId()).getDescription();
+		this.businessTripDescription = "";
+		if (this.businessTripId!=null)
+			this.businessTripDescription=drmMgr.getBusinessTripById(this.businessTripId).getDescription();
 		this.dayTransfert = wr.getDayTrasfert();
 		
 		wrRows = new ArrayList<>();
@@ -143,7 +147,10 @@ public class RBWorkReport {
 		//Add empty rows (for maximum 18)
 		for(int i = 0; i < (18 - wr.getDetails().size()); i++) wrRows.add(new RBWorkReportRows());
 		
-		this.warranty = drmMgr.getWorkReportSetting().getWarrantyText();
+		this.warranty="";
+		WorkReportSetting wrs=drmMgr.getWorkReportSetting();
+		if (wrs!=null)
+			this.warranty = wrs.getWarrantyText();
 		this.footer = drmMgr.getCompany(wr.getCompanyId()).getFooterColumnLeft();
 		
 		this.printTransfertDescription = ss.getPrintTransfertDescription();

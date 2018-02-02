@@ -1094,6 +1094,7 @@ public class Service extends BaseService {
 			
 		} catch(Exception ex) {
 			logger.error("Error in action PrintWorkReport", ex);
+			ex.printStackTrace();
 			ServletUtils.writeErrorHandlingJs(response, ex.getMessage());
 		}
 	}
