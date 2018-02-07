@@ -434,7 +434,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 									store: {
 										autoLoad: true,
 										model: 'WTA.model.Simple',
-										proxy: WTF.proxy(me.mys.ID, 'LookupDocStatuses'),
+										proxy: WTF.proxy(me.mys.ID, 'LookupDocStatuses')
 //										listeners: {
 //											load: function (s) {
 //												var meta = s.getProxy().getReader().metaData;
@@ -768,13 +768,14 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 	
 	onViewLoad: function(s, success) {
 		if(!success) return;
-		var me = this;
+		var me = this,
+				mo = me.getModel();
 	
 		if(me.isMode(me.MODE_NEW)) {
-			me.lref('fldapplySignature').setValue(me.mys.getVar('defaultApplySignature'));
-			me.lref('fldchargeTo').setValue(me.mys.getVar('defaultChargeTo'));
-			me.lref('fldfreeSupport').setValue(me.mys.getVar('defaultFreeSupport'));
-			me.lref('flddoctatus').setValue(me.mys.getVar('defaultStatus'));
+			mo.set('applySignature', me.mys.getVar('defaultApplySignature'));
+			mo.set('chargeTo', me.mys.getVar('defaultChargeTo'));
+			mo.set('freeSupport', me.mys.getVar('defaultFreeSupport'));
+			mo.set('docStatusId', me.mys.getVar('defaultStatus'));
 		}
 	},
 	

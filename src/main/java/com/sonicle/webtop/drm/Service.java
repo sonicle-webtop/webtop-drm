@@ -177,7 +177,7 @@ public class Service extends BaseService {
 		vs.put("defaultApplySignature", ss.getDefaultApplySignature());
 		vs.put("defaultChargeTo", ss.getDefaultChargeTo());
 		vs.put("defaultFreeSupport", ss.getDefaultFreeSupport());
-		vs.put("defaultDocStatusId", ss.getDefaultDocStatusId());
+		vs.put("defaultStatus", ss.getDefaultDocStatusId());
 
 		return vs;
 	}

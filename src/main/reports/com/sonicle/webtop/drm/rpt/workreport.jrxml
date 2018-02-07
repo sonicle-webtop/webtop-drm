@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.0.final using JasperReports Library version 6.3.0  -->
-<!-- 2017-11-23T14:36:22 -->
+<!-- 2018-02-07T12:14:13 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="workreport" pageWidth="595" pageHeight="842" columnWidth="557" leftMargin="19" rightMargin="19" topMargin="10" bottomMargin="10" isSummaryWithPageHeaderAndFooter="true" resourceBundle="workreport" uuid="47fa44bf-1a8e-4a18-a0df-8b26982ff32e">
 	<property name="com.jaspersoft.studio.unit." value="cm"/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
@@ -417,7 +417,7 @@
 				<textElement textAlignment="Center">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{ddtDate}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{ddtDate}!=null) ? $F{ddtDate} : ""]]></textFieldExpression>
 				<patternExpression><![CDATA[$P{WT_DATE_FORMAT_SHORT}]]></patternExpression>
 			</textField>
 		</band>

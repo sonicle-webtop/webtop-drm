@@ -41,7 +41,6 @@ import com.sonicle.webtop.core.sdk.WTException;
 import com.sonicle.webtop.drm.DrmManager;
 import com.sonicle.webtop.drm.DrmServiceSettings;
 import static com.sonicle.webtop.drm.Service.logger;
-import com.sonicle.webtop.drm.bol.OBusinessTrip;
 import com.sonicle.webtop.drm.model.CompanyPicture;
 import com.sonicle.webtop.drm.model.WorkReport;
 import com.sonicle.webtop.drm.model.WorkReportRow;
@@ -53,7 +52,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import javax.imageio.ImageIO;
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 
 /**
  *
@@ -115,7 +113,8 @@ public class RBWorkReport {
 		this.docStatusId = wr.getDocStatusId();
 		this.docStatusDescription = drmMgr.getDocStatus(wr.getDocStatusId()).getName();
 		this.contactId = wr.getContactId();
-		this.contactDescription = contactMgr.getContact(wr.getContactId()).getFullName();
+		if (this.contactId != null)
+			this.contactDescription = contactMgr.getContact(wr.getContactId()).getFullName();
 		this.customerId = wr.getCustomerId();
 		this.customerDescription = coreMgr.getMasterData(wr.getCustomerId()).getDescription();
 		this.customerAddress = coreMgr.getMasterData(wr.getCustomerId()).getAddress();
@@ -128,7 +127,8 @@ public class RBWorkReport {
 		this.causalId = wr.getCausalId();
 		this.causalDescription = coreMgr.getCausal(wr.getCausalId()).getDescription();
 		this.ddtNo = wr.getDdtNo();
-		this.ddtDate = wr.getDdtDate().toDate();
+		if(wr.getDdtDate() != null)
+			this.ddtDate = wr.getDdtDate().toDate();
 		this.notes = wr.getNotes();
 		this.description = wr.getDescription();
 		this.applySignature = wr.getApplySignature();
@@ -136,7 +136,7 @@ public class RBWorkReport {
 		this.freeSupport = wr.getFreeSupport();
 		this.businessTripId = wr.getBusinessTripId();
 		this.businessTripDescription = "";
-		if (this.businessTripId!=null)
+		if (this.businessTripId != null)
 			this.businessTripDescription=drmMgr.getBusinessTripById(this.businessTripId).getDescription();
 		this.dayTransfert = wr.getDayTrasfert();
 		
