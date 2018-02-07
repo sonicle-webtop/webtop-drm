@@ -50,7 +50,7 @@ CREATE SEQUENCE "drm"."seq_profiles_supervised_users";
 -- ----------------------------
 -- Sequence structure for "drm"."seq_seq_profiles_members"
 -- ----------------------------
-CREATE SEQUENCE "drm"."seq_seq_profiles_members";
+CREATE SEQUENCE "drm"."seq_profiles_members";
 
 -- ----------------------------
 -- Sequence structure for "drm"."seq_work_report_details"
