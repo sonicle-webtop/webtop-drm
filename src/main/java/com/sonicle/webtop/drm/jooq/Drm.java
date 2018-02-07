@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Drm extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = -1351077907;
+	private static final long serialVersionUID = 1235701565;
 
 	/**
 	 * The reference instance of <code>drm</code>
@@ -44,11 +44,24 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_COMPANIES_USERS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_DOC_STATUSES,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_DOC_STATUSES_GROUPS,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EXPENSE_NOTE_COSTS,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EXPENSE_NOTE_DOCUMENTS,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EXPENSE_NOTE_ROW_DETAILS,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EXPENSE_NOTE_ROW_DOCUMENTS,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EXPENSE_NOTE_ROWS,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EXPENSE_NOTES,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_FOLDERS_GROUPS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_GROUPS_USERS,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_HOLIDAY_3aDAY,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PERSON_IN_CHARGE,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_MASTERDATA,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_MEMBERS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_SUPERVISED_USERS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_USERS,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_TIMETABLE_MOVEMENTS,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_TIMETABLE_REQUESTS_HOLIDAY,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_TIMETABLE_USER_HOURS,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_USER_FOR_PERSON_IN_CHARGE,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_WORK_REPORT_DETAILS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_WORK_REPORTS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_WORK_REPORTS_COUNT,
@@ -86,10 +99,17 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.tables.FoldersGroups.FOLDERS_GROUPS,
 			com.sonicle.webtop.drm.jooq.tables.Groups.GROUPS,
 			com.sonicle.webtop.drm.jooq.tables.GroupsUsers.GROUPS_USERS,
+			com.sonicle.webtop.drm.jooq.tables.HolidayDate.HOLIDAY_DATE,
+			com.sonicle.webtop.drm.jooq.tables.PersonInCharge.PERSON_IN_CHARGE,
 			com.sonicle.webtop.drm.jooq.tables.Profiles.PROFILES,
 			com.sonicle.webtop.drm.jooq.tables.ProfilesMasterdata.PROFILES_MASTERDATA,
 			com.sonicle.webtop.drm.jooq.tables.ProfilesMembers.PROFILES_MEMBERS,
 			com.sonicle.webtop.drm.jooq.tables.ProfilesSupervisedUsers.PROFILES_SUPERVISED_USERS,
+			com.sonicle.webtop.drm.jooq.tables.TimetableAttendancesheet.TIMETABLE_ATTENDANCESHEET,
+			com.sonicle.webtop.drm.jooq.tables.TimetableMovements.TIMETABLE_MOVEMENTS,
+			com.sonicle.webtop.drm.jooq.tables.TimetableRequestsHoliday.TIMETABLE_REQUESTS_HOLIDAY,
+			com.sonicle.webtop.drm.jooq.tables.TimetableUserHours.TIMETABLE_USER_HOURS,
+			com.sonicle.webtop.drm.jooq.tables.UserForPersonInCharge.USER_FOR_PERSON_IN_CHARGE,
 			com.sonicle.webtop.drm.jooq.tables.WorkReports.WORK_REPORTS,
 			com.sonicle.webtop.drm.jooq.tables.WorkReportsAttachments.WORK_REPORTS_ATTACHMENTS,
 			com.sonicle.webtop.drm.jooq.tables.WorkReportsRows.WORK_REPORTS_ROWS,

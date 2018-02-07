@@ -70,41 +70,49 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 					}
 				}),
 				'->',
-				WTF.localCombo('id', 'desc', {
-					reference: 'flduser',
-					bind: '{record.operatorId}',
-					anyMatch: true,
-					store: {
-						autoLoad: true,
-						model: 'WTA.model.Simple',
-						proxy: WTF.proxy(me.mys.ID, 'LookupOperators'),
-						listeners: {
-							load: function (s) {
-								if (me.isMode('new')) {
-									var meta = s.getProxy().getReader().metaData;
-									if (meta.selected) {
-										me.lookupReference('flduser').setValue(meta.selected);
-									}
-									if (s.loadCount === 1) {
-										me.lref('fldcompany').getStore().load();
-										me.lref('fldmasterdata').getStore().load();
-										//me.lref('fldstatmasterdata').getStore().load();
-										me.lref('fldcausal').getStore().load();
+				{
+					xtype: 'wtform',
+					reference: 'toolbar',
+					modelValidation: true,
+					items: [
+						WTF.localCombo('id', 'desc', {
+							reference: 'flduser',
+							bind: '{record.operatorId}',
+							anyMatch: true,
+							selectOnFocus: true,
+							store: {
+								autoLoad: true,
+								model: 'WTA.model.Simple',
+								proxy: WTF.proxy(me.mys.ID, 'LookupOperators'),
+								listeners: {
+									load: function (s) {
+										if (me.isMode('new')) {
+											var meta = s.getProxy().getReader().metaData;
+											if (meta.selected) {
+												me.lookupReference('flduser').setValue(meta.selected);
+											}
+											if (s.loadCount === 1) {
+												me.lref('fldcompany').getStore().load();
+												me.lref('fldmasterdata').getStore().load();
+												//me.lref('fldstatmasterdata').getStore().load();
+												me.lref('fldcausal').getStore().load();
+											}
+										}
 									}
 								}
-							}
-						}
-					},
-					listeners: {
-						select: function (s, r) {
-							me.lref('fldcompany').getStore().load();
-							me.lref('fldmasterdata').getStore().load();
-							me.lref('fldstatmasterdata').getStore().load();
-							me.lref('fldcausal').getStore().load();
-						}
-					},
-					fieldLabel: me.mys.res('workReport.fld-nominative.lbl')
-				})
+							},
+							listeners: {
+								select: function (s, r) {
+									me.lref('fldcompany').getStore().load();
+									me.lref('fldmasterdata').getStore().load();
+									me.lref('fldstatmasterdata').getStore().load();
+									me.lref('fldcausal').getStore().load();
+								}
+							},
+							fieldLabel: me.mys.res('workReport.fld-nominative.lbl')
+						})
+					]
+				}
 			]
 		});
 
@@ -140,6 +148,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											bind: '{record.companyId}',
 											autoLoadOnValue: true,
 											tabIndex: 101,
+											selectOnFocus: true,
 											store: {
 												model: 'WTA.model.Simple',
 												proxy: WTF.proxy(me.mys.ID, 'LookupCompanies', null, {
@@ -169,6 +178,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											bind: '{record.contactId}',
 											anyMatch: true,
 											tabIndex: 102,
+											selectOnFocus: true,
 											store: {
 												autoLoad: true,
 												model: 'WTA.ux.data.SimpleSourceModel',
@@ -183,6 +193,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											bind: '{record.customerId}',
 											autoLoadOnValue: true,
 											tabIndex: 103,
+											selectOnFocus: true,
 											store: {
 												model: 'WTA.model.Simple',
 												proxy: WTF.proxy(me.mys.ID, 'LookupRealCustomers', null, {
@@ -231,6 +242,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											bind: '{record.fromDate}',
 											format: WT.getShortDateFmt(),
 											tabIndex: 105,
+											selectOnFocus: true,
 											listeners: {
 												select: function (s, v) {
 													if (me.lref('fldtodate').getValue() === null || v > me.lref('fldtodate').getValue()) {
@@ -248,13 +260,15 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											bind: '{record.referenceNo}',
 											fieldLabel: me.mys.res('workReport.fld-reference.lbl'),
 											width: '420px',
-											tabIndex: 107
+											tabIndex: 107,
+											selectOnFocus: true
 										}, {
 											xtype: 'textfield',
 											bind: '{record.ddtNo}',
 											fieldLabel: me.mys.res('workReport.fld-ddt.lbl'),
 											width: '420px',
-											tabIndex: 109
+											tabIndex: 109,
+											selectOnFocus: true
 										}
 									]
 								}, {
@@ -274,6 +288,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											bind: '{record.customerStatId}',
 											autoLoadOnValue: true,
 											tabIndex: 104,
+											selectOnFocus: true,
 											store: {
 												model: 'WTA.model.Simple',
 												proxy: WTF.proxy(me.mys.ID, 'LookupStatisticCustomers', null, {
@@ -309,6 +324,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											reference: 'fldtodate',
 											bind: '{record.toDate}',
 											tabIndex: 106,
+											selectOnFocus: true,
 											listeners: {
 												select: function (s, rec) {
 													var days = Sonicle.Date.diffDays(me.lref('fldfromdate').getValue(),
@@ -325,6 +341,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											bind: '{record.causalId}',
 											autoLoadOnValue: true,
 											tabIndex: 108,
+											selectOnFocus: true,
 											store: {
 												model: 'WTA.model.CausalLkp',
 												proxy: WTF.proxy(WT.ID, 'LookupCausals', null, {
@@ -364,7 +381,8 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											format: WT.getShortDateFmt(),
 											fieldLabel: me.mys.res('workReport.fld-ddtToDate.lbl'),
 											width: '420px',
-											tabIndex: 110
+											tabIndex: 110,
+											selectOnFocus: true
 										}
 									]
 								}
@@ -389,18 +407,21 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 									items: [
 										{
 											xtype: 'checkbox',
+											reference: 'fldapplySignature',
 											bind: '{record.applySignature}',
 											boxLabel: me.mys.res('workReport.fld-signature.lbl'),
 											boxLabelAlign: 'before'
 										},
 										{
 											xtype: 'checkbox',
+											reference: 'fldchargeTo',
 											bind: '{record.chargeTo}',
 											boxLabel: me.mys.res('workReport.fld-chargeTo.lbl'),
 											boxLabelAlign: 'before'
 										},
 										{
 											xtype: 'checkbox',
+											reference: 'fldfreeSupport',
 											bind: '{record.freeSupport}',
 											boxLabel: me.mys.res('workReport.fld-assistance.lbl'),
 											boxLabelAlign: 'before'
@@ -414,14 +435,14 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 										autoLoad: true,
 										model: 'WTA.model.Simple',
 										proxy: WTF.proxy(me.mys.ID, 'LookupDocStatuses'),
-										listeners: {
-											load: function (s) {
-												var meta = s.getProxy().getReader().metaData;
-												if (meta.selected) {
-													me.lookupReference('flddoctatus').setValue(meta.selected);
-												}
-											}
-										}
+//										listeners: {
+//											load: function (s) {
+//												var meta = s.getProxy().getReader().metaData;
+//												if (meta.selected) {
+//													me.lookupReference('flddoctatus').setValue(meta.selected);
+//												}
+//											}
+//										}
 									},
 									fieldLabel: me.mys.res('workReport.fld-status.lbl')
 								})
@@ -656,6 +677,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 		});
 
 		me.on('viewinvalid', me.onViewInvalid);
+		me.on('viewload', me.onViewLoad);
 
 	},
 	gpAttachment: function () {
@@ -743,6 +765,19 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 			me.mys.printWorkReport([contactId]);
 		}
 	},
+	
+	onViewLoad: function(s, success) {
+		if(!success) return;
+		var me = this;
+	
+		if(me.isMode(me.MODE_NEW)) {
+			me.lref('fldapplySignature').setValue(me.mys.getVar('defaultApplySignature'));
+			me.lref('fldchargeTo').setValue(me.mys.getVar('defaultChargeTo'));
+			me.lref('fldfreeSupport').setValue(me.mys.getVar('defaultFreeSupport'));
+			me.lref('flddoctatus').setValue(me.mys.getVar('defaultStatus'));
+		}
+	},
+	
 	initActions: function () {
 		var me = this;
 		me.addAct('openAttachment', {

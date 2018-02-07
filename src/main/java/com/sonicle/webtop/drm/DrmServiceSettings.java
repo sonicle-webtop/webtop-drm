@@ -108,5 +108,108 @@ public class DrmServiceSettings extends BaseServiceSettings {
 	public void setCloudTracking(boolean enabled) {
 		setBoolean(CLOUD_TRACKING, enabled); //imposta il settings a livello di dominio
 	}
+	
+	public boolean getDefaultApplySignature() {
+		return getBoolean(DEFAULT_APPLY_SIGNATURE, Boolean.FALSE); 
+	}
 
+	public void setDefaultApplySignature(boolean enabled) {
+		setBoolean(DEFAULT_APPLY_SIGNATURE, enabled); 
+	}
+	
+	public boolean getDefaultChargeTo() {
+		return getBoolean(DEFAULT_CHARGE_TO, Boolean.FALSE);
+	}
+
+	public void setDefaultChargeTo(boolean enabled) {
+		setBoolean(DEFAULT_CHARGE_TO, enabled); 
+	}
+	
+	public boolean getDefaultFreeSupport() {
+		return getBoolean(DEFAULT_FREE_SUPPORT, Boolean.FALSE); 
+	}
+
+	public void setDefaultFreeSupport(boolean enabled) {
+		setBoolean(DEFAULT_FREE_SUPPORT, enabled); 
+	}
+	
+	public String getDefaultDocStatusId() {
+		return getString(DEFAULT_DOC_STATUS_ID, ""); 
+	}
+
+	public void setDefaultDocStatusId(String value) {
+		setString(DEFAULT_DOC_STATUS_ID, value); 
+	}
+	
+	public String getAllowedAddresses() {
+		return getString(TIMETABLE_ALLOWED_ADDRESSES, ""); 
+	}
+
+	public void setAllowedAddresses(String value) {
+		setString(TIMETABLE_ALLOWED_ADDRESSES, value); 
+	}
+	
+	public String getAllowedUsers() {
+		return getString(TIMETABLE_ALLOWED_USERS, ""); 
+	}
+
+	public void setAllowedUsers(String value) {
+		setString(TIMETABLE_ALLOWED_USERS, value); 
+	}
+	
+	public String getStaffOfficeEmail() {
+		return getString(TIMETABLE_STAFF_OFFICE_EMAIL, ""); 
+	}
+
+	public void setStaffOfficeEmail(String value) {
+		setString(TIMETABLE_STAFF_OFFICE_EMAIL, value); 
+	}
+
+	public boolean getRequestsHolidaysPermitsPreviousDates() {
+		return getBoolean(TIMETABLE_REQUEST_HOLIDAYS_PERMITS_PREVIOUS_DATES, Boolean.FALSE);
+	}
+
+	public void setRequestsHolidaysPermitsPreviousDates(boolean enabled) {
+		setBoolean(TIMETABLE_REQUEST_HOLIDAYS_PERMITS_PREVIOUS_DATES, enabled); 
+	}
+	
+	public String getTotalToleranceInMinutes() {
+		return getString(TIMETABLE_TOT_TOLERANCE, ""); 
+	}
+
+	public void setTotalToleranceInMinutes(String value) {
+		setString(TIMETABLE_TOT_TOLERANCE, value); 
+	}
+	
+	public String getRounding() {
+		return getString(TIMETABLE_ROUNDING, ""); 
+	}
+
+	public void setRounding(String value) {
+		setString(TIMETABLE_ROUNDING, value); 
+	}
+	
+	public String getMinimumExtraordinary() {
+		return getString(TIMETABLE_MINIMUM_EXTRAORDINARY, ""); 
+	}
+
+	public void setMinimumExtraordinary(String value) {
+		setString(TIMETABLE_MINIMUM_EXTRAORDINARY, value); 
+	}
+	
+	public boolean getBreakAnomaly() {
+		return getBoolean(TIMETABLE_BREAK_ANOMALY, Boolean.FALSE);
+	}
+
+	public void setBreakAnomaly(boolean enabled) {
+		setBoolean(TIMETABLE_BREAK_ANOMALY, enabled); 
+	}
+	
+	public boolean getReadOnlyEvents() {
+		return getBoolean(TIMETABLE_READONLY_EVENTS, Boolean.FALSE);
+	}
+
+	public void setReadOnlyEvents(boolean enabled) {
+		setBoolean(TIMETABLE_READONLY_EVENTS, enabled); 
+	}
 }

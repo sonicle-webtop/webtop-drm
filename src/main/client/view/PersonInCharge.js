@@ -30,42 +30,71 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.WorkReportSetting', {
-	extend: 'WTA.ux.data.BaseModel',
+Ext.define('Sonicle.webtop.drm.view.PersonInCharge', {
+	extend: 'WTA.sdk.ModelView',
 	requires: [
-		'Sonicle.data.writer.Json',
-		'Sonicle.webtop.drm.model.WorkType',
-		'Sonicle.webtop.drm.model.BusinessTrip'
+		'Sonicle.webtop.drm.model.PersonInCharge',
+		'Sonicle.webtop.drm.ux.UserGrid',
+		'Sonicle.webtop.drm.ux.CustomerGrid'
 	],
-	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageWorkReportSetting', 'data', {
-		writer: {
-			type: 'sojson',
-			writeAssociations: true
+	dockableConfig: {
+		title: '{personincharge.tit}', //localizzato
+		iconCls: 'wtdrm-icon-configuration-profilesconfiguration-xs',
+		width: 500,
+		height: 500
+	},
+	fieldTitle: 'description',
+	modelName: 'Sonicle.webtop.drm.model.PersonInCharge',
+	constructor: function (cfg) {
+		var me = this;
+		me.callParent([cfg]);
+	},
+	initComponent: function () {
+		var me = this;
+		me.callParent(arguments);
+		me.add({
+			region: 'center',
+			xtype: 'panel',
+			layout: 'vbox',
+			items: [
+				{
+					xtype: 'wtform',
+					items: [
+						WTF.localCombo('id', 'desc', {
+							bind: '{record.type}',
+							anyMatch: true,
+							allowBlank: false,
+							store: {
+								autoLoad: true,
+								model: 'WTA.model.Simple',
+								proxy: WTF.proxy(me.mys.ID, 'LookupOperators')
+							},
+							fieldLabel: me.mys.res('personincharge.personincharge.lbl'),
+							width: 250
+						})
+					]
+				},
+				{
+					xtype: 'wtdrmusergrid',
+					title: me.mys.res('personincharge.gpUsersForPersonInCharge.tit'),
+					sid: me.mys.ID,
+					actionsInToolbar: false,
+					width: '100%',
+					bind: {
+						store: '{record.supervisedUsers}'
+					},
+					listeners: {
+						pick: function (s, vals, recs) {
+							var mo = me.getModel();
+							mo.supervisedUsers().add({
+								userId: vals
+							});
+						}
+					}
+				}
+			]
 		}
-	}),
-	identifier: 'negative',
-	idProperty: 'id',
-	fields: [
-		WTF.field('id', 'string', true),
-		WTF.field('domainId', 'string', true),
-		WTF.field('workReportSequence', 'int', true),
-		WTF.field('warranty', 'string', true),
-		WTF.field('printDaysTransfert', 'bool', true, {defaultValue: false}),
-		WTF.field('printTransfertDescription', 'bool', true, {defaultValue: false}),
-		WTF.field('printSignature', 'bool', true, {defaultValue: false}),
-		WTF.field('manageHours', 'bool', true, {defaultValue: false}),
-		WTF.field('roundingHour', 'int', true), 
-		WTF.field('tracking', 'bool', true, {defaultValue: false}), 
-		WTF.field('trackingMail', 'bool', true, {defaultValue: false}), 
-		WTF.field('trackingCloud', 'bool', true, {defaultValue: false}),
-		WTF.field('defaultApplySignature', 'bool', true, {defaultValue: false}),
-		WTF.field('defaultChargeTo', 'bool', true, {defaultValue: false}),
-		WTF.field('defaultFreeSupport', 'bool', true, {defaultValue: false}),
-		WTF.field('defaultCausal', 'string', true),
-		WTF.field('defaultStatus', 'string', true)
-	],
-	hasMany: [
-		WTF.hasMany('types', 'Sonicle.webtop.drm.model.WorkType'),
-		WTF.hasMany('trips', 'Sonicle.webtop.drm.model.BusinessTrip')
-	]
+		);
+	}
 });
+

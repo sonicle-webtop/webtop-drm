@@ -122,6 +122,16 @@ public class Tables {
 	public static final com.sonicle.webtop.drm.jooq.tables.GroupsUsers GROUPS_USERS = com.sonicle.webtop.drm.jooq.tables.GroupsUsers.GROUPS_USERS;
 
 	/**
+	 * The table drm.holiday_date
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.HolidayDate HOLIDAY_DATE = com.sonicle.webtop.drm.jooq.tables.HolidayDate.HOLIDAY_DATE;
+
+	/**
+	 * The table drm.person_in_charge
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.PersonInCharge PERSON_IN_CHARGE = com.sonicle.webtop.drm.jooq.tables.PersonInCharge.PERSON_IN_CHARGE;
+
+	/**
 	 * The table drm.profiles
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.Profiles PROFILES = com.sonicle.webtop.drm.jooq.tables.Profiles.PROFILES;
@@ -140,6 +150,31 @@ public class Tables {
 	 * The table drm.profiles_supervised_users
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.ProfilesSupervisedUsers PROFILES_SUPERVISED_USERS = com.sonicle.webtop.drm.jooq.tables.ProfilesSupervisedUsers.PROFILES_SUPERVISED_USERS;
+
+	/**
+	 * The table drm.timetable_attendancesheet
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.TimetableAttendancesheet TIMETABLE_ATTENDANCESHEET = com.sonicle.webtop.drm.jooq.tables.TimetableAttendancesheet.TIMETABLE_ATTENDANCESHEET;
+
+	/**
+	 * The table drm.timetable_movements
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.TimetableMovements TIMETABLE_MOVEMENTS = com.sonicle.webtop.drm.jooq.tables.TimetableMovements.TIMETABLE_MOVEMENTS;
+
+	/**
+	 * The table drm.timetable_requests_holiday
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.TimetableRequestsHoliday TIMETABLE_REQUESTS_HOLIDAY = com.sonicle.webtop.drm.jooq.tables.TimetableRequestsHoliday.TIMETABLE_REQUESTS_HOLIDAY;
+
+	/**
+	 * The table drm.timetable_user_hours
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.TimetableUserHours TIMETABLE_USER_HOURS = com.sonicle.webtop.drm.jooq.tables.TimetableUserHours.TIMETABLE_USER_HOURS;
+
+	/**
+	 * The table drm.user_for_person_in_charge
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.UserForPersonInCharge USER_FOR_PERSON_IN_CHARGE = com.sonicle.webtop.drm.jooq.tables.UserForPersonInCharge.USER_FOR_PERSON_IN_CHARGE;
 
 	/**
 	 * The table drm.work_reports

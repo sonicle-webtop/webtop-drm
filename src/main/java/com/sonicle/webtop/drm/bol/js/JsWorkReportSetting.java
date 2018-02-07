@@ -56,6 +56,10 @@ public class JsWorkReportSetting {
 	public Boolean tracking;
 	public Boolean trackingMail;
 	public Boolean trackingCloud;
+	public Boolean defaultApplySignature;
+	public Boolean defaultChargeTo;
+	public Boolean defaultFreeSupport;
+	public String defaultStatus;
 
 	public List<JsGridWorkType> types = new ArrayList();
 	public List<JsGridBusinessTrip> trips = new ArrayList();
@@ -81,6 +85,10 @@ public class JsWorkReportSetting {
 		this.tracking = false;
 		this.trackingMail = false;
 		this.trackingCloud = false;
+		this.defaultApplySignature = false;
+		this.defaultChargeTo = false;
+		this.defaultFreeSupport = false;
+		this.defaultStatus = null;
 
 	}
 

@@ -344,8 +344,14 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							}
 						}
 					]
-				},
-				{xtype: 'panel'}
+				},{
+					xtype: 'container',
+					itemId: 'tt',
+					layout: 'border',
+					items: [
+						
+					]
+				}
 			]
 		}));
 	},
@@ -407,6 +413,14 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			iconCls: 'wt-icon-options-xs',
 			handler: function () {
 				me.expenseNoteSetting();
+			}
+		});
+		me.addAct('toolbox', 'ttSetting', {
+			text: me.res('toolbox.tt-settings.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-options-xs',
+			handler: function () {
+				me.timetableSetting();
 			}
 		});
 		me.addAct('workReport', 'add', {
@@ -689,6 +703,24 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		var me = this,
 				vw = WT.createView(me.ID, 'view.ExpenseNoteSetting');
 		vw.show(false);
+	},
+	
+	timetableSetting: function (opts) {
+		opts = opts || {};
+
+		var me = this,
+				vct = WT.createView(me.ID, 'view.TimetableSetting');
+		vct.getView().on('viewsave', function (s, success, model) {
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vct.show(false,
+				function () {
+					vct.getView().begin('edit', {
+						data: {
+							id: 'tt'
+						}
+					});
+				});
 	},
 	
 	reloadExpenseNote: function (query) {

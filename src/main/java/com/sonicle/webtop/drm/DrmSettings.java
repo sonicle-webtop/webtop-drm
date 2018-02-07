@@ -57,5 +57,30 @@ public class DrmSettings {
 	public static final String MAIL_TRACKING = "workreport.tracking.mail";
 	
 	public static final String CLOUD_TRACKING = "workreport.tracking.cloud";
+	
+	public static final String DEFAULT_APPLY_SIGNATURE = "workreport.default.applysignature";
+	
+	public static final String DEFAULT_CHARGE_TO = "workreport.default.chargeto";
+	
+	public static final String DEFAULT_FREE_SUPPORT = "workreport.default.freesupport";
+	
+	public static final String DEFAULT_DOC_STATUS_ID = "workreport.default.docstatusid";
+	
+	public static final String TIMETABLE_ALLOWED_ADDRESSES = "timetable.allowed.addresses";
+	
+	public static final String TIMETABLE_ALLOWED_USERS = "timetable.allowed.users";
+	
+	public static final String TIMETABLE_STAFF_OFFICE_EMAIL = "timetable.staff_office_email";
+	
+	public static final String TIMETABLE_REQUEST_HOLIDAYS_PERMITS_PREVIOUS_DATES = "timetable_request_holidays_premits_previous_dates";
 
+	public static final String TIMETABLE_TOT_TOLERANCE = "timetable.total.tolerance.in.minutes";
+	
+	public static final String TIMETABLE_ROUNDING = "timetable.rounding";
+	
+	public static final String TIMETABLE_MINIMUM_EXTRAORDINARY = "timetable.minimum.extraordinary";
+	
+	public static final String TIMETABLE_BREAK_ANOMALY = "timetable.break.anomaly";
+	
+	public static final String TIMETABLE_READONLY_EVENTS = "timetable.readonly_events";
 }

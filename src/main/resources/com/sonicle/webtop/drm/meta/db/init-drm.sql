@@ -682,3 +682,150 @@ CREATE SEQUENCE "drm"."seq_expense_note_costs";
 CREATE SEQUENCE "drm"."seq_expense_note_rows";
 CREATE SEQUENCE "drm"."seq_expense_note_row_details";
 CREATE SEQUENCE "drm"."seq_expense_note_row_documents";
+
+
+CREATE TABLE "drm"."timetable_attendancesheet" (
+"operator_id" varchar(15) DEFAULT 0 NOT NULL,
+"group_id" int2 DEFAULT 0 NOT NULL,
+"day" varchar(10) NOT NULL,
+"h_work" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_permits" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_extra_1" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_extra_2" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_extra_3" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_holidays" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_disease" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_total" numeric(15,2) DEFAULT 0 NOT NULL,
+"no_load" int2 DEFAULT 0 NOT NULL,
+"h_reports" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_work_tot" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_work_h" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_work_min" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_permits_tot" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_permits_h" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_permits_min" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_extra_1_tot" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_extra_2_tot" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_extra_2_h" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_extra_2_min" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_extra_3_tot" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_extra_3_h" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_extra_3_min" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_holidays_tot" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_holidays_h" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_holidays_min" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_disease_tot" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_disease_h" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_disease_min" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_total_tot" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_total_h" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_total_min" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_reports_tot" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_reports_h" numeric(15,2) DEFAULT 0 NOT NULL,
+"h_reports_min" numeric(15,2) DEFAULT 0 NOT NULL,
+"username" varchar(50) NOT NULL
+);
+
+CREATE TABLE "drm"."holiday_date" (
+"holiday_date_id" numeric(38) NOT NULL,
+"description" varchar(50) NOT NULL,
+"date" timestamp(6),
+"domain_id" varchar(30)
+);
+
+CREATE TABLE "drm"."timetable_movements" (
+"movement_id" int4 DEFAULT nextval('timetable_movements_movement_id_seq'::regclass) NOT NULL,
+"type_movement" varchar(2) NOT NULL,
+"operator_id" varchar(15) NOT NULL,
+"date_from" timestamp(6) NOT NULL,
+"date_to" timestamp(6) NOT NULL,
+"duration" time(6) NOT NULL,
+"description" varchar(1024),
+"reference" varchar(100),
+"state" varchar(30),
+"category" varchar(30),
+"n_report" varchar(100),
+"username" varchar(50) NOT NULL
+);
+
+CREATE TABLE "drm"."timetable_requests_holiday" (
+"holiday_id" numeric(38) NOT NULL,
+"login" varchar(100),
+"domain_id" varchar(20),
+"type" varchar(5),
+"responsible" varchar(100),
+"email_responsible" varchar(80),
+"date_from" timestamp(6),
+"date_to" timestamp(6),
+"h_from" varchar(5),
+"h_to" varchar(5),
+"status" varchar(5),
+"approved" varchar(5),
+"date_request" timestamp(6),
+"request_cancel" varchar(5),
+"event_id" numeric(38),
+"note" varchar(1500)
+);
+
+CREATE TABLE "drm"."timetable_user_hours" (
+"user_hour_id" numeric(38) NOT NULL,
+"login" varchar(100) NOT NULL,
+"domain_id" varchar(20) DEFAULT ''::character varying NOT NULL,
+"line_id" numeric(3) NOT NULL,
+"1_e" varchar(5),
+"1_u" varchar(5),
+"1_h" varchar(5),
+"2_e" varchar(5),
+"2_u" varchar(5),
+"2_h" varchar(5),
+"3_e" varchar(5),
+"3_u" varchar(5),
+"3_h" varchar(5),
+"4_e" varchar(5),
+"4_u" varchar(5),
+"4_h" varchar(5),
+"5_e" varchar(5),
+"5_u" varchar(5),
+"5_h" varchar(5),
+"6_e" varchar(5),
+"6_u" varchar(5),
+"6_h" varchar(5),
+"7_e" varchar(5),
+"7_u" varchar(5),
+"7_h" varchar(5)
+);
+
+ALTER TABLE "drm"."timetable_attendancesheet" ADD PRIMARY KEY ("operator_id", "day");
+
+ALTER TABLE "drm"."holiday_date" ADD PRIMARY KEY ("holiday_date_id");
+
+ALTER TABLE "drm"."timetable_movements" ADD PRIMARY KEY ("movement_id");
+
+ALTER TABLE "drm"."timetable_requests_holiday" ADD PRIMARY KEY ("holiday_id");
+
+ALTER TABLE "drm"."timetable_user_hours" ADD PRIMARY KEY ("user_hour_id");
+
+CREATE SEQUENCE "drm"."seq_timetable_movements";
+CREATE SEQUENCE "drm"."seq_timetable_requests_holiday";
+CREATE SEQUENCE "drm"."seq_timetable_user_hours";
+CREATE SEQUENCE "drm"."seq_holiday:day";
+
+CREATE TABLE "drm"."person_in_charge" (
+"id" int4 NOT NULL,
+"domain_id" varchar(20) NOT NULL,
+"user_id" varchar(36) NOT NULL,
+PRIMARY KEY ("id")
+);
+
+CREATE SEQUENCE "drm"."seq_person_in_charge";
+
+CREATE TABLE "drm"."user_for_person_in_charge" (
+"id" int4 NOT NULL,
+"domain_id" varchar(20) NOT NULL,
+"person_in_charge_id" int4 NOT NULL,
+"user_id" varchar(32) NOT NULL,
+PRIMARY KEY ("id")
+);
+
+CREATE SEQUENCE "drm"."seq_user_for_person_in_charge";
+

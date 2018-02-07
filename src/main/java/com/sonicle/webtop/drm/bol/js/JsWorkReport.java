@@ -89,7 +89,7 @@ public class JsWorkReport {
 		this.referenceNo = report.getReferenceNo();
 		this.causalId = report.getCausalId();
 		this.ddtNo = report.getDdtNo();
-		this.ddtDate = report.getDdtDate().toString();
+		this.ddtDate = (null != report.getDdtDate()) ? report.getDdtDate().toString() : null;
 		this.notes = report.getNotes();
 		this.description = report.getDescription();
 		this.applySignature = report.getApplySignature();
@@ -129,7 +129,9 @@ public class JsWorkReport {
 		rw.setReferenceNo(js.referenceNo);
 		rw.setCausalId(js.causalId);
 		rw.setDdtNo(js.ddtNo);
-		rw.setDdtDate(new LocalDate(js.ddtDate));
+		if(null != js.ddtDate){
+			rw.setDdtDate(new LocalDate(js.ddtDate));
+		}
 		rw.setNotes(js.notes);
 		rw.setDescription(js.description);
 		rw.setApplySignature(js.applySignature);

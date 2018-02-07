@@ -30,42 +30,33 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.WorkReportSetting', {
+Ext.define('Sonicle.webtop.drm.model.PersonInCharge', {
 	extend: 'WTA.ux.data.BaseModel',
 	requires: [
 		'Sonicle.data.writer.Json',
-		'Sonicle.webtop.drm.model.WorkType',
-		'Sonicle.webtop.drm.model.BusinessTrip'
+		'Sonicle.webtop.drm.model.ProfileMasterdata',
+		'Sonicle.webtop.drm.model.ProfileSupervisedUser',
+		'Sonicle.webtop.drm.model.ProfileMember'
 	],
-	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageWorkReportSetting', 'data', {
+	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageProfile', 'data', {
 		writer: {
 			type: 'sojson',
 			writeAssociations: true
 		}
 	}),
-	identifier: 'negative',
-	idProperty: 'id',
+	identifier: 'negativestring',
+	idProperty: 'profileId',
 	fields: [
-		WTF.field('id', 'string', true),
+		WTF.field('profileId', 'string', false),
 		WTF.field('domainId', 'string', true),
-		WTF.field('workReportSequence', 'int', true),
-		WTF.field('warranty', 'string', true),
-		WTF.field('printDaysTransfert', 'bool', true, {defaultValue: false}),
-		WTF.field('printTransfertDescription', 'bool', true, {defaultValue: false}),
-		WTF.field('printSignature', 'bool', true, {defaultValue: false}),
-		WTF.field('manageHours', 'bool', true, {defaultValue: false}),
-		WTF.field('roundingHour', 'int', true), 
-		WTF.field('tracking', 'bool', true, {defaultValue: false}), 
-		WTF.field('trackingMail', 'bool', true, {defaultValue: false}), 
-		WTF.field('trackingCloud', 'bool', true, {defaultValue: false}),
-		WTF.field('defaultApplySignature', 'bool', true, {defaultValue: false}),
-		WTF.field('defaultChargeTo', 'bool', true, {defaultValue: false}),
-		WTF.field('defaultFreeSupport', 'bool', true, {defaultValue: false}),
-		WTF.field('defaultCausal', 'string', true),
-		WTF.field('defaultStatus', 'string', true)
+		WTF.field('description', 'string', false),
+		WTF.field('type', 'string', false)
 	],
 	hasMany: [
-		WTF.hasMany('types', 'Sonicle.webtop.drm.model.WorkType'),
-		WTF.hasMany('trips', 'Sonicle.webtop.drm.model.BusinessTrip')
+		WTF.hasMany('associatedCustomers', 'Sonicle.webtop.drm.model.ProfileMasterdata'),
+		WTF.hasMany('supervisedUsers', 'Sonicle.webtop.drm.model.ProfileSupervisedUser'),
+		WTF.hasMany('associatedUsers', 'Sonicle.webtop.drm.model.ProfileMember')
 	]
+
 });
+

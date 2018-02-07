@@ -65,7 +65,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 					items: [{
 							xtype: 'checkbox',
 							value: me.mys.getVar('useStatisticCustomer'),
-							//hideEmptyLabel: true,
 							boxLabel: me.mys.res('configGeneral.fld-useStatisticCustomer.lbl'),
 							listeners: {
 								change: function (s, nv) {
@@ -77,7 +76,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				{
 					xtype: 'grid',
 					reference: 'gpCompany',
-					title: me.mys.res('config.company.tit'), //da risorse localizzazione
+					title: me.mys.res('config.company.tit'),
 					iconCls: 'wtdrm-icon-configuration-companiesconfiguration-xs',
 					tabConfig: {
 						textAlign: 'left'
@@ -87,7 +86,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 						autoSync: true,
 						model: 'Sonicle.webtop.drm.model.GridCompany',
 						proxy: WTF.apiProxy(me.mys.ID, 'ManageCompanies', 'data', {
-							writer: {//con parametro a false invio sempre un array per l 'operazione di delete del server
+							writer: {
 								allowSingle: false
 							}
 						})
@@ -220,6 +219,50 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				},
 				{
 					xtype: 'grid',
+					title: me.mys.res('config.personsincharge.tit'),
+					reference: 'gpPersonInCharge',
+					iconCls: 'wtdrm-icon-configuration-personincharge-xs',
+					tabConfig: {
+						textAlign: 'left'
+					},
+					store: {
+						autoLoad: true,
+						autoSync: true,
+						modelName: 'Sonicle.webtop.drm.model.GridPersonsInCharge',
+						proxy: WTF.apiProxy(me.mys.ID, 'ManageGridPersonsInCharge', null, {
+							writer: {
+								allowSingle: false
+							}
+						})
+					},
+					columns: [{
+							xtype: 'rownumberer'
+						}, {
+							dataIndex: 'description',
+							header: me.mys.res('gpPersonInCharge.fld-personincharge.lbl'),
+							flex: 1
+						}
+					],
+					tbar: [
+						me.getAct('addPersonsInCharge'),
+						'-',
+						me.getAct('editPersonsInCharge'),
+						me.getAct('deletePersonsInCharge')
+					],
+					listeners: {
+						itemclick: function (s, rec, itm, i, e) {
+							me.updateDisabled('editPersonsInCharge');
+							me.updateDisabled('addPersonsInCharge');
+							me.updateDisabled('deletePersonsInCharge');
+						},
+						itemdblclick: function (s, rec, itm, i, e) {
+							if (rec.get('depth') !== 1)
+								me.editPersonsInChargeUI(rec);
+						}
+					}
+				},
+				{
+					xtype: 'grid',
 					reference: 'gpFolders',
 					title: me.mys.res('config.folders.tit'),
 					iconCls: 'wtdrm-icon-configuration-foldersconfiguration-xs',
@@ -250,9 +293,9 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 						}],
 					tbar: [
 						me.getAct('folder', 'add'),
-						me.getAct('folder', 'remove'),
+						me.getAct('folder', 'edit'),
 						'-',
-						me.getAct('folder', 'edit')
+						me.getAct('folder', 'remove')						
 					],
 					listeners: {
 						rowclick: function (s, rec) {
@@ -452,6 +495,45 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				var sel = me.getSelectedProfile();
 				if (sel) {
 					me.editProfileUI(sel);
+				}
+			}
+		});
+		//-----------------------------------------
+		me.addAct('addPersonsInCharge', {
+			text: WT.res('act-add.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-add-xs',
+			handler: function () {
+				me.addPersonsInCharge({
+					callback: function (success) {
+						if (success) {
+							me.gpPersonsInCharge().getStore().load();
+						}
+					}
+				});
+			}
+		});
+		me.addAct('deletePersonsInCharge', {
+			text: WT.res('act-remove.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-remove-xs',
+			disabled: true,
+			handler: function () {
+				var sel = me.getSelectedPersonsInCharge();
+				if (sel) {
+					me.deletePersonsInChargeUI(sel);
+				}
+			}
+		});
+		me.addAct('editPersonsInCharge', {
+			text: WT.res('act-edit.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-edit-xs',
+			disabled: true,
+			handler: function () {
+				var sel = me.getSelectedPersonsInCharge();
+				if (sel) {
+					me.editPersonsInChargeUI(sel);
 				}
 			}
 		});
@@ -883,7 +965,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 	deleteDocStatus: function (docStatusId, opts) {
 		opts = opts || {};
 		var me = this;
-		WT.ajaxReq(me.mys.ID, 'ManageStatus', {
+		WT.ajaxReq(me.mys.ID, 'ManageDocStatus', {
 			params: {
 				crud: 'delete',
 				docStatusIds: WTU.arrayAsParam(docStatusId)
@@ -1052,6 +1134,77 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 			params: {
 				crud: 'delete',
 				folderIds: WTU.arrayAsParam(profileId)
+			},
+			callback: function (success, json) {
+				Ext.callback(opts.callback, opts.scope || me, [success, json]);
+			}
+		});
+	},
+	
+	addPersonsInCharge: function (opts) {
+		opts = opts || {};
+		var me = this,
+			vct = WT.createView(me.mys.ID, 'view.PersonInCharge');
+	
+		vct.getView().on('viewsave', function (s, success, model) {
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});	
+		vct.show(false, function () {
+			vct.getView().begin('new', {
+			});
+		});
+	},
+	editPersonsInChargeUI: function (rec) {
+		var me = this;
+		me.editProfile(rec.get('personsInChargeId'), {
+			callback: function (success, model) {
+				if (success) {
+					this.gpPersonsInCharge().getStore().load();
+				} else {
+					alert('error');
+				}
+			}
+		});
+	},
+	editPersonsInCharge: function (personsInChargeId, opts) {
+
+		opts = opts || {};
+
+		var me = this,
+				vct = WT.createView(me.mys.ID, 'view.PersonInCharge');
+		vct.getView().on('viewsave', function (s, success, model) {
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vct.show(false, 
+				function () {
+					vct.getView().begin('edit', {
+						data: {
+							personsInChargeId: personsInChargeId
+						}
+					});
+				});
+	},
+	deletePersonsInChargeUI: function (rec) {
+		var me = this,
+			sto = me.gpPersonsInCharge().getStore(),
+			msg;
+	
+		if (rec) {
+			msg = me.mys.res('act.confirm.delete', Ext.String.ellipsis(rec.get('name'), 40));
+		}
+		WT.confirm(msg, function (bid) {
+			if (bid === 'yes') {
+				sto.remove(rec);
+			}
+		});
+	},
+	deletePersonsInCharge: function (personsInChargeId, opts) {
+		opts = opts || {};
+		var me = this;
+		WT.ajaxReq(me.mys.ID, 'ManagePersonsInCharge', {
+			params: {
+				crud: 'delete',
+				personsInChargeId: WTU.arrayAsParam(personsInChargeId)
 			},
 			callback: function (success, json) {
 				Ext.callback(opts.callback, opts.scope || me, [success, json]);

@@ -6,14 +6,17 @@
 Ext.define('Sonicle.webtop.drm.model.ServiceVars', {
 	extend: 'WTA.sdk.model.ServiceVars',
 	fields: [
-		WTF.field('useStatisticCustomer', 'boolean', false), //nomeCampo,tipo,allowBlank
-		WTF.field('printDaysTransfert', 'boolean', false), //nomeCampo,tipo,allowBlank
-		WTF.field('printTransfertDescription', 'boolean', false), //nomeCampo,tipo,allowBlank
+		WTF.field('useStatisticCustomer', 'boolean', false),
+		WTF.field('printDaysTransfert', 'boolean', false), 
+		WTF.field('printTransfertDescription', 'boolean', false),
 		WTF.field('printSignature', 'boolean', false),
 		WTF.field('roundingHour', 'int', true),
 		WTF.field('tracking', 'boolean', true),
 		WTF.field('mailTracking', 'boolean', true),
-		WTF.field('cloudTracking', 'boolean', true)
-		//nomeCampo,tipo,allowBlank//nomeCampo,tipo,allowBlank
+		WTF.field('cloudTracking', 'boolean', true),
+		WTF.field('defaultApplySignature', 'boolean', true),
+		WTF.field('defaultChargeTo', 'boolean', true),
+		WTF.field('defaultFreeSupport', 'boolean', true),
+		WTF.field('defaultStatus', 'string', true)
 	]
 });

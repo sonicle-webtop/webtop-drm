@@ -174,6 +174,10 @@ public class Service extends BaseService {
 		vs.put("tracking", ss.getTracking());
 		vs.put("mailTracking", ss.getMailTracking());
 		vs.put("cloudTracking", ss.getCloudTracking());
+		vs.put("defaultApplySignature", ss.getDefaultApplySignature());
+		vs.put("defaultChargeTo", ss.getDefaultChargeTo());
+		vs.put("defaultFreeSupport", ss.getDefaultFreeSupport());
+		vs.put("defaultDocStatusId", ss.getDefaultDocStatusId());
 
 		return vs;
 	}
@@ -693,6 +697,33 @@ public class Service extends BaseService {
 			logger.error("Error in action ManageGridProfiles", ex);
 		}
 	}
+	
+	public void processManageGridPersonsInCharge(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+//		try {
+//			String crud = ServletUtils.getStringParameter(request, "crud", true);
+//			if (crud.equals(Crud.READ)) {
+//
+//				List<JsGridPersonsInCharge> jsGridPersonsInCharge = new ArrayList();
+//
+//				for (ODrmPersonInCharge pic : manager.listPersonInCharge()) {
+//
+//					jsGridPersonsInCharge.add(new JsGridPersonsInCharge(pic));
+//				}
+//
+//				new JsonResult(jsGridPersonsInCharge).printTo(out);
+//
+//			} else if (crud.equals(Crud.DELETE)) {
+//				PayloadAsList <JsGridPersonsInCharge.List> pl = ServletUtils.getPayloadAsList(request, JsGridPersonsInCharge.List.class);
+//				
+//				manager.deleteDrmPersonsInCharge(pl.data.get(0).personsInChargeId);
+//
+//				new JsonResult().printTo(out);
+//			}
+//		} catch (Exception ex) {
+//			new JsonResult(ex).printTo(out);
+//			logger.error("Error in action ManageGridPersonsInCharge", ex);
+//		}
+	}
 
 	public void processManageProfile(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
@@ -1013,6 +1044,11 @@ public class Service extends BaseService {
 					item.tracking = ss.getTracking();
 					item.trackingMail = ss.getMailTracking();
 					item.trackingCloud = ss.getCloudTracking();
+					
+					item.defaultApplySignature = ss.getDefaultApplySignature();
+					item.defaultChargeTo = ss.getDefaultChargeTo();
+					item.defaultFreeSupport = ss.getDefaultFreeSupport();
+					item.defaultStatus = ss.getDefaultDocStatusId();
 				} else {
 					item = new JsWorkReportSetting(new WorkReportSetting());
 				}
@@ -1052,6 +1088,22 @@ public class Service extends BaseService {
 				if (pl.map.has("trackingCloud")) {
 					ss.setCloudTracking(pl.data.trackingCloud);
 				}
+				
+				if (pl.map.has("defaultApplySignature")) {
+					ss.setDefaultApplySignature(pl.data.defaultApplySignature);
+				}
+				
+				if (pl.map.has("defaultChargeTo")) {
+					ss.setDefaultChargeTo(pl.data.defaultChargeTo);
+				}
+				
+				if (pl.map.has("defaultFreeSupport")) {
+					ss.setDefaultFreeSupport(pl.data.defaultFreeSupport);
+				}
+				
+				if (pl.map.has("defaultStatus")) {
+					ss.setDefaultDocStatusId(pl.data.defaultStatus);
+				}
 
 				manager.updateWorkReportSetting(wrkSetting);
 
@@ -1064,6 +1116,74 @@ public class Service extends BaseService {
 		}
 	}
 
+	public void processManageTimetableSetting(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+//		JsWorkReportSetting item = null;
+//		try {
+//			String crud = ServletUtils.getStringParameter(request, "crud", true);
+//
+//			if (crud.equals(Crud.READ)) {
+//
+//				if (wrkRptSetting != null) {
+//					item = new JsWorkReportSetting(wrkRptSetting);
+//
+//					item.printDaysTransfert = ss.getPrintDaysTransfert();
+//					item.printTransfertDescription = ss.getPrintTransfertDescription();
+//					item.printSignature = ss.getPrintSignature();
+//					item.roundingHour = ss.getRoundingHour() == null ? 0 : ss.getRoundingHour();
+//					item.tracking = ss.getTracking();
+//					item.trackingMail = ss.getMailTracking();
+//					item.trackingCloud = ss.getCloudTracking();
+//				} else {
+//					item = new JsWorkReportSetting(new WorkReportSetting());
+//				}
+//
+//				new JsonResult(item).printTo(out);
+//
+//			} else if (crud.equals(Crud.UPDATE)) {
+//
+//				Payload<MapItem, JsWorkReportSetting> pl = ServletUtils.getPayload(request, JsWorkReportSetting.class);
+//
+//				WorkReportSetting wrkSetting = JsWorkReportSetting.createWorkReportSetting(pl.data);
+//
+//				if (pl.map.has("printDaysTransfert")) {
+//					ss.setPrintDaysTransfert(pl.data.printDaysTransfert);
+//				}
+//
+//				if (pl.map.has("printTransfertDescription")) {
+//					ss.setPrintTransfertDescription(pl.data.printTransfertDescription);
+//				}
+//
+//				if (pl.map.has("printSignature")) {
+//					ss.setPrintSignature(pl.data.printSignature);
+//				}
+//
+//				if (pl.map.has("roundingHour")) {
+//					ss.setRoundingHour(pl.data.roundingHour);
+//				}
+//
+//				if (pl.map.has("tracking")) {
+//					ss.setTracking(pl.data.tracking);
+//				}
+//
+//				if (pl.map.has("trackingMail")) {
+//					ss.setMailTracking(pl.data.trackingMail);
+//				}
+//
+//				if (pl.map.has("trackingCloud")) {
+//					ss.setCloudTracking(pl.data.trackingCloud);
+//				}
+//
+//				manager.updateWorkReportSetting(wrkSetting);
+//
+//				new JsonResult().printTo(out);
+//
+//			}
+//		} catch (Exception ex) {
+//			new JsonResult(ex).printTo(out);
+//			logger.error("Error in action ManageTimetableSetting", ex);
+//		}
+	}
+	
 	public void processPrintWorkReport(HttpServletRequest request, HttpServletResponse response) {
 		ArrayList<RBWorkReport> itemsWr = new ArrayList<>();
 		

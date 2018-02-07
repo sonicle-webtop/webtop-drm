@@ -214,6 +214,39 @@ Ext.define('Sonicle.webtop.drm.view.WorkReportSetting', {
 						ptype: 'cellediting',
 						clicksToEdit: 1
 					}
+				},
+				{
+					xtype: 'wtform',
+					title: me.mys.res('workReportDefault.tit'),
+					defaults: {
+						labelWidth: 80
+					},
+					items: [
+						{
+							xtype: 'checkbox',
+							bind: '{record.defaultApplySignature}',
+							boxLabel: me.mys.res('workReport.settings.fld-defaultApplySignature.lbl')
+						},
+						{
+							xtype: 'checkbox',
+							bind: '{record.defaultChargeTo}',
+							boxLabel: me.mys.res('workReport.settings.fld-defaultChargeTo.lbl')
+						},
+						{
+							xtype: 'checkbox',
+							bind: '{record.defaultFreeSupport}',
+							boxLabel: me.mys.res('workReport.settings.fld-defaultFreeSupport.lbl')
+						},
+						WTF.localCombo('id', 'desc', {
+							bind: '{record.defaultStatus}',
+							store: {
+								autoLoad: true,
+								model: 'WTA.model.Simple',
+								proxy: WTF.proxy(me.mys.ID, 'LookupDocStatuses')
+							},
+							fieldLabel: me.mys.res('workReport.settings.fld-defaultStatus.lbl')
+						})
+					]
 				}
 			]
 		});
