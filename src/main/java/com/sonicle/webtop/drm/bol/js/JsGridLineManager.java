@@ -32,35 +32,28 @@
  */
 package com.sonicle.webtop.drm.bol.js;
 
-import com.sonicle.webtop.drm.model.BusinessTrip;
+import com.sonicle.webtop.drm.bol.ODrmLineManager;
+import com.sonicle.webtop.drm.bol.ODrmProfile;
+import java.util.ArrayList;
 
 /**
  *
  * @author stfnnvl
  */
-public class JsGridBusinessTrip {
-
-	public Integer businessTripId;
+public class JsGridLineManager {
+		
 	public String domainId;
-	public String externalId;
+	public String userId;
 	public String description;
-
-	public JsGridBusinessTrip(BusinessTrip trip) {
-		this.businessTripId = trip.getBusinessTripId();
-		this.domainId = trip.getDomainId();
-		this.externalId = trip.getExternalId();
-		this.description = trip.getDescription();
-
+	
+	public JsGridLineManager(ODrmLineManager manager){
+		this.domainId = manager.getDomainId();
+		this.userId = manager.getUserId();
 	}
-
-	public static BusinessTrip createBusinessTrip(JsGridBusinessTrip js) {
-
-		BusinessTrip trip = new BusinessTrip();
-		trip.setBusinessTripId(js.businessTripId);
-		trip.setDomainId(js.domainId);
-		trip.setExternalId(js.externalId);
-		trip.setDescription(js.description);
-
-		return trip;
+	
+	public static class List extends ArrayList<JsGridLineManager> {
+		public List() {
+			super();
+		}
 	}
 }

@@ -116,16 +116,11 @@ Ext.define('Sonicle.webtop.drm.view.Profile', {
 							itemId: 'E',
 							sid: me.mys.ID,
 							bind: {
-								store: '{record.associatedCustomers}' //record. nome proprietà con dentro gli utenti,
-										//,hidden: '{foHiddenCard}',
-										//disabled: '{foHiddenCard}'
+								store: '{record.associatedCustomers}' //record. nome proprietà con dentro gli utenti
 							},
 							listeners: {
 								pick: function (s, vals, recs) {
-									//evento della griglia che restituisce l'out put del picker
-									var mo = me.getModel(); //modello
-
-									//proprieta del modello che contiene lo store dei dati interessati
+									var mo = me.getModel();
 									mo.associatedCustomers().add({
 										masterDataId: vals
 									});

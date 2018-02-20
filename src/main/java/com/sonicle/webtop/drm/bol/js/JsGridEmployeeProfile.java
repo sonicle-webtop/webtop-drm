@@ -32,35 +32,31 @@
  */
 package com.sonicle.webtop.drm.bol.js;
 
-import com.sonicle.webtop.drm.model.BusinessTrip;
+import com.sonicle.webtop.core.app.WT;
+import com.sonicle.webtop.core.sdk.UserProfileId;
+import com.sonicle.webtop.drm.bol.OEmployeeProfile;
 
 /**
  *
  * @author stfnnvl
  */
-public class JsGridBusinessTrip {
-
-	public Integer businessTripId;
+public class JsGridEmployeeProfile {
+		
+	public int id;
 	public String domainId;
-	public String externalId;
-	public String description;
-
-	public JsGridBusinessTrip(BusinessTrip trip) {
-		this.businessTripId = trip.getBusinessTripId();
-		this.domainId = trip.getDomainId();
-		this.externalId = trip.getExternalId();
-		this.description = trip.getDescription();
-
-	}
-
-	public static BusinessTrip createBusinessTrip(JsGridBusinessTrip js) {
-
-		BusinessTrip trip = new BusinessTrip();
-		trip.setBusinessTripId(js.businessTripId);
-		trip.setDomainId(js.domainId);
-		trip.setExternalId(js.externalId);
-		trip.setDescription(js.description);
-
-		return trip;
+	public String user;
+	public String number;
+	public String tolerance;
+	public Boolean extraordinary;
+	public Boolean onlyPresence;
+	
+	public JsGridEmployeeProfile(OEmployeeProfile ep){
+		this.id = ep.getId();
+		this.domainId = ep.getDomainId();
+		this.user = WT.getUserData(new UserProfileId(ep.getDomainId(), ep.getUserId())).getDisplayName();
+		this.number = ep.getNumber();
+		this.tolerance = ep.getTolerance();
+		this.extraordinary = ep.getExtraordinary();
+		this.onlyPresence = ep.getOnlyPresence();
 	}
 }

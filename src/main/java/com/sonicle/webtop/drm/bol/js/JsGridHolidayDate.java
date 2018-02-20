@@ -32,35 +32,34 @@
  */
 package com.sonicle.webtop.drm.bol.js;
 
-import com.sonicle.webtop.drm.model.BusinessTrip;
+import com.sonicle.webtop.drm.model.HolidayDate;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 /**
  *
  * @author stfnnvl
  */
-public class JsGridBusinessTrip {
+public class JsGridHolidayDate {
 
-	public Integer businessTripId;
 	public String domainId;
-	public String externalId;
+	public String date;
 	public String description;
 
-	public JsGridBusinessTrip(BusinessTrip trip) {
-		this.businessTripId = trip.getBusinessTripId();
-		this.domainId = trip.getDomainId();
-		this.externalId = trip.getExternalId();
-		this.description = trip.getDescription();
+	public JsGridHolidayDate(HolidayDate hd) {
+		this.domainId = hd.getDomainId();
+		this.date = hd.getDate().toString();
+		this.description = hd.getDescription();
 
 	}
 
-	public static BusinessTrip createBusinessTrip(JsGridBusinessTrip js) {
+	public static HolidayDate createHolidayDate(JsGridHolidayDate js) {
 
-		BusinessTrip trip = new BusinessTrip();
-		trip.setBusinessTripId(js.businessTripId);
-		trip.setDomainId(js.domainId);
-		trip.setExternalId(js.externalId);
-		trip.setDescription(js.description);
+		HolidayDate hd = new HolidayDate();
+		hd.setDomainId(js.domainId);
+		hd.setDate(DateTime.parse(js.date).toLocalDate());
+		hd.setDescription(js.description);
 
-		return trip;
+		return hd;
 	}
 }

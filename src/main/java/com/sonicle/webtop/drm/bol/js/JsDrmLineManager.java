@@ -32,35 +32,37 @@
  */
 package com.sonicle.webtop.drm.bol.js;
 
-import com.sonicle.webtop.drm.model.BusinessTrip;
+import com.sonicle.webtop.drm.model.DrmLineManager;
+import com.sonicle.webtop.drm.model.UserForManager;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author stfnnvl
  */
-public class JsGridBusinessTrip {
+public class JsDrmLineManager {
 
-	public Integer businessTripId;
 	public String domainId;
-	public String externalId;
-	public String description;
+	public String userId;
+	public List<UserForManager> associatedUsers = new ArrayList();
 
-	public JsGridBusinessTrip(BusinessTrip trip) {
-		this.businessTripId = trip.getBusinessTripId();
-		this.domainId = trip.getDomainId();
-		this.externalId = trip.getExternalId();
-		this.description = trip.getDescription();
+	public JsDrmLineManager(DrmLineManager manager) {
+		this.domainId = manager.getDomainId();
+		this.userId = manager.getUserId();
+		this.associatedUsers = manager.getAssociatedUsers();
 
 	}
 
-	public static BusinessTrip createBusinessTrip(JsGridBusinessTrip js) {
+	public static DrmLineManager createDrmLineManager(JsDrmLineManager js) {
 
-		BusinessTrip trip = new BusinessTrip();
-		trip.setBusinessTripId(js.businessTripId);
-		trip.setDomainId(js.domainId);
-		trip.setExternalId(js.externalId);
-		trip.setDescription(js.description);
+		DrmLineManager newDrmLineManager = new DrmLineManager();
 
-		return trip;
+		newDrmLineManager.setDomainId(js.domainId);
+		newDrmLineManager.setUserId(js.userId);
+		newDrmLineManager.setAssociatedUsers(js.associatedUsers);
+
+		return newDrmLineManager;
 	}
+
 }

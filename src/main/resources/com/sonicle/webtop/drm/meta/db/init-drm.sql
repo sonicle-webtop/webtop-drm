@@ -726,13 +726,6 @@ CREATE TABLE "drm"."timetable_attendancesheet" (
 "username" varchar(50) NOT NULL
 );
 
-CREATE TABLE "drm"."holiday_date" (
-"holiday_date_id" numeric(38) NOT NULL,
-"description" varchar(50) NOT NULL,
-"date" timestamp(6),
-"domain_id" varchar(30)
-);
-
 CREATE TABLE "drm"."timetable_movements" (
 "movement_id" int4 DEFAULT nextval('timetable_movements_movement_id_seq'::regclass) NOT NULL,
 "type_movement" varchar(2) NOT NULL,
@@ -767,11 +760,70 @@ CREATE TABLE "drm"."timetable_requests_holiday" (
 "note" varchar(1500)
 );
 
-CREATE TABLE "drm"."timetable_user_hours" (
-"user_hour_id" numeric(38) NOT NULL,
-"login" varchar(100) NOT NULL,
-"domain_id" varchar(20) DEFAULT ''::character varying NOT NULL,
-"line_id" numeric(3) NOT NULL,
+ALTER TABLE "drm"."timetable_attendancesheet" ADD PRIMARY KEY ("operator_id", "day");
+
+ALTER TABLE "drm"."timetable_movements" ADD PRIMARY KEY ("movement_id");
+
+ALTER TABLE "drm"."timetable_requests_holiday" ADD PRIMARY KEY ("holiday_id");
+
+CREATE SEQUENCE "drm"."seq_timetable_movements";
+CREATE SEQUENCE "drm"."seq_timetable_requests_holiday";
+
+CREATE TABLE "drm"."line_managers" (
+"domain_id" varchar(20) NOT NULL,
+"user_id" varchar(36) NOT NULL,
+PRIMARY KEY ("domain_id", "user_id")
+);
+
+CREATE TABLE "drm"."line_manager_users" (
+"domain_id" varchar(20) NOT NULL,
+"line_manager_user_id" varchar(36) NOT NULL,
+"user_id" varchar(36) NOT NULL,
+PRIMARY KEY ("domain_id", "line_manager_user_id", "user_id")
+);
+
+CREATE TABLE "drm"."holiday_date" (
+"domain_id" varchar(30),
+"date" date,
+"description" varchar(50) NOT NULL,
+PRIMARY KEY ("domain_id", "date")
+);
+
+CREATE TABLE "drm"."timetable_settings" (
+"timetable_setting_id" int4 NOT NULL,
+"domain_id" varchar(20) NOT NULL,
+"allowed_addresses" varchar(50),
+"allowed_users" varchar(50),
+"staff_office_email" varchar(50),
+"requests_holidays_permits_previous_dates" bool,
+"total_tolerance_in_minutes" varchar(50),
+"rounding" varchar(50),
+"minimum_extraordinary" varchar(50),
+"break_anomaly" bool,
+"read_only_events" bool,
+PRIMARY KEY ("timetable_setting_id")
+);
+
+CREATE SEQUENCE "drm"."seq_timetable_settings";
+
+CREATE TABLE "drm"."employee_profiles" (
+"id" int4 NOT NULL,
+"domain_id" varchar(20) NOT NULL,
+"user_id" varchar(36) NOT NULL,
+"number" varchar(50),
+"tolerance" varchar(50),
+"extraordinary" bool,
+"only_presence" bool,
+PRIMARY KEY ("id")
+);
+
+CREATE SEQUENCE "drm"."seq_employee_profiles";
+
+CREATE TABLE "drm"."employee_hours" (
+"id" int4 NOT NULL,
+"domain_id" varchar(20) NOT NULL,
+"employee_profile_id" int4 NOT NULL,
+"line_id" int4 NOT NULL,
 "1_e" varchar(5),
 "1_u" varchar(5),
 "1_h" varchar(5),
@@ -795,37 +847,4 @@ CREATE TABLE "drm"."timetable_user_hours" (
 "7_h" varchar(5)
 );
 
-ALTER TABLE "drm"."timetable_attendancesheet" ADD PRIMARY KEY ("operator_id", "day");
-
-ALTER TABLE "drm"."holiday_date" ADD PRIMARY KEY ("holiday_date_id");
-
-ALTER TABLE "drm"."timetable_movements" ADD PRIMARY KEY ("movement_id");
-
-ALTER TABLE "drm"."timetable_requests_holiday" ADD PRIMARY KEY ("holiday_id");
-
-ALTER TABLE "drm"."timetable_user_hours" ADD PRIMARY KEY ("user_hour_id");
-
-CREATE SEQUENCE "drm"."seq_timetable_movements";
-CREATE SEQUENCE "drm"."seq_timetable_requests_holiday";
-CREATE SEQUENCE "drm"."seq_timetable_user_hours";
-CREATE SEQUENCE "drm"."seq_holiday:day";
-
-CREATE TABLE "drm"."person_in_charge" (
-"id" int4 NOT NULL,
-"domain_id" varchar(20) NOT NULL,
-"user_id" varchar(36) NOT NULL,
-PRIMARY KEY ("id")
-);
-
-CREATE SEQUENCE "drm"."seq_person_in_charge";
-
-CREATE TABLE "drm"."user_for_person_in_charge" (
-"id" int4 NOT NULL,
-"domain_id" varchar(20) NOT NULL,
-"person_in_charge_id" int4 NOT NULL,
-"user_id" varchar(32) NOT NULL,
-PRIMARY KEY ("id")
-);
-
-CREATE SEQUENCE "drm"."seq_user_for_person_in_charge";
-
+CREATE SEQUENCE "drm"."seq_employee_hours";

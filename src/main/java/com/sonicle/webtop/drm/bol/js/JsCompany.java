@@ -32,10 +32,8 @@
  */
 package com.sonicle.webtop.drm.bol.js;
 
-import com.sonicle.webtop.drm.bol.OCompany;
 import com.sonicle.webtop.drm.model.Company;
 import com.sonicle.webtop.drm.model.CompanyUserAssociation;
-import com.sonicle.webtop.drm.model.DocStatusGroupAssociation;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;

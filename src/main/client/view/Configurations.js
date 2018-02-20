@@ -36,7 +36,8 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 	requires: [
 		'Sonicle.webtop.drm.model.GridDocStatuses',
 		'Sonicle.webtop.drm.model.GridCompany',
-		'Sonicle.webtop.drm.model.GridFolders'
+		'Sonicle.webtop.drm.model.GridFolders',
+		'Sonicle.webtop.drm.model.GridLineManagers'
 	],
 	dockableConfig: {
 		title: '{config.tit}',
@@ -219,17 +220,17 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				},
 				{
 					xtype: 'grid',
-					title: me.mys.res('config.personsincharge.tit'),
-					reference: 'gpPersonInCharge',
-					iconCls: 'wtdrm-icon-configuration-personincharge-xs',
+					title: me.mys.res('config.manager.tit'),
+					reference: 'gpManagers',
+					iconCls: 'wtdrm-icon-configuration-manager-xs',
 					tabConfig: {
 						textAlign: 'left'
 					},
 					store: {
 						autoLoad: true,
 						autoSync: true,
-						modelName: 'Sonicle.webtop.drm.model.GridPersonsInCharge',
-						proxy: WTF.apiProxy(me.mys.ID, 'ManageGridPersonsInCharge', null, {
+						modelName: 'Sonicle.webtop.drm.model.GridLineManagers',
+						proxy: WTF.apiProxy(me.mys.ID, 'ManageGridLineManager', null, {
 							writer: {
 								allowSingle: false
 							}
@@ -239,25 +240,25 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 							xtype: 'rownumberer'
 						}, {
 							dataIndex: 'description',
-							header: me.mys.res('gpPersonInCharge.fld-personincharge.lbl'),
+							header: me.mys.res('gpManager.fld-manager.lbl'),
 							flex: 1
 						}
 					],
 					tbar: [
-						me.getAct('addPersonsInCharge'),
+						me.getAct('addManager'),
 						'-',
-						me.getAct('editPersonsInCharge'),
-						me.getAct('deletePersonsInCharge')
+						me.getAct('editManager'),
+						me.getAct('deleteManager')
 					],
 					listeners: {
 						itemclick: function (s, rec, itm, i, e) {
-							me.updateDisabled('editPersonsInCharge');
-							me.updateDisabled('addPersonsInCharge');
-							me.updateDisabled('deletePersonsInCharge');
+							me.updateDisabled('editManager');
+							me.updateDisabled('addManager');
+							me.updateDisabled('deleteManager');
 						},
 						itemdblclick: function (s, rec, itm, i, e) {
 							if (rec.get('depth') !== 1)
-								me.editPersonsInChargeUI(rec);
+								me.editManagerUI(rec);
 						}
 					}
 				},
@@ -499,41 +500,41 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 			}
 		});
 		//-----------------------------------------
-		me.addAct('addPersonsInCharge', {
+		me.addAct('addManager', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
 			iconCls: 'wt-icon-add-xs',
 			handler: function () {
-				me.addPersonsInCharge({
+				me.addManager({
 					callback: function (success) {
 						if (success) {
-							me.gpPersonsInCharge().getStore().load();
+							me.gpManager().getStore().load();
 						}
 					}
 				});
 			}
 		});
-		me.addAct('deletePersonsInCharge', {
+		me.addAct('deleteManager', {
 			text: WT.res('act-remove.lbl'),
 			tooltip: null,
 			iconCls: 'wt-icon-remove-xs',
 			disabled: true,
 			handler: function () {
-				var sel = me.getSelectedPersonsInCharge();
+				var sel = me.getSelectedManager();
 				if (sel) {
-					me.deletePersonsInChargeUI(sel);
+					me.deleteManagerUI(sel);
 				}
 			}
 		});
-		me.addAct('editPersonsInCharge', {
+		me.addAct('editManager', {
 			text: WT.res('act-edit.lbl'),
 			tooltip: null,
 			iconCls: 'wt-icon-edit-xs',
 			disabled: true,
 			handler: function () {
-				var sel = me.getSelectedPersonsInCharge();
+				var sel = me.getSelectedManager();
 				if (sel) {
-					me.editPersonsInChargeUI(sel);
+					me.editManagerUI(sel);
 				}
 			}
 		});
@@ -702,6 +703,12 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 	},
 	getSelectedProfile: function () {
 		return this.gpProfile().getSelection()[0];
+	},
+	gpManager: function () {
+		return this.lref('gpManagers');
+	},
+	getSelectedManager: function () {
+		return this.gpManager().getSelection()[0];
 	},
 	updateConfiguration: function (name, val) {
 		var me = this, pars = {};
@@ -1084,8 +1091,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		me.editProfile(rec.get('profileId'), {
 			callback: function (success, model) {
 				if (success) {
-					//rec.set('text', model.get('name')); //modifico il nodo a livello client senza ricaricare
-					//ottengo lo store del componente 
 					this.gpProfile().getStore().load();
 				} else {
 					alert('error');
@@ -1095,16 +1100,14 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 	},
 	editProfile: function (profileId, opts) {
 
-		opts = opts || {}; //se nullo controlla e lo seta a obj empty
+		opts = opts || {};
 
 		var me = this,
-				//viewcontainer => recupero la view di webtop => id del servizio, nome View
 				vct = WT.createView(me.mys.ID, 'view.Profile');
-		vct.getView().on('viewsave', function (s, success, model) { //sender,success,modello
+		vct.getView().on('viewsave', function (s, success, model) { 
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		//al caricamento della finestra inizio il begin edit data
-		vct.show(false, //mostro la view
+		vct.show(false,
 				function () {
 					vct.getView().begin('edit', {
 						data: {
@@ -1141,10 +1144,10 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		});
 	},
 	
-	addPersonsInCharge: function (opts) {
+	addManager: function (opts) {
 		opts = opts || {};
 		var me = this,
-			vct = WT.createView(me.mys.ID, 'view.PersonInCharge');
+			vct = WT.createView(me.mys.ID, 'view.LineManager');
 	
 		vct.getView().on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
@@ -1154,24 +1157,23 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 			});
 		});
 	},
-	editPersonsInChargeUI: function (rec) {
+	editManagerUI: function (rec) {
 		var me = this;
-		me.editProfile(rec.get('personsInChargeId'), {
+		me.editManager(rec.get('userId'), {
 			callback: function (success, model) {
 				if (success) {
-					this.gpPersonsInCharge().getStore().load();
+					this.gpManager().getStore().load();
 				} else {
 					alert('error');
 				}
 			}
 		});
 	},
-	editPersonsInCharge: function (personsInChargeId, opts) {
-
+	editManager: function (userId, opts) {
 		opts = opts || {};
 
 		var me = this,
-				vct = WT.createView(me.mys.ID, 'view.PersonInCharge');
+				vct = WT.createView(me.mys.ID, 'view.LineManager');
 		vct.getView().on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
@@ -1179,14 +1181,14 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				function () {
 					vct.getView().begin('edit', {
 						data: {
-							personsInChargeId: personsInChargeId
+							userId: userId
 						}
 					});
 				});
 	},
-	deletePersonsInChargeUI: function (rec) {
+	deleteManagerUI: function (rec) {
 		var me = this,
-			sto = me.gpPersonsInCharge().getStore(),
+			sto = me.gpManager().getStore(),
 			msg;
 	
 		if (rec) {
@@ -1198,13 +1200,14 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 			}
 		});
 	},
-	deletePersonsInCharge: function (personsInChargeId, opts) {
+	deleteManager: function (domainId, userId, opts) {
 		opts = opts || {};
 		var me = this;
-		WT.ajaxReq(me.mys.ID, 'ManagePersonsInCharge', {
+		WT.ajaxReq(me.mys.ID, 'ManageManager', {
 			params: {
 				crud: 'delete',
-				personsInChargeId: WTU.arrayAsParam(personsInChargeId)
+				domainId: domainId,
+				userId: userId
 			},
 			callback: function (success, json) {
 				Ext.callback(opts.callback, opts.scope || me, [success, json]);

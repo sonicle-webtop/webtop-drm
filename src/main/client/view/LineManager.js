@@ -30,16 +30,81 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.WorkType', {
-	extend: 'WTA.ux.data.BaseModel',
-	identifier: 'negative',
-	idProperty: 'workTypeId',
+Ext.define('Sonicle.webtop.drm.view.LineManager', {
+	extend: 'WTA.sdk.ModelView',
+	requires: [
+		'Sonicle.webtop.drm.model.LineManager',
+		'Sonicle.webtop.drm.ux.UserGrid'
+	],
+	dockableConfig: {
+		title: '{manager.tit}',
+		iconCls: 'wtdrm-icon-configuration-manager-xs',
+		width: 500,
+		height: 500
+	},
+	fieldTitle: 'description',
+	modelName: 'Sonicle.webtop.drm.model.LineManager',
+	constructor: function (cfg) {
+		var me = this;
+		me.callParent([cfg]);
+	},
+	initComponent: function () {
+		var me = this;
+		me.callParent(arguments);
+		me.add({
+			region: 'center',
+			xtype: 'panel',
+			layout: 'vbox',
+			items: [
+				{
+					xtype: 'wtform',
+					items: [
+						WTF.localCombo('id', 'desc', {
+							bind: '{record.userId}',
+							reference: 'flduser',
+							anyMatch: true,
+							allowBlank: false,
+							store: {
+								autoLoad: true,
+								model: 'WTA.model.Simple',
+								proxy: WTF.proxy(me.mys.ID, 'LookupUsers')
+							},
+							fieldLabel: me.mys.res('manager.manager.lbl'),
+							width: 250
+						})
+					]
+				},
+				{
+					xtype: 'wtdrmusergrid',
+					title: me.mys.res('manager.gpUsersForManager.tit'),
+					sid: me.mys.ID,
+					actionsInToolbar: false,
+					width: '100%',
+					bind: {
+						store: '{record.associatedUsers}'
+					},
+					listeners: {
+						pick: function (s, vals, recs) {
+							var mo = me.getModel();
+							mo.associatedUsers().add({
+								userId: vals
+							});
+						}
+					}
+				}
+			]
+		});
 		
-	fields: [
-		WTF.field('workTypeId', 'int', false),
-		WTF.field('domainId', 'string', true),
-		WTF.field('externalId', 'string', true),
-		WTF.field('description', 'string', true)
-	]
+		me.on('viewload', me.onViewLoad);
+	},
+	
+	onViewLoad: function(s, success) {
+		if(!success) return;
+		var me = this;
+		
+		if(me.isMode(me.MODE_EDIT)) {
+			me.lref('flduser').setReadOnly(true);
+		}
+	}
 });
 

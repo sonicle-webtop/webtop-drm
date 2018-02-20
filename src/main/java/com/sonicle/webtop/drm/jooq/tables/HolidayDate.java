@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class HolidayDate extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.HolidayDateRecord> {
 
-	private static final long serialVersionUID = -772911914;
+	private static final long serialVersionUID = 1345508251;
 
 	/**
 	 * The reference instance of <code>drm.holiday_date</code>
@@ -32,24 +32,19 @@ public class HolidayDate extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.
 	}
 
 	/**
-	 * The column <code>drm.holiday_date.holiday_date_id</code>.
+	 * The column <code>drm.holiday_date.domain_id</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.HolidayDateRecord, java.math.BigInteger> HOLIDAY_DATE_ID = createField("holiday_date_id", org.jooq.impl.SQLDataType.DECIMAL_INTEGER.precision(38).nullable(false), this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.HolidayDateRecord, java.lang.String> DOMAIN_ID = createField("domain_id", org.jooq.impl.SQLDataType.VARCHAR.length(30).nullable(false), this, "");
+
+	/**
+	 * The column <code>drm.holiday_date.date</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.HolidayDateRecord, org.joda.time.LocalDate> DATE = createField("date", org.jooq.impl.SQLDataType.DATE.nullable(false), this, "", new com.sonicle.webtop.core.jooq.LocalDateConverter());
 
 	/**
 	 * The column <code>drm.holiday_date.description</code>.
 	 */
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.HolidayDateRecord, java.lang.String> DESCRIPTION = createField("description", org.jooq.impl.SQLDataType.VARCHAR.length(50).nullable(false), this, "");
-
-	/**
-	 * The column <code>drm.holiday_date.date</code>.
-	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.HolidayDateRecord, org.joda.time.DateTime> DATE = createField("date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "", new com.sonicle.webtop.core.jooq.DateTimeConverter());
-
-	/**
-	 * The column <code>drm.holiday_date.domain_id</code>.
-	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.HolidayDateRecord, java.lang.String> DOMAIN_ID = createField("domain_id", org.jooq.impl.SQLDataType.VARCHAR.length(30), this, "");
 
 	/**
 	 * Create a <code>drm.holiday_date</code> table reference

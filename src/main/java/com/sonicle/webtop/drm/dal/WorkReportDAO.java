@@ -43,7 +43,6 @@ import java.sql.Connection;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.DatePart;

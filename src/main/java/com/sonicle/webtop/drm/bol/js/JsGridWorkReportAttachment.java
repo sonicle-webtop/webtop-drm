@@ -33,7 +33,6 @@
 package com.sonicle.webtop.drm.bol.js;
 
 import com.sonicle.webtop.drm.model.WorkReportAttachment;
-import org.apache.commons.lang3.StringUtils;
 /**
  *
  * @author stfnnvl

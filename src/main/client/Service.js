@@ -584,13 +584,11 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		opts = opts || {};
 
 		var me = this,
-				//viewcontainer => recupero la view di webtop => id del servizio, nome View
 				vct = WT.createView(me.ID, 'view.WorkReportSetting');
-		vct.getView().on('viewsave', function (s, success, model) { //sender,success,modello
+		vct.getView().on('viewsave', function (s, success, model) { 
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		//al caricamento della finestra inizio il begin edit data
-		vct.show(false, //mostro la view
+		vct.show(false,
 				function () {
 					vct.getView().begin('edit', {
 						data: {

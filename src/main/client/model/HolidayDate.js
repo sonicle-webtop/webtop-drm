@@ -32,14 +32,11 @@
  */
 Ext.define('Sonicle.webtop.drm.model.HolidayDate', {
 	extend: 'WTA.ux.data.BaseModel',
-	identifier: 'negative',
-	idProperty: 'holidayDateId',
 		
 	fields: [
-		WTF.field('holidayDateId', 'int', false),
 		WTF.field('domainId', 'string', true),
-		WTF.field('date', 'date', true, {dateFormat: 'Y-m-d', defaultValue: new Date()}),
-		WTF.field('description', 'string', true)
+		WTF.field('date', 'date', false, {dateFormat: 'Y-m-d', defaultValue: new Date()}),
+		WTF.field('description', 'string', false)
 	]
 });
 

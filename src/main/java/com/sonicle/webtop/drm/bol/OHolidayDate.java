@@ -30,37 +30,17 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm.bol.js;
+package com.sonicle.webtop.drm.bol;
 
-import com.sonicle.webtop.drm.model.BusinessTrip;
+import com.sonicle.webtop.drm.jooq.tables.pojos.HolidayDate;
 
 /**
  *
  * @author stfnnvl
  */
-public class JsGridBusinessTrip {
+public class OHolidayDate extends HolidayDate {
 
-	public Integer businessTripId;
-	public String domainId;
-	public String externalId;
-	public String description;
-
-	public JsGridBusinessTrip(BusinessTrip trip) {
-		this.businessTripId = trip.getBusinessTripId();
-		this.domainId = trip.getDomainId();
-		this.externalId = trip.getExternalId();
-		this.description = trip.getDescription();
-
-	}
-
-	public static BusinessTrip createBusinessTrip(JsGridBusinessTrip js) {
-
-		BusinessTrip trip = new BusinessTrip();
-		trip.setBusinessTripId(js.businessTripId);
-		trip.setDomainId(js.domainId);
-		trip.setExternalId(js.externalId);
-		trip.setDescription(js.description);
-
-		return trip;
+	public OHolidayDate() {
+		
 	}
 }

@@ -30,16 +30,27 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.WorkType', {
+Ext.define('Sonicle.webtop.drm.model.LineManager', {
 	extend: 'WTA.ux.data.BaseModel',
-	identifier: 'negative',
-	idProperty: 'workTypeId',
-		
+	requires: [
+		'Sonicle.data.writer.Json',
+		'Sonicle.webtop.drm.model.UserForManager'
+	],
+	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageLineManager', 'data', {
+		writer: {
+			type: 'sojson',
+			writeAssociations: true
+		}
+	}),
+	identifier: 'negativestring',
+	idProperty: 'userId',
 	fields: [
-		WTF.field('workTypeId', 'int', false),
 		WTF.field('domainId', 'string', true),
-		WTF.field('externalId', 'string', true),
-		WTF.field('description', 'string', true)
+		WTF.field('userId', 'string', false)
+	],
+	hasMany: [
+		WTF.hasMany('associatedUsers', 'Sonicle.webtop.drm.model.UserForManager')
 	]
+
 });
 

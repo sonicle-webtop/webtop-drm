@@ -30,16 +30,30 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.WorkType', {
+Ext.define('Sonicle.webtop.drm.model.EmployeeProfile', {
 	extend: 'WTA.ux.data.BaseModel',
+	requires: [
+		'Sonicle.webtop.drm.model.EmployeeHour'
+	],	
+	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageEmployeeProfile', 'data', {
+		writer: {
+			type: 'sojson',
+			writeAssociations: true
+		}
+	}),
 	identifier: 'negative',
-	idProperty: 'workTypeId',
-		
+	idProperty: 'id',
 	fields: [
-		WTF.field('workTypeId', 'int', false),
+		WTF.field('id', 'int', true),
 		WTF.field('domainId', 'string', true),
-		WTF.field('externalId', 'string', true),
-		WTF.field('description', 'string', true)
+		WTF.field('userId', 'string', false),
+		WTF.field('number', 'string', false),
+		WTF.field('tolerance', 'string', true),
+		WTF.field('extraordinary', 'bool', true, {defaultValue: false}),
+		WTF.field('onlyPresence', 'bool', true, {defaultValue: false})	
+	],
+	hasMany: [
+		WTF.hasMany('employeeHours', 'Sonicle.webtop.drm.model.EmployeeHour')
 	]
 });
 

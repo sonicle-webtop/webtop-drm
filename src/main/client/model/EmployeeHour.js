@@ -30,33 +30,28 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.PersonInCharge', {
-	extend: 'WTA.ux.data.BaseModel',
-	requires: [
-		'Sonicle.data.writer.Json',
-		'Sonicle.webtop.drm.model.ProfileMasterdata',
-		'Sonicle.webtop.drm.model.ProfileSupervisedUser',
-		'Sonicle.webtop.drm.model.ProfileMember'
-	],
-	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageProfile', 'data', {
-		writer: {
-			type: 'sojson',
-			writeAssociations: true
-		}
-	}),
-	identifier: 'negativestring',
-	idProperty: 'profileId',
+Ext.define('Sonicle.webtop.drm.model.EmployeeHour', {
+	extend: 'WTA.ux.data.BaseModel',	
+	
 	fields: [
-		WTF.field('profileId', 'string', false),
+		WTF.field('id', 'int', true),
 		WTF.field('domainId', 'string', true),
-		WTF.field('description', 'string', false),
-		WTF.field('type', 'string', false)
-	],
-	hasMany: [
-		WTF.hasMany('associatedCustomers', 'Sonicle.webtop.drm.model.ProfileMasterdata'),
-		WTF.hasMany('supervisedUsers', 'Sonicle.webtop.drm.model.ProfileSupervisedUser'),
-		WTF.hasMany('associatedUsers', 'Sonicle.webtop.drm.model.ProfileMember')
+		WTF.field('employeeProfileId', 'int', true),
+		WTF.field('lineId', 'int', true),
+		WTF.field('e_1', 'string', true),
+		WTF.field('u_1', 'string', true),
+		WTF.field('e_2', 'string', true),
+		WTF.field('u_2', 'string', true),
+		WTF.field('e_3', 'string', true),
+		WTF.field('u_3', 'string', true),
+		WTF.field('e_4', 'string', true),
+		WTF.field('u_4', 'string', true),
+		WTF.field('e_5', 'string', true),
+		WTF.field('u_5', 'string', true),
+		WTF.field('e_6', 'string', true),
+		WTF.field('u_6', 'string', true),
+		WTF.field('e_7', 'string', true),
+		WTF.field('u_7', 'string', true),
 	]
-
 });
 

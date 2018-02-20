@@ -58,10 +58,16 @@ import com.sonicle.webtop.drm.bol.ODrmFolder;
 import com.sonicle.webtop.drm.bol.ODrmFolderGroup;
 import com.sonicle.webtop.drm.bol.ODrmGroup;
 import com.sonicle.webtop.drm.bol.ODrmGroupUser;
+import com.sonicle.webtop.drm.bol.ODrmLineManager;
+import com.sonicle.webtop.drm.bol.ODrmLineManagerUsers;
 import com.sonicle.webtop.drm.bol.ODrmProfile;
+import com.sonicle.webtop.drm.bol.OEmployeeHour;
+import com.sonicle.webtop.drm.bol.OEmployeeProfile;
+import com.sonicle.webtop.drm.bol.OHolidayDate;
 import com.sonicle.webtop.drm.bol.OProfileMasterdata;
 import com.sonicle.webtop.drm.bol.OProfileSupervisedUser;
 import com.sonicle.webtop.drm.bol.OProfileMember;
+import com.sonicle.webtop.drm.bol.OTimetableSetting;
 import com.sonicle.webtop.drm.bol.OWorkReport;
 import com.sonicle.webtop.drm.bol.OWorkReportAttachment;
 import com.sonicle.webtop.drm.bol.OWorkReportRow;
@@ -78,10 +84,16 @@ import com.sonicle.webtop.drm.dal.DrmFolderDAO;
 import com.sonicle.webtop.drm.dal.DrmFolderGroupDAO;
 import com.sonicle.webtop.drm.dal.DrmGroupDAO;
 import com.sonicle.webtop.drm.dal.DrmGroupUserDAO;
+import com.sonicle.webtop.drm.dal.DrmLineManagerDAO;
 import com.sonicle.webtop.drm.dal.DrmProfileDAO;
+import com.sonicle.webtop.drm.dal.DrmUserForManagerDAO;
+import com.sonicle.webtop.drm.dal.EmployeeHourDAO;
+import com.sonicle.webtop.drm.dal.EmployeeProfileDAO;
+import com.sonicle.webtop.drm.dal.HolidayDateDAO;
 import com.sonicle.webtop.drm.dal.ProfileMasterdataDAO;
 import com.sonicle.webtop.drm.dal.ProfileSupervisedUserDAO;
 import com.sonicle.webtop.drm.dal.ProfileMemberDAO;
+import com.sonicle.webtop.drm.dal.TimetableSettingDAO;
 import com.sonicle.webtop.drm.dal.WorkReportAttachmentDAO;
 import com.sonicle.webtop.drm.dal.WorkReportDAO;
 import com.sonicle.webtop.drm.dal.WorkReportRowDAO;
@@ -97,11 +109,17 @@ import com.sonicle.webtop.drm.model.DrmFolder;
 import com.sonicle.webtop.drm.model.DrmFolderGroupAssociation;
 import com.sonicle.webtop.drm.model.DrmGroup;
 import com.sonicle.webtop.drm.model.DrmGroupUserAssociation;
+import com.sonicle.webtop.drm.model.DrmLineManager;
 import com.sonicle.webtop.drm.model.DrmProfile;
+import com.sonicle.webtop.drm.model.EmployeeHour;
+import com.sonicle.webtop.drm.model.EmployeeProfile;
 import com.sonicle.webtop.drm.model.FileContent;
+import com.sonicle.webtop.drm.model.HolidayDate;
 import com.sonicle.webtop.drm.model.ProfileMasterdata;
 import com.sonicle.webtop.drm.model.ProfileSupervisedUser;
 import com.sonicle.webtop.drm.model.ProfileMember;
+import com.sonicle.webtop.drm.model.TimetableSetting;
+import com.sonicle.webtop.drm.model.UserForManager;
 import com.sonicle.webtop.drm.model.WorkReport;
 import com.sonicle.webtop.drm.model.WorkReportAttachment;
 import com.sonicle.webtop.drm.model.WorkReportRow;
@@ -116,6 +134,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -129,6 +148,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.imgscalr.Scalr;
+import org.joda.time.Interval;
+import org.joda.time.Period;
 
 /**
  *
@@ -490,7 +511,25 @@ public class DrmManager extends BaseManager {
 		return oComUsr;
 	}
 
-	//-----------------------------------------------------------------------------------------
+	public List<OEmployeeProfile> listEmployeeProfiles() throws WTException {
+		Connection con = null;
+		EmployeeProfileDAO epDao = EmployeeProfileDAO.getInstance();
+		List<OEmployeeProfile> eps = null;
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			eps = epDao.selectEmployeeProfileByDomain(con, getTargetProfileId().getDomainId());
+
+			return eps;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
 	public List<ODocStatus> listDocStatuses() throws WTException {
 		Connection con = null;
 		DocStatusDAO staDao = DocStatusDAO.getInstance();
@@ -1011,6 +1050,121 @@ public class DrmManager extends BaseManager {
 			DbUtils.closeQuietly(con);
 		}
 	}
+	
+	public OEmployeeProfile addEmployeeProfile(EmployeeProfile eProfile) throws WTException {
+
+		Connection con = null;
+
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			EmployeeProfileDAO epDao = EmployeeProfileDAO.getInstance();
+			EmployeeHourDAO ehDao = EmployeeHourDAO.getInstance();
+
+			OEmployeeProfile oEP = createOEmployeeProfile(eProfile);
+			oEP.setId(epDao.getSequence(con).intValue());
+			oEP.setDomainId(getTargetProfileId().getDomainId());
+
+			OEmployeeHour oEH = null;
+			for (EmployeeHour eh : eProfile.getEmployeeHours()) {
+				oEH = fillOEmployeeHour(new OEmployeeHour(), eh);
+				oEH.setId(ehDao.getSequence(con).intValue());
+				oEH.setDomainId(oEP.getDomainId());
+				oEH.setEmployeeProfileId(oEP.getId());
+				ehDao.insert(con, oEH);
+			}
+
+			epDao.insert(con, oEP);
+
+			DbUtils.commitQuietly(con);
+
+			return oEP;
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public OEmployeeProfile updateEmployeeProfile(EmployeeProfile item) throws WTException {
+
+		Connection con = null;
+	
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			EmployeeProfileDAO epDao = EmployeeProfileDAO.getInstance();
+			EmployeeHourDAO ehDao = EmployeeHourDAO.getInstance();
+		
+			EmployeeProfile oldEP = getEmployeeProfile(item.getId());
+			OEmployeeProfile eProfile = createOEmployeeProfile(item);
+
+			epDao.update(con, eProfile);
+
+			LangUtils.CollectionChangeSet<EmployeeHour> changesSet1 = LangUtils.getCollectionChanges(oldEP.getEmployeeHours(), item.getEmployeeHours());
+			for (EmployeeHour eh : changesSet1.inserted) {
+				final OEmployeeHour oEH = fillOEmployeeHour(new OEmployeeHour(), eh);
+				oEH.setId(ehDao.getSequence(con).intValue());
+				oEH.setDomainId(item.getDomainId());
+				oEH.setEmployeeProfileId(item.getId());
+				ehDao.insert(con, oEH);
+			}
+
+			for (EmployeeHour eh : changesSet1.deleted) {
+				ehDao.deleteById(con, eh.getId());
+			}
+			
+			for (EmployeeHour eh : changesSet1.updated) {
+				OEmployeeHour oEH = createOEmployeeHour(eh);
+				ehDao.update(con, oEH);
+			}
+
+			DbUtils.commitQuietly(con);
+
+			return eProfile;
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public void deleteEmployeeProfile(Integer id) throws WTException {
+
+		Connection con = null;
+	
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			EmployeeProfileDAO epDao = EmployeeProfileDAO.getInstance();
+			EmployeeHourDAO ehDao = EmployeeHourDAO.getInstance();
+
+			epDao.deleteById(con, id);
+
+			ehDao.deleteByEmployeeProfileId(con, id);
+
+			DbUtils.commitQuietly(con);
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
 
 	public ODrmProfile addDrmProfile(DrmProfile profile) throws WTException {
 
@@ -1184,6 +1338,114 @@ public class DrmManager extends BaseManager {
 			DbUtils.closeQuietly(con);
 		}
 	}
+	
+	private EmployeeProfile createEmployeeProfile(OEmployeeProfile oEP) {
+
+		if (oEP == null) {
+			return null;
+		}
+
+		EmployeeProfile eProfile = new EmployeeProfile();
+		eProfile.setId(oEP.getId());
+		eProfile.setDomainId(oEP.getDomainId());
+		eProfile.setUserId(oEP.getUserId());
+		eProfile.setNumber(oEP.getNumber());
+		eProfile.setTolerance(oEP.getTolerance());
+		eProfile.setExtraordinary(oEP.getExtraordinary());
+		eProfile.setOnlyPresence(oEP.getOnlyPresence());
+
+		return eProfile;
+	}
+
+	private OEmployeeProfile createOEmployeeProfile(EmployeeProfile eProfile) {
+
+		if (eProfile == null) {
+			return null;
+		}
+
+		OEmployeeProfile oEp = new OEmployeeProfile();
+		oEp.setId(eProfile.getId());
+		oEp.setDomainId(eProfile.getDomainId());
+		oEp.setUserId(eProfile.getUserId());
+		oEp.setNumber(eProfile.getNumber());
+		oEp.setTolerance(eProfile.getTolerance());
+		oEp.setExtraordinary(eProfile.getExtraordinary());
+		oEp.setOnlyPresence(eProfile.getOnlyPresence());
+
+		return oEp;
+	}
+	
+	private EmployeeHour createEmployeeHour(OEmployeeHour oEH) {
+
+		if (oEH == null) {
+			return null;
+		}
+
+		EmployeeHour eh = new EmployeeHour();
+		eh.setId(oEH.getId());
+		eh.setDomainId(oEH.getDomainId());
+		eh.setEmployeeProfileId(oEH.getEmployeeProfileId());
+		eh.setLineId(oEH.getLineId());
+		eh.setE_1(oEH.get_1E());
+		eh.setU_1(oEH.get_1U());
+		eh.setH_1(oEH.get_1H());
+		eh.setE_2(oEH.get_2E());
+		eh.setU_2(oEH.get_2U());
+		eh.setH_2(oEH.get_2H());
+		eh.setE_3(oEH.get_3E());
+		eh.setU_3(oEH.get_3U());
+		eh.setH_3(oEH.get_3H());
+		eh.setE_4(oEH.get_4E());
+		eh.setU_4(oEH.get_4U());
+		eh.setH_4(oEH.get_4H());
+		eh.setE_5(oEH.get_5E());
+		eh.setU_5(oEH.get_5U());
+		eh.setH_5(oEH.get_5H());
+		eh.setE_6(oEH.get_6E());
+		eh.setU_6(oEH.get_6U());
+		eh.setH_6(oEH.get_6H());
+		eh.setE_7(oEH.get_7E());
+		eh.setU_7(oEH.get_7U());
+		eh.setH_7(oEH.get_7H());
+
+		return eh;
+	}
+
+	private OEmployeeHour createOEmployeeHour(EmployeeHour eh) {
+
+		if (eh == null) {
+			return null;
+		}
+
+		OEmployeeHour oEH = new OEmployeeHour();
+		oEH.setId(eh.getId());
+		oEH.setDomainId(eh.getDomainId());
+		oEH.setEmployeeProfileId(eh.getEmployeeProfileId());
+		oEH.setLineId(eh.getLineId());
+		oEH.set_1E(eh.getE_1());
+		oEH.set_1U(eh.getU_1());
+		oEH.set_1H(getDiffHours(eh.getE_1(), eh.getU_1()));
+		oEH.set_2E(eh.getE_2());
+		oEH.set_2U(eh.getU_2());
+		oEH.set_2H(getDiffHours(eh.getE_2(), eh.getU_2()));
+		oEH.set_3E(eh.getE_3());
+		oEH.set_3U(eh.getU_3());
+		oEH.set_3H(getDiffHours(eh.getE_3(), eh.getU_3()));
+		oEH.set_4E(eh.getE_4());
+		oEH.set_4U(eh.getU_4());
+		oEH.set_4H(getDiffHours(eh.getE_4(), eh.getU_4()));
+		oEH.set_5E(eh.getE_5());
+		oEH.set_5U(eh.getU_5());
+		oEH.set_5H(getDiffHours(eh.getE_5(), eh.getU_5()));
+		oEH.set_6E(eh.getE_6());
+		oEH.set_6U(eh.getU_6());
+		oEH.set_6H(getDiffHours(eh.getE_6(), eh.getU_6()));
+		oEH.set_7E(eh.getE_7());
+		oEH.set_7U(eh.getU_7());
+		oEH.set_7H(getDiffHours(eh.getE_7(), eh.getU_7()));
+
+		return oEH;
+	}
 
 	private DrmProfile createProfile(ODrmProfile oProfile) {
 
@@ -1288,6 +1550,61 @@ public class DrmManager extends BaseManager {
 		if ((fill != null) && (with != null)) {
 			fill.setId(with.getId());
 			fill.setProfileId(with.getProfileId());
+			fill.setUserId(with.getUserId());
+		}
+		return fill;
+	}
+	
+	private OEmployeeHour fillOEmployeeHour(OEmployeeHour fill, EmployeeHour with) {
+		if ((fill != null) && (with != null)) {
+			fill.setLineId(with.getLineId());
+			fill.set_1E(with.getE_1());
+			fill.set_1U(with.getU_1());
+			fill.set_1H(getDiffHours(with.getE_1(), with.getU_1()));
+			fill.set_2E(with.getE_2());
+			fill.set_2U(with.getU_2());
+			fill.set_2H(getDiffHours(with.getE_2(), with.getU_2()));
+			fill.set_3E(with.getE_3());
+			fill.set_3U(with.getU_3());
+			fill.set_3H(getDiffHours(with.getE_3(), with.getU_3()));
+			fill.set_4E(with.getE_4());
+			fill.set_4U(with.getU_4());
+			fill.set_4H(getDiffHours(with.getE_4(), with.getU_4()));
+			fill.set_5E(with.getE_5());
+			fill.set_5U(with.getU_5());
+			fill.set_5H(getDiffHours(with.getE_5(), with.getU_5()));
+			fill.set_6E(with.getE_6());
+			fill.set_6U(with.getU_6());
+			fill.set_6H(getDiffHours(with.getE_6(), with.getU_6()));
+			fill.set_7E(with.getE_7());
+			fill.set_7U(with.getU_7());
+			fill.set_7H(getDiffHours(with.getE_7(), with.getU_7()));
+		}
+		return fill;
+	}
+	
+	public String getDiffHours(String e, String u){
+		if(null != e && null != u){
+			java.util.Date startDate = new java.util.Date();
+			java.util.Date endDate = new java.util.Date();
+			startDate.setHours(Integer.parseInt(e.split(":")[0]));
+			startDate.setMinutes(Integer.parseInt(e.split(":")[1]));
+			startDate.setSeconds(0);
+			endDate.setHours(Integer.parseInt(u.split(":")[0]));
+			endDate.setMinutes(Integer.parseInt(u.split(":")[1]));
+			endDate.setSeconds(0);
+
+			Interval interval = new Interval(startDate.getTime(), endDate.getTime());
+			Period period = interval.toPeriod();
+			
+			return period.getHours()+ "";
+		}else{
+			return null;
+		}
+	  }
+	
+	private ODrmLineManagerUsers fillODrmLineManagerUsers(ODrmLineManagerUsers fill, UserForManager with) {
+		if ((fill != null) && (with != null)) {
 			fill.setUserId(with.getUserId());
 		}
 		return fill;
@@ -1935,6 +2252,131 @@ public class DrmManager extends BaseManager {
 			DbUtils.closeQuietly(con);
 		}
 	}
+	
+	public TimetableSetting getTimetableSetting() throws WTException {
+		Connection con = null;
+		TimetableSettingDAO tSettDao = TimetableSettingDAO.getInstance();
+		HolidayDateDAO hdDao = HolidayDateDAO.getInstance();
+
+		TimetableSetting setting = null;
+		
+		try {
+			con = WT.getConnection(SERVICE_ID);
+
+			setting = createTimetableSetting(tSettDao.selectByDomainId(con, getTargetProfileId().getDomainId()));
+			
+			if (setting != null) {
+				for (OHolidayDate oHd : hdDao.selectByDomain(con, getTargetProfileId().getDomainId())) {
+					setting.getHolidayDates().add(createHolidayDate(oHd));
+				}
+			}
+			return setting;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	private OTimetableSetting createOTimetableSetting(TimetableSetting tSetting) {
+		if (tSetting == null) {
+			return null;
+		}
+		OTimetableSetting oSetting = new OTimetableSetting();
+		oSetting.setTimetableSettingId(tSetting.getTimetableSettingId());
+		oSetting.setDomainId(tSetting.getDomainId());
+		oSetting.setAllowedAddresses(tSetting.getAllowedAddresses());
+		oSetting.setAllowedUsers(tSetting.getAllowedUsers());
+		oSetting.setStaffOfficeEmail(tSetting.getStaffOfficeEmail());
+		oSetting.setRequestsHolidaysPermitsPreviousDates(tSetting.getRequestsHolidaysPermitsPreviousDates());
+		oSetting.setTotalToleranceInMinutes(tSetting.getTotalToleranceInMinutes());
+		oSetting.setRounding(tSetting.getRounding());
+		oSetting.setMinimumExtraordinary(tSetting.getMinimumExtraordinary());
+		oSetting.setBreakAnomaly(tSetting.getBreakAnomaly());
+		oSetting.setReadOnlyEvents(tSetting.getReadOnlyEvents());
+
+		return oSetting;
+	}
+
+	private TimetableSetting createTimetableSetting(OTimetableSetting oTSetting) {
+		if (oTSetting == null) {
+			return null;
+		}
+		TimetableSetting tSetting = new TimetableSetting();
+		tSetting.setTimetableSettingId(oTSetting.getTimetableSettingId());
+		tSetting.setDomainId(oTSetting.getDomainId());
+		tSetting.setAllowedAddresses(oTSetting.getAllowedAddresses());
+		tSetting.setAllowedUsers(oTSetting.getAllowedUsers());
+		tSetting.setStaffOfficeEmail(oTSetting.getStaffOfficeEmail());
+		tSetting.setRequestsHolidaysPermitsPreviousDates(oTSetting.getRequestsHolidaysPermitsPreviousDates());
+		tSetting.setTotalToleranceInMinutes(oTSetting.getTotalToleranceInMinutes());
+		tSetting.setRounding(oTSetting.getRounding());
+		tSetting.setMinimumExtraordinary(oTSetting.getMinimumExtraordinary());
+		tSetting.setBreakAnomaly(oTSetting.getBreakAnomaly());
+		tSetting.setReadOnlyEvents(oTSetting.getReadOnlyEvents());
+
+		return tSetting;
+	}
+	
+	public void updateTimetableSetting(TimetableSetting item) throws WTException {
+
+		Connection con = null;
+		TimetableSettingDAO tDao = TimetableSettingDAO.getInstance();
+		HolidayDateDAO hdDao = HolidayDateDAO.getInstance();
+
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			TimetableSetting oldTimetableSetting = getTimetableSetting();
+
+			OTimetableSetting setting = createOTimetableSetting(item);
+
+			if (oldTimetableSetting == null) {
+
+				setting.setTimetableSettingId(tDao.getSequence(con).intValue());
+				setting.setDomainId(getTargetProfileId().getDomainId());
+
+				tDao.insert(con, setting);
+
+			} else {
+				tDao.update(con, setting);
+			}
+
+			List<HolidayDate> hds = oldTimetableSetting == null ? new ArrayList() : oldTimetableSetting.getHolidayDates();
+			
+			CollectionChangeSet<HolidayDate> changesSet1 = getCollectionChanges(hds, item.getHolidayDates());
+			for (HolidayDate hd : changesSet1.inserted) {
+
+				OHolidayDate oHd = createOHolidayDate(hd);
+				oHd.setDomainId(getTargetProfileId().getDomainId());
+
+				hdDao.insert(con, oHd);
+			}
+
+			for (HolidayDate hd : changesSet1.deleted) {
+				hdDao.deleteByDomainIdDate(con, hd.getDomainId(), hd.getDate().toDateTimeAtStartOfDay());
+			}
+
+			for (HolidayDate hd : changesSet1.updated) {
+
+				OHolidayDate oHd = createOHolidayDate(hd);
+				OHolidayDate newOHd = null;
+				
+				newOHd = hdDao.selectByDomainDate(con, oHd.getDomainId(), DateTime.parse(oHd.getDate().toString()));
+
+				if(newOHd != null) hdDao.updateByDomainIdDate(con, oHd);
+				else hdDao.updateByDomainId(con, oHd);
+			}
+
+			DbUtils.commitQuietly(con);
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
 
 	public OWorkReportSetting addWorkReportSetting(WorkReportSetting wrkSett) throws WTException {
 		Connection con = null;
@@ -2133,6 +2575,34 @@ public class DrmManager extends BaseManager {
 		oType.setDescription(type.getDescription());
 
 		return oType;
+	}
+	
+	private HolidayDate createHolidayDate(OHolidayDate oHd) {
+
+		if (oHd == null) {
+			return null;
+		}
+
+		HolidayDate hd = new HolidayDate();
+		hd.setDomainId(oHd.getDomainId());
+		hd.setDate(oHd.getDate());
+		hd.setDescription(oHd.getDescription());
+
+		return hd;
+	}
+
+	private OHolidayDate createOHolidayDate(HolidayDate hd) {
+
+		if (hd == null) {
+			return null;
+		}
+
+		OHolidayDate oHd = new OHolidayDate();
+		oHd.setDomainId(hd.getDomainId());
+		oHd.setDate(hd.getDate());
+		oHd.setDescription(hd.getDescription());
+
+		return oHd;
 	}
 
 	private BusinessTrip createBusinessTrip(OBusinessTrip oTrip) {
@@ -2378,5 +2848,260 @@ public class DrmManager extends BaseManager {
 			ocpic.setBytes(picture.getBytes());
 		}
 		cpicDao.insert(con, ocpic);
+	}
+
+	public Iterable<ODrmLineManager> listLineManagers() throws WTException {
+		Connection con = null;
+		DrmLineManagerDAO mngDao = DrmLineManagerDAO.getInstance();
+		List<ODrmLineManager> managers = null;
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			managers = mngDao.selectLineManagerByDomain(con, getTargetProfileId().getDomainId());
+
+			return managers;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public void deleteDrmLineManager(String domainId, String userId) throws WTException {
+		Connection con = null;
+		DrmLineManagerDAO mngDao = DrmLineManagerDAO.getInstance();
+		DrmUserForManagerDAO ufmDao = DrmUserForManagerDAO.getInstance();
+
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			mngDao.deleteByDomainIdUserId(con,domainId, userId);
+
+			ufmDao.deleteByDomainIdLineManagerUserId(con, domainId, userId);
+
+			DbUtils.commitQuietly(con);
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	private DrmLineManager createLineManager(ODrmLineManager oLineManager) {
+
+		if (oLineManager == null) {
+			return null;
+		}
+
+		DrmLineManager manager = new DrmLineManager();
+		manager.setDomainId(oLineManager.getDomainId());
+		manager.setUserId(oLineManager.getUserId());
+
+		return manager;
+	}
+	
+	private ODrmLineManager createODrmLineManager(DrmLineManager manager) {
+
+		if (manager == null) {
+			return null;
+		}
+
+		ODrmLineManager oManager = new ODrmLineManager();
+		oManager.setDomainId(manager.getDomainId());
+		oManager.setUserId(manager.getUserId());
+
+		return oManager;
+	}
+	
+	private UserForManager createUserForManager(ODrmLineManagerUsers oLineManagerUser) {
+
+		if (oLineManagerUser == null) {
+			return null;
+		}
+
+		UserForManager userForManager = new UserForManager();
+		userForManager.setDomainId(oLineManagerUser.getDomainId());
+		userForManager.setManagerUserId(oLineManagerUser.getLineManagerUserId());
+		userForManager.setUserId(oLineManagerUser.getUserId());
+
+		return userForManager;
+	}
+	
+	private ODrmLineManagerUsers createODrmLineManagerUser(UserForManager ufm) {
+
+		if (ufm == null) {
+			return null;
+		}
+
+		ODrmLineManagerUsers oLmu = new ODrmLineManagerUsers();
+		oLmu.setDomainId(ufm.getDomainId());
+		oLmu.setLineManagerUserId(ufm.getManagerUserId());
+		oLmu.setUserId(ufm.getUserId());
+
+		return oLmu;
+	}
+
+	public DrmLineManager getDrmLineManager(String userId) throws WTException {
+		Connection con = null;
+		DrmLineManagerDAO mngDao = DrmLineManagerDAO.getInstance();
+		DrmUserForManagerDAO ufmngDao = DrmUserForManagerDAO.getInstance();
+
+		DrmLineManager manager = null;
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			manager = createLineManager(mngDao.selectLineManagerByDomainUserId(con, getTargetProfileId().getDomainId(), userId));
+
+			for (ODrmLineManagerUsers olmu : ufmngDao.listByDomainLineManagerUserId(con, getTargetProfileId().getDomainId(), userId)) {
+				manager.getAssociatedUsers().add(createUserForManager(olmu));
+			}
+
+			return manager;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public ODrmLineManager addDrmLineManager(DrmLineManager lineManager) throws WTException {
+		Connection con = null;
+
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			DrmLineManagerDAO mngDao = DrmLineManagerDAO.getInstance();
+			DrmUserForManagerDAO ufmngDao = DrmUserForManagerDAO.getInstance();
+
+			ODrmLineManager newDrmLineManager = createODrmLineManager(lineManager);
+			newDrmLineManager.setDomainId(getTargetProfileId().getDomainId());
+
+			ODrmLineManagerUsers newLmu = null;
+			
+			for (UserForManager ufm : lineManager.getAssociatedUsers()) {
+				ufm.setManagerUserId(newDrmLineManager.getUserId());
+				ufm.setDomainId(getTargetProfileId().getDomainId());
+				newLmu = createODrmLineManagerUser(ufm);
+
+				ufmngDao.insert(con, newLmu);
+			}
+
+			mngDao.insert(con, newDrmLineManager);
+
+			DbUtils.commitQuietly(con);
+
+			return newDrmLineManager;
+
+		} catch (SQLException | DAOException ex) {
+
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+
+		} catch (Exception ex) {
+
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public ODrmLineManager updateDrmLineManager(DrmLineManager item) throws WTException {
+		Connection con = null;
+		
+		try {
+			DrmLineManager oldDrmLineManage = getDrmLineManager(item.getUserId());
+			DrmUserForManagerDAO ufmngDao = DrmUserForManagerDAO.getInstance();
+			ODrmLineManager manager = createODrmLineManager(item);
+			
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			LangUtils.CollectionChangeSet<UserForManager> changesSet1 = LangUtils.getCollectionChanges(oldDrmLineManage.getAssociatedUsers(), item.getAssociatedUsers());
+			for (UserForManager ufm : changesSet1.inserted) {
+				final ODrmLineManagerUsers oufm = fillODrmLineManagerUsers(new ODrmLineManagerUsers(), ufm);
+				oufm.setDomainId(getTargetProfileId().getDomainId());
+				oufm.setLineManagerUserId(item.getUserId());
+				ufmngDao.insert(con, oufm);
+			}
+
+			for (UserForManager ufm : changesSet1.deleted) {
+				ufmngDao.deleteByDomainIdLineManagerUserIdUserId(con, ufm.getDomainId(), ufm.getManagerUserId(), ufm.getUserId());
+			}
+
+			DbUtils.commitQuietly(con);
+
+			return manager;
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public void deleteDrmLineManager(String userId) throws WTException {
+		Connection con = null;
+		
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			DrmLineManagerDAO mngDao = DrmLineManagerDAO.getInstance();
+			DrmUserForManagerDAO ufmngDao = DrmUserForManagerDAO.getInstance();
+
+			mngDao.deleteByDomainIdUserId(con, getTargetProfileId().getDomainId(), userId);
+
+			ufmngDao.deleteByDomainIdLineManagerUserId(con, getTargetProfileId().getDomainId(), userId);
+
+			DbUtils.commitQuietly(con);
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public EmployeeProfile getEmployeeProfile(Integer id) throws WTException {
+		Connection con = null;
+		EmployeeProfileDAO epDao =EmployeeProfileDAO.getInstance();
+		EmployeeHourDAO ehDao = EmployeeHourDAO.getInstance();
+
+		EmployeeProfile employeeProfile = null;
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			employeeProfile = createEmployeeProfile(epDao.selectEmployeeProfileById(con, id));
+
+			for (OEmployeeHour oEH : ehDao.selectEmployeeHourByEmployeeProfileId(con, id)) {
+				employeeProfile.getEmployeeHours().add(createEmployeeHour(oEH));
+			}
+
+			return employeeProfile;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
 	}
 }

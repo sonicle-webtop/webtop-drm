@@ -32,35 +32,53 @@
  */
 package com.sonicle.webtop.drm.bol.js;
 
-import com.sonicle.webtop.drm.model.BusinessTrip;
+import com.sonicle.webtop.drm.model.EmployeeHour;
+import com.sonicle.webtop.drm.model.EmployeeProfile;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author stfnnvl
  */
-public class JsGridBusinessTrip {
+public class JsEmployeeProfile {
 
-	public Integer businessTripId;
+	public Integer id;
 	public String domainId;
-	public String externalId;
-	public String description;
+	public String userId;
+	public String number;
+	public String tolerance;
+	public Boolean extraordinary;
+	public Boolean onlyPresence;
+	public List<EmployeeHour> employeeHours = new ArrayList();
 
-	public JsGridBusinessTrip(BusinessTrip trip) {
-		this.businessTripId = trip.getBusinessTripId();
-		this.domainId = trip.getDomainId();
-		this.externalId = trip.getExternalId();
-		this.description = trip.getDescription();
+
+	public JsEmployeeProfile(EmployeeProfile ep) {
+		this.id = ep.getId();
+		this.domainId = ep.getDomainId();
+		this.userId = ep.getUserId();
+		this.number = ep.getNumber();
+		this.tolerance = ep.getTolerance();
+		this.extraordinary = ep.getExtraordinary();
+		this.onlyPresence = ep.getOnlyPresence();
+		this.employeeHours = ep.getEmployeeHours();
 
 	}
 
-	public static BusinessTrip createBusinessTrip(JsGridBusinessTrip js) {
+	public static EmployeeProfile createEmployeeProfile(JsEmployeeProfile js) {
 
-		BusinessTrip trip = new BusinessTrip();
-		trip.setBusinessTripId(js.businessTripId);
-		trip.setDomainId(js.domainId);
-		trip.setExternalId(js.externalId);
-		trip.setDescription(js.description);
+		EmployeeProfile newHp = new EmployeeProfile();
 
-		return trip;
+		newHp.setId(js.id);
+		newHp.setDomainId(js.domainId);
+		newHp.setUserId(js.userId);
+		newHp.setNumber(js.number);
+		newHp.setTolerance(js.tolerance);
+		newHp.setExtraordinary(js.extraordinary);
+		newHp.setOnlyPresence(js.onlyPresence);
+		newHp.setEmployeeHours(js.employeeHours);
+
+		return newHp;
 	}
+
 }

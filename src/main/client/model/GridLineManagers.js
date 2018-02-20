@@ -30,71 +30,13 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.view.PersonInCharge', {
-	extend: 'WTA.sdk.ModelView',
-	requires: [
-		'Sonicle.webtop.drm.model.PersonInCharge',
-		'Sonicle.webtop.drm.ux.UserGrid',
-		'Sonicle.webtop.drm.ux.CustomerGrid'
-	],
-	dockableConfig: {
-		title: '{personincharge.tit}', //localizzato
-		iconCls: 'wtdrm-icon-configuration-profilesconfiguration-xs',
-		width: 500,
-		height: 500
-	},
-	fieldTitle: 'description',
-	modelName: 'Sonicle.webtop.drm.model.PersonInCharge',
-	constructor: function (cfg) {
-		var me = this;
-		me.callParent([cfg]);
-	},
-	initComponent: function () {
-		var me = this;
-		me.callParent(arguments);
-		me.add({
-			region: 'center',
-			xtype: 'panel',
-			layout: 'vbox',
-			items: [
-				{
-					xtype: 'wtform',
-					items: [
-						WTF.localCombo('id', 'desc', {
-							bind: '{record.type}',
-							anyMatch: true,
-							allowBlank: false,
-							store: {
-								autoLoad: true,
-								model: 'WTA.model.Simple',
-								proxy: WTF.proxy(me.mys.ID, 'LookupOperators')
-							},
-							fieldLabel: me.mys.res('personincharge.personincharge.lbl'),
-							width: 250
-						})
-					]
-				},
-				{
-					xtype: 'wtdrmusergrid',
-					title: me.mys.res('personincharge.gpUsersForPersonInCharge.tit'),
-					sid: me.mys.ID,
-					actionsInToolbar: false,
-					width: '100%',
-					bind: {
-						store: '{record.supervisedUsers}'
-					},
-					listeners: {
-						pick: function (s, vals, recs) {
-							var mo = me.getModel();
-							mo.supervisedUsers().add({
-								userId: vals
-							});
-						}
-					}
-				}
-			]
-		}
-		);
-	}
-});
 
+Ext.define('Sonicle.webtop.drm.model.GridLineManagers', {
+	extend: 'WTA.ux.data.BaseModel',
+	
+	fields: [
+		WTF.roField('domainId', 'string'),
+		WTF.roField('userId', 'string'),
+		WTF.roField('description', 'string')
+	]
+});

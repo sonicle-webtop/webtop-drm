@@ -69,7 +69,9 @@ import com.sonicle.webtop.drm.bol.OCompany;
 import com.sonicle.webtop.drm.bol.ODocStatus;
 import com.sonicle.webtop.drm.bol.ODrmFolder;
 import com.sonicle.webtop.drm.bol.ODrmGroup;
+import com.sonicle.webtop.drm.bol.ODrmLineManager;
 import com.sonicle.webtop.drm.bol.ODrmProfile;
+import com.sonicle.webtop.drm.bol.OEmployeeProfile;
 import com.sonicle.webtop.drm.bol.OWorkReport;
 import com.sonicle.webtop.drm.bol.OWorkType;
 import com.sonicle.webtop.drm.bol.js.JsCompany;
@@ -78,10 +80,15 @@ import com.sonicle.webtop.drm.bol.js.JsGridDocStatuses;
 import com.sonicle.webtop.drm.bol.js.JsDocStatus;
 import com.sonicle.webtop.drm.bol.js.JsDrmFolder;
 import com.sonicle.webtop.drm.bol.js.JsDrmGroup;
+import com.sonicle.webtop.drm.bol.js.JsDrmLineManager;
 import com.sonicle.webtop.drm.bol.js.JsDrmProfile;
+import com.sonicle.webtop.drm.bol.js.JsEmployeeProfile;
+import com.sonicle.webtop.drm.bol.js.JsGridEmployeeProfile;
 import com.sonicle.webtop.drm.bol.js.JsGridFolders;
+import com.sonicle.webtop.drm.bol.js.JsGridLineManager;
 import com.sonicle.webtop.drm.bol.js.JsGridProfiles;
 import com.sonicle.webtop.drm.bol.js.JsGridWorkReports;
+import com.sonicle.webtop.drm.bol.js.JsTimetableSetting;
 import com.sonicle.webtop.drm.bol.js.JsWorkReport;
 import com.sonicle.webtop.drm.bol.js.JsWorkReportSetting;
 import com.sonicle.webtop.drm.bol.model.RBWorkReport;
@@ -90,9 +97,12 @@ import com.sonicle.webtop.drm.model.CompanyPicture;
 import com.sonicle.webtop.drm.model.DocStatus;
 import com.sonicle.webtop.drm.model.DrmFolder;
 import com.sonicle.webtop.drm.model.DrmGroup;
+import com.sonicle.webtop.drm.model.DrmLineManager;
 import com.sonicle.webtop.drm.model.DrmProfile;
+import com.sonicle.webtop.drm.model.EmployeeProfile;
 import com.sonicle.webtop.drm.model.FileContent;
 import com.sonicle.webtop.drm.model.GroupCategory;
+import com.sonicle.webtop.drm.model.TimetableSetting;
 import com.sonicle.webtop.drm.model.WorkReport;
 import com.sonicle.webtop.drm.model.WorkReportAttachment;
 import com.sonicle.webtop.drm.model.WorkReportSetting;
@@ -698,31 +708,90 @@ public class Service extends BaseService {
 		}
 	}
 	
-	public void processManageGridPersonsInCharge(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
-//		try {
-//			String crud = ServletUtils.getStringParameter(request, "crud", true);
-//			if (crud.equals(Crud.READ)) {
-//
-//				List<JsGridPersonsInCharge> jsGridPersonsInCharge = new ArrayList();
-//
-//				for (ODrmPersonInCharge pic : manager.listPersonInCharge()) {
-//
-//					jsGridPersonsInCharge.add(new JsGridPersonsInCharge(pic));
-//				}
-//
-//				new JsonResult(jsGridPersonsInCharge).printTo(out);
-//
-//			} else if (crud.equals(Crud.DELETE)) {
-//				PayloadAsList <JsGridPersonsInCharge.List> pl = ServletUtils.getPayloadAsList(request, JsGridPersonsInCharge.List.class);
-//				
-//				manager.deleteDrmPersonsInCharge(pl.data.get(0).personsInChargeId);
-//
-//				new JsonResult().printTo(out);
-//			}
-//		} catch (Exception ex) {
-//			new JsonResult(ex).printTo(out);
-//			logger.error("Error in action ManageGridPersonsInCharge", ex);
-//		}
+	public void processManageGridLineManager(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			if (crud.equals(Crud.READ)) {
+
+				List<JsGridLineManager> jsGridLineManager = new ArrayList();
+				JsGridLineManager record = null;
+						
+				for (ODrmLineManager m : manager.listLineManagers()) {
+					record = new JsGridLineManager(m);
+					record.description = WT.getCoreManager().getUser(new UserProfileId(record.domainId, record.userId)).getDisplayName();
+					jsGridLineManager.add(record);
+				}
+
+				new JsonResult(jsGridLineManager).printTo(out);
+
+			} else if (crud.equals(Crud.DELETE)) {
+				PayloadAsList <JsGridLineManager.List> pl = ServletUtils.getPayloadAsList(request, JsGridLineManager.List.class);
+				
+				manager.deleteDrmLineManager(pl.data.get(0).domainId, pl.data.get(0).userId);
+
+				new JsonResult().printTo(out);
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageGridLineManager", ex);
+		}
+	}
+	
+	public void processManageEmployeeProfile(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			if (crud.equals(Crud.READ)) {
+				String id = ServletUtils.getStringParameter(request, "id", false);
+				
+				if(id != null){
+					EmployeeProfile ep = manager.getEmployeeProfile(Integer.parseInt(id));
+
+					new JsonResult(new JsEmployeeProfile(ep)).printTo(out);
+				}
+			} else if (crud.equals(Crud.CREATE)) {
+
+				Payload<MapItem, JsEmployeeProfile> pl = ServletUtils.getPayload(request, JsEmployeeProfile.class);
+				manager.addEmployeeProfile(JsEmployeeProfile.createEmployeeProfile(pl.data));
+
+				new JsonResult().printTo(out);
+			} else if (crud.equals(Crud.UPDATE)) {
+				Payload<MapItem, JsEmployeeProfile> pl = ServletUtils.getPayload(request, JsEmployeeProfile.class);
+
+				manager.updateEmployeeProfile(JsEmployeeProfile.createEmployeeProfile(pl.data));
+
+				new JsonResult().printTo(out);
+			} else if (crud.equals(Crud.DELETE)) {
+
+				StringArray id = ServletUtils.getObjectParameter(request, "id", StringArray.class, true);
+				manager.deleteEmployeeProfile(Integer.parseInt(id.get(0)));
+
+				new JsonResult().printTo(out);
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageEmployeeProfile", ex);
+		}
+	}
+	
+	public void processManageGridEmployeeProfile(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			if (crud.equals(Crud.READ)) {
+
+				List<JsGridEmployeeProfile> jsGridEP = new ArrayList();
+
+				for (OEmployeeProfile oEP : manager.listEmployeeProfiles()) {
+
+					jsGridEP.add(new JsGridEmployeeProfile(oEP));
+				}
+
+				new JsonResult(jsGridEP).printTo(out);
+
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageGridEmployeeProfile", ex);
+		}
 	}
 
 	public void processManageProfile(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
@@ -756,11 +825,45 @@ public class Service extends BaseService {
 			}
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
-			logger.error("Error in action ManageCompany", ex);
+			logger.error("Error in action ManageProfile", ex);
 		}
 	}
 
-//-------------------------------------------------------------------------------------------------------------------------------------------------
+	public void processManageLineManager(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			if (crud.equals(Crud.READ)) {
+				String userId = ServletUtils.getStringParameter(request, "id", true);
+
+				DrmLineManager mng = manager.getDrmLineManager(userId);
+
+				new JsonResult(new JsDrmLineManager(mng)).printTo(out);
+			} else if (crud.equals(Crud.CREATE)) {
+
+				Payload<MapItem, JsDrmLineManager> pl = ServletUtils.getPayload(request, JsDrmLineManager.class);
+				
+				manager.addDrmLineManager(JsDrmLineManager.createDrmLineManager(pl.data));
+
+				new JsonResult().printTo(out);
+			} else if (crud.equals(Crud.UPDATE)) {
+				Payload<MapItem, JsDrmLineManager> pl = ServletUtils.getPayload(request, JsDrmLineManager.class);
+
+				manager.updateDrmLineManager(JsDrmLineManager.createDrmLineManager(pl.data));
+
+				new JsonResult().printTo(out);
+			} else if (crud.equals(Crud.DELETE)) {
+
+				StringArray ids = ServletUtils.getObjectParameter(request, "userIds", StringArray.class, true);
+				manager.deleteDrmLineManager(ids.get(0));
+
+				new JsonResult().printTo(out);
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageLineManager", ex);
+		}
+	}
+	
 	public void processManageGridDocStatuses(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			String crud = ServletUtils.getStringParameter(request, "crud", true);
@@ -1025,13 +1128,9 @@ public class Service extends BaseService {
 		JsWorkReportSetting item = null;
 		try {
 			String crud = ServletUtils.getStringParameter(request, "crud", true);
-//			Boolean printDaysTransfert = ServletUtils.getBooleanParameter(request, "printDaysTransfert", null);
 
 			if (crud.equals(Crud.READ)) {
 
-				String id = ServletUtils.getStringParameter(request, "id", false);
-
-				//TODO ENUM PER TIPOLOGIA DI SETTING PER I VARI PROGRAMMI ES: wr(Work report), en(Expense Note), tt(Timetable)
 				WorkReportSetting wrkRptSetting = manager.getWorkReportSetting();
 
 				if (wrkRptSetting != null) {
@@ -1117,71 +1216,35 @@ public class Service extends BaseService {
 	}
 
 	public void processManageTimetableSetting(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
-//		JsWorkReportSetting item = null;
-//		try {
-//			String crud = ServletUtils.getStringParameter(request, "crud", true);
-//
-//			if (crud.equals(Crud.READ)) {
-//
-//				if (wrkRptSetting != null) {
-//					item = new JsWorkReportSetting(wrkRptSetting);
-//
-//					item.printDaysTransfert = ss.getPrintDaysTransfert();
-//					item.printTransfertDescription = ss.getPrintTransfertDescription();
-//					item.printSignature = ss.getPrintSignature();
-//					item.roundingHour = ss.getRoundingHour() == null ? 0 : ss.getRoundingHour();
-//					item.tracking = ss.getTracking();
-//					item.trackingMail = ss.getMailTracking();
-//					item.trackingCloud = ss.getCloudTracking();
-//				} else {
-//					item = new JsWorkReportSetting(new WorkReportSetting());
-//				}
-//
-//				new JsonResult(item).printTo(out);
-//
-//			} else if (crud.equals(Crud.UPDATE)) {
-//
-//				Payload<MapItem, JsWorkReportSetting> pl = ServletUtils.getPayload(request, JsWorkReportSetting.class);
-//
-//				WorkReportSetting wrkSetting = JsWorkReportSetting.createWorkReportSetting(pl.data);
-//
-//				if (pl.map.has("printDaysTransfert")) {
-//					ss.setPrintDaysTransfert(pl.data.printDaysTransfert);
-//				}
-//
-//				if (pl.map.has("printTransfertDescription")) {
-//					ss.setPrintTransfertDescription(pl.data.printTransfertDescription);
-//				}
-//
-//				if (pl.map.has("printSignature")) {
-//					ss.setPrintSignature(pl.data.printSignature);
-//				}
-//
-//				if (pl.map.has("roundingHour")) {
-//					ss.setRoundingHour(pl.data.roundingHour);
-//				}
-//
-//				if (pl.map.has("tracking")) {
-//					ss.setTracking(pl.data.tracking);
-//				}
-//
-//				if (pl.map.has("trackingMail")) {
-//					ss.setMailTracking(pl.data.trackingMail);
-//				}
-//
-//				if (pl.map.has("trackingCloud")) {
-//					ss.setCloudTracking(pl.data.trackingCloud);
-//				}
-//
-//				manager.updateWorkReportSetting(wrkSetting);
-//
-//				new JsonResult().printTo(out);
-//
-//			}
-//		} catch (Exception ex) {
-//			new JsonResult(ex).printTo(out);
-//			logger.error("Error in action ManageTimetableSetting", ex);
-//		}
+		JsTimetableSetting item = null;
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+
+			if (crud.equals(Crud.READ)) {
+				TimetableSetting ttSetting = manager.getTimetableSetting();
+
+				if (ttSetting != null) {
+					item = new JsTimetableSetting(ttSetting);
+				} else {
+					item = new JsTimetableSetting(new TimetableSetting());
+				}
+
+				new JsonResult(item).printTo(out);
+
+			} else if (crud.equals(Crud.UPDATE)) {
+				Payload<MapItem, JsTimetableSetting> pl = ServletUtils.getPayload(request, JsTimetableSetting.class);
+
+				TimetableSetting tSetting = JsTimetableSetting.createTimetableSetting(pl.data);
+
+				manager.updateTimetableSetting(tSetting);
+
+				new JsonResult().printTo(out);
+
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageTimetableSetting", ex);
+		}
 	}
 	
 	public void processPrintWorkReport(HttpServletRequest request, HttpServletResponse response) {

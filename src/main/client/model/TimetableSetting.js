@@ -46,6 +46,7 @@ Ext.define('Sonicle.webtop.drm.model.TimetableSetting', {
 	idProperty: 'id',
 	fields: [
 		WTF.field('id', 'string', true),
+		WTF.field('timetableSettingId', 'int', true),
 		WTF.field('domainId', 'string', true),
 		WTF.field('allowedAddresses', 'string', true),
 		WTF.field('allowedUsers', 'string', true),

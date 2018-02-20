@@ -16,49 +16,22 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class HolidayDate implements java.io.Serializable {
 
-	private static final long serialVersionUID = -900957777;
+	private static final long serialVersionUID = 1630090971;
 
-	private java.math.BigInteger   holidayDateId;
-	private java.lang.String       description;
-	private org.joda.time.DateTime date;
-	private java.lang.String       domainId;
+	private java.lang.String        domainId;
+	private org.joda.time.LocalDate date;
+	private java.lang.String        description;
 
 	public HolidayDate() {}
 
 	public HolidayDate(
-		java.math.BigInteger   holidayDateId,
-		java.lang.String       description,
-		org.joda.time.DateTime date,
-		java.lang.String       domainId
+		java.lang.String        domainId,
+		org.joda.time.LocalDate date,
+		java.lang.String        description
 	) {
-		this.holidayDateId = holidayDateId;
-		this.description = description;
-		this.date = date;
 		this.domainId = domainId;
-	}
-
-	public java.math.BigInteger getHolidayDateId() {
-		return this.holidayDateId;
-	}
-
-	public void setHolidayDateId(java.math.BigInteger holidayDateId) {
-		this.holidayDateId = holidayDateId;
-	}
-
-	public java.lang.String getDescription() {
-		return this.description;
-	}
-
-	public void setDescription(java.lang.String description) {
-		this.description = description;
-	}
-
-	public org.joda.time.DateTime getDate() {
-		return this.date;
-	}
-
-	public void setDate(org.joda.time.DateTime date) {
 		this.date = date;
+		this.description = description;
 	}
 
 	public java.lang.String getDomainId() {
@@ -67,5 +40,21 @@ public class HolidayDate implements java.io.Serializable {
 
 	public void setDomainId(java.lang.String domainId) {
 		this.domainId = domainId;
+	}
+
+	public org.joda.time.LocalDate getDate() {
+		return this.date;
+	}
+
+	public void setDate(org.joda.time.LocalDate date) {
+		this.date = date;
+	}
+
+	public java.lang.String getDescription() {
+		return this.description;
+	}
+
+	public void setDescription(java.lang.String description) {
+		this.description = description;
 	}
 }
