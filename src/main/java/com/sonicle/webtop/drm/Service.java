@@ -313,7 +313,7 @@ public class Service extends BaseService {
 					customers.add(new JsSimple(customer.getMasterDataId(), customer.getDescription()));
 				}
 				
-				Integer selected = customers.isEmpty() ? null : Integer.parseInt(customers.get(0).id.toString());
+				Object selected = customers.isEmpty() ? null : customers.get(0).id;
 				meta = new LookupMeta().setSelected(selected);
 			}
 				
