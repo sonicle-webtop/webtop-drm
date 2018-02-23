@@ -205,7 +205,7 @@ CREATE TABLE "drm"."groups" (
 "name" varchar(100) NOT NULL,
 "description" varchar(255),
 "group_type" varchar(1) NOT NULL,
-"customer_id" varchar(15),
+"customer_id" varchar(36),
 "supervisior_user_id" varchar(100)
 )
 WITH (OIDS=FALSE)
@@ -286,8 +286,8 @@ CREATE TABLE "drm"."work_reports" (
 "revision_sequence" int4,
 "doc_status_id" int4,
 "contact_id" int4,
-"customer_id" varchar(15),
-"customer_stat_id" varchar(15),
+"customer_id" varchar(36),
+"customer_stat_id" varchar(36),
 "from_date" timestamptz(6),
 "to_date" timestamptz(6),
 "reference_no" varchar(30),
@@ -607,7 +607,7 @@ CREATE TABLE "drm"."expense_note_rows" (
 "date" timestamp(6),
 "operator_id" varchar(100),
 "domain_id" varchar(20),
-"customer_id" varchar(15),
+"customer_id" varchar(36),
 "payment_company" varchar(5),
 "invoice" varchar(5),
 "invoice_number" varchar(20),
@@ -627,7 +627,7 @@ CREATE TABLE "drm"."expense_note_row_details" (
 "invoice" varchar(5),
 "invoice_number" varchar(20),
 "present" varchar(300),
-"customer_id" varchar(15),
+"customer_id" varchar(36),
 "point_of_sale" varchar(15),
 "km" numeric,
 "total_doc" numeric,
