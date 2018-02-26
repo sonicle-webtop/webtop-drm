@@ -72,6 +72,7 @@ import com.sonicle.webtop.drm.bol.ODrmGroup;
 import com.sonicle.webtop.drm.bol.ODrmLineManager;
 import com.sonicle.webtop.drm.bol.ODrmProfile;
 import com.sonicle.webtop.drm.bol.OEmployeeProfile;
+import com.sonicle.webtop.drm.bol.OHourProfile;
 import com.sonicle.webtop.drm.bol.OWorkReport;
 import com.sonicle.webtop.drm.bol.OWorkType;
 import com.sonicle.webtop.drm.bol.js.JsCompany;
@@ -85,9 +86,11 @@ import com.sonicle.webtop.drm.bol.js.JsDrmProfile;
 import com.sonicle.webtop.drm.bol.js.JsEmployeeProfile;
 import com.sonicle.webtop.drm.bol.js.JsGridEmployeeProfile;
 import com.sonicle.webtop.drm.bol.js.JsGridFolders;
+import com.sonicle.webtop.drm.bol.js.JsGridHourProfile;
 import com.sonicle.webtop.drm.bol.js.JsGridLineManager;
 import com.sonicle.webtop.drm.bol.js.JsGridProfiles;
 import com.sonicle.webtop.drm.bol.js.JsGridWorkReports;
+import com.sonicle.webtop.drm.bol.js.JsHourProfile;
 import com.sonicle.webtop.drm.bol.js.JsTimetableSetting;
 import com.sonicle.webtop.drm.bol.js.JsWorkReport;
 import com.sonicle.webtop.drm.bol.js.JsWorkReportSetting;
@@ -102,6 +105,7 @@ import com.sonicle.webtop.drm.model.DrmProfile;
 import com.sonicle.webtop.drm.model.EmployeeProfile;
 import com.sonicle.webtop.drm.model.FileContent;
 import com.sonicle.webtop.drm.model.GroupCategory;
+import com.sonicle.webtop.drm.model.HourProfile;
 import com.sonicle.webtop.drm.model.TimetableSetting;
 import com.sonicle.webtop.drm.model.WorkReport;
 import com.sonicle.webtop.drm.model.WorkReportAttachment;
@@ -241,6 +245,23 @@ public class Service extends BaseService {
 			ResultMeta meta = new LookupMeta().setSelected(selected);
 				
 			new JsonResult(companies, meta, companies.size()).printTo(out);
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
+			new JsonResult(ex).printTo(out);
+		}
+	}
+	
+	public void processLookupHourProfiles(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			List<JsSimple> hourProfiles = new ArrayList();
+			
+			DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID);
+
+			for (OHourProfile hp : manager.listHourProfiles()) {
+				hourProfiles.add(new JsSimple(hp.getId(), hp.getDescription()));
+			}
+			
+			new JsonResult(hourProfiles, hourProfiles.size()).printTo(out);
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
 			new JsonResult(ex).printTo(out);
@@ -773,6 +794,42 @@ public class Service extends BaseService {
 		}
 	}
 	
+	public void processManageHourProfile(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			if (crud.equals(Crud.READ)) {
+				String id = ServletUtils.getStringParameter(request, "id", false);
+				
+				if(id != null){
+					HourProfile hp = manager.getHourProfile(Integer.parseInt(id));
+
+					new JsonResult(new JsHourProfile(hp)).printTo(out);
+				}
+			} else if (crud.equals(Crud.CREATE)) {
+
+				Payload<MapItem, JsHourProfile> pl = ServletUtils.getPayload(request, JsHourProfile.class);
+				manager.addHourProfile(JsHourProfile.createHourProfile(pl.data));
+
+				new JsonResult().printTo(out);
+			} else if (crud.equals(Crud.UPDATE)) {
+				Payload<MapItem, JsHourProfile> pl = ServletUtils.getPayload(request, JsHourProfile.class);
+
+				manager.updateHourProfile(JsHourProfile.createHourProfile(pl.data));
+
+				new JsonResult().printTo(out);
+			} else if (crud.equals(Crud.DELETE)) {
+
+				StringArray id = ServletUtils.getObjectParameter(request, "id", StringArray.class, true);
+				manager.deleteHourProfile(Integer.parseInt(id.get(0)));
+
+				new JsonResult().printTo(out);
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageHourProfile", ex);
+		}
+	}
+	
 	public void processManageGridEmployeeProfile(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			String crud = ServletUtils.getStringParameter(request, "crud", true);
@@ -786,6 +843,27 @@ public class Service extends BaseService {
 				}
 
 				new JsonResult(jsGridEP).printTo(out);
+
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageGridEmployeeProfile", ex);
+		}
+	}
+	
+	public void processManageGridHourProfile(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			if (crud.equals(Crud.READ)) {
+
+				List<JsGridHourProfile> jsGridHP = new ArrayList();
+
+				for (OHourProfile oHP : manager.listHourProfiles()) {
+
+					jsGridHP.add(new JsGridHourProfile(oHP));
+				}
+
+				new JsonResult(jsGridHP).printTo(out);
 
 			}
 		} catch (Exception ex) {

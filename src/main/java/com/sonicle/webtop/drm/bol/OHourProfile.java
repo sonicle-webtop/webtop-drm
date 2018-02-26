@@ -30,55 +30,14 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm.bol.js;
+package com.sonicle.webtop.drm.bol;
 
-import com.sonicle.webtop.drm.model.LineHour;
-import com.sonicle.webtop.drm.model.EmployeeProfile;
-import java.util.ArrayList;
-import java.util.List;
+import com.sonicle.webtop.drm.jooq.tables.pojos.HourProfiles;
 
 /**
  *
  * @author stfnnvl
  */
-public class JsEmployeeProfile {
-
-	public Integer id;
-	public String domainId;
-	public String userId;
-	public String number;
-	public String tolerance;
-	public Boolean extraordinary;
-	public Boolean onlyPresence;
-	public Integer hourProfileId;
-
-
-	public JsEmployeeProfile(EmployeeProfile ep) {
-		this.id = ep.getId();
-		this.domainId = ep.getDomainId();
-		this.userId = ep.getUserId();
-		this.number = ep.getNumber();
-		this.tolerance = ep.getTolerance();
-		this.extraordinary = ep.getExtraordinary();
-		this.onlyPresence = ep.getOnlyPresence();
-		this.hourProfileId = ep.getHourProfileId();
-
-	}
-
-	public static EmployeeProfile createEmployeeProfile(JsEmployeeProfile js) {
-
-		EmployeeProfile newHp = new EmployeeProfile();
-
-		newHp.setId(js.id);
-		newHp.setDomainId(js.domainId);
-		newHp.setUserId(js.userId);
-		newHp.setNumber(js.number);
-		newHp.setTolerance(js.tolerance);
-		newHp.setExtraordinary(js.extraordinary);
-		newHp.setOnlyPresence(js.onlyPresence);
-		newHp.setHourProfileId(js.hourProfileId);
-
-		return newHp;
-	}
+public class OHourProfile extends HourProfiles {
 
 }

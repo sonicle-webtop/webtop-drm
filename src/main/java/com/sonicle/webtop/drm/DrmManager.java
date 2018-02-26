@@ -61,9 +61,10 @@ import com.sonicle.webtop.drm.bol.ODrmGroupUser;
 import com.sonicle.webtop.drm.bol.ODrmLineManager;
 import com.sonicle.webtop.drm.bol.ODrmLineManagerUsers;
 import com.sonicle.webtop.drm.bol.ODrmProfile;
-import com.sonicle.webtop.drm.bol.OEmployeeHour;
+import com.sonicle.webtop.drm.bol.OLineHour;
 import com.sonicle.webtop.drm.bol.OEmployeeProfile;
 import com.sonicle.webtop.drm.bol.OHolidayDate;
+import com.sonicle.webtop.drm.bol.OHourProfile;
 import com.sonicle.webtop.drm.bol.OProfileMasterdata;
 import com.sonicle.webtop.drm.bol.OProfileSupervisedUser;
 import com.sonicle.webtop.drm.bol.OProfileMember;
@@ -87,9 +88,10 @@ import com.sonicle.webtop.drm.dal.DrmGroupUserDAO;
 import com.sonicle.webtop.drm.dal.DrmLineManagerDAO;
 import com.sonicle.webtop.drm.dal.DrmProfileDAO;
 import com.sonicle.webtop.drm.dal.DrmUserForManagerDAO;
-import com.sonicle.webtop.drm.dal.EmployeeHourDAO;
+import com.sonicle.webtop.drm.dal.LineHourDAO;
 import com.sonicle.webtop.drm.dal.EmployeeProfileDAO;
 import com.sonicle.webtop.drm.dal.HolidayDateDAO;
+import com.sonicle.webtop.drm.dal.HourProfileDAO;
 import com.sonicle.webtop.drm.dal.ProfileMasterdataDAO;
 import com.sonicle.webtop.drm.dal.ProfileSupervisedUserDAO;
 import com.sonicle.webtop.drm.dal.ProfileMemberDAO;
@@ -111,10 +113,11 @@ import com.sonicle.webtop.drm.model.DrmGroup;
 import com.sonicle.webtop.drm.model.DrmGroupUserAssociation;
 import com.sonicle.webtop.drm.model.DrmLineManager;
 import com.sonicle.webtop.drm.model.DrmProfile;
-import com.sonicle.webtop.drm.model.EmployeeHour;
+import com.sonicle.webtop.drm.model.LineHour;
 import com.sonicle.webtop.drm.model.EmployeeProfile;
 import com.sonicle.webtop.drm.model.FileContent;
 import com.sonicle.webtop.drm.model.HolidayDate;
+import com.sonicle.webtop.drm.model.HourProfile;
 import com.sonicle.webtop.drm.model.ProfileMasterdata;
 import com.sonicle.webtop.drm.model.ProfileSupervisedUser;
 import com.sonicle.webtop.drm.model.ProfileMember;
@@ -522,6 +525,25 @@ public class DrmManager extends BaseManager {
 			eps = epDao.selectEmployeeProfileByDomain(con, getTargetProfileId().getDomainId());
 
 			return eps;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public List<OHourProfile> listHourProfiles() throws WTException {
+		Connection con = null;
+		HourProfileDAO hpDao = HourProfileDAO.getInstance();
+		List<OHourProfile> hps = null;
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			hps = hpDao.selectHourProfileByDomain(con, getTargetProfileId().getDomainId());
+
+			return hps;
 
 		} catch (SQLException | DAOException ex) {
 			throw new WTException(ex, "DB error");
@@ -1059,20 +1081,10 @@ public class DrmManager extends BaseManager {
 			con = WT.getConnection(SERVICE_ID, false);
 
 			EmployeeProfileDAO epDao = EmployeeProfileDAO.getInstance();
-			EmployeeHourDAO ehDao = EmployeeHourDAO.getInstance();
 
 			OEmployeeProfile oEP = createOEmployeeProfile(eProfile);
 			oEP.setId(epDao.getSequence(con).intValue());
 			oEP.setDomainId(getTargetProfileId().getDomainId());
-
-			OEmployeeHour oEH = null;
-			for (EmployeeHour eh : eProfile.getEmployeeHours()) {
-				oEH = fillOEmployeeHour(new OEmployeeHour(), eh);
-				oEH.setId(ehDao.getSequence(con).intValue());
-				oEH.setDomainId(oEP.getDomainId());
-				oEH.setEmployeeProfileId(oEP.getId());
-				ehDao.insert(con, oEH);
-			}
 
 			epDao.insert(con, oEP);
 
@@ -1099,30 +1111,9 @@ public class DrmManager extends BaseManager {
 			con = WT.getConnection(SERVICE_ID, false);
 			
 			EmployeeProfileDAO epDao = EmployeeProfileDAO.getInstance();
-			EmployeeHourDAO ehDao = EmployeeHourDAO.getInstance();
-		
-			EmployeeProfile oldEP = getEmployeeProfile(item.getId());
 			OEmployeeProfile eProfile = createOEmployeeProfile(item);
 
 			epDao.update(con, eProfile);
-
-			LangUtils.CollectionChangeSet<EmployeeHour> changesSet1 = LangUtils.getCollectionChanges(oldEP.getEmployeeHours(), item.getEmployeeHours());
-			for (EmployeeHour eh : changesSet1.inserted) {
-				final OEmployeeHour oEH = fillOEmployeeHour(new OEmployeeHour(), eh);
-				oEH.setId(ehDao.getSequence(con).intValue());
-				oEH.setDomainId(item.getDomainId());
-				oEH.setEmployeeProfileId(item.getId());
-				ehDao.insert(con, oEH);
-			}
-
-			for (EmployeeHour eh : changesSet1.deleted) {
-				ehDao.deleteById(con, eh.getId());
-			}
-			
-			for (EmployeeHour eh : changesSet1.updated) {
-				OEmployeeHour oEH = createOEmployeeHour(eh);
-				ehDao.update(con, oEH);
-			}
 
 			DbUtils.commitQuietly(con);
 
@@ -1147,11 +1138,8 @@ public class DrmManager extends BaseManager {
 			con = WT.getConnection(SERVICE_ID, false);
 			
 			EmployeeProfileDAO epDao = EmployeeProfileDAO.getInstance();
-			EmployeeHourDAO ehDao = EmployeeHourDAO.getInstance();
 
 			epDao.deleteById(con, id);
-
-			ehDao.deleteByEmployeeProfileId(con, id);
 
 			DbUtils.commitQuietly(con);
 
@@ -1166,6 +1154,121 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
+	public OHourProfile addHourProfile(HourProfile hProfile) throws WTException {
+
+		Connection con = null;
+
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			HourProfileDAO hpDao = HourProfileDAO.getInstance();
+			LineHourDAO lhDao = LineHourDAO.getInstance();
+
+			OHourProfile oHP = createOHourProfile(hProfile);
+			oHP.setId(hpDao.getSequence(con).intValue());
+			oHP.setDomainId(getTargetProfileId().getDomainId());
+
+			OLineHour oLH = null;
+			for (LineHour eh : hProfile.getLineHours()) {
+				oLH = fillOLineHour(new OLineHour(), eh);
+				oLH.setId(lhDao.getSequence(con).intValue());
+				oLH.setDomainId(oHP.getDomainId());
+				oLH.setHourProfileId(oHP.getId());
+				lhDao.insert(con, oLH);
+			}
+
+			hpDao.insert(con, oHP);
+
+			DbUtils.commitQuietly(con);
+
+			return oHP;
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public OHourProfile updateHourProfile(HourProfile item) throws WTException {
+
+		Connection con = null;
+	
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			HourProfileDAO hpDao = HourProfileDAO.getInstance();
+			LineHourDAO lhDao = LineHourDAO.getInstance();
+		
+			HourProfile oldHP = getHourProfile(item.getId());
+			OHourProfile hProfile = createOHourProfile(item);
+
+			hpDao.update(con, hProfile);
+
+			LangUtils.CollectionChangeSet<LineHour> changesSet1 = LangUtils.getCollectionChanges(oldHP.getLineHours(), item.getLineHours());
+			for (LineHour eh : changesSet1.inserted) {
+				final OLineHour oLH = fillOLineHour(new OLineHour(), eh);
+				oLH.setId(lhDao.getSequence(con).intValue());
+				oLH.setDomainId(item.getDomainId());
+				oLH.setHourProfileId(item.getId());
+				lhDao.insert(con, oLH);
+			}
+
+			for (LineHour eh : changesSet1.deleted) {
+				lhDao.deleteById(con, eh.getId());
+			}
+			
+			for (LineHour eh : changesSet1.updated) {
+				OLineHour oLH = createOLineHour(eh);
+				lhDao.update(con, oLH);
+			}
+
+			DbUtils.commitQuietly(con);
+
+			return hProfile;
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public void deleteHourProfile(Integer id) throws WTException {
+
+		Connection con = null;
+	
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			HourProfileDAO hpDao = HourProfileDAO.getInstance();
+			LineHourDAO lhDao = LineHourDAO.getInstance();
+
+			hpDao.deleteById(con, id);
+
+			lhDao.deleteByHourProfileId(con, id);
+
+			DbUtils.commitQuietly(con);
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
 	public ODrmProfile addDrmProfile(DrmProfile profile) throws WTException {
 
 		Connection con = null;
@@ -1353,6 +1456,7 @@ public class DrmManager extends BaseManager {
 		eProfile.setTolerance(oEP.getTolerance());
 		eProfile.setExtraordinary(oEP.getExtraordinary());
 		eProfile.setOnlyPresence(oEP.getOnlyPresence());
+		eProfile.setHourProfileId(oEP.getHourProfileId());
 
 		return eProfile;
 	}
@@ -1371,20 +1475,49 @@ public class DrmManager extends BaseManager {
 		oEp.setTolerance(eProfile.getTolerance());
 		oEp.setExtraordinary(eProfile.getExtraordinary());
 		oEp.setOnlyPresence(eProfile.getOnlyPresence());
+		oEp.setHourProfileId(eProfile.getHourProfileId());
 
 		return oEp;
 	}
 	
-	private EmployeeHour createEmployeeHour(OEmployeeHour oEH) {
+	private HourProfile createHourProfile(OHourProfile oHP) {
+
+		if (oHP == null) {
+			return null;
+		}
+
+		HourProfile hpProfile = new HourProfile();
+		hpProfile.setId(oHP.getId());
+		hpProfile.setDomainId(oHP.getDomainId());
+		hpProfile.setDescription(oHP.getDescription());
+		
+		return hpProfile;
+	}
+
+	private OHourProfile createOHourProfile(HourProfile hProfile) {
+
+		if (hProfile == null) {
+			return null;
+		}
+
+		OHourProfile oHp = new OHourProfile();
+		oHp.setId(hProfile.getId());
+		oHp.setDomainId(hProfile.getDomainId());
+		oHp.setDescription(hProfile.getDescription());
+
+		return oHp;
+	}
+	
+	private LineHour createLineHour(OLineHour oEH) {
 
 		if (oEH == null) {
 			return null;
 		}
 
-		EmployeeHour eh = new EmployeeHour();
+		LineHour eh = new LineHour();
 		eh.setId(oEH.getId());
 		eh.setDomainId(oEH.getDomainId());
-		eh.setEmployeeProfileId(oEH.getEmployeeProfileId());
+		eh.setHourProfileId(oEH.getHourProfileId());
 		eh.setLineId(oEH.getLineId());
 		eh.setE_1(oEH.get_1E());
 		eh.setU_1(oEH.get_1U());
@@ -1411,16 +1544,16 @@ public class DrmManager extends BaseManager {
 		return eh;
 	}
 
-	private OEmployeeHour createOEmployeeHour(EmployeeHour eh) {
+	private OLineHour createOLineHour(LineHour eh) {
 
 		if (eh == null) {
 			return null;
 		}
 
-		OEmployeeHour oEH = new OEmployeeHour();
+		OLineHour oEH = new OLineHour();
 		oEH.setId(eh.getId());
 		oEH.setDomainId(eh.getDomainId());
-		oEH.setEmployeeProfileId(eh.getEmployeeProfileId());
+		oEH.setHourProfileId(eh.getHourProfileId());
 		oEH.setLineId(eh.getLineId());
 		oEH.set_1E(eh.getE_1());
 		oEH.set_1U(eh.getU_1());
@@ -1555,7 +1688,7 @@ public class DrmManager extends BaseManager {
 		return fill;
 	}
 	
-	private OEmployeeHour fillOEmployeeHour(OEmployeeHour fill, EmployeeHour with) {
+	private OLineHour fillOLineHour(OLineHour fill, LineHour with) {
 		if ((fill != null) && (with != null)) {
 			fill.setLineId(with.getLineId());
 			fill.set_1E(with.getE_1());
@@ -3083,7 +3216,7 @@ public class DrmManager extends BaseManager {
 	public EmployeeProfile getEmployeeProfile(Integer id) throws WTException {
 		Connection con = null;
 		EmployeeProfileDAO epDao =EmployeeProfileDAO.getInstance();
-		EmployeeHourDAO ehDao = EmployeeHourDAO.getInstance();
+		LineHourDAO ehDao = LineHourDAO.getInstance();
 
 		EmployeeProfile employeeProfile = null;
 		try {
@@ -3092,11 +3225,32 @@ public class DrmManager extends BaseManager {
 
 			employeeProfile = createEmployeeProfile(epDao.selectEmployeeProfileById(con, id));
 
-			for (OEmployeeHour oEH : ehDao.selectEmployeeHourByEmployeeProfileId(con, id)) {
-				employeeProfile.getEmployeeHours().add(createEmployeeHour(oEH));
+			return employeeProfile;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public HourProfile getHourProfile(Integer id) throws WTException {
+		Connection con = null;
+		HourProfileDAO hpDao = HourProfileDAO.getInstance();
+		LineHourDAO lhDao = LineHourDAO.getInstance();
+
+		HourProfile hProfile = null;
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			hProfile = createHourProfile(hpDao.selectHourProfileById(con, id));
+
+			for (OLineHour oEH : lhDao.selectLineHourByHourProfileId(con, id)) {
+				hProfile.getLineHours().add(createLineHour(oEH));
 			}
 
-			return employeeProfile;
+			return hProfile;
 
 		} catch (SQLException | DAOException ex) {
 			throw new WTException(ex, "DB error");

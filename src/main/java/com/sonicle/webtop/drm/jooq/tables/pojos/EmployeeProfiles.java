@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class EmployeeProfiles implements java.io.Serializable {
 
-	private static final long serialVersionUID = -153217369;
+	private static final long serialVersionUID = 1482847721;
 
 	private java.lang.Integer id;
 	private java.lang.String  domainId;
@@ -25,6 +25,7 @@ public class EmployeeProfiles implements java.io.Serializable {
 	private java.lang.String  tolerance;
 	private java.lang.Boolean extraordinary;
 	private java.lang.Boolean onlyPresence;
+	private java.lang.Integer hourProfileId;
 
 	public EmployeeProfiles() {}
 
@@ -35,7 +36,8 @@ public class EmployeeProfiles implements java.io.Serializable {
 		java.lang.String  number,
 		java.lang.String  tolerance,
 		java.lang.Boolean extraordinary,
-		java.lang.Boolean onlyPresence
+		java.lang.Boolean onlyPresence,
+		java.lang.Integer hourProfileId
 	) {
 		this.id = id;
 		this.domainId = domainId;
@@ -44,6 +46,7 @@ public class EmployeeProfiles implements java.io.Serializable {
 		this.tolerance = tolerance;
 		this.extraordinary = extraordinary;
 		this.onlyPresence = onlyPresence;
+		this.hourProfileId = hourProfileId;
 	}
 
 	public java.lang.Integer getId() {
@@ -100,5 +103,13 @@ public class EmployeeProfiles implements java.io.Serializable {
 
 	public void setOnlyPresence(java.lang.Boolean onlyPresence) {
 		this.onlyPresence = onlyPresence;
+	}
+
+	public java.lang.Integer getHourProfileId() {
+		return this.hourProfileId;
+	}
+
+	public void setHourProfileId(java.lang.Integer hourProfileId) {
+		this.hourProfileId = hourProfileId;
 	}
 }

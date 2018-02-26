@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Groups extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.GroupsRecord> {
 
-	private static final long serialVersionUID = -1622769745;
+	private static final long serialVersionUID = 1662988206;
 
 	/**
 	 * The reference instance of <code>drm.groups</code>
@@ -64,7 +64,7 @@ public class Groups extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.
 	/**
 	 * The column <code>drm.groups.customer_id</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.GroupsRecord, java.lang.String> CUSTOMER_ID = createField("customer_id", org.jooq.impl.SQLDataType.VARCHAR.length(15), this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.GroupsRecord, java.lang.String> CUSTOMER_ID = createField("customer_id", org.jooq.impl.SQLDataType.VARCHAR.length(36), this, "");
 
 	/**
 	 * The column <code>drm.groups.supervisior_user_id</code>.

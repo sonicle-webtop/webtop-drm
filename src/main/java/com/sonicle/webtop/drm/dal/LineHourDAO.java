@@ -34,10 +34,10 @@ package com.sonicle.webtop.drm.dal;
 
 import com.sonicle.webtop.core.dal.BaseDAO;
 import com.sonicle.webtop.core.dal.DAOException;
-import com.sonicle.webtop.drm.bol.OEmployeeProfile;
+import com.sonicle.webtop.drm.bol.OLineHour;
 import com.sonicle.webtop.drm.jooq.Sequences;
-import static com.sonicle.webtop.drm.jooq.Tables.EMPLOYEE_PROFILES;
-import com.sonicle.webtop.drm.jooq.tables.records.EmployeeProfilesRecord;
+import static com.sonicle.webtop.drm.jooq.Tables.LINE_HOURS;
+import com.sonicle.webtop.drm.jooq.tables.records.LineHoursRecord;
 import java.sql.Connection;
 import java.util.List;
 import org.jooq.DSLContext;
@@ -46,64 +46,79 @@ import org.jooq.DSLContext;
  *
  * @author stfnnvl
  */
-public class EmployeeProfileDAO extends BaseDAO {
+public class LineHourDAO extends BaseDAO {
 
-	private final static EmployeeProfileDAO INSTANCE = new EmployeeProfileDAO();
+	private final static LineHourDAO INSTANCE = new LineHourDAO();
 
-	public static EmployeeProfileDAO getInstance() {
+	public static LineHourDAO getInstance() {
 		return INSTANCE;
 	}
-	
+
 	public Long getSequence(Connection con) throws DAOException {
 		DSLContext dsl = getDSL(con);
-		Long nextID = dsl.nextval(Sequences.SEQ_EMPLOYEE_PROFILES);
+		Long nextID = dsl.nextval(Sequences.SEQ_LINE_HOURS);
 		return nextID;
 	}
-
-	public int insert(Connection con, OEmployeeProfile item) throws DAOException {
+	
+	public int insert(Connection con, OLineHour item) throws DAOException {
 		DSLContext dsl = getDSL(con);
-		EmployeeProfilesRecord record = dsl.newRecord(EMPLOYEE_PROFILES, item);
+		LineHoursRecord record = dsl.newRecord(LINE_HOURS, item);
 
 		return dsl
-				.insertInto(EMPLOYEE_PROFILES)
+				.insertInto(LINE_HOURS)
 				.set(record)
 				.execute();
 	}
 
-	public List<OEmployeeProfile> selectEmployeeProfileByDomain(Connection con, String domainId) throws DAOException {
+	public OLineHour selectLineHourById(Connection con, Integer id) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		return dsl
 				.select()
-				.from(EMPLOYEE_PROFILES)
+				.from(LINE_HOURS)
 				.where(
-						EMPLOYEE_PROFILES.DOMAIN_ID.equal(domainId)
+						LINE_HOURS.ID.equal(id)
 				)
-				.fetchInto(OEmployeeProfile.class);
+				.fetchOneInto(OLineHour.class);
 	}
-
-	public OEmployeeProfile selectEmployeeProfileById(Connection con, Integer id) throws DAOException {
+	
+	public List<OLineHour> selectLineHourByHourProfileId(Connection con, Integer hourProfileId) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		return dsl
 				.select()
-				.from(EMPLOYEE_PROFILES)
+				.from(LINE_HOURS)
 				.where(
-						EMPLOYEE_PROFILES.ID.equal(id)
+						LINE_HOURS.HOUR_PROFILE_ID.equal(hourProfileId)
 				)
-				.fetchOneInto(OEmployeeProfile.class);
+				.fetchInto(OLineHour.class);
 	}
 
-	public int update(Connection con, OEmployeeProfile item) throws DAOException {
+	public int update(Connection con, OLineHour item) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		return dsl
-				.update(EMPLOYEE_PROFILES)
-				.set(EMPLOYEE_PROFILES.EXTRAORDINARY, item.getExtraordinary())
-				.set(EMPLOYEE_PROFILES.ONLY_PRESENCE, item.getOnlyPresence())
-				.set(EMPLOYEE_PROFILES.NUMBER, item.getNumber())
-				.set(EMPLOYEE_PROFILES.TOLERANCE, item.getTolerance())
-				.set(EMPLOYEE_PROFILES.USER_ID, item.getUserId())
-				.set(EMPLOYEE_PROFILES.HOUR_PROFILE_ID, item.getHourProfileId())
+				.update(LINE_HOURS)
+				.set(LINE_HOURS._1_E, item.get_1E())
+				.set(LINE_HOURS._1_U, item.get_1U())
+				.set(LINE_HOURS._1_H, item.get_1H())
+				.set(LINE_HOURS._2_E, item.get_2E())
+				.set(LINE_HOURS._2_U, item.get_2U())
+				.set(LINE_HOURS._2_H, item.get_2H())
+				.set(LINE_HOURS._3_E, item.get_3E())
+				.set(LINE_HOURS._3_U, item.get_3U())
+				.set(LINE_HOURS._3_H, item.get_3H())
+				.set(LINE_HOURS._4_E, item.get_4E())
+				.set(LINE_HOURS._4_U, item.get_4U())
+				.set(LINE_HOURS._4_H, item.get_4H())
+				.set(LINE_HOURS._5_E, item.get_5E())
+				.set(LINE_HOURS._5_U, item.get_5U())
+				.set(LINE_HOURS._5_H, item.get_5H())
+				.set(LINE_HOURS._6_E, item.get_6E())
+				.set(LINE_HOURS._6_U, item.get_6U())
+				.set(LINE_HOURS._6_H, item.get_6H())
+				.set(LINE_HOURS._7_E, item.get_7E())
+				.set(LINE_HOURS._7_U, item.get_7U())
+				.set(LINE_HOURS._7_H, item.get_7H())
 				.where(
-						EMPLOYEE_PROFILES.ID.equal(item.getId())
+						LINE_HOURS.ID.equal(item.getId())
 				)
 				.execute();
 	}
@@ -111,9 +126,19 @@ public class EmployeeProfileDAO extends BaseDAO {
 	public int deleteById(Connection con, Integer id) {
 		DSLContext dsl = getDSL(con);
 		return dsl
-			.delete(EMPLOYEE_PROFILES)
+			.delete(LINE_HOURS)
 			.where(
-					EMPLOYEE_PROFILES.ID.equal(id)
+					LINE_HOURS.ID.equal(id)
+			)
+			.execute();
+	}
+	
+	public int deleteByHourProfileId(Connection con, Integer hourProfileId) {
+		DSLContext dsl = getDSL(con);
+		return dsl
+			.delete(LINE_HOURS)
+			.where(
+					LINE_HOURS.HOUR_PROFILE_ID.equal(hourProfileId)
 			)
 			.execute();
 	}

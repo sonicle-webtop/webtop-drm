@@ -30,55 +30,54 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm.bol.js;
+package com.sonicle.webtop.drm.dal;
 
-import com.sonicle.webtop.drm.model.LineHour;
-import com.sonicle.webtop.drm.model.EmployeeProfile;
-import java.util.ArrayList;
-import java.util.List;
+import com.sonicle.webtop.core.dal.BaseDAO;
+import com.sonicle.webtop.core.dal.DAOException;
+import com.sonicle.webtop.drm.bol.OTimetableStamp;
+import static com.sonicle.webtop.drm.jooq.Sequences.SEQ_TIMETABLE_STAMP;
+import static com.sonicle.webtop.drm.jooq.Tables.TIMETABLE_STAMP;
+import com.sonicle.webtop.drm.jooq.Sequences;
+import com.sonicle.webtop.drm.jooq.tables.records.TimetableStampRecord;
+import java.sql.Connection;
+import org.jooq.DSLContext;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
-public class JsEmployeeProfile {
+public class TimetableStampDAO extends BaseDAO{
+	
+	private final static TimetableStampDAO INSTANCE = new TimetableStampDAO();
 
-	public Integer id;
-	public String domainId;
-	public String userId;
-	public String number;
-	public String tolerance;
-	public Boolean extraordinary;
-	public Boolean onlyPresence;
-	public Integer hourProfileId;
-
-
-	public JsEmployeeProfile(EmployeeProfile ep) {
-		this.id = ep.getId();
-		this.domainId = ep.getDomainId();
-		this.userId = ep.getUserId();
-		this.number = ep.getNumber();
-		this.tolerance = ep.getTolerance();
-		this.extraordinary = ep.getExtraordinary();
-		this.onlyPresence = ep.getOnlyPresence();
-		this.hourProfileId = ep.getHourProfileId();
-
+	public static TimetableStampDAO getInstance() {
+		return INSTANCE;
 	}
-
-	public static EmployeeProfile createEmployeeProfile(JsEmployeeProfile js) {
-
-		EmployeeProfile newHp = new EmployeeProfile();
-
-		newHp.setId(js.id);
-		newHp.setDomainId(js.domainId);
-		newHp.setUserId(js.userId);
-		newHp.setNumber(js.number);
-		newHp.setTolerance(js.tolerance);
-		newHp.setExtraordinary(js.extraordinary);
-		newHp.setOnlyPresence(js.onlyPresence);
-		newHp.setHourProfileId(js.hourProfileId);
-
-		return newHp;
+	
+	public Long getSequence(Connection con) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		Long nextID = dsl.nextval(SEQ_TIMETABLE_STAMP);
+		return nextID;
 	}
-
+	
+	public int insert(Connection con,OTimetableStamp item) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		TimetableStampRecord record = dsl.newRecord(TIMETABLE_STAMP, item);
+		
+		return dsl
+				.insertInto(TIMETABLE_STAMP)
+				.set(record)
+				.execute();
+	}
+	
+	public int update(Connection con, OTimetableStamp item) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+			.update(TIMETABLE_STAMP)
+			.set(TIMETABLE_STAMP.EXIT,item.getExit())
+			.where(
+				TIMETABLE_STAMP.ID.equal(item.getId())
+			)
+			.execute();
+	}
 }

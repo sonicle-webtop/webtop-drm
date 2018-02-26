@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Drm extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = 1490302393;
+	private static final long serialVersionUID = 1280089498;
 
 	/**
 	 * The reference instance of <code>drm</code>
@@ -44,7 +44,6 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_COMPANIES_USERS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_DOC_STATUSES,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_DOC_STATUSES_GROUPS,
-			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EMPLOYEE_HOURS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EMPLOYEE_PROFILES,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EXPENSE_NOTE_COSTS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EXPENSE_NOTE_DOCUMENTS,
@@ -54,6 +53,8 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EXPENSE_NOTES,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_FOLDERS_GROUPS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_GROUPS_USERS,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_HOUR_PROFILES,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_LINE_HOURS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_MASTERDATA,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_MEMBERS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_SUPERVISED_USERS,
@@ -61,6 +62,7 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_TIMETABLE_MOVEMENTS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_TIMETABLE_REQUESTS_HOLIDAY,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_TIMETABLE_SETTINGS,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_TIMETABLE_STAMP,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_WORK_REPORT_DETAILS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_WORK_REPORTS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_WORK_REPORTS_COUNT,
@@ -83,7 +85,6 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.tables.CompaniesUsers.COMPANIES_USERS,
 			com.sonicle.webtop.drm.jooq.tables.DocStatuses.DOC_STATUSES,
 			com.sonicle.webtop.drm.jooq.tables.DocStatusesGroups.DOC_STATUSES_GROUPS,
-			com.sonicle.webtop.drm.jooq.tables.EmployeeHours.EMPLOYEE_HOURS,
 			com.sonicle.webtop.drm.jooq.tables.EmployeeProfiles.EMPLOYEE_PROFILES,
 			com.sonicle.webtop.drm.jooq.tables.EnabledPrograms.ENABLED_PROGRAMS,
 			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteCostTypes.EXPENSE_NOTE_COST_TYPES,
@@ -101,16 +102,16 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.tables.Groups.GROUPS,
 			com.sonicle.webtop.drm.jooq.tables.GroupsUsers.GROUPS_USERS,
 			com.sonicle.webtop.drm.jooq.tables.HolidayDate.HOLIDAY_DATE,
+			com.sonicle.webtop.drm.jooq.tables.HourProfiles.HOUR_PROFILES,
+			com.sonicle.webtop.drm.jooq.tables.LineHours.LINE_HOURS,
 			com.sonicle.webtop.drm.jooq.tables.LineManagerUsers.LINE_MANAGER_USERS,
 			com.sonicle.webtop.drm.jooq.tables.LineManagers.LINE_MANAGERS,
 			com.sonicle.webtop.drm.jooq.tables.Profiles.PROFILES,
 			com.sonicle.webtop.drm.jooq.tables.ProfilesMasterdata.PROFILES_MASTERDATA,
 			com.sonicle.webtop.drm.jooq.tables.ProfilesMembers.PROFILES_MEMBERS,
 			com.sonicle.webtop.drm.jooq.tables.ProfilesSupervisedUsers.PROFILES_SUPERVISED_USERS,
-			com.sonicle.webtop.drm.jooq.tables.TimetableAttendancesheet.TIMETABLE_ATTENDANCESHEET,
-			com.sonicle.webtop.drm.jooq.tables.TimetableMovements.TIMETABLE_MOVEMENTS,
-			com.sonicle.webtop.drm.jooq.tables.TimetableRequestsHoliday.TIMETABLE_REQUESTS_HOLIDAY,
 			com.sonicle.webtop.drm.jooq.tables.TimetableSettings.TIMETABLE_SETTINGS,
+			com.sonicle.webtop.drm.jooq.tables.TimetableStamp.TIMETABLE_STAMP,
 			com.sonicle.webtop.drm.jooq.tables.WorkReports.WORK_REPORTS,
 			com.sonicle.webtop.drm.jooq.tables.WorkReportsAttachments.WORK_REPORTS_ATTACHMENTS,
 			com.sonicle.webtop.drm.jooq.tables.WorkReportsRows.WORK_REPORTS_ROWS,

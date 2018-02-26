@@ -38,8 +38,8 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 	dockableConfig: {
 		title: '{EmployeeProfile.tit}',
 		iconCls: 'wtdrm-icon-configuration-employeeprofile-xs',
-		width: 1160,
-		height: 500,
+		width: 400,
+		height: 280,
 		modal: true
 	},
 	fieldTitle: 'description',
@@ -56,7 +56,7 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 			xtype: 'panel',
 			layout: 'vbox',
 			defaults: {
-				labelWidth: 140
+				labelWidth: 180
 			},
 			items: [
 				{
@@ -89,6 +89,18 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 							fieldLabel: me.mys.res('EmployeeProfile.fld-tolerance.lbl'),
 							selectOnFocus: true
 						},
+						WTF.localCombo('id', 'desc', {
+							bind: '{record.hourProfileId}',
+							reference: 'fldhourprofile',
+							anyMatch: true,
+							allowBlank: true,
+							store: {
+								autoLoad: true,
+								model: 'WTA.model.Simple',
+								proxy: WTF.proxy(me.mys.ID, 'LookupHourProfiles')
+							},
+							fieldLabel: me.mys.res('EmployeeProfile.fld-hourProfiles.lbl')
+						}),
 						{
 							xtype: 'checkbox',
 							bind: '{record.extraordinary}',
@@ -100,273 +112,6 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 							boxLabel: me.mys.res('EmployeeProfile.fld-onlyPresence.lbl')
 						}
 					]
-				},
-				{
-					title: me.mys.res('EmployeeHours.tit'),
-					xtype: 'grid',
-					reference: 'gpEmployeeHours',
-					bind: {
-						store: '{record.employeeHours}'
-					},
-					width: '100%',
-					border: true,
-					columns: [
-						{
-							dataIndex: 'lineId',
-							width: '25',
-							header: me.mys.res('gpEmployeeHours.lineId.lbl')
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'e_1',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
-								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
-							header: me.mys.res('gpEmployeeHours.1_e.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'u_1',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
-								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
-							header: me.mys.res('gpEmployeeHours.1_u.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'e_2',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
-								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
-							header: me.mys.res('gpEmployeeHours.2_e.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'u_2',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
-								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
-							header: me.mys.res('gpEmployeeHours.2_u.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'e_3',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
-								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
-							header: me.mys.res('gpEmployeeHours.3_e.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'u_3',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
-								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
-							header: me.mys.res('gpEmployeeHours.3_u.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'e_4',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
-								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
-							header: me.mys.res('gpEmployeeHours.4_e.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'u_4',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
-								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
-							header: me.mys.res('gpEmployeeHours.4_u.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'e_5',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
-								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
-							header: me.mys.res('gpEmployeeHours.5_e.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'u_5',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
-								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
-							header: me.mys.res('gpEmployeeHours.5_u.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'e_6',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
-								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
-							header: me.mys.res('gpEmployeeHours.6_e.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'u_6',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
-								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
-							header: me.mys.res('gpEmployeeHours.6_u.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'e_7',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
-								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
-							header: me.mys.res('gpEmployeeHours.7_e.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'u_7',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
-								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
-							header: me.mys.res('gpEmployeeHours.7_u.lbl'),
-							flex: 2
-						}
-					],
-					tbar: [
-						me.addAct('add', {
-							text: WT.res('act-add.lbl'),
-							tooltip: null,
-							iconCls: 'wt-icon-add-xs',
-							handler: function () {
-								me.addEmployeeHour();
-							},
-							scope: me
-						}),
-						me.addAct('delete', {
-							text: WT.res('act-delete.lbl'),
-							tooltip: null,
-							iconCls: 'wt-icon-delete-xs',
-							handler: function () {
-								var sm = me.lref('gpEmployeeHours').getSelectionModel();
-								me.deleteEmployeeHour(sm.getSelection());
-							},
-							scope: me
-						})
-					],
-					plugins: {
-						ptype: 'cellediting',
-						clicksToEdit: 1
-					}
-
 				}
 			]
 		});
@@ -377,35 +122,6 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 	onViewInvalid: function (s, mo, errs) {
 		var me = this;
 		WTU.updateFieldsErrors(me.lref('employeeProfileform'), errs);
-	},
-	
-	addEmployeeHour: function () {
-		var me = this;
-		var gp = me.lref('gpEmployeeHours'),
-				sto = gp.getStore(),
-				cep = gp.findPlugin('cellediting');
-
-
-		cep.cancelEdit();
-
-		sto.add(sto.createModel({
-			lineId: sto.getCount() + 1
-		}));
-
-		cep.startEditByPosition({row: sto.getCount(), column: 0});
-	},
-	deleteEmployeeHour: function (rec) {
-		var me = this,
-				grid = me.lref('gpEmployeeHours'),
-				sto = grid.getStore(),
-				cellediting = grid.findPlugin('cellediting');
-
-		WT.confirm(WT.res('confirm.delete'), function (bid) {
-			if (bid === 'yes') {
-				cellediting.cancelEdit();
-				sto.remove(rec);
-			}
-		}, me);
 	}
 });
 

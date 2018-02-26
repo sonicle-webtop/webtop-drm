@@ -32,53 +32,21 @@
  */
 package com.sonicle.webtop.drm.bol.js;
 
-import com.sonicle.webtop.drm.model.LineHour;
-import com.sonicle.webtop.drm.model.EmployeeProfile;
-import java.util.ArrayList;
-import java.util.List;
+import com.sonicle.webtop.drm.bol.OHourProfile;
 
 /**
  *
  * @author stfnnvl
  */
-public class JsEmployeeProfile {
-
-	public Integer id;
+public class JsGridHourProfile {
+		
+	public int id;
 	public String domainId;
-	public String userId;
-	public String number;
-	public String tolerance;
-	public Boolean extraordinary;
-	public Boolean onlyPresence;
-	public Integer hourProfileId;
-
-
-	public JsEmployeeProfile(EmployeeProfile ep) {
-		this.id = ep.getId();
-		this.domainId = ep.getDomainId();
-		this.userId = ep.getUserId();
-		this.number = ep.getNumber();
-		this.tolerance = ep.getTolerance();
-		this.extraordinary = ep.getExtraordinary();
-		this.onlyPresence = ep.getOnlyPresence();
-		this.hourProfileId = ep.getHourProfileId();
-
+	public String description;
+	
+	public JsGridHourProfile(OHourProfile hp){
+		this.id = hp.getId();
+		this.domainId = hp.getDomainId();
+		this.description = hp.getDescription();
 	}
-
-	public static EmployeeProfile createEmployeeProfile(JsEmployeeProfile js) {
-
-		EmployeeProfile newHp = new EmployeeProfile();
-
-		newHp.setId(js.id);
-		newHp.setDomainId(js.domainId);
-		newHp.setUserId(js.userId);
-		newHp.setNumber(js.number);
-		newHp.setTolerance(js.tolerance);
-		newHp.setExtraordinary(js.extraordinary);
-		newHp.setOnlyPresence(js.onlyPresence);
-		newHp.setHourProfileId(js.hourProfileId);
-
-		return newHp;
-	}
-
 }

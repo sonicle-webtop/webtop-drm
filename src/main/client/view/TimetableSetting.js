@@ -33,7 +33,8 @@
 Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 	extend: 'WTA.sdk.ModelView',
 	requires: [
-		'Sonicle.webtop.drm.model.GridEmployeeProfiles'
+		'Sonicle.webtop.drm.model.GridEmployeeProfiles',
+		'Sonicle.webtop.drm.model.GridHourProfiles'
 	],
 	dockableConfig: {
 		title: '{timetable.config.tit}', //localizzato
@@ -268,6 +269,74 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 						}
 					}
 
+				},
+				{
+					title: me.mys.res('ourprofiles.tit'),
+					xtype: 'grid',
+					reference: 'gpHourProfile',
+					store: {
+						autoLoad: true,
+						model: 'Sonicle.webtop.drm.model.GridHourProfiles',
+						proxy: WTF.apiProxy(me.mys.ID, 'ManageGridHourProfile', 'data', {
+							writer: {
+								allowSingle: false
+							}
+						})
+					},
+					width: '100%',
+					border: true,
+					flex: 1,
+					columns: [
+						{
+							dataIndex: 'description',
+							header: me.mys.res('gpHourProfile.description.lbl'),
+							flex: 2
+						}
+					],
+					tbar: [
+						me.addAct('add', {
+							text: WT.res('act-add.lbl'),
+							tooltip: null,
+							iconCls: 'wt-icon-add-xs',
+							handler: function () {
+								me.addHourProfile({
+									callback: function (success) {
+										if (success) {
+											me.lref('gpHourProfile').getStore().load();
+										}
+									}
+								});
+							},
+							scope: me
+						}),
+						'-',
+						me.addAct('edit', {
+							text: WT.res('act-edit.lbl'),
+							tooltip: null,
+							iconCls: 'wt-icon-edit-xs',
+							handler: function () {
+								var sel = me.lref('gpHourProfile').getSelection()[0];
+								me.editHourProfileUI(sel);
+							},
+							scope: me
+						}),
+						me.addAct('delete', {
+							text: WT.res('act-delete.lbl'),
+							tooltip: null,
+							iconCls: 'wt-icon-delete-xs',
+							handler: function () {
+								var sel = me.lref('gpHourProfile').getSelection()[0];
+								me.deleteHourProfileUI(sel);
+							},
+							scope: me
+						})
+					],
+					listeners: {
+						rowdblclick: function (s, rec) {
+							me.editHourProfileUI(rec);
+						}
+					}
+
 				}
 			]
 		});
@@ -371,6 +440,84 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 		opts = opts || {};
 		var me = this;
 		WT.ajaxReq(me.mys.ID, 'ManageEmployeeProfile', {
+			params: {
+				crud: 'delete',
+				id: WTU.arrayAsParam(id)
+			},
+			callback: function (success, json) {
+				Ext.callback(opts.callback, opts.scope || me, [success, json]);
+			}
+		});
+	},
+	
+	addHourProfile: function (opts) {
+		opts = opts || {};
+		var me = this,
+			vct = WT.createView(me.mys.ID, 'view.HourProfile');
+	
+		vct.getView().on('viewsave', function (s, success, model) {
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});	
+		vct.show(false, function () {
+			vct.getView().begin('new', {
+				data: {
+				}
+			});
+		});
+	},
+	
+	editHourProfileUI: function (rec) {
+		var me = this;
+		me.editHourProfile(rec.id, {
+			callback: function (success, model) {
+				if (success) {
+					me.lref('gpHourProfile').getStore().load();
+				} else {
+					alert('error');
+				}
+			}
+		});
+	},
+	
+	editHourProfile: function (id, opts) {
+		opts = opts || {};
+		var me = this,
+				vct = WT.createView(me.mys.ID, 'view.HourProfile');
+		vct.getView().on('viewsave', function (s, success, model) {
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vct.show(false,
+				function () {
+					vct.getView().begin('edit', {
+						data: {
+							id: id
+						}
+					});
+				});
+	},
+	
+	deleteHourProfileUI: function (rec) {
+		var me = this,
+				sto = me.lref('gpHourProfile').getStore(),
+				msg;
+		if (rec) {
+			msg = me.mys.res('act.confirm.delete', Ext.String.ellipsis(rec.get('description'), 40));
+		}
+		WT.confirm(msg, function (bid) {
+			if (bid === 'yes') {
+				me.deleteHourProfile(rec.id, {
+					callback: function (success) {
+						if (success)
+							sto.remove(rec);
+					}
+				});
+			}
+		});
+	},
+	deleteHourProfile: function (id, opts) {
+		opts = opts || {};
+		var me = this;
+		WT.ajaxReq(me.mys.ID, 'ManageHourProfile', {
 			params: {
 				crud: 'delete',
 				id: WTU.arrayAsParam(id)

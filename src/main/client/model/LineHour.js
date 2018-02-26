@@ -30,25 +30,28 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.EmployeeProfile', {
-	extend: 'WTA.ux.data.BaseModel',
-	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageEmployeeProfile', 'data', {
-		writer: {
-			type: 'sojson',
-			writeAssociations: true
-		}
-	}),
-	identifier: 'negative',
-	idProperty: 'id',
+Ext.define('Sonicle.webtop.drm.model.LineHour', {
+	extend: 'WTA.ux.data.BaseModel',	
+	
 	fields: [
 		WTF.field('id', 'int', true),
 		WTF.field('domainId', 'string', true),
-		WTF.field('userId', 'string', false),
-		WTF.field('number', 'string', false),
-		WTF.field('tolerance', 'string', true),
 		WTF.field('hourProfileId', 'int', true),
-		WTF.field('extraordinary', 'bool', true, {defaultValue: false}),
-		WTF.field('onlyPresence', 'bool', true, {defaultValue: false})
+		WTF.field('lineId', 'int', true),
+		WTF.field('e_1', 'string', true),
+		WTF.field('u_1', 'string', true),
+		WTF.field('e_2', 'string', true),
+		WTF.field('u_2', 'string', true),
+		WTF.field('e_3', 'string', true),
+		WTF.field('u_3', 'string', true),
+		WTF.field('e_4', 'string', true),
+		WTF.field('u_4', 'string', true),
+		WTF.field('e_5', 'string', true),
+		WTF.field('u_5', 'string', true),
+		WTF.field('e_6', 'string', true),
+		WTF.field('u_6', 'string', true),
+		WTF.field('e_7', 'string', true),
+		WTF.field('u_7', 'string', true)
 	]
 });
 

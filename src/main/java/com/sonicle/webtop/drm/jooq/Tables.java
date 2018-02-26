@@ -47,11 +47,6 @@ public class Tables {
 	public static final com.sonicle.webtop.drm.jooq.tables.DocStatusesGroups DOC_STATUSES_GROUPS = com.sonicle.webtop.drm.jooq.tables.DocStatusesGroups.DOC_STATUSES_GROUPS;
 
 	/**
-	 * The table drm.employee_hours
-	 */
-	public static final com.sonicle.webtop.drm.jooq.tables.EmployeeHours EMPLOYEE_HOURS = com.sonicle.webtop.drm.jooq.tables.EmployeeHours.EMPLOYEE_HOURS;
-
-	/**
 	 * The table drm.employee_profiles
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.EmployeeProfiles EMPLOYEE_PROFILES = com.sonicle.webtop.drm.jooq.tables.EmployeeProfiles.EMPLOYEE_PROFILES;
@@ -137,6 +132,16 @@ public class Tables {
 	public static final com.sonicle.webtop.drm.jooq.tables.HolidayDate HOLIDAY_DATE = com.sonicle.webtop.drm.jooq.tables.HolidayDate.HOLIDAY_DATE;
 
 	/**
+	 * The table drm.hour_profiles
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.HourProfiles HOUR_PROFILES = com.sonicle.webtop.drm.jooq.tables.HourProfiles.HOUR_PROFILES;
+
+	/**
+	 * The table drm.line_hours
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.LineHours LINE_HOURS = com.sonicle.webtop.drm.jooq.tables.LineHours.LINE_HOURS;
+
+	/**
 	 * The table drm.line_manager_users
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.LineManagerUsers LINE_MANAGER_USERS = com.sonicle.webtop.drm.jooq.tables.LineManagerUsers.LINE_MANAGER_USERS;
@@ -167,24 +172,14 @@ public class Tables {
 	public static final com.sonicle.webtop.drm.jooq.tables.ProfilesSupervisedUsers PROFILES_SUPERVISED_USERS = com.sonicle.webtop.drm.jooq.tables.ProfilesSupervisedUsers.PROFILES_SUPERVISED_USERS;
 
 	/**
-	 * The table drm.timetable_attendancesheet
-	 */
-	public static final com.sonicle.webtop.drm.jooq.tables.TimetableAttendancesheet TIMETABLE_ATTENDANCESHEET = com.sonicle.webtop.drm.jooq.tables.TimetableAttendancesheet.TIMETABLE_ATTENDANCESHEET;
-
-	/**
-	 * The table drm.timetable_movements
-	 */
-	public static final com.sonicle.webtop.drm.jooq.tables.TimetableMovements TIMETABLE_MOVEMENTS = com.sonicle.webtop.drm.jooq.tables.TimetableMovements.TIMETABLE_MOVEMENTS;
-
-	/**
-	 * The table drm.timetable_requests_holiday
-	 */
-	public static final com.sonicle.webtop.drm.jooq.tables.TimetableRequestsHoliday TIMETABLE_REQUESTS_HOLIDAY = com.sonicle.webtop.drm.jooq.tables.TimetableRequestsHoliday.TIMETABLE_REQUESTS_HOLIDAY;
-
-	/**
 	 * The table drm.timetable_settings
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.TimetableSettings TIMETABLE_SETTINGS = com.sonicle.webtop.drm.jooq.tables.TimetableSettings.TIMETABLE_SETTINGS;
+
+	/**
+	 * The table drm.timetable_stamp
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.TimetableStamp TIMETABLE_STAMP = com.sonicle.webtop.drm.jooq.tables.TimetableStamp.TIMETABLE_STAMP;
 
 	/**
 	 * The table drm.work_reports

@@ -11,6 +11,7 @@
 .wtdrm-icon-workreport-xs { background-image: url('work_report_16.png') !important; }
 .wtdrm-icon-expensenote-xs { background-image: url('expense_note_16.png') !important; }
 .wtdrm-icon-timetable-xs { background-image: url('timetable_16.png') !important; }
+.wtdrm-icon-timetable1-xs { background-image: url('timetable1_16.png') !important; }
 
 .wtdrm-icon-configuration-xs { background-image: url('configuration_16.png') !important; }
 .wtdrm-icon-configuration-generalconfiguration-xs { background-image: url('general_configurations_16.png') !important; }
@@ -21,9 +22,13 @@
 .wtdrm-icon-configuration-enabledprograms-xs { background-image: url('enabledprograms_configuration_16.png') !important; }
 .wtdrm-icon-configuration-manager-xs { background-image: url('manager_configuration_16.png') !important; }
 .wtdrm-icon-configuration-employeeprofile-xs { background-image: url('employee_profile_16.png') !important; }
+.wtdrm-icon-configuration-ourprofile-xs { background-image: url('our_profile_16.png') !important; }
 
 .wtdrm-trash-trigger { background-image: url('trash-trigger.png') !important; }
 .wtdrm-add-trigger { background-image: url('add-trigger.png') !important; }
 
 .wtdrm-icon-totcurrency-xs { background-image: url('totcurrency_16.png') !important; }
 .wtdrm-icon-notes-xs { background-image: url('notes_16.png') !important; }
+
+.wtdrm-icon-mainstamp-m { background-image: url('mainstamp_32.png') !important; width: 32px !important; height: 32px !important; }
+.wtdrm-icon-companystamp-m { background-image: url('companystamp_32.png') !important; width: 32px !important; height: 32px !important; }

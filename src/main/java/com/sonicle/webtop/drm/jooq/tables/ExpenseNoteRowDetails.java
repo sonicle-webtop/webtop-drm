@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ExpenseNoteRowDetails extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.ExpenseNoteRowDetailsRecord> {
 
-	private static final long serialVersionUID = 772148908;
+	private static final long serialVersionUID = 1083755691;
 
 	/**
 	 * The reference instance of <code>drm.expense_note_row_details</code>
@@ -94,7 +94,7 @@ public class ExpenseNoteRowDetails extends org.jooq.impl.TableImpl<com.sonicle.w
 	/**
 	 * The column <code>drm.expense_note_row_details.customer_id</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.ExpenseNoteRowDetailsRecord, java.lang.String> CUSTOMER_ID = createField("customer_id", org.jooq.impl.SQLDataType.VARCHAR.length(15), this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.ExpenseNoteRowDetailsRecord, java.lang.String> CUSTOMER_ID = createField("customer_id", org.jooq.impl.SQLDataType.VARCHAR.length(36), this, "");
 
 	/**
 	 * The column <code>drm.expense_note_row_details.point_of_sale</code>.

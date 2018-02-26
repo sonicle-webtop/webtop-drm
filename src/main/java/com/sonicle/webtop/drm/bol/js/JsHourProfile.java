@@ -33,7 +33,7 @@
 package com.sonicle.webtop.drm.bol.js;
 
 import com.sonicle.webtop.drm.model.LineHour;
-import com.sonicle.webtop.drm.model.EmployeeProfile;
+import com.sonicle.webtop.drm.model.HourProfile;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,42 +41,30 @@ import java.util.List;
  *
  * @author stfnnvl
  */
-public class JsEmployeeProfile {
+public class JsHourProfile {
 
 	public Integer id;
 	public String domainId;
-	public String userId;
-	public String number;
-	public String tolerance;
-	public Boolean extraordinary;
-	public Boolean onlyPresence;
-	public Integer hourProfileId;
+	public String description;
+	public List<LineHour> lineHours = new ArrayList();
 
 
-	public JsEmployeeProfile(EmployeeProfile ep) {
-		this.id = ep.getId();
-		this.domainId = ep.getDomainId();
-		this.userId = ep.getUserId();
-		this.number = ep.getNumber();
-		this.tolerance = ep.getTolerance();
-		this.extraordinary = ep.getExtraordinary();
-		this.onlyPresence = ep.getOnlyPresence();
-		this.hourProfileId = ep.getHourProfileId();
+	public JsHourProfile(HourProfile hp) {
+		this.id = hp.getId();
+		this.domainId = hp.getDomainId();
+		this.description = hp.getDescription();
+		this.lineHours = hp.getLineHours();
 
 	}
 
-	public static EmployeeProfile createEmployeeProfile(JsEmployeeProfile js) {
+	public static HourProfile createHourProfile(JsHourProfile js) {
 
-		EmployeeProfile newHp = new EmployeeProfile();
+		HourProfile newHp = new HourProfile();
 
 		newHp.setId(js.id);
 		newHp.setDomainId(js.domainId);
-		newHp.setUserId(js.userId);
-		newHp.setNumber(js.number);
-		newHp.setTolerance(js.tolerance);
-		newHp.setExtraordinary(js.extraordinary);
-		newHp.setOnlyPresence(js.onlyPresence);
-		newHp.setHourProfileId(js.hourProfileId);
+		newHp.setDescription(js.description);
+		newHp.setLineHours(js.lineHours);
 
 		return newHp;
 	}

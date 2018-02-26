@@ -29,7 +29,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		
 		me.setToolbar(Ext.create({
 			xtype: 'toolbar',
-			referenceHolder: true, //riferimento alla toolbar
+			referenceHolder: true,
 			items: [
 			]
 		}));
@@ -349,7 +349,90 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					itemId: 'tt',
 					layout: 'border',
 					items: [
-						
+						{
+							region: 'north',
+							xtype: 'panel',
+							iconCls: 'wtdrm-icon-timetable1-xs',
+							title: me.res('timetable.tit.lbl'),
+							height: 150,
+							sid: me.ID,
+							layout: {
+								type: 'hbox',
+								align: 'center',
+								pack: 'center'
+							}, 
+							items: [
+								{
+									xtype: 'label',
+									text: Ext.Date.format(new Date(),'j') + ' ' + me.res('timetable.date.month' + Ext.Date.format(new Date(),'m') + '.lbl') + ' ' + Ext.Date.format(new Date(),'Y'),
+									margin: '0 0 0 10',
+									style: 'font-weight:bold;font-size: 24px;color: #157fcc;'
+								}
+							]
+						},
+						{
+							region: 'center',
+							xtype: 'grid',
+							reference: 'gpTimetable',
+							store: {
+								autoLoad: true,
+								model: 'Sonicle.webtop.drm.model.GridTimetable',
+								proxy: WTF.apiProxy(me.ID, 'ManageGridTimetable')
+							},
+							columns: [
+								{
+									header: me.res('gpTimetable.type.lbl'),
+									dataIndex: 'type',
+									flex: 1
+								},
+								{
+									header: me.res('gpTimetable.entrance.lbl'),
+									dataIndex: 'entrance',
+									flex: 1,
+									hideable: false
+								},
+								{
+									header: me.res('gpTimetable.exit.lbl'),
+									dataIndex: 'exit',
+									flex: 1,
+									hideable: false
+								}
+							],
+							tbar: [
+								{
+									xtype: 'button',
+									text: me.res('gpTimetable.mainstamp.lbl'),
+									iconCls: 'wtdrm-icon-mainstamp-m',
+									handler: function () {
+										WT.ajaxReq(me.ID, 'SetTimetable', {
+											params: {
+												type: 'M'
+											},
+											callback: function (success, json) {
+												if (success) this.getMainComponent().lookupReference('gpTimetable').getStore().reload();
+											}
+										});
+									}
+								},
+								'-',
+								{
+									xtype: 'button',
+									text: me.res('gpTimetable.companystamp.lbl'),
+									iconCls: 'wtdrm-icon-companystamp-m',
+									handler: function () {
+										WT.ajaxReq(me.ID, 'SetTimetable', {
+											params: {
+												type: 'C',
+												timestamp: new Date()
+											},
+											callback: function (success, json) {
+												if (success) this.getMainComponent().lookupReference('gpTimetable').getStore().reload();
+											}
+										});
+									}
+								}
+							]
+						}
 					]
 				}
 			]
@@ -457,7 +540,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				me.deleteWorkReportUI(sel);
 			}
 		});
-
 		me.addAct('expenseNote', 'add', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
@@ -473,7 +555,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				});
 			}
 		});
-		
 		me.addAct('expenseNote', 'edit', {
 			text: WT.res('act-edit.lbl'),
 			tooltip: null,
@@ -484,7 +565,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				me.editExpenseNoteUI(sel);
 			}
 		});
-		
 		me.addAct('expenseNote', 'remove', {
 			text: WT.res('act-remove.lbl'),
 			tooltip: null,
@@ -495,7 +575,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				me.deleteExpenseNoteUI(sel);
 			}
 		});
-
 	},
 	
 	//inizializ	zo il menu Contestuale

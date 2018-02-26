@@ -32,12 +32,12 @@
  */
 package com.sonicle.webtop.drm.bol;
 
-import com.sonicle.webtop.drm.jooq.tables.pojos.EmployeeHours;
+import com.sonicle.webtop.drm.jooq.tables.pojos.LineHours;
 
 /**
  *
  * @author stfnnvl
  */
-public class OEmployeeHour extends EmployeeHours {
+public class OLineHour extends LineHours {
 
 }

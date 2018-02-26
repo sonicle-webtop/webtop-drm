@@ -848,3 +848,27 @@ CREATE TABLE "drm"."employee_hours" (
 );
 
 CREATE SEQUENCE "drm"."seq_employee_hours";
+
+--------------
+--26/02/2018--
+--------------
+
+ALTER TABLE "drm"."employee_hours" RENAME TO "line_hours";
+
+ALTER TABLE "drm"."line_hours" RENAME "employee_profile_id" TO "hour_profile_id";
+
+CREATE TABLE "drm"."hour_profiles" (
+"id" int4 NOT NULL,
+"domain_id" varchar(20) NOT NULL,
+"description" varchar(50) NOT NULL,
+PRIMARY KEY ("id")
+);
+
+ALTER TABLE "drm"."employee_profiles"
+ADD COLUMN "hour_profile_id" int4;
+
+CREATE SEQUENCE "drm"."seq_hour_profiles";
+
+CREATE SEQUENCE "drm"."seq_line_hours";
+
+DROP SEQUENCE "drm"."seq_employee_hours";
