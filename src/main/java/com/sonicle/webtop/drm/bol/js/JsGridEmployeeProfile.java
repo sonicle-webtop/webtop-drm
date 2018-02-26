@@ -49,6 +49,7 @@ public class JsGridEmployeeProfile {
 	public String tolerance;
 	public Boolean extraordinary;
 	public Boolean onlyPresence;
+	public String hourProfile;
 	
 	public JsGridEmployeeProfile(OEmployeeProfile ep){
 		this.id = ep.getId();

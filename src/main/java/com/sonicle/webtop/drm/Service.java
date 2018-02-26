@@ -833,13 +833,18 @@ public class Service extends BaseService {
 	public void processManageGridEmployeeProfile(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			JsGridEmployeeProfile jsGEP;
+			HourProfile hp;
+			
 			if (crud.equals(Crud.READ)) {
 
 				List<JsGridEmployeeProfile> jsGridEP = new ArrayList();
 
 				for (OEmployeeProfile oEP : manager.listEmployeeProfiles()) {
-
-					jsGridEP.add(new JsGridEmployeeProfile(oEP));
+					jsGEP = new JsGridEmployeeProfile(oEP);
+					hp = manager.getHourProfile(oEP.getHourProfileId());
+					jsGEP.hourProfile = (hp != null) ? hp.getDescription() : "";
+					jsGridEP.add(jsGEP);
 				}
 
 				new JsonResult(jsGridEP).printTo(out);

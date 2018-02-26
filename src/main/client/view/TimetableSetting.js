@@ -39,7 +39,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 	dockableConfig: {
 		title: '{timetable.config.tit}', //localizzato
 		iconCls: 'wtdrm-icon-configuration-generalconfiguration-xs',
-		width: 550,
+		width: 650,
 		height: 500
 	},
 	modelName: 'Sonicle.webtop.drm.model.TimetableSetting',
@@ -209,6 +209,11 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 							dataIndex: 'tolerance',
 							header: me.mys.res('gpEmployeeProfile.tolerance.lbl'),
 							flex: 1
+						},
+						{
+							dataIndex: 'hourProfile',
+							header: me.mys.res('gpEmployeeProfile.hourProfile.lbl'),
+							flex: 2
 						},
 						{
 							xtype: 'checkcolumn',
