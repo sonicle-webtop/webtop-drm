@@ -36,7 +36,7 @@ import com.sonicle.webtop.drm.jooq.tables.pojos.WorkReportsAttachments;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class OWorkReportAttachment extends WorkReportsAttachments{
 	

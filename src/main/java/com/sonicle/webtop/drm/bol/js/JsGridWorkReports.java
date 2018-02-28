@@ -37,7 +37,7 @@ import org.joda.time.DateTimeZone;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class JsGridWorkReports {
 

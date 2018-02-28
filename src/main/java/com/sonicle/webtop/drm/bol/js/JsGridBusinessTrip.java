@@ -36,7 +36,7 @@ import com.sonicle.webtop.drm.model.BusinessTrip;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class JsGridBusinessTrip {
 

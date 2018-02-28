@@ -36,7 +36,7 @@ import com.sonicle.webtop.drm.jooq.tables.pojos.BusinessTrips;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class OBusinessTrip extends BusinessTrips {
 

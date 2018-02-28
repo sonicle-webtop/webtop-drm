@@ -38,7 +38,7 @@ import com.sonicle.webtop.drm.jooq.tables.pojos.FoldersGroups;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class ODrmFolderGroup extends FoldersGroups{
 	

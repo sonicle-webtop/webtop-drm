@@ -42,7 +42,7 @@ import org.jooq.DSLContext;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class DrmUserForManagerDAO extends BaseDAO {
 

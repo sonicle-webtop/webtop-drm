@@ -9,7 +9,7 @@ import com.sonicle.webtop.drm.jooq.tables.pojos.EnabledPrograms;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class OEnabledProgram extends EnabledPrograms {
 	

@@ -35,7 +35,7 @@ package com.sonicle.webtop.drm.bol.js;
 import com.sonicle.webtop.drm.model.WorkReportAttachment;
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class JsGridWorkReportAttachment {
 

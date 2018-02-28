@@ -36,7 +36,7 @@ import com.sonicle.webtop.drm.model.WorkReportRow;
 import org.apache.commons.lang3.StringUtils;
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class JsGridWorkReportRow {
 

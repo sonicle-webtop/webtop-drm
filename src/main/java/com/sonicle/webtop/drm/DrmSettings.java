@@ -34,7 +34,7 @@ package com.sonicle.webtop.drm;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class DrmSettings {
 	//creo le constati che servono per le impostazioni sia per utente che per servizio

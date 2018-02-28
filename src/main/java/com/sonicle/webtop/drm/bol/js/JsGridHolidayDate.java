@@ -38,7 +38,7 @@ import org.joda.time.LocalDate;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class JsGridHolidayDate {
 

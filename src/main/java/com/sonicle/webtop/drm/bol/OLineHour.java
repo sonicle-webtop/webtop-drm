@@ -36,7 +36,7 @@ import com.sonicle.webtop.drm.jooq.tables.pojos.LineHours;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class OLineHour extends LineHours {
 

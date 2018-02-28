@@ -36,7 +36,7 @@ import com.sonicle.webtop.drm.jooq.tables.pojos.ProfilesSupervisedUsers;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class OProfileSupervisedUser extends ProfilesSupervisedUsers{
 	

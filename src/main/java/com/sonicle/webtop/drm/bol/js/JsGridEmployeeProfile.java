@@ -38,7 +38,7 @@ import com.sonicle.webtop.drm.bol.OEmployeeProfile;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class JsGridEmployeeProfile {
 		

@@ -44,7 +44,7 @@ import static com.sonicle.webtop.drm.jooq.Tables.DOC_STATUSES_GROUPS;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class DocStausGroupDAO extends BaseDAO {
 

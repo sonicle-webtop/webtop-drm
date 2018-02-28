@@ -38,7 +38,7 @@ import com.sonicle.webtop.drm.bol.ODrmFolder;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class JsGridFolders {
 		

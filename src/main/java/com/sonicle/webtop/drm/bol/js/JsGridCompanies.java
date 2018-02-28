@@ -37,7 +37,7 @@ import com.sonicle.webtop.drm.bol.OCompany;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class JsGridCompanies {
 		

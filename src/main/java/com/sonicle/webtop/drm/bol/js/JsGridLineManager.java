@@ -38,7 +38,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class JsGridLineManager {
 		

@@ -36,7 +36,7 @@ import com.sonicle.webtop.drm.jooq.tables.pojos.WorkReportsSettings;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class OWorkReportSetting extends WorkReportsSettings {
 

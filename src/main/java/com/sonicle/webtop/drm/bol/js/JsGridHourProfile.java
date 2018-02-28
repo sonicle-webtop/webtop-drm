@@ -36,7 +36,7 @@ import com.sonicle.webtop.drm.bol.OHourProfile;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class JsGridHourProfile {
 		

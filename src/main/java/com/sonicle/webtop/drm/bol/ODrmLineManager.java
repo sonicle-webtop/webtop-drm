@@ -36,7 +36,7 @@ import com.sonicle.webtop.drm.jooq.tables.pojos.LineManagers;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class ODrmLineManager extends LineManagers {
 

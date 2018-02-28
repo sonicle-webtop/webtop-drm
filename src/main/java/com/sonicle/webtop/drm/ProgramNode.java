@@ -9,7 +9,7 @@ import java.util.LinkedHashMap;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class ProgramNode {
 

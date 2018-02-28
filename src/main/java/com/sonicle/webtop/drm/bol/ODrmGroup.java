@@ -36,7 +36,7 @@ import com.sonicle.webtop.drm.jooq.tables.pojos.Groups;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class ODrmGroup extends Groups {
 

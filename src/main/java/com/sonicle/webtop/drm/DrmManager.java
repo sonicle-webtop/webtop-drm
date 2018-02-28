@@ -159,7 +159,7 @@ import org.joda.time.Period;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class DrmManager extends BaseManager {
 

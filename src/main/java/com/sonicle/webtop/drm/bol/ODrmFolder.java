@@ -36,7 +36,7 @@ import com.sonicle.webtop.drm.jooq.tables.pojos.Folders;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class ODrmFolder extends Folders {
 

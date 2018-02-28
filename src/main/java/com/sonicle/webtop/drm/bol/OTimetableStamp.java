@@ -36,7 +36,7 @@ import com.sonicle.webtop.drm.jooq.tables.pojos.TimetableStamp;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class OTimetableStamp extends TimetableStamp{
 	

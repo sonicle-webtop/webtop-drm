@@ -36,7 +36,7 @@ import com.sonicle.webtop.drm.jooq.tables.pojos.Profiles;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class ODrmProfile extends Profiles {
 

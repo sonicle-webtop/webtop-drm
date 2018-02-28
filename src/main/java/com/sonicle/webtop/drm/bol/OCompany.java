@@ -36,7 +36,7 @@ import com.sonicle.webtop.drm.jooq.tables.pojos.Companies;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class OCompany extends Companies{
 	

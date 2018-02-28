@@ -45,7 +45,7 @@ import static org.jooq.impl.DSL.*;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class WorkReportSettingDAO extends BaseDAO {
 

@@ -37,7 +37,7 @@ import java.util.List;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class RootGroupNode extends ProgramNode {
 

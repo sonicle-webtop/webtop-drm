@@ -36,7 +36,7 @@ import com.sonicle.webtop.drm.jooq.tables.pojos.EmployeeProfiles;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class OEmployeeProfile extends EmployeeProfiles {
 

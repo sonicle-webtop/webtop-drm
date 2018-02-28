@@ -36,7 +36,7 @@ import com.sonicle.webtop.drm.jooq.tables.pojos.LineManagerUsers;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class ODrmLineManagerUsers extends LineManagerUsers {
 

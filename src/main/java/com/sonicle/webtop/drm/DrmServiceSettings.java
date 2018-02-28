@@ -37,7 +37,7 @@ import static com.sonicle.webtop.drm.DrmSettings.*;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class DrmServiceSettings extends BaseServiceSettings {
 

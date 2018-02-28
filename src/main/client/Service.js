@@ -835,6 +835,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					if(json.data === true){
 						me.getMainComponent().lookupReference('btnMainStamp').setDisabled(false);
 						me.getMainComponent().lookupReference('btnCompanyStamp').setDisabled(false);
+					}else {
+						me.getMainComponent().lookupReference('btnMainStamp').setDisabled(true);
+						me.getMainComponent().lookupReference('btnCompanyStamp').setDisabled(true);
 					}
 				}
 			}

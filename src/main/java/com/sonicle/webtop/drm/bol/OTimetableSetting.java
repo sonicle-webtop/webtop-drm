@@ -36,7 +36,7 @@ import com.sonicle.webtop.drm.jooq.tables.pojos.TimetableSettings;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class OTimetableSetting extends TimetableSettings {
 

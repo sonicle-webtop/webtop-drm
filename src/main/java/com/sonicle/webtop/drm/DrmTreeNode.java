@@ -7,7 +7,7 @@ package com.sonicle.webtop.drm;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class DrmTreeNode {
 

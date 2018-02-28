@@ -36,7 +36,7 @@ import com.sonicle.webtop.drm.jooq.tables.pojos.HolidayDate;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class OHolidayDate extends HolidayDate {
 

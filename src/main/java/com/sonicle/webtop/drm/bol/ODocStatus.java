@@ -36,7 +36,7 @@ import com.sonicle.webtop.drm.jooq.tables.pojos.DocStatuses;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class ODocStatus extends DocStatuses{
 	

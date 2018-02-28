@@ -49,7 +49,7 @@ import org.jooq.DatePart;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class WorkReportDAO extends BaseDAO {
 

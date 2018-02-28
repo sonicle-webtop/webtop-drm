@@ -36,7 +36,7 @@ import com.sonicle.webtop.drm.bol.ODocStatus;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class JsGridDocStatuses {
 		

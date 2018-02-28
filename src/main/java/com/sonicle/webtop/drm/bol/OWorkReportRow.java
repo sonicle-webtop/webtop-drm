@@ -36,7 +36,7 @@ import com.sonicle.webtop.drm.jooq.tables.pojos.WorkReportsRows;
 
 /**
  *
- * @author stfnnvl
+ * @author lssndrvs
  */
 public class OWorkReportRow extends WorkReportsRows{
 	
