@@ -61,13 +61,17 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 							xtype: 'textfield',
 							bind: '{record.allowedAddresses}',
 							fieldLabel: me.mys.res('timetable.settings.fld-allowedaddresses.lbl'),
-							selectOnFocus: true
+							selectOnFocus: true,
+							emptyText: me.mys.res('timetable.settings.fld-allowedaddresses.emp'),
+							width: 500
 						},
 						{
 							xtype: 'textfield',
 							bind: '{record.allowedUsers}',
 							fieldLabel: me.mys.res('timetable.settings.fld-allowedusers.lbl'),
-							selectOnFocus: true
+							selectOnFocus: true,
+							emptyText: me.mys.res('timetable.settings.fld-allowedusers.emp'),
+							width: 500
 						},
 						{
 							xtype: 'textfield',

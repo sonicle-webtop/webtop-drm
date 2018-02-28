@@ -37,9 +37,11 @@ import com.sonicle.webtop.core.dal.DAOException;
 import com.sonicle.webtop.drm.bol.OTimetableStamp;
 import static com.sonicle.webtop.drm.jooq.Sequences.SEQ_TIMETABLE_STAMP;
 import static com.sonicle.webtop.drm.jooq.Tables.TIMETABLE_STAMP;
-import com.sonicle.webtop.drm.jooq.Sequences;
 import com.sonicle.webtop.drm.jooq.tables.records.TimetableStampRecord;
 import java.sql.Connection;
+import java.util.List;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 import org.jooq.DSLContext;
 
 /**
@@ -60,7 +62,7 @@ public class TimetableStampDAO extends BaseDAO{
 		return nextID;
 	}
 	
-	public int insert(Connection con,OTimetableStamp item) throws DAOException {
+	public int insert(Connection con, OTimetableStamp item) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		TimetableStampRecord record = dsl.newRecord(TIMETABLE_STAMP, item);
 		
@@ -79,5 +81,36 @@ public class TimetableStampDAO extends BaseDAO{
 				TIMETABLE_STAMP.ID.equal(item.getId())
 			)
 			.execute();
+	}
+	
+	public List<OTimetableStamp> getDailyStampsByDomainType(Connection con, String domainId, String type) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.select()
+				.from(TIMETABLE_STAMP)
+				.where(
+						TIMETABLE_STAMP.DOMAIN_ID.equal(domainId)
+				)
+				.and(
+						TIMETABLE_STAMP.TYPE.equal(type)
+				)
+				.and(
+						TIMETABLE_STAMP.ENTRANCE.between(new DateTime().withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0), new DateTime().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
+				)
+				.fetchInto(OTimetableStamp.class);
+	}
+	
+	public List<OTimetableStamp> getDailyStampsByDomain(Connection con, String domainId) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.select()
+				.from(TIMETABLE_STAMP)
+				.where(
+						TIMETABLE_STAMP.DOMAIN_ID.equal(domainId)
+				)
+				.and(
+						TIMETABLE_STAMP.ENTRANCE.between(new DateTime().withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0), new DateTime().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
+				)
+				.fetchInto(OTimetableStamp.class);
 	}
 }

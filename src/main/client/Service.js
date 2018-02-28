@@ -18,7 +18,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		'Sonicle.webtop.drm.model.GridExpenseNotes',
 		'Sonicle.webtop.drm.ux.ExpenseNoteSearch',
 		'Sonicle.webtop.drm.view.ExpenseNote',
-		'Sonicle.webtop.drm.model.TreeNode'
+		'Sonicle.webtop.drm.model.TreeNode',
+		'Sonicle.webtop.drm.model.GridTimetable'
 	],
 	needsReload: true,
 	init: function () {
@@ -381,26 +382,35 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							},
 							columns: [
 								{
-									header: me.res('gpTimetable.type.lbl'),
-									dataIndex: 'type',
-									flex: 1
+									xtype: 'soiconcolumn',
+									hideable: false,
+									align: 'center',
+									getIconCls: function(v, rec) {
+										return me.cssIconCls((rec.get('type') === 'M') ? 'mainstamp' : 'companystamp', 'xs');
+									},
+									iconSize: WTU.imgSizeToPx('xs'),
+									width: 30
 								},
 								{
 									header: me.res('gpTimetable.entrance.lbl'),
 									dataIndex: 'entrance',
 									flex: 1,
-									hideable: false
+									hideable: false,
+									align: 'center'
 								},
 								{
 									header: me.res('gpTimetable.exit.lbl'),
 									dataIndex: 'exit',
 									flex: 1,
-									hideable: false
+									hideable: false,
+									align: 'center'
 								}
 							],
 							tbar: [
 								{
 									xtype: 'button',
+									reference: 'btnMainStamp',
+									disabled: true,
 									text: me.res('gpTimetable.mainstamp.lbl'),
 									iconCls: 'wtdrm-icon-mainstamp-m',
 									handler: function () {
@@ -409,7 +419,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 												type: 'M'
 											},
 											callback: function (success, json) {
-												if (success) this.getMainComponent().lookupReference('gpTimetable').getStore().reload();
+												if(success) me.getMainComponent().lookupReference('gpTimetable').getStore().reload();
 											}
 										});
 									}
@@ -417,6 +427,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								'-',
 								{
 									xtype: 'button',
+									reference: 'btnCompanyStamp',
+									disabled: true,
 									text: me.res('gpTimetable.companystamp.lbl'),
 									iconCls: 'wtdrm-icon-companystamp-m',
 									handler: function () {
@@ -426,7 +438,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 												timestamp: new Date()
 											},
 											callback: function (success, json) {
-												if (success) this.getMainComponent().lookupReference('gpTimetable').getStore().reload();
+												if(success) me.getMainComponent().lookupReference('gpTimetable').getStore().reload();
 											}
 										});
 									}
@@ -814,6 +826,21 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		}
 	},
 	
+	enablingStampButtons: function () {
+		var me = this;
+		WT.ajaxReq(me.ID, 'ChekIpAddressNetwork', {
+			params: {},
+			callback: function (success, json) {
+				if(success){
+					if(json.data === true){
+						me.getMainComponent().lookupReference('btnMainStamp').setDisabled(false);
+						me.getMainComponent().lookupReference('btnCompanyStamp').setDisabled(false);
+					}
+				}
+			}
+		});
+	},
+	
 	configurationView: function () {
 		var me = this,
 				vw = WT.createView(me.ID, 'view.Configurations');
@@ -828,6 +855,10 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				me.reloadWorkReport(me.filtersWorkReport().getData());
 				break;
 			case 2:
+				break;
+			case 3:
+				me.enablingStampButtons();
+				me.getMainComponent().lookupReference('gpTimetable').getStore().reload();
 				break;
 		}
 	}

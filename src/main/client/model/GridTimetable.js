@@ -31,15 +31,14 @@
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
 
-Ext.define('Sonicle.webtop.drm.model.GridExpenseNotes', {
+Ext.define('Sonicle.webtop.drm.model.GridTimetable', {
 	extend: 'WTA.ux.data.BaseModel',
-	idProperty: 'id',
 	fields: [
 		WTF.roField('id', 'int'),
 		WTF.roField('domainId', 'string'),
 		WTF.roField('userId', 'string'),
 		WTF.roField('type', 'string'),
-		WTF.roField('entrance', 'date', {dateFormat: 'Y-m-d H:i:s'}),		
-		WTF.roField('exit', 'date', {dateFormat: 'Y-m-d H:i:s'})
+		WTF.roField('entrance', 'string'),		
+		WTF.roField('exit', 'string')
 	]
 });

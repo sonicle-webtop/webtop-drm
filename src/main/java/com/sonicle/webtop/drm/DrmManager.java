@@ -69,6 +69,7 @@ import com.sonicle.webtop.drm.bol.OProfileMasterdata;
 import com.sonicle.webtop.drm.bol.OProfileSupervisedUser;
 import com.sonicle.webtop.drm.bol.OProfileMember;
 import com.sonicle.webtop.drm.bol.OTimetableSetting;
+import com.sonicle.webtop.drm.bol.OTimetableStamp;
 import com.sonicle.webtop.drm.bol.OWorkReport;
 import com.sonicle.webtop.drm.bol.OWorkReportAttachment;
 import com.sonicle.webtop.drm.bol.OWorkReportRow;
@@ -96,6 +97,7 @@ import com.sonicle.webtop.drm.dal.ProfileMasterdataDAO;
 import com.sonicle.webtop.drm.dal.ProfileSupervisedUserDAO;
 import com.sonicle.webtop.drm.dal.ProfileMemberDAO;
 import com.sonicle.webtop.drm.dal.TimetableSettingDAO;
+import com.sonicle.webtop.drm.dal.TimetableStampDAO;
 import com.sonicle.webtop.drm.dal.WorkReportAttachmentDAO;
 import com.sonicle.webtop.drm.dal.WorkReportDAO;
 import com.sonicle.webtop.drm.dal.WorkReportRowDAO;
@@ -122,6 +124,7 @@ import com.sonicle.webtop.drm.model.ProfileMasterdata;
 import com.sonicle.webtop.drm.model.ProfileSupervisedUser;
 import com.sonicle.webtop.drm.model.ProfileMember;
 import com.sonicle.webtop.drm.model.TimetableSetting;
+import com.sonicle.webtop.drm.model.TimetableStamp;
 import com.sonicle.webtop.drm.model.UserForManager;
 import com.sonicle.webtop.drm.model.WorkReport;
 import com.sonicle.webtop.drm.model.WorkReportAttachment;
@@ -1578,6 +1581,40 @@ public class DrmManager extends BaseManager {
 		oEH.set_7H(getDiffHours(eh.getE_7(), eh.getU_7()));
 
 		return oEH;
+	}
+	
+	private TimetableStamp createTimetableStamp(OTimetableStamp oTS) {
+
+		if (oTS == null) {
+			return null;
+		}
+
+		TimetableStamp stamp = new TimetableStamp();
+		stamp.setId(oTS.getId());
+		stamp.setDomainId(oTS.getDomainId());
+		stamp.setUserId(oTS.getUserId());
+		stamp.setType(oTS.getType());
+		stamp.setEntrance(oTS.getEntrance());
+		stamp.setExit(oTS.getExit());
+
+		return stamp;
+	}
+
+	private OTimetableStamp createOTimetableStamp(TimetableStamp stamp) {
+
+		if (stamp == null) {
+			return null;
+		}
+
+		OTimetableStamp oTS = new OTimetableStamp();
+		oTS.setId(stamp.getId());
+		oTS.setDomainId(stamp.getDomainId());
+		oTS.setUserId(stamp.getUserId());
+		oTS.setType(stamp.getType());
+		oTS.setEntrance(stamp.getEntrance());
+		oTS.setExit(stamp.getExit());
+
+		return oTS;
 	}
 
 	private DrmProfile createProfile(ODrmProfile oProfile) {
@@ -3251,6 +3288,85 @@ public class DrmManager extends BaseManager {
 			}
 
 			return hProfile;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public OTimetableStamp setTimetable(TimetableStamp stamp) throws WTException {
+
+		Connection con = null;
+		List<OTimetableStamp> stamps = null;
+		boolean chek = false;
+		
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			TimetableStampDAO tsDao = TimetableStampDAO.getInstance();
+
+			OTimetableStamp oTS = createOTimetableStamp(stamp);
+			
+			//Guardo le timbrature di giornata, se non esite nemmeno una allora insert oggetto nuovo, altrimenti faccio controlli su uscita
+			stamps = tsDao.getDailyStampsByDomainType(con, getTargetProfileId().getDomainId(), oTS.getType());
+			
+			if(stamps.size() > 0){
+				for(OTimetableStamp ts : stamps){
+					if(ts.getExit() == null){
+						ts.setExit(new DateTime());
+						
+						tsDao.update(con, ts);
+						chek = true;
+						
+						break;
+					}
+				}
+				if(!chek){
+					oTS.setId(tsDao.getSequence(con).intValue());
+					oTS.setDomainId(getTargetProfileId().getDomainId());
+					oTS.setUserId(getTargetProfileId().getUserId());
+					oTS.setEntrance(new DateTime());
+
+					tsDao.insert(con, oTS);
+				}
+			}else{
+				oTS.setId(tsDao.getSequence(con).intValue());
+				oTS.setDomainId(getTargetProfileId().getDomainId());
+				oTS.setUserId(getTargetProfileId().getUserId());
+				oTS.setEntrance(new DateTime());
+				
+				tsDao.insert(con, oTS);
+			}			
+
+			DbUtils.commitQuietly(con);
+
+			return oTS;
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public List<OTimetableStamp> listTimetableStamp() throws WTException {
+		Connection con = null;
+		TimetableStampDAO tsDao = TimetableStampDAO.getInstance();
+		List<OTimetableStamp> tss = null;
+		
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			tss = tsDao.getDailyStampsByDomain(con, getTargetProfileId().getDomainId());
+
+			return tss;
 
 		} catch (SQLException | DAOException ex) {
 			throw new WTException(ex, "DB error");

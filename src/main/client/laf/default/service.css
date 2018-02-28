@@ -30,5 +30,8 @@
 .wtdrm-icon-totcurrency-xs { background-image: url('totcurrency_16.png') !important; }
 .wtdrm-icon-notes-xs { background-image: url('notes_16.png') !important; }
 
+.wtdrm-icon-mainstamp-xs { background-image: url('mainstamp_16.png') !important; }
+.wtdrm-icon-companystamp-xs { background-image: url('companystamp_16.png') !important; }
+
 .wtdrm-icon-mainstamp-m { background-image: url('mainstamp_32.png') !important; width: 32px !important; height: 32px !important; }
 .wtdrm-icon-companystamp-m { background-image: url('companystamp_32.png') !important; width: 32px !important; height: 32px !important; }

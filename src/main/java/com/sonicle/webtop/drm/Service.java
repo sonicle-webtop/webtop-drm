@@ -33,10 +33,12 @@
 package com.sonicle.webtop.drm;
 
 import com.sonicle.commons.EnumUtils;
+import com.sonicle.commons.net.IPUtils;
 import com.sonicle.commons.web.Crud;
 import com.sonicle.commons.web.ServletUtils;
 import com.sonicle.commons.web.ServletUtils.IntegerArray;
 import com.sonicle.commons.web.ServletUtils.StringArray;
+import static com.sonicle.commons.web.ServletUtils.getIPFromHeader;
 import com.sonicle.commons.web.json.JsonResult;
 import com.sonicle.commons.web.json.MapItem;
 import com.sonicle.commons.web.json.Payload;
@@ -73,6 +75,7 @@ import com.sonicle.webtop.drm.bol.ODrmLineManager;
 import com.sonicle.webtop.drm.bol.ODrmProfile;
 import com.sonicle.webtop.drm.bol.OEmployeeProfile;
 import com.sonicle.webtop.drm.bol.OHourProfile;
+import com.sonicle.webtop.drm.bol.OTimetableStamp;
 import com.sonicle.webtop.drm.bol.OWorkReport;
 import com.sonicle.webtop.drm.bol.OWorkType;
 import com.sonicle.webtop.drm.bol.js.JsCompany;
@@ -89,6 +92,7 @@ import com.sonicle.webtop.drm.bol.js.JsGridFolders;
 import com.sonicle.webtop.drm.bol.js.JsGridHourProfile;
 import com.sonicle.webtop.drm.bol.js.JsGridLineManager;
 import com.sonicle.webtop.drm.bol.js.JsGridProfiles;
+import com.sonicle.webtop.drm.bol.js.JsGridTimetableStamp;
 import com.sonicle.webtop.drm.bol.js.JsGridWorkReports;
 import com.sonicle.webtop.drm.bol.js.JsHourProfile;
 import com.sonicle.webtop.drm.bol.js.JsTimetableSetting;
@@ -107,6 +111,7 @@ import com.sonicle.webtop.drm.model.FileContent;
 import com.sonicle.webtop.drm.model.GroupCategory;
 import com.sonicle.webtop.drm.model.HourProfile;
 import com.sonicle.webtop.drm.model.TimetableSetting;
+import com.sonicle.webtop.drm.model.TimetableStamp;
 import com.sonicle.webtop.drm.model.WorkReport;
 import com.sonicle.webtop.drm.model.WorkReportAttachment;
 import com.sonicle.webtop.drm.model.WorkReportSetting;
@@ -119,6 +124,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1362,6 +1368,81 @@ public class Service extends BaseService {
 			logger.error("Error in action PrintWorkReport", ex);
 			ex.printStackTrace();
 			ServletUtils.writeErrorHandlingJs(response, ex.getMessage());
+		}
+	}
+	
+	public void processSetTimetable(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String type = ServletUtils.getStringParameter(request, "type", true);
+			
+			TimetableStamp stamp = new TimetableStamp();
+			stamp.setType(type);
+			
+			if(ChekIpAddressNetwork()){
+				manager.setTimetable(stamp);
+			}
+			
+			new JsonResult().printTo(out);
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action SetTimetable", ex);
+		}
+	}
+	
+	public void processChekIpAddressNetwork(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			new JsonResult(ChekIpAddressNetwork()).printTo(out);
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ChekIpAddressNetwork", ex);
+		}
+	}
+	
+	private boolean ChekIpAddressNetwork() throws WTException, UnknownHostException{
+		boolean enabling = false;
+		TimetableSetting ts = manager.getTimetableSetting();
+
+		if(!StringUtils.isEmpty(ts.getAllowedAddresses())){
+			String ip = getEnv().getWebTopSession().getRemoteIP();
+
+			for(String address : ts.getAllowedAddresses().split(",")){
+				if(address.contains("/")){
+					//Network
+					if(IPUtils.isIPInRange(new String[]{address}, ip)){
+						enabling = true;
+					}
+				}else{
+					//IP
+					if(address.equals(ip)){
+						enabling = true;
+					}
+				}
+			}
+		}else{
+			enabling = true;
+		}
+		
+		return enabling;
+	}
+	
+	public void processManageGridTimetable(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			if (crud.equals(Crud.READ)) {
+
+				List<JsGridTimetableStamp> jsGridTS = new ArrayList();
+
+				for (OTimetableStamp oTS : manager.listTimetableStamp()) {
+
+					jsGridTS.add(new JsGridTimetableStamp(oTS));
+				}
+
+				new JsonResult(jsGridTS).printTo(out);
+
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageGridTimetable", ex);
 		}
 	}
 	
