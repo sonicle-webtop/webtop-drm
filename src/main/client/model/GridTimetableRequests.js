@@ -30,38 +30,20 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.TimetableSetting', {
+
+Ext.define('Sonicle.webtop.drm.model.GridTimetableRequests', {
 	extend: 'WTA.ux.data.BaseModel',
-	requires: [
-		'Sonicle.data.writer.Json',
-		'Sonicle.webtop.drm.model.HolidayDate'
-	],
-	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageTimetableSetting', 'data', {
-		writer: {
-			type: 'sojson',
-			writeAssociations: true
-		}
-	}),
-	identifier: 'negative',
-	idProperty: 'id',
+	idProperty: 'leaveRequestId',
 	fields: [
-		WTF.field('id', 'string', true),
-		WTF.field('timetableSettingId', 'int', true),
-		WTF.field('domainId', 'string', true),
-		WTF.field('allowedAddresses', 'string', true),
-		WTF.field('allowedUsers', 'string', true),
-		WTF.field('staffOfficeEmail', 'string', true),
-		WTF.field('requestsHolidaysPermitsPreviousDates', 'bool', true, {defaultValue: false}),
-		WTF.field('totalToleranceInMinutes', 'string', true),
-		WTF.field('rounding', 'string', true),
-		WTF.field('minimumExtraordinary', 'string', true),
-		WTF.field('breakAnomaly', 'bool', true, {defaultValue: false}),
-		WTF.field('readOnlyEvents', 'bool', true, {defaultValue: false}),
-		WTF.field('requestsPermitsNotRemunered', 'bool', true, {defaultValue: false}),
-		WTF.field('requestsPermitsMedicalVisits', 'bool', true, {defaultValue: false}),
-		WTF.field('requestsPermitsContractuals', 'bool', true, {defaultValue: false})
-	],
-	hasMany: [
-		WTF.hasMany('holidayDates', 'Sonicle.webtop.drm.model.HolidayDate')
+		WTF.roField('leaveRequestId', 'int'),
+		WTF.roField('userId', 'string'),
+		WTF.roField('managerId', 'string'),
+		WTF.roField('type', 'string'),
+		WTF.roField('fromDate', 'date', {dateFormat: 'Y-m-d'}),
+		WTF.roField('toDate', 'date', {dateFormat: 'Y-m-d'}),
+		WTF.roField('fromHour', 'string'),
+		WTF.roField('toHour', 'string'),
+		WTF.roField('status', 'string'),
+		WTF.roField('result', 'bool')
 	]
 });

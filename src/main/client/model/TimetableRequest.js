@@ -30,38 +30,39 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.TimetableSetting', {
+Ext.define('Sonicle.webtop.drm.model.TimetableRequest', {
 	extend: 'WTA.ux.data.BaseModel',
 	requires: [
 		'Sonicle.data.writer.Json',
-		'Sonicle.webtop.drm.model.HolidayDate'
+		'Sonicle.webtop.drm.model.LeaveRequestDocument'
 	],
-	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageTimetableSetting', 'data', {
+	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageLeaveRequest', 'data', {
 		writer: {
 			type: 'sojson',
 			writeAssociations: true
 		}
 	}),
 	identifier: 'negative',
-	idProperty: 'id',
+	idProperty: 'leaveRequestId',
 	fields: [
-		WTF.field('id', 'string', true),
-		WTF.field('timetableSettingId', 'int', true),
+		WTF.field('leaveRequestId', 'int', true),
 		WTF.field('domainId', 'string', true),
-		WTF.field('allowedAddresses', 'string', true),
-		WTF.field('allowedUsers', 'string', true),
-		WTF.field('staffOfficeEmail', 'string', true),
-		WTF.field('requestsHolidaysPermitsPreviousDates', 'bool', true, {defaultValue: false}),
-		WTF.field('totalToleranceInMinutes', 'string', true),
-		WTF.field('rounding', 'string', true),
-		WTF.field('minimumExtraordinary', 'string', true),
-		WTF.field('breakAnomaly', 'bool', true, {defaultValue: false}),
-		WTF.field('readOnlyEvents', 'bool', true, {defaultValue: false}),
-		WTF.field('requestsPermitsNotRemunered', 'bool', true, {defaultValue: false}),
-		WTF.field('requestsPermitsMedicalVisits', 'bool', true, {defaultValue: false}),
-		WTF.field('requestsPermitsContractuals', 'bool', true, {defaultValue: false})
+		WTF.field('companyId', 'int', false),
+		WTF.field('userId', 'string', false),
+		WTF.field('managerId', 'string', false),
+		WTF.field('type', 'string', false),
+		WTF.field('fromDate', 'date', false, {dateFormat: 'Y-m-d', defaultValue: new Date()}),
+		WTF.field('toDate', 'date', false, {dateFormat: 'Y-m-d', defaultValue: new Date()}),
+		WTF.field('fromHour', 'string', true),
+		WTF.field('toHour', 'string', true),
+		WTF.field('status', 'string', true),
+		WTF.field('notes', 'string', true),
+		WTF.field('result', 'bool', true),
+		WTF.field('cancRequest', 'bool', true),
+		WTF.field('cancReason', 'string', true),
+		WTF.field('cancResult', 'bool', true)
 	],
 	hasMany: [
-		WTF.hasMany('holidayDates', 'Sonicle.webtop.drm.model.HolidayDate')
+		WTF.hasMany('documents', 'Sonicle.webtop.drm.model.LeaveRequestDocument')
 	]
 });

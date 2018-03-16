@@ -15,6 +15,9 @@ public class DrmTreeNode {
 	public static final String WORK_REPORT = "Report di intervento"; //work-Report  da sostiutire
 	public static final String EXPENSE_NOTE = "Note Spese";
 	public static final String TIMETABLE = "Gestione Presenze";
+	public static final String TIMETABLE_STAMP = "Timbratura";
+	public static final String TIMETABLE_REQUEST = "Richiesta Ferie/Permessi";
+	public static final String TIMETABLE_REPORT = "Reportistica";
 	public static final String CONFIGURATION = "Configurazioni";
 	//public static final String CONFIGURATION_GENERAL = "Configurazioni Generali";
 

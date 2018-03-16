@@ -55,7 +55,10 @@ public class JsTimetableSetting {
 	public String minimumExtraordinary;
 	public Boolean breakAnomaly;
 	public Boolean readOnlyEvents;
-
+	public Boolean requestsPermitsNotRemunered;
+	public Boolean requestsPermitsMedicalVisits;
+	public Boolean requestsPermitsContractuals;
+	
 	public List<JsGridHolidayDate> holidayDates = new ArrayList();
 
 	public JsTimetableSetting(TimetableSetting setting) {
@@ -71,6 +74,9 @@ public class JsTimetableSetting {
 		this.minimumExtraordinary = setting.getMinimumExtraordinary();
 		this.breakAnomaly = setting.getBreakAnomaly();
 		this.readOnlyEvents = setting.getReadOnlyEvents();
+		this.requestsPermitsNotRemunered = setting.getRequestsPermitsNotRemunered();
+		this.requestsPermitsMedicalVisits = setting.getRequestsPermitsMedicalVisits();
+		this.requestsPermitsContractuals = setting.getRequestsPermitsContractuals();
 		
 		for (HolidayDate hd : setting.getHolidayDates()) {
 			this.holidayDates.add(new JsGridHolidayDate(hd));
@@ -91,6 +97,9 @@ public class JsTimetableSetting {
 		tt.setMinimumExtraordinary(js.minimumExtraordinary);
 		tt.setBreakAnomaly(js.breakAnomaly);
 		tt.setReadOnlyEvents(js.readOnlyEvents);
+		tt.setRequestsPermitsNotRemunered(js.requestsPermitsNotRemunered);
+		tt.setRequestsPermitsMedicalVisits(js.requestsPermitsMedicalVisits);
+		tt.setRequestsPermitsContractuals(js.requestsPermitsContractuals);
 
 		for (JsGridHolidayDate hd : js.holidayDates) {
 

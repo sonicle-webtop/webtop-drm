@@ -19,7 +19,10 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		'Sonicle.webtop.drm.ux.ExpenseNoteSearch',
 		'Sonicle.webtop.drm.view.ExpenseNote',
 		'Sonicle.webtop.drm.model.TreeNode',
-		'Sonicle.webtop.drm.model.GridTimetable'
+		'Sonicle.webtop.drm.model.GridTimetable',
+		'Sonicle.webtop.drm.ux.TimetableRequestSearch',
+		'Sonicle.webtop.drm.model.GridTimetableRequests',
+		'Sonicle.webtop.drm.view.TimetableRequest'
 	],
 	needsReload: true,
 	init: function () {
@@ -345,9 +348,11 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							}
 						}
 					]
-				},{
+				},
+				{xtype: 'panel'},
+				{
 					xtype: 'container',
-					itemId: 'tt',
+					itemId: 'tts',
 					layout: 'border',
 					items: [
 						{
@@ -446,12 +451,148 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							]
 						}
 					]
-				}
+				},
+				{
+					xtype: 'container',
+					itemId: 'ttr',
+					layout: 'border',
+					items: [
+						{
+							region: 'north',
+							xtype: 'wtdrmtimetablerequestsearch',
+							reference: 'filtersTimetableRequest',
+							title: me.res('timetableRequest.tit.lbl'),
+							iconCls: 'wtdrm-icon-timetable2-xs',
+							titleCollapse: true,
+							collapsible: true,
+							sid: me.ID,
+							listeners: {
+								search: function(s, query){
+									me.reloadTimetableRequest(query);
+								}
+							}
+						}, {
+							region: 'center',
+							xtype: 'grid',
+							reference: 'gpTimetableRequest',
+							store: {
+								autoLoad: false,
+								model: 'Sonicle.webtop.drm.model.GridTimetableRequests',
+								proxy: WTF.apiProxy(me.ID, 'ManageGridTimetableRequest')
+							},
+							columns: [
+								{
+									xtype: 'soiconcolumn',
+									//header: me.res('gpTimetableRequest.approved.lbl'),
+									align: 'center',
+									dataIndex: 'result',
+									getIconCls: function(v, rec) {
+										return me.cssIconCls((rec.get('result') === true) ? 'approvedrequest' : (rec.get('result') === false) ? 'notapprovedrequest' : 'sendedrequest', 'xs');
+									},
+									iconSize: WTU.imgSizeToPx('xs'),
+									width: 30
+								}, {
+									header: me.res('gpTimetableRequest.type.lbl'),
+									dataIndex: 'type',
+									flex: 1,
+									renderer: function (value, record) {
+										switch(value) {
+											case 'H':
+												return me.res('gpTimetableRequest.type.H.lbl');
+												break;
+											case 'P':
+												return me.res('gpTimetableRequest.type.P.lbl');
+												break;
+											case 'U':
+												return me.res('gpTimetableRequest.type.U.lbl');
+												break;
+											case 'M':
+												return me.res('gpTimetableRequest.type.M.lbl');
+												break;
+											case 'C':
+												return me.res('gpTimetableRequest.type.C.lbl');
+												break;
+											case 'O':
+												return me.res('gpTimetableRequest.type.O.lbl');
+												break;
+											default:
+												return '';
+												break;
+										}
+									}
+								}, {
+									header: me.res('gpTimetableRequest.requestBy.lbl'),
+									dataIndex: 'userId',
+									flex: 1
+								}, {
+									header: me.res('gpTimetableRequest.manager.lbl'),
+									dataIndex: 'managerId',
+									flex: 1
+								}, {
+									header: me.res('gpTimetableRequest.fromDate.lbl'),
+									dataIndex: 'fromDate',
+									xtype: 'datecolumn',
+									format: WT.getShortDateFmt(),
+									flex: 1
+								}, {
+									header: me.res('gpTimetableRequest.fromHour.lbl'),
+									dataIndex: 'fromHour',
+									flex: 1
+								}, {
+									header: me.res('gpTimetableRequest.toDate.lbl'),
+									dataIndex: 'toDate',
+									xtype: 'datecolumn',
+									format: WT.getShortDateFmt(),
+									flex: 1
+								}, {
+									header: me.res('gpTimetableRequest.toHour.lbl'),
+									dataIndex: 'toHour',
+									flex: 1
+								}, {
+									header: me.res('gpTimetableRequest.status.lbl'),
+									dataIndex: 'status',
+									flex: 1,
+									renderer: function (value, record) {
+										switch(value) {
+											case 'O':
+												return me.res('gpTimetableRequest.status.O.lbl');
+												break;
+											case 'C':
+												return me.res('gpTimetableRequest.status.C.lbl');
+												break;
+											case 'D':
+												return me.res('gpTimetableRequest.status.D.lbl');
+												break;
+											default:
+												return '';
+												break;
+										}
+									}
+								}
+							],
+							tbar: [
+								me.getAct('timetableRequest', 'add'),
+								'-',
+								me.getAct('timetableRequest', 'edit')
+								//me.getAct('timetableRequest', 'remove')
+							],
+							listeners: {
+								rowclick: function (s, rec) {
+									me.getAct('timetableRequest', 'edit').setDisabled(false);
+									me.getAct('timetableRequest', 'remove').setDisabled(false);
+								},
+								rowdblclick: function (s, rec) {
+									me.editTimetableRequestUI(rec);
+								}
+							}
+						}
+					]
+				},
+				{xtype: 'panel'}
 			]
 		}));
 	},
 	
-	//Getter
 	filtersWorkReport: function () {
 		return this.getMainComponent().lookupReference('filtersWorkReport');
 	},
@@ -470,6 +611,18 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	
 	gpExpenseNoteSelected: function () {
 		return this.getMainComponent().lookupReference('gpExpenseNote').getSelection()[0];
+	},
+	
+	filtersTimetableRequest: function () {
+		return this.getMainComponent().lookupReference('filtersTimetableRequest');
+	},
+	
+	gpTimetableRequest: function () {
+		return this.getMainComponent().lookupReference('gpTimetableRequest');
+	},
+	
+	gpTimetableRequestSelected: function () {
+		return this.getMainComponent().lookupReference('gpTimetableRequest').getSelection()[0];
 	},
 	
 	itemActive: function () {
@@ -560,7 +713,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				me.addExpenseNote({
 					callback: function (success) {
 						if (success) {
-							alert('success');
 							me.gpExpenseNote().getStore().load();
 						}
 					}
@@ -587,9 +739,42 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				me.deleteExpenseNoteUI(sel);
 			}
 		});
+		me.addAct('timetableRequest', 'add', {
+			text: WT.res('act-add.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-add-xs',
+			handler: function () {
+				me.addTimetableRequest({
+					callback: function (success) {
+						if (success) {
+							me.gpTimetableRequest().getStore().load();
+						}
+					}
+				});
+			}
+		});
+		me.addAct('timetableRequest', 'edit', {
+			text: WT.res('act-edit.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-edit-xs',
+			disabled: true,
+			handler: function () {
+				var sel = me.gpTimetableRequestSelected();
+				me.editTimetableRequestUI(sel);
+			}
+		});
+		me.addAct('timetableRequest', 'remove', {
+			text: WT.res('act-remove.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-remove-xs',
+			disabled: true,
+			handler: function () {
+				var sel = me.gpTimetableRequestSelected();
+				me.deleteTimetableRequestUI(sel);
+			}
+		});
 	},
 	
-	//inizializ	zo il menu Contestuale
 	initCxm: function () {
 		var me = this;
 	},
@@ -688,7 +873,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					});
 				});
 	},
-	
 	reloadWorkReport: function (query) {
 		var me = this,
 				pars = {},
@@ -702,13 +886,11 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			me.needsReload = true;
 		}
 	},
-	
 	printWorkReport: function(ids) {
 		var me = this, url;
 		url = WTF.processBinUrl(me.ID, 'PrintWorkReport', {ids: WTU.arrayAsParam(ids)});
 		Sonicle.URLMgr.openFile(url, {filename: 'workreport', newWindow: true});
 	},
-	
 	addExpenseNote: function (opts) {
 		opts = opts || {};
 
@@ -722,7 +904,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					vct.getView().begin('new');
 				});
 	},
-	
 	editExpenseNoteUI: function (rec) {
 		var me = this;
 		me.editWorkReport(rec.get('expenseNoteId'), {
@@ -735,7 +916,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			}
 		});
 	},
-	
 	editExpenseNote: function (expenseNoteId, opts) {
 		opts = opts || {};
 		var me = this,
@@ -752,7 +932,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					});
 				});
 	},
-	
 	deleteExpenseNoteUI: function (rec) {
 		var me = this,
 				sto = me.gpExpenseNote().getStore(),
@@ -773,7 +952,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			}
 		});
 	},
-	
 	deleteExpenseNote: function (expenseNoteId, opts) {
 		opts = opts || {};
 		var me = this;
@@ -787,13 +965,99 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			}
 		});
 	},
-	
 	expenseNoteSetting: function (opts) {
 		var me = this,
 				vw = WT.createView(me.ID, 'view.ExpenseNoteSetting');
 		vw.show(false);
 	},
-	
+	reloadExpenseNote: function (query) {
+		var me = this,
+				pars = {},
+				sto;
+		if (me.isActive() && me.itemActiveId() === 'en') {
+			sto = me.gpExpenseNote().getStore();
+			if (query !== undefined)
+				Ext.apply(pars, {query: Ext.JSON.encode(query)});
+			WTU.loadWithExtraParams(sto, pars);
+		} else {
+			me.needsReload = true;
+		}
+	},
+	addTimetableRequest: function (opts) {
+		opts = opts || {};
+
+		var me = this,
+				vct = WT.createView(me.ID, 'view.TimetableRequest');
+		vct.getView().on('viewsave', function (s, success, model) {
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vct.show(false, //mostro la view
+				function () {
+					vct.getView().begin('new');
+				});
+	},
+	editTimetableRequestUI: function (rec) {
+		var me = this;
+		me.editTimetableRequest(rec.get('leaveRequestId'), rec.get('status'), {
+			callback: function (success, model) {
+				if (success) {
+					this.gpTimetableRequest().getStore().load();
+				} else {
+					alert('error');
+				}
+			}
+		});
+	},
+	editTimetableRequest: function (leaveRequestId, status, opts) {
+		opts = opts || {};
+		var mode = (status === 'C' || status === 'D') ? 'view' : 'edit';
+		var me = this,
+				vct = WT.createView(me.ID, 'view.TimetableRequest');
+		vct.getView().on('viewsave', function (s, success, model) {
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vct.show(false,
+				function () {
+					vct.getView().begin(mode, {
+						data: {
+							leaveRequestId: leaveRequestId
+						}
+					});
+				});
+	},
+	deleteTimetableRequestUI: function (rec) {
+		var me = this,
+				sto = me.gpTimetableRequest().getStore(),
+				msg;
+		if (rec) {
+			msg = me.res('act.confirm.delete', Ext.String.ellipsis(rec.get('leaveRequestId'), 40));
+		} else {
+			msg = me.res('gpTimetableRequest.confirm.delete.selection');
+		}
+		WT.confirm(msg, function (bid) {
+			if (bid === 'yes') {
+				me.deleteTimetableRequest(rec.get('leaveRequestId'), {
+					callback: function (success) {
+						if (success)
+							sto.remove(rec);
+					}
+				});
+			}
+		});
+	},
+	deleteTimetableRequest: function (leaveRequestId, opts) {
+		opts = opts || {};
+		var me = this;
+		WT.ajaxReq(me.ID, 'ManageLeaveRequest', {
+			params: {
+				crud: 'delete',
+				leaveRequestIds: WTU.arrayAsParam(leaveRequestId)
+			},
+			callback: function (success, json) {
+				Ext.callback(opts.callback, opts.scope || me, [success, json]);
+			}
+		});
+	},
 	timetableSetting: function (opts) {
 		opts = opts || {};
 
@@ -811,13 +1075,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					});
 				});
 	},
-	
-	reloadExpenseNote: function (query) {
+	reloadTimetableRequest: function (query) {
 		var me = this,
 				pars = {},
 				sto;
-		if (me.isActive() && me.itemActiveId() === 'en') {
-			sto = me.gpExpenseNote().getStore();
+		if (me.isActive() && me.itemActiveId() === 'ttr') {
+			sto = me.gpTimetableRequest().getStore();
 			if (query !== undefined)
 				Ext.apply(pars, {query: Ext.JSON.encode(query)});
 			WTU.loadWithExtraParams(sto, pars);
@@ -825,7 +1088,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			me.needsReload = true;
 		}
 	},
-	
 	enablingStampButtons: function () {
 		var me = this;
 		WT.ajaxReq(me.ID, 'ChekIpAddressNetwork', {
@@ -860,8 +1122,15 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			case 2:
 				break;
 			case 3:
+				break;
+			case 4:
 				me.enablingStampButtons();
 				me.getMainComponent().lookupReference('gpTimetable').getStore().reload();
+				break;
+			case 5:
+				me.reloadTimetableRequest(me.filtersTimetableRequest().getData());
+				break;
+			case 6:
 				break;
 		}
 	}

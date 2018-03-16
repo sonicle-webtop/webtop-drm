@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableSettings implements java.io.Serializable {
 
-	private static final long serialVersionUID = 1213256853;
+	private static final long serialVersionUID = 621488301;
 
 	private java.lang.Integer timetableSettingId;
 	private java.lang.String  domainId;
@@ -29,6 +29,9 @@ public class TimetableSettings implements java.io.Serializable {
 	private java.lang.String  minimumExtraordinary;
 	private java.lang.Boolean breakAnomaly;
 	private java.lang.Boolean readOnlyEvents;
+	private java.lang.Boolean requestsPermitsNotRemunered;
+	private java.lang.Boolean requestsPermitsMedicalVisits;
+	private java.lang.Boolean requestsPermitsContractuals;
 
 	public TimetableSettings() {}
 
@@ -43,7 +46,10 @@ public class TimetableSettings implements java.io.Serializable {
 		java.lang.String  rounding,
 		java.lang.String  minimumExtraordinary,
 		java.lang.Boolean breakAnomaly,
-		java.lang.Boolean readOnlyEvents
+		java.lang.Boolean readOnlyEvents,
+		java.lang.Boolean requestsPermitsNotRemunered,
+		java.lang.Boolean requestsPermitsMedicalVisits,
+		java.lang.Boolean requestsPermitsContractuals
 	) {
 		this.timetableSettingId = timetableSettingId;
 		this.domainId = domainId;
@@ -56,6 +62,9 @@ public class TimetableSettings implements java.io.Serializable {
 		this.minimumExtraordinary = minimumExtraordinary;
 		this.breakAnomaly = breakAnomaly;
 		this.readOnlyEvents = readOnlyEvents;
+		this.requestsPermitsNotRemunered = requestsPermitsNotRemunered;
+		this.requestsPermitsMedicalVisits = requestsPermitsMedicalVisits;
+		this.requestsPermitsContractuals = requestsPermitsContractuals;
 	}
 
 	public java.lang.Integer getTimetableSettingId() {
@@ -144,5 +153,29 @@ public class TimetableSettings implements java.io.Serializable {
 
 	public void setReadOnlyEvents(java.lang.Boolean readOnlyEvents) {
 		this.readOnlyEvents = readOnlyEvents;
+	}
+
+	public java.lang.Boolean getRequestsPermitsNotRemunered() {
+		return this.requestsPermitsNotRemunered;
+	}
+
+	public void setRequestsPermitsNotRemunered(java.lang.Boolean requestsPermitsNotRemunered) {
+		this.requestsPermitsNotRemunered = requestsPermitsNotRemunered;
+	}
+
+	public java.lang.Boolean getRequestsPermitsMedicalVisits() {
+		return this.requestsPermitsMedicalVisits;
+	}
+
+	public void setRequestsPermitsMedicalVisits(java.lang.Boolean requestsPermitsMedicalVisits) {
+		this.requestsPermitsMedicalVisits = requestsPermitsMedicalVisits;
+	}
+
+	public java.lang.Boolean getRequestsPermitsContractuals() {
+		return this.requestsPermitsContractuals;
+	}
+
+	public void setRequestsPermitsContractuals(java.lang.Boolean requestsPermitsContractuals) {
+		this.requestsPermitsContractuals = requestsPermitsContractuals;
 	}
 }

@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Drm extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = 1280089498;
+	private static final long serialVersionUID = -229046308;
 
 	/**
 	 * The reference instance of <code>drm</code>
@@ -45,22 +45,16 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_DOC_STATUSES,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_DOC_STATUSES_GROUPS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EMPLOYEE_PROFILES,
-			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EXPENSE_NOTE_COSTS,
-			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EXPENSE_NOTE_DOCUMENTS,
-			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EXPENSE_NOTE_ROW_DETAILS,
-			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EXPENSE_NOTE_ROW_DOCUMENTS,
-			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EXPENSE_NOTE_ROWS,
-			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EXPENSE_NOTES,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_FOLDERS_GROUPS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_GROUPS_USERS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_HOUR_PROFILES,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_LEAVE_REQUEST_DOCUMENTS,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_LEAVE_REQUESTS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_LINE_HOURS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_MASTERDATA,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_MEMBERS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_SUPERVISED_USERS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_USERS,
-			com.sonicle.webtop.drm.jooq.Sequences.SEQ_TIMETABLE_MOVEMENTS,
-			com.sonicle.webtop.drm.jooq.Sequences.SEQ_TIMETABLE_REQUESTS_HOLIDAY,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_TIMETABLE_SETTINGS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_TIMETABLE_STAMP,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_WORK_REPORT_DETAILS,
@@ -87,22 +81,14 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.tables.DocStatusesGroups.DOC_STATUSES_GROUPS,
 			com.sonicle.webtop.drm.jooq.tables.EmployeeProfiles.EMPLOYEE_PROFILES,
 			com.sonicle.webtop.drm.jooq.tables.EnabledPrograms.ENABLED_PROGRAMS,
-			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteCostTypes.EXPENSE_NOTE_COST_TYPES,
-			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteCosts.EXPENSE_NOTE_COSTS,
-			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteDocumentLinks.EXPENSE_NOTE_DOCUMENT_LINKS,
-			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteDocuments.EXPENSE_NOTE_DOCUMENTS,
-			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteRowDetails.EXPENSE_NOTE_ROW_DETAILS,
-			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteRowDocumentLinks.EXPENSE_NOTE_ROW_DOCUMENT_LINKS,
-			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteRowDocuments.EXPENSE_NOTE_ROW_DOCUMENTS,
-			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteRows.EXPENSE_NOTE_ROWS,
-			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteSettings.EXPENSE_NOTE_SETTINGS,
-			com.sonicle.webtop.drm.jooq.tables.ExpenseNotes.EXPENSE_NOTES,
 			com.sonicle.webtop.drm.jooq.tables.Folders.FOLDERS,
 			com.sonicle.webtop.drm.jooq.tables.FoldersGroups.FOLDERS_GROUPS,
 			com.sonicle.webtop.drm.jooq.tables.Groups.GROUPS,
 			com.sonicle.webtop.drm.jooq.tables.GroupsUsers.GROUPS_USERS,
 			com.sonicle.webtop.drm.jooq.tables.HolidayDate.HOLIDAY_DATE,
 			com.sonicle.webtop.drm.jooq.tables.HourProfiles.HOUR_PROFILES,
+			com.sonicle.webtop.drm.jooq.tables.LeaveRequestDocuments.LEAVE_REQUEST_DOCUMENTS,
+			com.sonicle.webtop.drm.jooq.tables.LeaveRequests.LEAVE_REQUESTS,
 			com.sonicle.webtop.drm.jooq.tables.LineHours.LINE_HOURS,
 			com.sonicle.webtop.drm.jooq.tables.LineManagerUsers.LINE_MANAGER_USERS,
 			com.sonicle.webtop.drm.jooq.tables.LineManagers.LINE_MANAGERS,

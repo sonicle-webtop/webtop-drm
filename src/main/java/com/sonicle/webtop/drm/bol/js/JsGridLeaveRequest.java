@@ -30,39 +30,41 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm;
+package com.sonicle.webtop.drm.bol.js;
+
+import com.sonicle.webtop.core.app.WT;
+import com.sonicle.webtop.core.sdk.UserProfileId;
+import com.sonicle.webtop.drm.bol.OLeaveRequest;
 
 /**
  *
  * @author lssndrvs
  */
-public class DrmSettings {
-	//creo le constati che servono per le impostazioni sia per utente che per servizio
+public class JsGridLeaveRequest {
 
-	/**
-	 * [system + domain] [boolean] Enable or Disable use Statistic Customer
-	 */
-	public static final String USE_STATISTIC_CUSTOMER = "customer.usestatistic";
+	public Integer leaveRequestId;
+	public String domainId;
+	public String userId;
+	public String managerId;
+	public String type;
+	public String fromDate;
+	public String toDate;
+	public String fromHour;
+	public String toHour;
+	public String status;
+	public Boolean result;
 
-	public static final String PRINT_DAYS_TRANSFERT = "workreport.daystrasfert.print";
+	public JsGridLeaveRequest(OLeaveRequest lr) {
+		this.leaveRequestId = lr.getLeaveRequestId();
+		this.userId = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getUserId())).getDisplayName();
+		this.managerId = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getManagerId())).getDisplayName();
+		this.type = lr.getType();
+		this.fromDate = lr.getFromDate().toString();
+		this.toDate = lr.getToDate().toString();
+		this.fromHour = lr.getFromHour();
+		this.toHour = lr.getToHour();
+		this.status = lr.getStatus();
+		this.result = lr.getResult();
+	}
 
-	public static final String PRINT_TRANSFERT_DESCRIPTION = "workreport.transfert.print.description";
-
-	public static final String PRINT_SIGNATURE = "workreport.print.signature";
-
-	public static final String ROUNDING_HOUR = "workreport.roundinghour";
-	
-	public static final String TRACKING = "workreport.tracking";
-	
-	public static final String MAIL_TRACKING = "workreport.tracking.mail";
-	
-	public static final String CLOUD_TRACKING = "workreport.tracking.cloud";
-	
-	public static final String DEFAULT_APPLY_SIGNATURE = "workreport.default.applysignature";
-	
-	public static final String DEFAULT_CHARGE_TO = "workreport.default.chargeto";
-	
-	public static final String DEFAULT_FREE_SUPPORT = "workreport.default.freesupport";
-	
-	public static final String DEFAULT_DOC_STATUS_ID = "workreport.default.docstatusid";
 }

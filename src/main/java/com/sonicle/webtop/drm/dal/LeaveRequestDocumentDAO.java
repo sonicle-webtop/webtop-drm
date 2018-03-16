@@ -34,9 +34,10 @@ package com.sonicle.webtop.drm.dal;
 
 import com.sonicle.webtop.core.dal.BaseDAO;
 import com.sonicle.webtop.core.dal.DAOException;
-import com.sonicle.webtop.drm.bol.ODrmLineManagerUsers;
-import static com.sonicle.webtop.drm.jooq.Tables.LINE_MANAGER_USERS;
-import com.sonicle.webtop.drm.jooq.tables.records.LineManagerUsersRecord;
+import com.sonicle.webtop.drm.bol.OLeaveRequestDocument;
+import static com.sonicle.webtop.drm.jooq.Sequences.SEQ_LEAVE_REQUEST_DOCUMENTS;
+import static com.sonicle.webtop.drm.jooq.Tables.LEAVE_REQUEST_DOCUMENTS;
+import com.sonicle.webtop.drm.jooq.tables.records.LeaveRequestDocumentsRecord;
 import java.sql.Connection;
 import java.util.List;
 import org.jooq.DSLContext;
@@ -45,91 +46,73 @@ import org.jooq.DSLContext;
  *
  * @author lssndrvs
  */
-public class DrmUserForManagerDAO extends BaseDAO {
+public class LeaveRequestDocumentDAO extends BaseDAO {
 
-	private final static DrmUserForManagerDAO INSTANCE = new DrmUserForManagerDAO();
+	private final static LeaveRequestDocumentDAO INSTANCE = new LeaveRequestDocumentDAO();
 
-	public static DrmUserForManagerDAO getInstance() {
+	public static LeaveRequestDocumentDAO getInstance() {
 		return INSTANCE;
 	}
 	
-	public int insert(Connection con, ODrmLineManagerUsers item) throws DAOException {
+	public Long getSequence(Connection con) throws DAOException {
 		DSLContext dsl = getDSL(con);
-		LineManagerUsersRecord record = dsl.newRecord(LINE_MANAGER_USERS, item);
+		Long nextID = dsl.nextval(SEQ_LEAVE_REQUEST_DOCUMENTS);
+		return nextID;
+	}
+
+	public List<OLeaveRequestDocument> selectByLeaveRequest(Connection con, Integer leaveRequestId) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.select()
+				.from(LEAVE_REQUEST_DOCUMENTS)
+				.where(
+						LEAVE_REQUEST_DOCUMENTS.LEAVE_REQUEST_ID.equal(leaveRequestId)
+				)
+				.fetchInto(OLeaveRequestDocument.class);
+	}
+	
+	public OLeaveRequestDocument select(Connection con, String leaveRequestDocumentId) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.select()
+				.from(LEAVE_REQUEST_DOCUMENTS)
+				.where(
+						LEAVE_REQUEST_DOCUMENTS.LEAVE_REQUEST_DOCUMENT_ID.equal(leaveRequestDocumentId)
+				)
+				.fetchOneInto(OLeaveRequestDocument.class);
+	}
+
+	public int insert(Connection con, OLeaveRequestDocument item) throws DAOException {
+		DSLContext dsl = getDSL(con);
+
+		LeaveRequestDocumentsRecord record = dsl.newRecord(LEAVE_REQUEST_DOCUMENTS, item);
 
 		return dsl
-				.insertInto(LINE_MANAGER_USERS)
+				.insertInto(LEAVE_REQUEST_DOCUMENTS)
 				.set(record)
 				.execute();
 	}
 
-	public int deleteByDomainIdLineManagerUserId(Connection con, String domainId, String userId) {
+	public int deleteById(Connection con, String id) {
 		DSLContext dsl = getDSL(con);
 
 		return dsl
-				.delete(LINE_MANAGER_USERS)
+				.delete(LEAVE_REQUEST_DOCUMENTS)
 				.where(
-						LINE_MANAGER_USERS.DOMAIN_ID.equal(domainId)
-				).
-				and(
-						LINE_MANAGER_USERS.LINE_MANAGER_USER_ID.equal(userId)
-				)
-				.execute();
-	}
-	
-	public int deleteByDomainIdLineManagerUserIdUserId(Connection con, String domainId, String lineManagerUserId, String userId) {
-		DSLContext dsl = getDSL(con);
-
-		return dsl
-				.delete(LINE_MANAGER_USERS)
-				.where(
-						LINE_MANAGER_USERS.DOMAIN_ID.equal(domainId)
-				).
-				and(
-						LINE_MANAGER_USERS.LINE_MANAGER_USER_ID.equal(lineManagerUserId)
-				).
-				and(
-						LINE_MANAGER_USERS.USER_ID.equal(userId)
+						LEAVE_REQUEST_DOCUMENTS.LEAVE_REQUEST_DOCUMENT_ID.equal(id)
 				)
 				.execute();
 	}
 
-	public Iterable<ODrmLineManagerUsers> listByDomainLineManagerUserId(Connection con, String domainId, String userId) {
+	public int deleteByLeaveRequest(Connection con, Integer leaveRequestId) {
 		DSLContext dsl = getDSL(con);
+
 		return dsl
-				.select()
-				.from(LINE_MANAGER_USERS)
+				.delete(LEAVE_REQUEST_DOCUMENTS)
 				.where(
-						LINE_MANAGER_USERS.DOMAIN_ID.equal(domainId)
-				).and(
-						LINE_MANAGER_USERS.LINE_MANAGER_USER_ID.equal(userId)
+						LEAVE_REQUEST_DOCUMENTS.LEAVE_REQUEST_ID.equal(leaveRequestId)
 				)
-				.fetchInto(ODrmLineManagerUsers.class);
+				.execute();
 	}
-	
-	public List<ODrmLineManagerUsers> selectByDomainUserId(Connection con, String domainId, String userId) {
-		DSLContext dsl = getDSL(con);
-		return dsl
-				.select()
-				.from(LINE_MANAGER_USERS)
-				.where(
-						LINE_MANAGER_USERS.DOMAIN_ID.equal(domainId)
-				).and(
-						LINE_MANAGER_USERS.USER_ID.equal(userId)
-				)
-				.fetchInto(ODrmLineManagerUsers.class);
-	}
-	
-	public List<String> selectManagerByDomainUserId(Connection con, String domainId, String userId) {
-		DSLContext dsl = getDSL(con);
-		return dsl
-				.select(LINE_MANAGER_USERS.LINE_MANAGER_USER_ID)
-				.from(LINE_MANAGER_USERS)
-				.where(
-						LINE_MANAGER_USERS.DOMAIN_ID.equal(domainId)
-				).and(
-						LINE_MANAGER_USERS.USER_ID.equal(userId)
-				)
-				.fetchInto(String.class);
-	}
+
 }

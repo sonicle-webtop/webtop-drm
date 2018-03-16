@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableSettings extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord> {
 
-	private static final long serialVersionUID = 332213662;
+	private static final long serialVersionUID = 1380291445;
 
 	/**
 	 * The reference instance of <code>drm.timetable_settings</code>
@@ -85,6 +85,21 @@ public class TimetableSettings extends org.jooq.impl.TableImpl<com.sonicle.webto
 	 * The column <code>drm.timetable_settings.read_only_events</code>.
 	 */
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord, java.lang.Boolean> READ_ONLY_EVENTS = createField("read_only_events", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
+
+	/**
+	 * The column <code>drm.timetable_settings.requests_permits_not_remunered</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord, java.lang.Boolean> REQUESTS_PERMITS_NOT_REMUNERED = createField("requests_permits_not_remunered", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
+
+	/**
+	 * The column <code>drm.timetable_settings.requests_permits_medical_visits</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord, java.lang.Boolean> REQUESTS_PERMITS_MEDICAL_VISITS = createField("requests_permits_medical_visits", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
+
+	/**
+	 * The column <code>drm.timetable_settings.requests_permits_contractuals</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord, java.lang.Boolean> REQUESTS_PERMITS_CONTRACTUALS = createField("requests_permits_contractuals", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
 
 	/**
 	 * Create a <code>drm.timetable_settings</code> table reference

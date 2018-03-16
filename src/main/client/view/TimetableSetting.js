@@ -118,6 +118,21 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 							xtype: 'checkbox',
 							bind: '{record.requestsHolidaysPermitsPreviousDates}',
 							boxLabel: me.mys.res('timetable.settings.fld-requestsholidayspermitspreviousdates.lbl')
+						},
+						{
+							xtype: 'checkbox',
+							bind: '{record.requestsPermitsNotRemunered}',
+							boxLabel: me.mys.res('timetable.settings.fld-requestspermitsnotremunered.lbl')
+						},
+						{
+							xtype: 'checkbox',
+							bind: '{record.requestsPermitsMedicalVisits}',
+							boxLabel: me.mys.res('timetable.settings.fld-requestspermitsmedicalvisits.lbl')
+						},
+						{
+							xtype: 'checkbox',
+							bind: '{record.requestsPermitsContractuals}',
+							boxLabel: me.mys.res('timetable.settings.fld-requestspermitscontractuals.lbl')
 						}
 					]
 				},

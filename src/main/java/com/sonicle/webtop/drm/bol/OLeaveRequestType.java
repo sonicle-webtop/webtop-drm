@@ -30,39 +30,19 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm;
+package com.sonicle.webtop.drm.bol;
+
+import com.google.gson.annotations.SerializedName;
 
 /**
  *
  * @author lssndrvs
  */
-public class DrmSettings {
-	//creo le constati che servono per le impostazioni sia per utente che per servizio
-
-	/**
-	 * [system + domain] [boolean] Enable or Disable use Statistic Customer
-	 */
-	public static final String USE_STATISTIC_CUSTOMER = "customer.usestatistic";
-
-	public static final String PRINT_DAYS_TRANSFERT = "workreport.daystrasfert.print";
-
-	public static final String PRINT_TRANSFERT_DESCRIPTION = "workreport.transfert.print.description";
-
-	public static final String PRINT_SIGNATURE = "workreport.print.signature";
-
-	public static final String ROUNDING_HOUR = "workreport.roundinghour";
-	
-	public static final String TRACKING = "workreport.tracking";
-	
-	public static final String MAIL_TRACKING = "workreport.tracking.mail";
-	
-	public static final String CLOUD_TRACKING = "workreport.tracking.cloud";
-	
-	public static final String DEFAULT_APPLY_SIGNATURE = "workreport.default.applysignature";
-	
-	public static final String DEFAULT_CHARGE_TO = "workreport.default.chargeto";
-	
-	public static final String DEFAULT_FREE_SUPPORT = "workreport.default.freesupport";
-	
-	public static final String DEFAULT_DOC_STATUS_ID = "workreport.default.docstatusid";
+public enum OLeaveRequestType {
+	@SerializedName("H") HOLIDAY,
+	@SerializedName("P") PAID_LEAVE,
+	@SerializedName("U") UNPAID_LEAVE,
+	@SerializedName("M") MEDICAL_VISIT,
+	@SerializedName("C") CONTRACTUAL,
+	@SerializedName("O") OVERTIME;
 }

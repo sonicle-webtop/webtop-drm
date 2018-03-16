@@ -101,6 +101,9 @@ public class TimetableSettingDAO extends BaseDAO {
 				.set(TIMETABLE_SETTINGS.MINIMUM_EXTRAORDINARY, item.getMinimumExtraordinary())
 				.set(TIMETABLE_SETTINGS.BREAK_ANOMALY, item.getBreakAnomaly())
 				.set(TIMETABLE_SETTINGS.READ_ONLY_EVENTS, item.getReadOnlyEvents())
+				.set(TIMETABLE_SETTINGS.REQUESTS_PERMITS_NOT_REMUNERED, item.getRequestsPermitsNotRemunered())
+				.set(TIMETABLE_SETTINGS.REQUESTS_PERMITS_MEDICAL_VISITS, item.getRequestsPermitsMedicalVisits())
+				.set(TIMETABLE_SETTINGS.REQUESTS_PERMITS_CONTRACTUALS, item.getRequestsPermitsContractuals())
 				.where(
 						TIMETABLE_SETTINGS.TIMETABLE_SETTING_ID.equal(item.getTimetableSettingId())
 				)

@@ -30,38 +30,21 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.TimetableSetting', {
-	extend: 'WTA.ux.data.BaseModel',
-	requires: [
-		'Sonicle.data.writer.Json',
-		'Sonicle.webtop.drm.model.HolidayDate'
+
+Ext.define('Sonicle.webtop.drm.store.ApprovedType', {
+	extend: 'Ext.data.ArrayStore',
+	
+	model: 'WTA.model.Simple',
+	data: [
+		['true',''],
+		['false','']
 	],
-	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageTimetableSetting', 'data', {
-		writer: {
-			type: 'sojson',
-			writeAssociations: true
-		}
-	}),
-	identifier: 'negative',
-	idProperty: 'id',
-	fields: [
-		WTF.field('id', 'string', true),
-		WTF.field('timetableSettingId', 'int', true),
-		WTF.field('domainId', 'string', true),
-		WTF.field('allowedAddresses', 'string', true),
-		WTF.field('allowedUsers', 'string', true),
-		WTF.field('staffOfficeEmail', 'string', true),
-		WTF.field('requestsHolidaysPermitsPreviousDates', 'bool', true, {defaultValue: false}),
-		WTF.field('totalToleranceInMinutes', 'string', true),
-		WTF.field('rounding', 'string', true),
-		WTF.field('minimumExtraordinary', 'string', true),
-		WTF.field('breakAnomaly', 'bool', true, {defaultValue: false}),
-		WTF.field('readOnlyEvents', 'bool', true, {defaultValue: false}),
-		WTF.field('requestsPermitsNotRemunered', 'bool', true, {defaultValue: false}),
-		WTF.field('requestsPermitsMedicalVisits', 'bool', true, {defaultValue: false}),
-		WTF.field('requestsPermitsContractuals', 'bool', true, {defaultValue: false})
-	],
-	hasMany: [
-		WTF.hasMany('holidayDates', 'Sonicle.webtop.drm.model.HolidayDate')
-	]
+	
+	constructor: function(cfg) {
+		var me = this;
+		Ext.each(me.config.data, function(row) {
+			row[1] = WT.res('com.sonicle.webtop.drm', 'store.approved.'+row[0]);
+		});
+		me.callParent([cfg]);
+	}
 });

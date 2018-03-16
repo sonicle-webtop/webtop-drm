@@ -38,7 +38,6 @@ import com.sonicle.commons.web.Crud;
 import com.sonicle.commons.web.ServletUtils;
 import com.sonicle.commons.web.ServletUtils.IntegerArray;
 import com.sonicle.commons.web.ServletUtils.StringArray;
-import static com.sonicle.commons.web.ServletUtils.getIPFromHeader;
 import com.sonicle.commons.web.json.JsonResult;
 import com.sonicle.commons.web.json.MapItem;
 import com.sonicle.commons.web.json.Payload;
@@ -75,6 +74,8 @@ import com.sonicle.webtop.drm.bol.ODrmLineManager;
 import com.sonicle.webtop.drm.bol.ODrmProfile;
 import com.sonicle.webtop.drm.bol.OEmployeeProfile;
 import com.sonicle.webtop.drm.bol.OHourProfile;
+import com.sonicle.webtop.drm.bol.OLeaveRequest;
+import com.sonicle.webtop.drm.bol.OLeaveRequestType;
 import com.sonicle.webtop.drm.bol.OTimetableStamp;
 import com.sonicle.webtop.drm.bol.OWorkReport;
 import com.sonicle.webtop.drm.bol.OWorkType;
@@ -90,11 +91,13 @@ import com.sonicle.webtop.drm.bol.js.JsEmployeeProfile;
 import com.sonicle.webtop.drm.bol.js.JsGridEmployeeProfile;
 import com.sonicle.webtop.drm.bol.js.JsGridFolders;
 import com.sonicle.webtop.drm.bol.js.JsGridHourProfile;
+import com.sonicle.webtop.drm.bol.js.JsGridLeaveRequest;
 import com.sonicle.webtop.drm.bol.js.JsGridLineManager;
 import com.sonicle.webtop.drm.bol.js.JsGridProfiles;
 import com.sonicle.webtop.drm.bol.js.JsGridTimetableStamp;
 import com.sonicle.webtop.drm.bol.js.JsGridWorkReports;
 import com.sonicle.webtop.drm.bol.js.JsHourProfile;
+import com.sonicle.webtop.drm.bol.js.JsLeaveRequest;
 import com.sonicle.webtop.drm.bol.js.JsTimetableSetting;
 import com.sonicle.webtop.drm.bol.js.JsWorkReport;
 import com.sonicle.webtop.drm.bol.js.JsWorkReportSetting;
@@ -110,6 +113,8 @@ import com.sonicle.webtop.drm.model.EmployeeProfile;
 import com.sonicle.webtop.drm.model.FileContent;
 import com.sonicle.webtop.drm.model.GroupCategory;
 import com.sonicle.webtop.drm.model.HourProfile;
+import com.sonicle.webtop.drm.model.LeaveRequest;
+import com.sonicle.webtop.drm.model.LeaveRequestDocument;
 import com.sonicle.webtop.drm.model.TimetableSetting;
 import com.sonicle.webtop.drm.model.TimetableStamp;
 import com.sonicle.webtop.drm.model.WorkReport;
@@ -162,6 +167,7 @@ public class Service extends BaseService {
 		ss = new DrmServiceSettings(SERVICE_ID, pid.getDomainId());
 
 		RootProgramNode prog = null;
+		ProgramNode subProg = null;
 
 		prog = new RootProgramNode(DrmTreeNode.WORK_REPORT, "wtdrm-icon-workreport-xs");
 		programs.put(prog.getId(), prog);
@@ -170,7 +176,10 @@ public class Service extends BaseService {
 		programs.put(prog.getId(), prog);
 
 		prog = new RootProgramNode(DrmTreeNode.TIMETABLE, "wtdrm-icon-timetable-xs");
-		programs.put(prog.getId(), prog);
+		prog.addSubPrograms(DrmTreeNode.TIMETABLE_STAMP, "wtdrm-icon-timetable1-xs");
+		prog.addSubPrograms(DrmTreeNode.TIMETABLE_REQUEST, "wtdrm-icon-timetable2-xs");
+		prog.addSubPrograms(DrmTreeNode.TIMETABLE_REPORT, "wtdrm-icon-timetable3-xs");
+		programs.put(prog.getId(), prog);		
 
 		groupCategories.put(EnumUtils.toSerializedName(GroupCategory.IDENTITY), lookupResource("groupCategory.I"));
 		groupCategories.put(EnumUtils.toSerializedName(GroupCategory.STRUCTURE), lookupResource("groupCategory.S"));
@@ -394,6 +403,56 @@ public class Service extends BaseService {
 			ResultMeta meta = new LookupMeta().setSelected(selected);
 
 			new JsonResult(docStatuses, meta, docStatuses.size()).printTo(out);
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
+		}
+	}
+	
+	public void processLookupManagers(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String operator = ServletUtils.getStringParameter(request, "operator", null);
+			List<JsSimple> managers = new ArrayList();
+			
+			if(operator != null){
+				DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID, new UserProfileId(getEnv().getProfileId().getDomain(), operator));
+
+				for (String u : manager.listManagersByDomainUser(operator)) {
+					managers.add(new JsSimple(WT.getCoreManager().getUser(new UserProfileId(getEnv().getProfileId().getDomain(), u)).getUserId(), WT.getCoreManager().getUser(new UserProfileId(getEnv().getProfileId().getDomain(), u)).getDisplayName()));
+				}
+			}
+			String selected = managers.isEmpty() ? null : (String) managers.get(0).id;
+			ResultMeta meta = new LookupMeta().setSelected(selected);
+				
+			new JsonResult(managers, meta, managers.size()).printTo(out);
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
+			new JsonResult(ex).printTo(out);
+		}
+	}
+	
+	private JsSimple createLeaveRequestJsSimple(OLeaveRequestType rs){
+		String id = EnumUtils.toSerializedName(rs);
+		
+		return new JsSimple(id, lookupResource("leaveRequestType." + id));
+	}
+	
+	public void processLookupLeaveRequestType(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			TimetableSetting ts = manager.getTimetableSetting();
+			
+			List<JsSimple> types = new ArrayList();
+			
+			types.add(createLeaveRequestJsSimple(OLeaveRequestType.HOLIDAY));
+			types.add(createLeaveRequestJsSimple(OLeaveRequestType.PAID_LEAVE));
+			types.add(createLeaveRequestJsSimple(OLeaveRequestType.OVERTIME));
+			if(ts.getRequestsPermitsNotRemunered())types.add(createLeaveRequestJsSimple(OLeaveRequestType.UNPAID_LEAVE));
+			if(ts.getRequestsPermitsMedicalVisits())types.add(createLeaveRequestJsSimple(OLeaveRequestType.MEDICAL_VISIT));
+			if(ts.getRequestsPermitsContractuals())types.add(createLeaveRequestJsSimple(OLeaveRequestType.CONTRACTUAL));
+			
+			String selected = types.isEmpty() ? null : (String) types.get(0).id;
+			ResultMeta meta = new LookupMeta().setSelected(selected);
+
+			new JsonResult(types, meta, types.size()).printTo(out);
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
 		}
@@ -1158,6 +1217,73 @@ public class Service extends BaseService {
 			logger.error("Error in action ManageWorkReport", ex);
 		}
 	}
+	
+	public void processManageLeaveRequest(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		JsLeaveRequest item = null;
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			HashMap<String, File> files = new HashMap<>();
+			if (crud.equals(Crud.READ)) {
+
+				Integer id = ServletUtils.getIntParameter(request, "id", true);
+
+				LeaveRequest lr = manager.getLeaveRequest(id);
+
+				item = new JsLeaveRequest(lr);
+
+				new JsonResult(item).printTo(out);
+
+			} else if (crud.equals(Crud.CREATE)) {
+
+				Payload<MapItem, JsLeaveRequest> pl = ServletUtils.getPayload(request, JsLeaveRequest.class);
+
+				LeaveRequest lr = JsLeaveRequest.createLeaveRequest(pl.data);
+
+				for (LeaveRequestDocument doc : lr.getDocuments()) {
+
+					WebTopSession.UploadedFile uf = getUploadedFile(doc.getLeaveRequestDocumentId().toString());
+
+					if (uf != null) {
+						files.put(uf.getUploadId(), uf.getFile());
+					}
+				}
+
+				manager.addLeaveRequest(lr, files);
+
+				new JsonResult().printTo(out);
+
+			} else if (crud.equals(Crud.UPDATE)) {
+
+				Payload<MapItem, JsLeaveRequest> pl = ServletUtils.getPayload(request, JsLeaveRequest.class);
+
+				LeaveRequest lr = JsLeaveRequest.createLeaveRequest(pl.data);
+
+				for (LeaveRequestDocument doc : lr.getDocuments()) {
+
+					WebTopSession.UploadedFile uf = getUploadedFile(doc.getLeaveRequestDocumentId().toString());
+
+					if (uf != null) {
+						files.put(uf.getUploadId(), uf.getFile());
+					}
+				}
+
+				manager.updateLeaveRequest(lr, files);
+
+				new JsonResult().printTo(out);
+
+			} else if (crud.equals(Crud.DELETE)) {
+
+				IntegerArray ids = ServletUtils.getObjectParameter(request, "leaveRequestIds", IntegerArray.class, true);
+
+				manager.deleteLeaveRequest(ids.get(0));
+
+				new JsonResult().printTo(out);
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageLeaveRequest", ex);
+		}
+	}
 
 	public void processDownloadWorkReportAttachment(HttpServletRequest request, HttpServletResponse response) {
 
@@ -1177,6 +1303,46 @@ public class Service extends BaseService {
 					fc = toFileContent(getUploadedFile(fileId));
 				} else {
 					fc = manager.getWorkReportAttachmentContent(fileId);
+				}
+
+				is = fc.getStream();
+
+				OutputStream os = response.getOutputStream();
+				ServletUtils.setContentLengthHeader(response, fc.getSize());
+				if (raw == 1) {
+					ServletUtils.setFileStreamHeadersForceDownload(response, fc.getFilename());
+				} else {
+					ServletUtils.setFileStreamHeaders(response, fc.getMediaType(), fc.getFilename());
+				}
+				IOUtils.copy(is, os);
+
+			} finally {
+				IOUtils.closeQuietly(is);
+			}
+
+		} catch (Exception ex) {
+			logger.error("Error in action DownloadFiles", ex);
+			ServletUtils.writeErrorHandlingJs(response, ex.getMessage());
+		}
+	}
+	
+	public void processDownloadTimetableRequestDocument(HttpServletRequest request, HttpServletResponse response) {
+
+		try {
+			StringArray documentIds = ServletUtils.getObjectParameter(request, "documentIds", StringArray.class, true);
+
+			Integer raw = ServletUtils.getIntParameter(request, "raw", 0);
+
+			String fileId = documentIds.get(0);
+
+			InputStream is = null;
+			FileContent fc = null;
+			try {
+
+				if (hasUploadedFile(fileId)) {
+					fc = toFileContent(getUploadedFile(fileId));
+				} else {
+					fc = manager.getLeaveRequesDocumentContent(fileId);
 				}
 
 				is = fc.getStream();
@@ -1440,6 +1606,55 @@ public class Service extends BaseService {
 				new JsonResult(jsGridTS).printTo(out);
 
 			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageGridTimetable", ex);
+		}
+	}
+	
+	public void processManageGridTimetableRequest(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			if (crud.equals(Crud.READ)) {
+
+				String query = ServletUtils.getStringParameter(request, "query", null);
+				LeaveRequestQuery lrQuery = LeaveRequestQuery.fromJson(query);
+				List<JsGridLeaveRequest> jsGridLR = new ArrayList();
+
+				for (OLeaveRequest oLR : manager.listLeaveRequest(lrQuery)) {
+
+					jsGridLR.add(new JsGridLeaveRequest(oLR));
+				}
+
+				new JsonResult(jsGridLR).printTo(out);
+
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageGridTimetable", ex);
+		}
+	}
+	
+	public void processIsTimetableRequestPreviousDate(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try{
+			TimetableSetting ts = manager.getTimetableSetting();
+			
+			Boolean isPreviousDate = ts.getRequestsHolidaysPermitsPreviousDates();
+
+			new JsonResult(isPreviousDate).printTo(out);
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageGridTimetable", ex);
+		}
+	}
+	
+	public void processIsLineManagerLogged(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try{
+			DrmLineManager lm = manager.getDrmLineManager(getEnv().getProfileId().getUserId());
+			
+			Boolean isLineManagerLogged = (lm != null) ? true : false;
+
+			new JsonResult(isLineManagerLogged).printTo(out);
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action ManageGridTimetable", ex);

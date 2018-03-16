@@ -65,6 +65,9 @@ import com.sonicle.webtop.drm.bol.OLineHour;
 import com.sonicle.webtop.drm.bol.OEmployeeProfile;
 import com.sonicle.webtop.drm.bol.OHolidayDate;
 import com.sonicle.webtop.drm.bol.OHourProfile;
+import com.sonicle.webtop.drm.bol.OLeaveRequest;
+import com.sonicle.webtop.drm.bol.OLeaveRequestDocument;
+import com.sonicle.webtop.drm.bol.OLeaveRequestType;
 import com.sonicle.webtop.drm.bol.OProfileMasterdata;
 import com.sonicle.webtop.drm.bol.OProfileSupervisedUser;
 import com.sonicle.webtop.drm.bol.OProfileMember;
@@ -93,6 +96,8 @@ import com.sonicle.webtop.drm.dal.LineHourDAO;
 import com.sonicle.webtop.drm.dal.EmployeeProfileDAO;
 import com.sonicle.webtop.drm.dal.HolidayDateDAO;
 import com.sonicle.webtop.drm.dal.HourProfileDAO;
+import com.sonicle.webtop.drm.dal.LeaveRequestDAO;
+import com.sonicle.webtop.drm.dal.LeaveRequestDocumentDAO;
 import com.sonicle.webtop.drm.dal.ProfileMasterdataDAO;
 import com.sonicle.webtop.drm.dal.ProfileSupervisedUserDAO;
 import com.sonicle.webtop.drm.dal.ProfileMemberDAO;
@@ -120,6 +125,8 @@ import com.sonicle.webtop.drm.model.EmployeeProfile;
 import com.sonicle.webtop.drm.model.FileContent;
 import com.sonicle.webtop.drm.model.HolidayDate;
 import com.sonicle.webtop.drm.model.HourProfile;
+import com.sonicle.webtop.drm.model.LeaveRequest;
+import com.sonicle.webtop.drm.model.LeaveRequestDocument;
 import com.sonicle.webtop.drm.model.ProfileMasterdata;
 import com.sonicle.webtop.drm.model.ProfileSupervisedUser;
 import com.sonicle.webtop.drm.model.ProfileMember;
@@ -2423,6 +2430,342 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
+	public List<OLeaveRequest> listLeaveRequest(LeaveRequestQuery query) throws WTException {
+		Connection con = null;
+		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
+		DrmLineManagerDAO lmDao = DrmLineManagerDAO.getInstance();
+		ODrmLineManager oLm = null;
+		List<OLeaveRequest> lrs = null;
+		
+		try {
+			con = WT.getConnection(SERVICE_ID);
+			
+			oLm = lmDao.selectLineManagerByDomainUserId(con, getTargetProfileId().getDomainId(), query.userId);
+			lrs = lrDao.selectLeaveRequests(con, query, getTargetProfileId().getDomainId(), (oLm != null) ? true : false);
+
+			return lrs;
+			
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public LeaveRequest getLeaveRequest(Integer leaveRequestId) throws WTException {
+		Connection con = null;
+		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
+		LeaveRequestDocumentDAO docDao = LeaveRequestDocumentDAO.getInstance();
+		LeaveRequest lr = null;
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			lr = createLeaveRequest(lrDao.selectById(con, leaveRequestId));
+
+			for (OLeaveRequestDocument oDoc : docDao.selectByLeaveRequest(con, leaveRequestId)) {
+				lr.getDocuments().add(createLeaveRequestDocument(oDoc));
+			}
+
+			return lr;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public OLeaveRequest addLeaveRequest(LeaveRequest lv, HashMap<String, File> files) throws WTException {
+
+		Connection con = null;
+
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			DateTime employeeReqTimestamp = createRevisionTimestamp();
+
+			LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
+			LeaveRequestDocumentDAO docDao = LeaveRequestDocumentDAO.getInstance();
+
+			OLeaveRequest newLr = createOLeaveRequest(lv);
+			newLr.setLeaveRequestId(lrDao.getLeaveRequestSequence(con).intValue());
+			newLr.setDomainId(getTargetProfileId().getDomainId());
+			newLr.setEmployeeReqTimestamp(employeeReqTimestamp);
+			newLr.setStatus("O");
+			newLr.setEmployeeCancReq(false);
+
+			for (LeaveRequestDocument doc : lv.getDocuments()) {
+				OLeaveRequestDocument oDoc = createOLeaveRequestDocument(doc);
+				oDoc.setLeaveRequestId(newLr.getLeaveRequestId());
+				oDoc.setRevisionTimestamp(employeeReqTimestamp);
+				oDoc.setRevisionSequence((short) 1);
+
+				docDao.insert(con, oDoc);
+			}
+
+			lrDao.insert(con, newLr, employeeReqTimestamp);
+
+			File destDir = new File(getLeaveRequestPath(newLr.getLeaveRequestId()));
+			if (!destDir.exists()) {
+				destDir.mkdir();
+			}
+			
+			for (LeaveRequestDocument doc : lv.getDocuments()) {
+
+				File file = files.get(doc.getLeaveRequestDocumentId());
+				String fileName = PathUtils.addFileExension(file.getName(), FilenameUtils.getExtension(doc.getFileName()));
+				File destFile = new File(destDir, fileName);
+
+				FileUtils.copyFile(file, destFile);
+			}
+
+			DbUtils.commitQuietly(con);
+
+			return newLr;
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public OLeaveRequest updateLeaveRequest(LeaveRequest item, HashMap<String, File> files) throws WTException {
+
+		Connection con = null;
+		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
+		LeaveRequestDocumentDAO docDao = LeaveRequestDocumentDAO.getInstance();
+		
+		try {
+			DateTime revisionTimestamp = createRevisionTimestamp();
+
+			LeaveRequest oldLr = getLeaveRequest(item.getLeaveRequestId());
+
+			con = WT.getConnection(SERVICE_ID, false);
+
+			OLeaveRequest lr = createOLeaveRequest(item);
+			lr.setEmployeeReqTimestamp(revisionTimestamp);
+			if(lr.getEmployeeCancReq()) lr.setEmployeeCancReqTimestamp(revisionTimestamp);
+			if(lr.getResult() != null){
+				lr.setManagerRespTimestamp(revisionTimestamp);
+				lr.setStatus("C");
+			}
+			if(lr.getCancResult() != null){
+				lr.setManagerCancRespTimetamp(revisionTimestamp);
+				if(lr.getCancResult() == true){
+					lr.setStatus("D");
+				}
+			}
+
+			lrDao.update(con, lr);
+
+			LangUtils.CollectionChangeSet<LeaveRequestDocument> changesSet2 = LangUtils.getCollectionChanges(oldLr.getDocuments(), item.getDocuments());
+
+			File destDir = new File(getLeaveRequestPath(item.getLeaveRequestId()));
+			if (!destDir.exists()) {
+				destDir.mkdirs();
+			}
+
+			for (LeaveRequestDocument lrDoc : changesSet2.inserted) {
+
+				OLeaveRequestDocument oLrDoc = createOLeaveRequestDocument(lrDoc);
+
+				oLrDoc.setLeaveRequestId(item.getLeaveRequestId());
+				oLrDoc.setRevisionTimestamp(revisionTimestamp);
+				oLrDoc.setRevisionSequence((short) 1);
+
+				docDao.insert(con, oLrDoc);
+
+				File file = files.get(lrDoc.getLeaveRequestDocumentId());
+				String fileName = PathUtils.addFileExension(file.getName(), FilenameUtils.getExtension(lrDoc.getFileName()));
+				File destFile = new File(destDir, fileName);
+
+				FileUtils.copyFile(file, destFile);
+			}
+
+			for (LeaveRequestDocument lrDoc : changesSet2.deleted) {
+
+				String fileName = PathUtils.addFileExension(lrDoc.getLeaveRequestDocumentId().toString(), FilenameUtils.getExtension(lrDoc.getFileName()));
+				File file = new File(destDir, fileName);
+
+				FileUtils.deleteQuietly(file);
+				docDao.deleteById(con, lrDoc.getLeaveRequestDocumentId());
+			}
+
+			DbUtils.commitQuietly(con);
+
+			return lr;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} catch (IOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public void deleteLeaveRequest(Integer leaveRequestId) throws WTException {
+
+		Connection con = null;
+		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
+		LeaveRequestDocumentDAO docDao = LeaveRequestDocumentDAO.getInstance();
+		
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			lrDao.deleteById(con, leaveRequestId);
+
+			docDao.deleteByLeaveRequest(con, leaveRequestId);
+			
+			DbUtils.commitQuietly(con);
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	private LeaveRequest createLeaveRequest(OLeaveRequest oLr) {
+		if (oLr == null) {
+			return null;
+		}
+		LeaveRequest lr = new LeaveRequest();
+		lr.setLeaveRequestId(oLr.getLeaveRequestId());
+		lr.setDomainId(oLr.getDomainId());
+		lr.setCompanyId(oLr.getCompanyId());
+		lr.setUserId(oLr.getUserId());
+		lr.setManagerId(oLr.getManagerId());
+		lr.setType(oLr.getType());
+		lr.setFromDate(oLr.getFromDate());
+		lr.setToDate(oLr.getToDate());
+		lr.setFromHour(oLr.getFromHour());
+		lr.setToHour(oLr.getToHour());
+		lr.setStatus(oLr.getStatus());
+		lr.setNotes(oLr.getNotes());
+		lr.setCancRequest(oLr.getEmployeeCancReq());
+		lr.setResult(oLr.getResult());
+		lr.setCancReason(oLr.getCancReason());
+		lr.setCancResult(oLr.getCancResult());
+
+		return lr;
+	}
+
+	private OLeaveRequest createOLeaveRequest(LeaveRequest lr) {
+		if (lr == null) {
+			return null;
+		}
+		OLeaveRequest oLr = new OLeaveRequest();
+		oLr.setLeaveRequestId(lr.getLeaveRequestId());
+		oLr.setDomainId(lr.getDomainId());
+		oLr.setCompanyId(lr.getCompanyId());
+		oLr.setUserId(lr.getUserId());
+		oLr.setManagerId(lr.getManagerId());
+		oLr.setType(lr.getType());
+		oLr.setFromDate(lr.getFromDate());
+		oLr.setToDate(lr.getToDate());
+		oLr.setFromHour(lr.getFromHour());
+		oLr.setToHour(lr.getToHour());
+		oLr.setStatus(lr.getStatus());
+		oLr.setNotes(lr.getNotes());
+		oLr.setResult(lr.getResult());
+		oLr.setEmployeeCancReq(lr.getCancRequest());
+		oLr.setCancReason(lr.getCancReason());
+		oLr.setCancResult(lr.getCancResult());
+
+		return oLr;
+	}
+
+	private OLeaveRequestDocument createOLeaveRequestDocument(LeaveRequestDocument doc) {
+
+		if (doc == null) {
+			return null;
+		}
+
+		OLeaveRequestDocument oDoc = new OLeaveRequestDocument();
+		oDoc.setLeaveRequestDocumentId(doc.getLeaveRequestDocumentId());
+		oDoc.setLeaveRequestId(doc.getLeaveRequestId());
+		oDoc.setFilename(doc.getFileName());
+		oDoc.setSize(doc.getSize());
+		oDoc.setMediaTpye(doc.getMediaType());
+
+		return oDoc;
+	}
+
+	private LeaveRequestDocument createLeaveRequestDocument(OLeaveRequestDocument oDoc) {
+
+		if (oDoc == null) {
+			return null;
+		}
+
+		LeaveRequestDocument doc = new LeaveRequestDocument();
+		doc.setLeaveRequestDocumentId(oDoc.getLeaveRequestDocumentId());
+		doc.setLeaveRequestId(oDoc.getLeaveRequestId());
+		doc.setFileName(oDoc.getFilename());
+		doc.setSize(oDoc.getSize());
+		doc.setMediaType(oDoc.getMediaTpye());
+
+		return doc;
+	}
+
+	public String getLeaveRequestPath(Integer leaveRequestId) {
+
+		return PathUtils.concatPathParts(WT.getServiceHomePath(getTargetProfileId().getDomainId(), SERVICE_ID),
+				"LeaveRequest", leaveRequestId.toString());
+
+	}
+
+	public LeaveRequestDocument getLeaveRequesDocument(String leaveRequestDocumentId) throws WTException {
+		Connection con = null;
+		LeaveRequestDocumentDAO docDao = LeaveRequestDocumentDAO.getInstance();
+		LeaveRequestDocument doc = null;
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			doc = createLeaveRequestDocument(docDao.select(con, leaveRequestDocumentId));
+
+			return doc;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public FileContent getLeaveRequesDocumentContent(String leaveRequestDocumentId) throws WTException {
+
+		LeaveRequestDocument doc = getLeaveRequesDocument(leaveRequestDocumentId);
+
+		if (doc == null) {
+			return null;
+		}
+
+		File file = new File(getLeaveRequestPath(doc.getLeaveRequestId()),
+				PathUtils.addFileExension(doc.getLeaveRequestDocumentId().toString(),
+						PathUtils.getFileExtension(doc.getFileName())));
+
+		if (!file.canRead() || !file.exists()) {
+			throw new WTException("File not exists or not readable [{0}]", file.getAbsolutePath());
+		}
+		try {
+			return new FileContent(doc.getFileName(), file.length(), doc.getMediaType(), new FileInputStream(file));
+		} catch (FileNotFoundException ex) {
+			throw new WTException("File not found", ex);
+		}
+	}
+	
 	public TimetableSetting getTimetableSetting() throws WTException {
 		Connection con = null;
 		TimetableSettingDAO tSettDao = TimetableSettingDAO.getInstance();
@@ -2465,6 +2808,9 @@ public class DrmManager extends BaseManager {
 		oSetting.setMinimumExtraordinary(tSetting.getMinimumExtraordinary());
 		oSetting.setBreakAnomaly(tSetting.getBreakAnomaly());
 		oSetting.setReadOnlyEvents(tSetting.getReadOnlyEvents());
+		oSetting.setRequestsPermitsNotRemunered(tSetting.getRequestsPermitsNotRemunered());
+		oSetting.setRequestsPermitsMedicalVisits(tSetting.getRequestsPermitsMedicalVisits());
+		oSetting.setRequestsPermitsContractuals(tSetting.getRequestsPermitsContractuals());
 
 		return oSetting;
 	}
@@ -2485,6 +2831,9 @@ public class DrmManager extends BaseManager {
 		tSetting.setMinimumExtraordinary(oTSetting.getMinimumExtraordinary());
 		tSetting.setBreakAnomaly(oTSetting.getBreakAnomaly());
 		tSetting.setReadOnlyEvents(oTSetting.getReadOnlyEvents());
+		tSetting.setRequestsPermitsNotRemunered(oTSetting.getRequestsPermitsNotRemunered());
+		tSetting.setRequestsPermitsMedicalVisits(oTSetting.getRequestsPermitsMedicalVisits());
+		tSetting.setRequestsPermitsContractuals(oTSetting.getRequestsPermitsContractuals());
 
 		return tSetting;
 	}
@@ -2876,6 +3225,23 @@ public class DrmManager extends BaseManager {
 			users.add(0, getTargetProfileId().getUserId());
 			
 			return users;
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	List<String> listManagersByDomainUser(String userId) throws WTException {
+		Connection con = null;
+		DrmUserForManagerDAO lmDao = DrmUserForManagerDAO.getInstance();
+		List<String> managers = null;
+		
+		try {			
+			con = WT.getConnection(SERVICE_ID);
+			managers = lmDao.selectManagerByDomainUserId(con, getTargetProfileId().getDomainId(), userId);
+			
+			return managers;
 		} catch (SQLException | DAOException ex) {
 			throw new WTException(ex, "DB error");
 		} finally {

@@ -537,127 +537,6 @@ DROP COLUMN "logo_upload_id";
 -- 14/12/2017
 -- ----------------------------
 
-CREATE TABLE "drm"."expense_notes" (
-"expense_note_id" numeric(38) NOT NULL,
-"currency" varchar(10) NOT NULL,
-"amountkm" numeric NOT NULL,
-"subtotal" numeric,
-"advance" numeric,
-"total" numeric,
-"operator_id" varchar(100),
-"status" varchar(38),
-"domain_id" varchar(20),
-"sign" varchar(5),
-"from_date" timestamp(6),
-"to_date" timestamp(6),
-"company_id" numeric(38) DEFAULT 1,
-"description" varchar(150),
-"statusd" varchar(3)
-);
-
-CREATE TABLE "drm"."expense_note_documents" (
-"expense_note_document_id" numeric(38) NOT NULL,
-"file" oid,
-"filename" varchar(1024),
-"expense_note_id" numeric(38),
-"revision" timestamp(6) NOT NULL,
-"operator_id_lock_file" varchar(100)
-);
-
-CREATE TABLE "drm"."expense_note_document_links" (
-"expense_note_id" numeric(38) NOT NULL,
-"expense_note_document_id" numeric(38) NOT NULL,
-"operator_id" varchar(100),
-"domain_id" varchar(20)
-);
-
-CREATE TABLE "drm"."expense_note_costs" (
-"type_id" numeric(38) NOT NULL,
-"description" varchar(30),
-"max_import" varchar(15),
-"type_cost" numeric(38),
-"type_cost_present" varchar(5),
-"type_cost_km" varchar(5),
-"domain_id" varchar(30),
-"consumption" varchar(5),
-"type_cost_advance" varchar(5) DEFAULT 'false'::character varying,
-"type_cost_unlock_change" varchar(5) DEFAULT 'false'::character varying,
-"type_cost_person" varchar(5) DEFAULT 'false'::character varying
-);
-
-CREATE TABLE "drm"."expense_note_cost_types" (
-"cost_type_id" numeric(38) NOT NULL,
-"description" varchar(30),
-"domain_id" varchar(30)
-);
-
-CREATE TABLE "drm"."expense_note_rows" (
-"expense_note_row_id" numeric(38) NOT NULL,
-"expense_note_id" numeric(38),
-"revision" timestamp(6),
-"description" varchar(150),
-"km" numeric,
-"stay" numeric,
-"highway" numeric,
-"park" numeric,
-"meals" numeric,
-"amount_km" numeric,
-"other" numeric,
-"total" numeric,
-"date" timestamp(6),
-"operator_id" varchar(100),
-"domain_id" varchar(20),
-"customer_id" varchar(36),
-"payment_company" varchar(5),
-"invoice" varchar(5),
-"invoice_number" varchar(20),
-"point_of_sale" varchar(15)
-);
-
-CREATE TABLE "drm"."expense_note_row_details" (
-"expense_note_row_detail_id" numeric(38) NOT NULL,
-"expense_note_id" numeric(38),
-"revision" timestamp(6),
-"type_id" numeric(38),
-"total" numeric,
-"date" timestamp(6),
-"operator_id" varchar(100),
-"domain_id" varchar(20),
-"payment_company" varchar(5),
-"invoice" varchar(5),
-"invoice_number" varchar(20),
-"present" varchar(300),
-"customer_id" varchar(36),
-"point_of_sale" varchar(15),
-"km" numeric,
-"total_doc" numeric,
-"consumptive" varchar(5),
-"currency" varchar(10),
-"change" varchar(10),
-"currency_cost_doc" varchar(10) DEFAULT 'EUR'::character varying,
-"description" varchar(150)
-);
-
-CREATE TABLE "drm"."expense_note_row_documents" (
-"expense_note_row_document_id" numeric(38) NOT NULL,
-"expense_note_row_detail_id" numeric(38) NOT NULL,
-"revision" timestamp(6) NOT NULL,
-"file" oid,
-"filename" varchar(60),
-"expense_note_id" numeric(38),
-"operator_id" varchar(100),
-"domain_id" varchar(20),
-"operator_id_lock_file" varchar(100)
-);
-
-CREATE TABLE "drm"."expense_note_row_document_links" (
-"expense_note_row_detail_id" numeric(38) NOT NULL,
-"expense_note_id" numeric(38),
-"expense_note_row_document_id" numeric(38) NOT NULL,
-"operator_id" varchar(100),
-"domain_id" varchar(20)
-);
-
 CREATE TABLE "drm"."expense_note_settings" (
 "integrate_tracking" varchar(5),
 "integrate_mail" varchar(5),
@@ -666,108 +545,6 @@ CREATE TABLE "drm"."expense_note_settings" (
 "operator_id" varchar(100),
 "integrate_calendar" varchar(5)
 );
-
-
-ALTER TABLE "drm"."expense_notes" ADD PRIMARY KEY ("expense_note_id");
-ALTER TABLE "drm"."expense_note_documents" ADD PRIMARY KEY ("expense_note_document_id");
-ALTER TABLE "drm"."expense_note_costs" ADD PRIMARY KEY ("type_id");
-ALTER TABLE "drm"."expense_note_cost_types" ADD PRIMARY KEY ("cost_type_id");
-ALTER TABLE "drm"."expense_note_rows" ADD PRIMARY KEY ("expense_note_row_id");
-ALTER TABLE "drm"."expense_note_row_details" ADD PRIMARY KEY ("expense_note_row_detail_id");
-ALTER TABLE "drm"."expense_note_row_documents" ADD PRIMARY KEY ("expense_note_row_document_id");
-
-CREATE SEQUENCE "drm"."seq_expense_note_documents";
-CREATE SEQUENCE "drm"."seq_expense_notes";
-CREATE SEQUENCE "drm"."seq_expense_note_costs";
-CREATE SEQUENCE "drm"."seq_expense_note_rows";
-CREATE SEQUENCE "drm"."seq_expense_note_row_details";
-CREATE SEQUENCE "drm"."seq_expense_note_row_documents";
-
-
-CREATE TABLE "drm"."timetable_attendancesheet" (
-"operator_id" varchar(15) DEFAULT 0 NOT NULL,
-"group_id" int2 DEFAULT 0 NOT NULL,
-"day" varchar(10) NOT NULL,
-"h_work" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_permits" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_extra_1" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_extra_2" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_extra_3" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_holidays" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_disease" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_total" numeric(15,2) DEFAULT 0 NOT NULL,
-"no_load" int2 DEFAULT 0 NOT NULL,
-"h_reports" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_work_tot" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_work_h" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_work_min" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_permits_tot" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_permits_h" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_permits_min" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_extra_1_tot" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_extra_2_tot" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_extra_2_h" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_extra_2_min" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_extra_3_tot" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_extra_3_h" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_extra_3_min" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_holidays_tot" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_holidays_h" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_holidays_min" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_disease_tot" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_disease_h" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_disease_min" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_total_tot" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_total_h" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_total_min" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_reports_tot" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_reports_h" numeric(15,2) DEFAULT 0 NOT NULL,
-"h_reports_min" numeric(15,2) DEFAULT 0 NOT NULL,
-"username" varchar(50) NOT NULL
-);
-
-CREATE TABLE "drm"."timetable_movements" (
-"movement_id" int4 DEFAULT nextval('timetable_movements_movement_id_seq'::regclass) NOT NULL,
-"type_movement" varchar(2) NOT NULL,
-"operator_id" varchar(15) NOT NULL,
-"date_from" timestamp(6) NOT NULL,
-"date_to" timestamp(6) NOT NULL,
-"duration" time(6) NOT NULL,
-"description" varchar(1024),
-"reference" varchar(100),
-"state" varchar(30),
-"category" varchar(30),
-"n_report" varchar(100),
-"username" varchar(50) NOT NULL
-);
-
-CREATE TABLE "drm"."timetable_requests_holiday" (
-"holiday_id" numeric(38) NOT NULL,
-"login" varchar(100),
-"domain_id" varchar(20),
-"type" varchar(5),
-"responsible" varchar(100),
-"email_responsible" varchar(80),
-"date_from" timestamp(6),
-"date_to" timestamp(6),
-"h_from" varchar(5),
-"h_to" varchar(5),
-"status" varchar(5),
-"approved" varchar(5),
-"date_request" timestamp(6),
-"request_cancel" varchar(5),
-"event_id" numeric(38),
-"note" varchar(1500)
-);
-
-ALTER TABLE "drm"."timetable_attendancesheet" ADD PRIMARY KEY ("operator_id", "day");
-
-ALTER TABLE "drm"."timetable_movements" ADD PRIMARY KEY ("movement_id");
-
-ALTER TABLE "drm"."timetable_requests_holiday" ADD PRIMARY KEY ("holiday_id");
-
-CREATE SEQUENCE "drm"."seq_timetable_movements";
-CREATE SEQUENCE "drm"."seq_timetable_requests_holiday";
 
 CREATE TABLE "drm"."line_managers" (
 "domain_id" varchar(20) NOT NULL,
@@ -872,3 +649,62 @@ CREATE SEQUENCE "drm"."seq_hour_profiles";
 CREATE SEQUENCE "drm"."seq_line_hours";
 
 DROP SEQUENCE "drm"."seq_employee_hours";
+
+
+--------------
+--05/03/2018--
+--------------
+
+CREATE TABLE "drm"."leave_requests" (
+"leave_request_id" int4 NOT NULL,
+"domain_id" varchar(20) NOT NULL,
+"company_id" int4 NOT NULL,
+"user_id" varchar(36) NOT NULL,
+"manager_id" varchar(36) NOT NULL,
+"type" varchar(1) NOT NULL,
+"from_date" date NOT NULL,
+"to_date" date NOT NULL,
+"from_hour" varchar(5),
+"to_hour" varchar(5),
+"status" varchar(1) NOT NULL,
+"notes" text,
+"employee_req_timestamp" timestamptz(6) NOT NULL,
+"manager_resp_timestamp" timestamptz(6),
+"result" bool,
+"employee_canc_req" bool,
+"employee_canc_req_timestamp" timestamptz(6),
+"manager_canc_resp_timetamp" timestamptz(6),
+"canc_reason" text,
+"canc_result" bool,
+PRIMARY KEY ("leave_request_id")
+);
+
+CREATE SEQUENCE "drm"."seq_leave_requests";
+
+ALTER TABLE "drm"."timetable_settings"
+ADD COLUMN "requests_permits_not_remunered" bool,
+ADD COLUMN "requests_permits_medical_visits" bool,
+ADD COLUMN "requests_permits_contractuals" bool;
+
+CREATE TABLE "drm"."leave_request_documents" (
+"leave_request_document_id" varchar(36) NOT NULL,
+"leave_request_id" int4 NOT NULL,
+"revision_timestamp" timestamptz(6) NOT NULL,
+"revision_sequence" int2 NOT NULL,
+"filename" varchar(255) NOT NULL,
+"size" int4 NOT NULL,
+"media_tpye" varchar(100) NOT NULL
+);
+
+ALTER TABLE "drm"."leave_request_documents" ADD PRIMARY KEY ("leave_request_document_id");
+
+CREATE SEQUENCE "drm"."seq_leave_request_documents";
+
+DROP TABLE "drm"."expense_notes", "drm"."expense_note_documents", "drm"."expense_note_document_links", "drm"."expense_note_costs", "drm"."expense_note_cost_types", "drm"."expense_note_rows", "drm"."expense_note_row_details", "drm"."expense_note_row_documents", "drm"."expense_note_row_document_links";
+
+DROP SEQUENCE "drm"."seq_expense_note_documents";
+DROP SEQUENCE "drm"."seq_expense_notes";
+DROP SEQUENCE "drm"."seq_expense_note_costs";
+DROP SEQUENCE "drm"."seq_expense_note_rows";
+DROP SEQUENCE "drm"."seq_expense_note_row_details";
+DROP SEQUENCE "drm"."seq_expense_note_row_documents";

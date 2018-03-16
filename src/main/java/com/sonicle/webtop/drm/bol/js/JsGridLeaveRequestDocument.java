@@ -30,39 +30,38 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm;
+package com.sonicle.webtop.drm.bol.js;
 
+import com.sonicle.webtop.drm.model.LeaveRequestDocument;
 /**
  *
  * @author lssndrvs
  */
-public class DrmSettings {
-	//creo le constati che servono per le impostazioni sia per utente che per servizio
+public class JsGridLeaveRequestDocument {
 
-	/**
-	 * [system + domain] [boolean] Enable or Disable use Statistic Customer
-	 */
-	public static final String USE_STATISTIC_CUSTOMER = "customer.usestatistic";
+	public String id;
+	public Integer leaveRequestId;
+	public String fileName;
+	public Integer size;
+	public String mediaType;
 
-	public static final String PRINT_DAYS_TRANSFERT = "workreport.daystrasfert.print";
+	public JsGridLeaveRequestDocument(LeaveRequestDocument lrDoc) {
+		this.id = lrDoc.getLeaveRequestDocumentId();
+		this.leaveRequestId = lrDoc.getLeaveRequestId();
+		this.fileName = lrDoc.getFileName();
+		this.size = lrDoc.getSize();
+		this.mediaType = lrDoc.getMediaType();
+	}
 
-	public static final String PRINT_TRANSFERT_DESCRIPTION = "workreport.transfert.print.description";
+	public static LeaveRequestDocument createLeaveRequestDocument(JsGridLeaveRequestDocument js) {
 
-	public static final String PRINT_SIGNATURE = "workreport.print.signature";
+		LeaveRequestDocument lrDoc = new LeaveRequestDocument();
+		lrDoc.setLeaveRequestDocumentId(js.id);
+		lrDoc.setLeaveRequestId(js.leaveRequestId);
+		lrDoc.setFileName(js.fileName);
+		lrDoc.setSize(js.size);
+		lrDoc.setMediaType(js.mediaType);
 
-	public static final String ROUNDING_HOUR = "workreport.roundinghour";
-	
-	public static final String TRACKING = "workreport.tracking";
-	
-	public static final String MAIL_TRACKING = "workreport.tracking.mail";
-	
-	public static final String CLOUD_TRACKING = "workreport.tracking.cloud";
-	
-	public static final String DEFAULT_APPLY_SIGNATURE = "workreport.default.applysignature";
-	
-	public static final String DEFAULT_CHARGE_TO = "workreport.default.chargeto";
-	
-	public static final String DEFAULT_FREE_SUPPORT = "workreport.default.freesupport";
-	
-	public static final String DEFAULT_DOC_STATUS_ID = "workreport.default.docstatusid";
+		return lrDoc;
+	}
 }

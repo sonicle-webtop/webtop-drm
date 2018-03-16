@@ -12,6 +12,8 @@
 .wtdrm-icon-expensenote-xs { background-image: url('expense_note_16.png') !important; }
 .wtdrm-icon-timetable-xs { background-image: url('timetable_16.png') !important; }
 .wtdrm-icon-timetable1-xs { background-image: url('timetable1_16.png') !important; }
+.wtdrm-icon-timetable2-xs { background-image: url('timetable2_16.png') !important; }
+.wtdrm-icon-timetable3-xs { background-image: url('timetable3_16.png') !important; }
 
 .wtdrm-icon-configuration-xs { background-image: url('configuration_16.png') !important; }
 .wtdrm-icon-configuration-generalconfiguration-xs { background-image: url('general_configurations_16.png') !important; }
@@ -35,3 +37,7 @@
 
 .wtdrm-icon-mainstamp-m { background-image: url('mainstamp_32.png') !important; width: 32px !important; height: 32px !important; }
 .wtdrm-icon-companystamp-m { background-image: url('companystamp_32.png') !important; width: 32px !important; height: 32px !important; }
+
+.wtdrm-icon-approvedrequest-xs { background-image: url('approvedrequest_16.png') !important; }
+.wtdrm-icon-notapprovedrequest-xs { background-image: url('notapprovedrequest_16.png') !important; }
+.wtdrm-icon-sendedrequest-xs { background-image: url('sendedrequest_16.png') !important; }
