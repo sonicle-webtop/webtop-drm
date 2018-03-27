@@ -699,12 +699,3 @@ CREATE TABLE "drm"."leave_request_documents" (
 ALTER TABLE "drm"."leave_request_documents" ADD PRIMARY KEY ("leave_request_document_id");
 
 CREATE SEQUENCE "drm"."seq_leave_request_documents";
-
-DROP TABLE "drm"."expense_notes", "drm"."expense_note_documents", "drm"."expense_note_document_links", "drm"."expense_note_costs", "drm"."expense_note_cost_types", "drm"."expense_note_rows", "drm"."expense_note_row_details", "drm"."expense_note_row_documents", "drm"."expense_note_row_document_links";
-
-DROP SEQUENCE "drm"."seq_expense_note_documents";
-DROP SEQUENCE "drm"."seq_expense_notes";
-DROP SEQUENCE "drm"."seq_expense_note_costs";
-DROP SEQUENCE "drm"."seq_expense_note_rows";
-DROP SEQUENCE "drm"."seq_expense_note_row_details";
-DROP SEQUENCE "drm"."seq_expense_note_row_documents";
