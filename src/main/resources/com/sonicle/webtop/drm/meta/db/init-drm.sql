@@ -699,3 +699,75 @@ CREATE TABLE "drm"."leave_request_documents" (
 ALTER TABLE "drm"."leave_request_documents" ADD PRIMARY KEY ("leave_request_document_id");
 
 CREATE SEQUENCE "drm"."seq_leave_request_documents";
+
+DROP TABLE "drm"."expense_notes", "drm"."expense_note_documents", "drm"."expense_note_document_links", "drm"."expense_note_costs", "drm"."expense_note_cost_types", "drm"."expense_note_rows", "drm"."expense_note_row_details", "drm"."expense_note_row_documents", "drm"."expense_note_row_document_links";
+
+DROP SEQUENCE "drm"."seq_expense_note_documents";
+DROP SEQUENCE "drm"."seq_expense_notes";
+DROP SEQUENCE "drm"."seq_expense_note_costs";
+DROP SEQUENCE "drm"."seq_expense_note_rows";
+DROP SEQUENCE "drm"."seq_expense_note_row_details";
+DROP SEQUENCE "drm"."seq_expense_note_row_documents";
+
+--------------
+--19/03/2018--
+--------------
+
+CREATE TABLE "drm"."timetable_report_temp" (
+"id" int4 NOT NULL,
+"domain_id" varchar(20) NOT NULL,
+"user_id" varchar(36) NOT NULL,
+"company_id" int4 NOT NULL,
+"date" timestamp(6),
+"working_hours" varchar(5),
+"overtime" varchar(5),
+"paid_leave" varchar(5),
+"unpaid_leave" varchar(5),
+"holiday" varchar(5),
+"medical_visit" varchar(5),
+"contractual" varchar(5),
+"causal" varchar(5),
+"hour" varchar(5),
+"detail" varchar(500),
+"note" varchar(500),
+PRIMARY KEY ("id")
+);
+
+CREATE SEQUENCE "drm"."seq_timetable_report_temp";
+
+--------------
+--27/03/2018--
+--------------
+
+CREATE TABLE "drm"."timetable_events" (
+"timetable_event_id" int4 NOT NULL,
+"domain_id" varchar(20) NOT NULL,
+"company_id" int4 NOT NULL,
+"user_id" varchar(36) NOT NULL,
+"type" varchar(1) NOT NULL,
+"date" date NOT NULL,
+"hour" varchar(36) NOT NULL,
+PRIMARY KEY ("timetable_event_id")
+);
+
+CREATE SEQUENCE "drm"."seq_timetable_event";
+
+ALTER TABLE "drm"."timetable_settings"
+ALTER COLUMN "break_anomaly" SET DEFAULT false,
+ALTER COLUMN "read_only_events" SET DEFAULT false,
+ALTER COLUMN "requests_permits_not_remunered" SET DEFAULT false,
+ALTER COLUMN "requests_permits_medical_visits" SET DEFAULT false,
+ALTER COLUMN "requests_permits_contractuals" SET DEFAULT false;
+
+CREATE TABLE "drm"."timetable_stamp" (
+"id" int4 NOT NULL,
+"domain_id" varchar(20) NOT NULL,
+"user_id" varchar(36) NOT NULL,
+"type" varchar(1) NOT NULL,
+"entrance" timestamp(6),
+"exit" timestamp(6)
+);
+
+ALTER TABLE "drm"."timetable_stamp" ADD PRIMARY KEY ("id");
+
+CREATE SEQUENCE "drm"."seq_timetable_stamp";
