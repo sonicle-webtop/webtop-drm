@@ -30,15 +30,6 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-//Ext.define('Sonicle.webtop.drm.model.DrmGroupLkp', {
-//	extend: 'WTA.ux.data.SimpleGroupedModel',
-//	fields: [
-//		WTF.calcField('label', 'string', ['desc', 'groupDesc'], function (v, rec) {
-//			return WTA.ux.data.SimpleModel.buildLabel(rec.get('desc'), rec.get('groupDesc'));
-//		})
-//	]
-//});
-
 Ext.define('Sonicle.webtop.drm.model.DrmGroupLkp', {
 	extend: 'WTA.ux.data.SimpleModel',
 	

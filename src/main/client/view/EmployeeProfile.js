@@ -84,10 +84,15 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 							selectOnFocus: true
 						},
 						{
-							xtype: 'textfield',
+							xtype: 'numberfield',
 							bind: '{record.tolerance}',
+							allowDecimals: false,
+							allowBlank: true,
+							editable: true,
+							selectOnFocus: true,
+							minValue: 1,
+							maxValue: 1000,
 							fieldLabel: me.mys.res('EmployeeProfile.fld-tolerance.lbl'),
-							selectOnFocus: true
 						},
 						WTF.localCombo('id', 'desc', {
 							bind: '{record.hourProfileId}',

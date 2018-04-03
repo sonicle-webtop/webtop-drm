@@ -37,7 +37,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 		'Sonicle.webtop.drm.model.GridHourProfiles'
 	],
 	dockableConfig: {
-		title: '{timetable.config.tit}', //localizzato
+		title: '{timetable.config.tit}',
 		iconCls: 'wtdrm-icon-configuration-generalconfiguration-xs',
 		width: 650,
 		height: 500
@@ -80,10 +80,15 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 							selectOnFocus: true
 						},
 						{
-							xtype: 'textfield',
+							xtype: 'numberfield',
 							bind: '{record.totalToleranceInMinutes}',
-							fieldLabel: me.mys.res('timetable.settings.fld-totaltoleranceinminutes.lbl'),
-							selectOnFocus: true
+							allowDecimals: false,
+							allowBlank: true,
+							editable: true,
+							selectOnFocus: true,
+							minValue: 1,
+							maxValue: 1000,
+							fieldLabel: me.mys.res('timetable.settings.fld-totaltoleranceinminutes.lbl')
 						},
 						WTF.lookupCombo('id', 'desc', {
 							bind: '{record.rounding}',
@@ -99,10 +104,15 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 							editable: true
 						}),
 						{
-							xtype: 'textfield',
+							xtype: 'numberfield',
 							bind: '{record.minimumExtraordinary}',
-							fieldLabel: me.mys.res('timetable.settings.fld-minimumextraordinary.lbl'),
-							selectOnFocus: true
+							allowDecimals: false,
+							allowBlank: true,
+							editable: true,
+							selectOnFocus: true,
+							minValue: 1,
+							maxValue: 1000,
+							fieldLabel: me.mys.res('timetable.settings.fld-minimumextraordinary.lbl')
 						},
 						{
 							xtype: 'checkbox',

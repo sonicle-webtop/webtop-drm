@@ -41,10 +41,10 @@ Ext.define('Sonicle.webtop.drm.model.Folder', {
 			type: 'sojson',
 			writeAssociations: true
 		}
-	}), //NB: SE NN NECESSARIO USARE 'data' COME DEFAULT X IL JSON
+	}),
 	idProperty: 'folderId',
 	fields: [
-		WTF.field('folderId', 'string', true), //nome,tipo,allowBlank
+		WTF.field('folderId', 'string', true),
 		WTF.field('name', 'string', true),
 		WTF.field('description', 'string', true),
 		WTF.field('expired', 'boolean', true)

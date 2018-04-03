@@ -41,17 +41,15 @@ Ext.define('Sonicle.webtop.drm.model.DocStatus', {
 			type: 'sojson',
 			writeAssociations: true
 		}
-	}), //NB: SE NN NECESSARIO USARE 'data' COME DEFAULT X IL JSON
+	}),
 	idProperty: 'docStatusId',
 	fields: [
-		WTF.field('docStatusId', 'int', false), //nome,tipo,allowBlank
+		WTF.field('docStatusId', 'int', false), 
 		WTF.field('name', 'string', false),
 		WTF.field('description', 'string', true),
 		WTF.field('type', 'string', false,{
 			defaultValue: 'C'
 		})
-//		
-		//WTF.field('builtIn', 'boolean', false)
 	],
 	
 	hasMany: [

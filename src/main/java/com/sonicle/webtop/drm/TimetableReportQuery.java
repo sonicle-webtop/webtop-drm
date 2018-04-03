@@ -32,33 +32,37 @@
  */
 package com.sonicle.webtop.drm;
 
+import com.sonicle.commons.web.json.JsonResult;
+
 /**
  *
  * @author lssndrvs
  */
-public class DrmSettings {
+public class TimetableReportQuery {
 
-	public static final String USE_STATISTIC_CUSTOMER = "customer.usestatistic";
+	public Integer companyId;
+	public String userId;
+	public Integer month;
+	public Integer year;
+	public Integer fromDay;
+	public String crud;
+	
+	public TimetableReportQuery() {
+	}
 
-	public static final String PRINT_DAYS_TRANSFERT = "workreport.daystrasfert.print";
+	public static TimetableReportQuery fromJson(String value) {
+		if (value == null) {
+			return null;
+		}
 
-	public static final String PRINT_TRANSFERT_DESCRIPTION = "workreport.transfert.print.description";
+		return JsonResult.GSON.fromJson(value, TimetableReportQuery.class);
+	}
 
-	public static final String PRINT_SIGNATURE = "workreport.print.signature";
+	public static String toJson(TimetableReportQuery value) {
+		if (value == null) {
+			return null;
+		}
 
-	public static final String ROUNDING_HOUR = "workreport.roundinghour";
-	
-	public static final String TRACKING = "workreport.tracking";
-	
-	public static final String MAIL_TRACKING = "workreport.tracking.mail";
-	
-	public static final String CLOUD_TRACKING = "workreport.tracking.cloud";
-	
-	public static final String DEFAULT_APPLY_SIGNATURE = "workreport.default.applysignature";
-	
-	public static final String DEFAULT_CHARGE_TO = "workreport.default.chargeto";
-	
-	public static final String DEFAULT_FREE_SUPPORT = "workreport.default.freesupport";
-	
-	public static final String DEFAULT_DOC_STATUS_ID = "workreport.default.docstatusid";
+		return JsonResult.GSON.toJson(value, TimetableReportQuery.class);
+	}
 }

@@ -32,7 +32,7 @@
  */
 Ext.define('Sonicle.webtop.drm.ux.UserGrid', {
 	extend: 'Ext.grid.Panel',
-	alias: 'widget.wtdrmusergrid', //widget parola chiave di Extjs
+	alias: 'widget.wtdrmusergrid', 
 	requires: [
 		'Sonicle.picker.List',
 		'WTA.ux.PickerWindow',
@@ -135,8 +135,8 @@ Ext.define('Sonicle.webtop.drm.ux.UserGrid', {
 			items: [{
 					xtype: 'solistpicker',
 					store: me.lookupStore,
-					enableGrouping: false, //abilita il raggruppamento step 1 vd 
-					valueField: 'id', //sempre 'id' poiche arriva dal SimpleModel
+					enableGrouping: false, 
+					valueField: 'id', 
 					displayField: 'desc',
 					searchField: 'desc',
 					emptyText: WT.res('grid.empty'),
@@ -173,7 +173,7 @@ Ext.define('Sonicle.webtop.drm.ux.UserGrid', {
 			this.removeAction.setDisabled(sel.length === 0);
 		},
 		onStoreRemove: function (s, recs) {
-			this.getSelectionModel().deselect(recs); // Fix for updating selection
+			this.getSelectionModel().deselect(recs);
 		},
 		onAddClick: function () {
 			var me = this;

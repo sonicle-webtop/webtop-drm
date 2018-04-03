@@ -35,7 +35,7 @@ Ext.define('Sonicle.webtop.drm.model.UsersAssociation', {
 	identifier: 'negative',
 	idProperty: 'associationId',
 	fields: [
-		WTF.field('associationId', 'int', false), //nome,tipo,allowBlank
+		WTF.field('associationId', 'int', false),
 		WTF.field('userId', 'string', false)
 	]
 });

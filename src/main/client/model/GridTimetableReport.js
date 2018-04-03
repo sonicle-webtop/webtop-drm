@@ -30,13 +30,25 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.GroupAssociation', {
+
+Ext.define('Sonicle.webtop.drm.model.GridTimetableReport', {
 	extend: 'WTA.ux.data.BaseModel',
-	identifier: 'negative',
-	idProperty: 'associationId',
 	fields: [
-		WTF.field('associationId', 'int', false),
-		WTF.field('groupId', 'string', false)
+		WTF.field('id', 'int', false),
+		WTF.field('domainId', 'string', false),
+		WTF.field('company', 'string', false),
+		WTF.field('user', 'string', false),
+		WTF.field('date', 'string', false),
+		WTF.field('workingHours', 'string', true),
+		WTF.field('overtime', 'string', true),
+		WTF.field('paidLeave', 'string', true),
+		WTF.field('unpaidLeave', 'string', true),
+		WTF.field('holiday', 'string', true),
+		WTF.field('medicalVisit', 'string', true),
+		WTF.field('contractual', 'string', true),
+		WTF.field('causal', 'string', true),
+		WTF.field('hour', 'string', true),
+		WTF.field('detail', 'string', true),
+		WTF.field('note', 'string', true)
 	]
 });
-

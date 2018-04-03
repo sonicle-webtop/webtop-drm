@@ -41,7 +41,6 @@ import com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord;
 import java.sql.Connection;
 import java.util.List;
 import org.jooq.DSLContext;
-import static org.jooq.impl.DSL.*;
 
 /**
  *

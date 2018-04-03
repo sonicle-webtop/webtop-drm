@@ -35,7 +35,7 @@ Ext.define('Sonicle.webtop.drm.model.BusinessTrip', {
 	identifier: 'negative',
 	idProperty: 'businessTripId',
 	fields: [
-		WTF.field('businessTripId', 'int', false), //nome,tipo,allowBlank
+		WTF.field('businessTripId', 'int', false),
 		WTF.field('domainId', 'string', true),
 		WTF.field('externalId', 'string', true),
 		WTF.field('description', 'string', true)

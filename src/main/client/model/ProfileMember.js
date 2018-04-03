@@ -35,7 +35,7 @@ Ext.define('Sonicle.webtop.drm.model.ProfileMember', {
 	identifier: 'negative',
 	idProperty: 'id',
 	fields: [
-		WTF.field('id', 'int', false), //nome,tipo,allowBlank
+		WTF.field('id', 'int', false),
 		WTF.field('profileId', 'string', false),
 		WTF.field('userId', 'string', false)
 	]

@@ -34,80 +34,75 @@ package com.sonicle.webtop.drm.dal;
 
 import com.sonicle.webtop.core.dal.BaseDAO;
 import com.sonicle.webtop.core.dal.DAOException;
-import com.sonicle.webtop.drm.bol.ODocStatus;
-import static com.sonicle.webtop.drm.jooq.Sequences.SEQ_DOC_STATUSES;
-import static com.sonicle.webtop.drm.jooq.Tables.DOC_STATUSES;
-import com.sonicle.webtop.drm.jooq.tables.records.DocStatusesRecord;
+import com.sonicle.webtop.drm.bol.OTimetableEvent;
+import com.sonicle.webtop.drm.bol.OTimetableReport;
+import static com.sonicle.webtop.drm.jooq.Sequences.SEQ_TIMETABLE_EVENT;
+import static com.sonicle.webtop.drm.jooq.Tables.TIMETABLE_EVENTS;
+import com.sonicle.webtop.drm.jooq.tables.records.TimetableEventsRecord;
 import java.sql.Connection;
+import java.util.Collection;
 import java.util.List;
+import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 
 /**
  *
  * @author lssndrvs
  */
-public class DocStatusDAO extends BaseDAO{
-	
-	private final static DocStatusDAO INSTANCE = new DocStatusDAO();
+public class TimetableEventDAO extends BaseDAO {
 
-	public static DocStatusDAO getInstance() {
+	private final static TimetableEventDAO INSTANCE = new TimetableEventDAO();
+
+	public static TimetableEventDAO getInstance() {
 		return INSTANCE;
 	}
-	
+
 	public Long getSequence(Connection con) throws DAOException {
 		DSLContext dsl = getDSL(con);
-		Long nextID = dsl.nextval(SEQ_DOC_STATUSES);
+		Long nextID = dsl.nextval(SEQ_TIMETABLE_EVENT);
 		return nextID;
 	}
 	
-	public int insertDocStatus(Connection con,ODocStatus item) throws DAOException {
+	public int insert(Connection con, OTimetableEvent item) throws DAOException {
 		DSLContext dsl = getDSL(con);
-		DocStatusesRecord record = dsl.newRecord(DOC_STATUSES,item);
-		
+
+		TimetableEventsRecord record = dsl.newRecord(TIMETABLE_EVENTS, item);
 		return dsl
-				.insertInto(DOC_STATUSES)
+				.insertInto(TIMETABLE_EVENTS)
 				.set(record)
 				.execute();
 	}
 
-	public List<ODocStatus> selectStatuses(Connection con) throws DAOException{
-			DSLContext dsl = getDSL(con);
-		return dsl
-				.select()
-				.from(DOC_STATUSES)
-				.fetchInto(ODocStatus.class);
-	}
-
-	public ODocStatus selectById(Connection con, int docStatusId) throws DAOException {
+	public List<OTimetableEvent> getEventsByDomainUserDateRange(Connection con, String domainId, Integer companyId, String userId, Integer fromDay, Integer month, Integer year) {
 		DSLContext dsl = getDSL(con);
 		return dsl
-			.select()
-			.from(DOC_STATUSES)
-			.where(DOC_STATUSES.DOC_STATUS_ID.equal(docStatusId))
-			.fetchOneInto(ODocStatus.class);
+				.select(
+						TIMETABLE_EVENTS.DOMAIN_ID, 
+						TIMETABLE_EVENTS.COMPANY_ID,
+						TIMETABLE_EVENTS.USER_ID, 
+						TIMETABLE_EVENTS.DATE,
+						TIMETABLE_EVENTS.HOUR,
+						TIMETABLE_EVENTS.TYPE
+				)
+				.from(
+						TIMETABLE_EVENTS
+				)
+				.where(
+						TIMETABLE_EVENTS.DOMAIN_ID.equal(domainId)
+				)
+				.and(
+						TIMETABLE_EVENTS.USER_ID.equal(userId)
+				)
+				.and(
+						TIMETABLE_EVENTS.DATE.between(new DateTime().withYear(year).withMonthOfYear(month).withDayOfMonth(fromDay).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).toLocalDate(), new DateTime().withYear(year).withMonthOfYear(month).dayOfMonth().withMaximumValue().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toLocalDate())
+				)
+				.and(
+						TIMETABLE_EVENTS.COMPANY_ID.equal(companyId)
+				)
+				.orderBy(
+						TIMETABLE_EVENTS.USER_ID, 
+						TIMETABLE_EVENTS.DATE
+				)
+				.fetchInto(OTimetableEvent.class);
 	}
-	
-	public int update(Connection con, ODocStatus item) throws DAOException {
-		DSLContext dsl = getDSL(con);
-		return dsl
-			.update(DOC_STATUSES)
-			.set(DOC_STATUSES.NAME,item.getName())
-			.set(DOC_STATUSES.DESCRIPTION,item.getDescription())
-			.set(DOC_STATUSES.TYPE,item.getType())
-			.where(
-				DOC_STATUSES.DOC_STATUS_ID.equal(item.getDocStatusId())
-			)
-			.execute();
-	}
-
-	public int deleteById(Connection con, int docStatusId ) {
-		DSLContext dsl = getDSL(con);
-		return dsl
-			.delete(DOC_STATUSES)
-			.where(
-				DOC_STATUSES.DOC_STATUS_ID.equal(docStatusId)
-			)
-			.execute();
-	}
-	
 }

@@ -38,7 +38,7 @@ Ext.define('Sonicle.webtop.drm.view.Company', {
 		'Sonicle.webtop.drm.ux.UserGrid'
 	],
 	dockableConfig: {
-		title: '{company.tit}', //localizzato
+		title: '{company.tit}',
 		iconCls: 'wtdrm-icon-configuration-companiesconfiguration-xs',
 		width: 500,
 		height: 530

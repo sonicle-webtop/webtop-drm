@@ -42,9 +42,7 @@ Ext.define('Sonicle.webtop.drm.model.Group',{
 			writeAssociations: true
 		}
 	}),
-	//identifico come viene gestita la chiave primaria
 	identifier: 'negativestring',
-	//identifico la chiave primaria
 	idProperty: 'groupId',
 	fields: [
 		WTF.field('groupId','string',false),

@@ -72,7 +72,6 @@ public class JsWorkReport {
 	public List<JsGridWorkReportRow> details = new ArrayList();
 	public List<JsGridWorkReportAttachment> attachments = new ArrayList();
 
-	// Read-only fields
 	public String _profileId;
 
 	public JsWorkReport(WorkReport report, DateTimeZone profileTz, String ownerPid) {
@@ -106,7 +105,6 @@ public class JsWorkReport {
 			this.attachments.add(new JsGridWorkReportAttachment(wrkAttachment));
 		}
 
-		// Read-only fields
 		this._profileId = ownerPid;
 	}
 
@@ -117,9 +115,6 @@ public class JsWorkReport {
 		rw.setWorkReportNo(js.workReportNo);
 		rw.setCompanyId(js.companyId);
 		rw.setOperatorId(js.operatorId);
-//		rw.setRevisionStatus(js.revisionStatus);
-//		rw.setRevisionTimestamp(DateTimeUtils.parseYmdHmsWithZone(js.revisionTimestamp, profileTz));
-//		rw.setRevisionSequence(js.revisionSequence);
 		rw.setDocStatusId(js.docStatusId);
 		rw.setContactId(js.contactId);
 		rw.setCustomerId(js.customerId);

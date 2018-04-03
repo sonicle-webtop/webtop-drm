@@ -41,6 +41,8 @@ import com.sonicle.webtop.drm.jooq.tables.records.LineHoursRecord;
 import java.sql.Connection;
 import java.util.List;
 import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.impl.DSL;
 
 /**
  *
@@ -90,6 +92,20 @@ public class LineHourDAO extends BaseDAO {
 						LINE_HOURS.HOUR_PROFILE_ID.equal(hourProfileId)
 				)
 				.fetchInto(OLineHour.class);
+	}
+	
+	public String selectSumLineHourByHourProfileIdDayOfWeek(Connection con, Integer hourProfileId, Integer dayOfWeek) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		
+		return dsl
+				.select(
+						DSL.sum(getDayFieldByDayOfWeek(dayOfWeek).cast(Integer.class))
+				)
+				.from(LINE_HOURS)
+				.where(
+						LINE_HOURS.HOUR_PROFILE_ID.equal(hourProfileId)
+				)
+				.fetchOneInto(String.class);
 	}
 
 	public int update(Connection con, OLineHour item) throws DAOException {
@@ -141,6 +157,30 @@ public class LineHourDAO extends BaseDAO {
 					LINE_HOURS.HOUR_PROFILE_ID.equal(hourProfileId)
 			)
 			.execute();
+	}
+	
+	private Field<String> getDayFieldByDayOfWeek(int dayOfWeek){
+		
+		switch(dayOfWeek){
+			case 1:
+				return LINE_HOURS._1_H;
+			case 2: 
+				return LINE_HOURS._2_H;
+			case 3: 
+				return LINE_HOURS._3_H;
+			case 4: 
+				return LINE_HOURS._4_H;
+			case 5: 
+				return LINE_HOURS._5_H;
+			case 6: 
+				return LINE_HOURS._6_H;
+			case 7: 
+				return LINE_HOURS._7_H;
+			case 0: 
+				return LINE_HOURS._7_H;
+			default: 
+				return LINE_HOURS._1_H;
+		}
 	}
 
 }

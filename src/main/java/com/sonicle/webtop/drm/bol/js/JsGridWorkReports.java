@@ -58,7 +58,6 @@ public class JsGridWorkReports {
 	public Integer businessTripId;
 	public Boolean freeSupport;
 
-	// Read-only fields
 	public String _profileId;
 
 	public JsGridWorkReports(OWorkReport report, DateTimeZone profileTz, String ownerPid) {

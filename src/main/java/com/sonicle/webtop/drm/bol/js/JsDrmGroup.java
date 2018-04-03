@@ -61,8 +61,6 @@ public class JsDrmGroup {
 		this.description = group.getDescription();
 		this.groupCategory= group.getGroupCategory();
 		this.groupType = group.getGroupType();
-//		this.customerId = group.getCustomerId();
-//		this.supervisiorUserId = group.getSupervisiorUserId();
 		
 		this.associatedUsers = group.getAssociatedUsers();
 	}
@@ -77,8 +75,6 @@ public class JsDrmGroup {
 		newDrmGroup.setDescription(js.description);
 		newDrmGroup.setGroupCategory(js.groupCategory);
 		newDrmGroup.setGroupType(js.groupType);
-//		newDrmGroup.setSupervisiorUserId(js.supervisiorUserId);
-//		newDrmGroup.setCustomerId(js.customerId);
 		
 		newDrmGroup.setAssociatedUsers(js.associatedUsers);
 

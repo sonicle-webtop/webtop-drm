@@ -30,13 +30,31 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.GroupAssociation', {
-	extend: 'WTA.ux.data.BaseModel',
-	identifier: 'negative',
-	idProperty: 'associationId',
-	fields: [
-		WTF.field('associationId', 'int', false),
-		WTF.field('groupId', 'string', false)
-	]
-});
 
+Ext.define('Sonicle.webtop.drm.store.MonthStore', {
+	extend: 'Ext.data.ArrayStore',
+	
+	model: 'WTA.model.Simple',
+	data: [
+		[1,''],
+		[2,''],
+		[3,''],
+		[4,''],
+		[5,''],
+		[6,''],
+		[7,''],
+		[8,''],
+		[9,''],
+		[10,''],
+		[11,''],
+		[12,'']
+	],
+	
+	constructor: function(cfg) {
+		var me = this;
+		Ext.each(me.config.data, function(row) {
+			row[1] = WT.res('com.sonicle.webtop.drm', 'store.month.'+row[0]);
+		});
+		me.callParent([cfg]);
+	}
+});

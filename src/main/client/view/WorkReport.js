@@ -63,9 +63,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 					text: null,
 					tooltip: WT.res('act-print.lbl'),
 					iconCls: 'wt-icon-print-xs',
-					//disabled: me.isMode(me.MODE_NEW),
 					handler: function() {
-						//TODO: aggiungere l'azione 'salva' permettendo così la stampa senza chiudere la form
 						me.printWorkReport(me.getModel().getId());
 					}
 				}),
@@ -94,7 +92,6 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											if (s.loadCount === 1) {
 												me.lref('fldcompany').getStore().load();
 												me.lref('fldmasterdata').getStore().load();
-												//me.lref('fldstatmasterdata').getStore().load();
 												me.lref('fldcausal').getStore().load();
 											}
 										}
@@ -435,14 +432,6 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 										autoLoad: true,
 										model: 'WTA.model.Simple',
 										proxy: WTF.proxy(me.mys.ID, 'LookupDocStatuses')
-//										listeners: {
-//											load: function (s) {
-//												var meta = s.getProxy().getReader().metaData;
-//												if (meta.selected) {
-//													me.lookupReference('flddoctatus').setValue(meta.selected);
-//												}
-//											}
-//										}
 									},
 									fieldLabel: me.mys.res('workReport.fld-status.lbl')
 								})
@@ -598,12 +587,6 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 									bind: '{record.description}',
 									maxLength: 2048,
 									enableKeyEvents: true
-//									style: {textTransform: 'uppercase', overflow: 'scroll', fontFamily: 'courier new'},
-//									listeners: {
-//										change: function (field, newValue) {
-//											field.setValue(newValue.toUpperCase());
-//										}
-//									}
 								}
 							]
 						}

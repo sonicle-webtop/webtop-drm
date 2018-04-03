@@ -32,7 +32,7 @@
  */
 Ext.define('Sonicle.webtop.drm.ux.GroupGrid', {
 	extend: 'Ext.grid.Panel',
-	alias: 'widget.wtdrmgroupgrid',//widget parola chiave di Extjs
+	alias: 'widget.wtdrmgroupgrid',
 	requires: [
 		'Sonicle.picker.List',
 		'WTA.ux.PickerWindow',
@@ -52,7 +52,6 @@ Ext.define('Sonicle.webtop.drm.ux.GroupGrid', {
 			autoLoad: true,
 			model: 'Sonicle.webtop.drm.model.DrmGroupLkp',
 			proxy: WTF.proxy(me.sid, 'LookupGroups', 'data')
-			//groupField: 'groupDesc' //campo sul quale raggruppare i dati Step2
 		});
 		
 		me.selModel = {
@@ -114,8 +113,8 @@ Ext.define('Sonicle.webtop.drm.ux.GroupGrid', {
 			items: [{
 				xtype: 'solistpicker',
 				store: me.lookupStore,
-				enableGrouping: true, //abilita il raggruppamento step 1 vd 
-				valueField: 'id', //sempre 'id' poiche arriva dal SimpleModel
+				enableGrouping: true, 
+				valueField: 'id', 
 				displayField: 'desc', 
 				searchField: 'desc', 
 				emptyText: WT.res('grid.empty'),
@@ -155,7 +154,7 @@ Ext.define('Sonicle.webtop.drm.ux.GroupGrid', {
 		},
 		
 		onStoreRemove: function(s, recs) {
-			this.getSelectionModel().deselect(recs); // Fix for updating selection
+			this.getSelectionModel().deselect(recs);
 		},
 		
 		onAddClick: function() {

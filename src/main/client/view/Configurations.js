@@ -147,9 +147,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 								me.getAct('deleteGroup')
 							],
 							listeners: {
-								//aggiungo l'item ctx menu
-								itemcontextmenu: function (s, rec, itm, i, e) {//sender,record,item,index,event
-									//mostro il menu cxt
+								itemcontextmenu: function (s, rec, itm, i, e) {
 									WT.showContextMenu(e, me.getRef('cxmGrid'), {node: rec});
 								},
 								itemclick: function (s, rec, itm, i, e) {
@@ -272,10 +270,9 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 					},
 					store: {
 						autoLoad: true,
-						//autoSync: true,
 						model: 'Sonicle.webtop.drm.model.GridFolders',
 						proxy: WTF.apiProxy(me.mys.ID, 'ManageGridFolders', 'data', {
-							writer: {//con parametro a false invio sempre un array per l 'operazione di delete del server
+							writer: {
 								allowSingle: false
 							}
 						})
@@ -283,12 +280,12 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 					columns: [{
 							xtype: 'rownumberer'
 						}, {
-							header: me.mys.res('config.gpFolders.name.lbl'), //localizzata
+							header: me.mys.res('config.gpFolders.name.lbl'), 
 							dataIndex: 'name',
 							hideable: false,
 							flex: 1
 						}, {
-							header: me.mys.res('config.gpFolders.description.lbl'), //localizzata
+							header: me.mys.res('config.gpFolders.description.lbl'), 
 							dataIndex: 'description',
 							flex: 2
 						}],
@@ -318,10 +315,9 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 					},
 					store: {
 						autoLoad: true,
-						//autoSync: true,
 						model: 'Sonicle.webtop.drm.model.GridDocStatuses',
 						proxy: WTF.apiProxy(me.mys.ID, 'ManageGridDocStatuses', 'data', {
-							writer: {//con parametro a false invio sempre un array per l 'operazione di delete del server
+							writer: {
 								allowSingle: false
 							}
 						})
@@ -329,12 +325,12 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 					columns: [{
 							xtype: 'rownumberer'
 						}, {
-							header: me.mys.res('config.gpdocStatus.name.lbl'), //localizzata
+							header: me.mys.res('config.gpdocStatus.name.lbl'),
 							dataIndex: 'name',
 							flex: 1,
 							hideable: false
 						}, {
-							header: me.mys.res('config.gpdocStatus.description.lbl'), //localizzata
+							header: me.mys.res('config.gpdocStatus.description.lbl'),
 							dataIndex: 'description',
 							flex: 2
 						}],
@@ -366,13 +362,11 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 	},
 	initActions: function () {
 		var me = this;
-		//-----------------------------------------
 		me.addAct('company', 'add', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
 			iconCls: 'wt-icon-add-xs',
 			handler: function () {
-				//add la view
 				me.addCompany({
 					callback: function (success) {
 						if (success) {
@@ -406,13 +400,11 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				}
 			}
 		});
-		//------------------------------------------
 		me.addAct('addGroup', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
 			iconCls: 'wt-icon-add-xs',
 			handler: function () {
-				//add la view
 				me.addGroup({
 					callback: function (success) {
 						if (success) {
@@ -446,7 +438,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				}
 			}
 		});
-		//-----------------------------------------
 		me.addAct('addSupervisorProfile', {
 			text: me.mys.res('act-addSupervisorProfile.lbl'),
 			tooltip: null,
@@ -499,7 +490,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				}
 			}
 		});
-		//-----------------------------------------
 		me.addAct('addManager', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
@@ -538,13 +528,11 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				}
 			}
 		});
-		//-----------------------------------------
 		me.addAct('folder', 'add', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
 			iconCls: 'wt-icon-add-xs',
 			handler: function () {
-				//add la view
 				me.addFolder({
 					callback: function (success) {
 						if (success) {
@@ -578,13 +566,11 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				}
 			}
 		});
-		//-----------------------------------------
 		me.addAct('docStatus', 'add', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
 			iconCls: 'wt-icon-add-xs',
 			handler: function () {
-				//add la view
 				me.addDocStatus({
 					callback: function (success) {
 						if (success) {
@@ -618,17 +604,14 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				}
 			}
 		});
-
-		//----------------------------------------
 	},
 	initCxm: function () {
 		var me = this;
 		me.addRef('cxmGrid', Ext.create({
 			xtype: 'menu',
 			items: [
-				//ottengo l'azione
 				me.getAct('addGroup'),
-				'-', //linea separatore
+				'-',
 				me.getAct('editGroup'),
 				me.getAct('deleteGroup')
 			],
@@ -673,7 +656,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 					return true;
 		}
 	},
-	//--------------
 	treeGroup: function () {
 		return this.lref('treeGroup');
 	},
@@ -713,7 +695,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 	updateConfiguration: function (name, val) {
 		var me = this, pars = {};
 		pars[name] = val;
-		//richiamo a livello server il metodo per il salvataggio della variabie
 		WT.ajaxReq(me.mys.ID, 'UpdateConfiguration', {
 			params: pars,
 			callback: function (success, json) {
@@ -722,7 +703,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 			}
 		});
 	},
-	//----------------------------------------------------
 
 	addCompany: function (opts) {
 
@@ -776,7 +756,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 			msg = me.mys.res('act.confirm.delete', Ext.String.ellipsis(rec.get('name'), 40));
 		} else {
 			alert('non cancellando');
-			//msg = me.mys.res('gptasks.confirm.delete.selection');
 		}
 		WT.confirm(msg, function (bid) {
 			if (bid === 'yes') {
@@ -784,7 +763,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 					callback: function (success) {
 						if (success)
 							sto.remove(rec);
-						//me.reloadTasks();
 					}
 				});
 			}
@@ -803,7 +781,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 			}
 		});
 	},
-	//----------------------------------
 	addGroupUI: function (rec) {
 		var me = this;
 		me.addGroup(rec.get('groupCategory'), {
@@ -821,16 +798,14 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 	},
 	addGroup: function (groupCategory, opts) {
 
-		opts = opts || {}; //se nullo controlla e lo setta a obj empty
+		opts = opts || {};
 
 		var me = this,
-				//viewcontainer => recupero la view di webtop => id del servizio, nome View
 				vct = WT.createView(me.mys.ID, 'view.Group');
-		vct.getView().on('viewsave', function (s, success, model) { //sender,success,modello
+		vct.getView().on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		//al caricamento della finestra inizio il begin edit data
-		vct.show(false, //mostro la view
+		vct.show(false,
 				function () {
 					vct.getView().begin('new', {
 						data: {
@@ -844,8 +819,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		me.editGroup(rec.getId(), {
 			callback: function (success, model) {
 				if (success) {
-					//rec.set('text', model.get('name')); //modifico il nodo a livello client senza ricaricare
-					//ottengo lo store del componente
 					var sto = this.treeGroup().getStore();
 					sto.load({
 						node: sto.getNodeById(model.get('groupCategory'))
@@ -858,16 +831,14 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 	},
 	editGroup: function (groupId, opts) {
 
-		opts = opts || {}; //se nullo controlla e lo seta a obj empty
+		opts = opts || {};
 
 		var me = this,
-				//viewcontainer => recupero la view di webtop => id del servizio, nome View
 				vct = WT.createView(me.mys.ID, 'view.Group');
-		vct.getView().on('viewsave', function (s, success, model) { //sender,success,modello
+		vct.getView().on('viewsave', function (s, success, model) { 
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		//al caricamento della finestra inizio il begin edit data
-		vct.show(false, //mostro la view
+		vct.show(false,
 				function () {
 					vct.getView().begin('edit', {
 						data: {
@@ -884,7 +855,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 			msg = me.mys.res('act.confirm.delete', Ext.String.ellipsis(rec.get('text'), 40));
 		} else {
 			alert('non cancellando');
-			//msg = me.mys.res('gptasks.confirm.delete.selection');
 		}
 		WT.confirm(msg, function (bid) {
 			if (bid === 'yes') {
@@ -900,16 +870,14 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 
 	addDocStatus: function (opts) {
 
-		opts = opts || {}; //se nullo controlla e lo seta a obj empty
+		opts = opts || {};
 
 		var me = this,
-				//viewcontainer => recupero la view di webtop => id del servizio, nome View
 				vct = WT.createView(me.mys.ID, 'view.DocStatus');
-		vct.getView().on('viewsave', function (s, success, model) { //sender,success,modello
+		vct.getView().on('viewsave', function (s, success, model) { 
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		//al caricamento della finestra inizio il begin edit data
-		vct.show(false, //mostro la view
+		vct.show(false, 
 				function () {
 					vct.getView().begin('new');
 				});
@@ -919,8 +887,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		me.editDocStatus(rec.get('docStatusId'), {
 			callback: function (success, model) {
 				if (success) {
-					//rec.set('text', model.get('name')); //modifico il nodo a livello client senza ricaricare
-					//ottengo lo store del componente 
 					this.gpDocStatus().getStore().load();
 				} else {
 					alert('error');
@@ -930,16 +896,14 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 	},
 	editDocStatus: function (docStatusId, opts) {
 
-		opts = opts || {}; //se nullo controlla e lo seta a obj empty
+		opts = opts || {};
 
 		var me = this,
-				//viewcontainer => recupero la view di webtop => id del servizio, nome View
 				vct = WT.createView(me.mys.ID, 'view.DocStatus');
-		vct.getView().on('viewsave', function (s, success, model) { //sender,success,modello
+		vct.getView().on('viewsave', function (s, success, model) { 
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		//al caricamento della finestra inizio il begin edit data
-		vct.show(false, //mostro la view
+		vct.show(false, 
 				function () {
 					vct.getView().begin('edit', {
 						data: {
@@ -956,7 +920,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 			msg = me.mys.res('act.confirm.delete', Ext.String.ellipsis(rec.get('name'), 40));
 		} else {
 			alert('non cancellando');
-			//msg = me.mys.res('gptasks.confirm.delete.selection');
 		}
 		WT.confirm(msg, function (bid) {
 			if (bid === 'yes') {
@@ -982,20 +945,17 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 			}
 		});
 	},
-	//-----------------------------------
 
 	addFolder: function (opts) {
 
-		opts = opts || {}; //se nullo controlla e lo setta a obj empty
+		opts = opts || {}; 
 
 		var me = this,
-				//viewcontainer => recupero la view di webtop => id del servizio, nome View
 				vct = WT.createView(me.mys.ID, 'view.Folder');
-		vct.getView().on('viewsave', function (s, success, model) { //sender,success,modello
+		vct.getView().on('viewsave', function (s, success, model) { 
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		//al caricamento della finestra inizio il begin edit data
-		vct.show(false, //mostro la view
+		vct.show(false,
 				function () {
 					vct.getView().begin('new');
 				});
@@ -1005,8 +965,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		me.editFolder(rec.get('folderId'), {
 			callback: function (success, model) {
 				if (success) {
-					//rec.set('text', model.get('name')); //modifico il nodo a livello client senza ricaricare
-					//ottengo lo store del componente 
 					this.gpFolder().getStore().load();
 				} else {
 					alert('error');
@@ -1016,16 +974,14 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 	},
 	editFolder: function (folderId, opts) {
 
-		opts = opts || {}; //se nullo controlla e lo seta a obj empty
+		opts = opts || {};
 
 		var me = this,
-				//viewcontainer => recupero la view di webtop => id del servizio, nome View
 				vct = WT.createView(me.mys.ID, 'view.Folder');
-		vct.getView().on('viewsave', function (s, success, model) { //sender,success,modello
+		vct.getView().on('viewsave', function (s, success, model) { 
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		//al caricamento della finestra inizio il begin edit data
-		vct.show(false, //mostro la view
+		vct.show(false, 
 				function () {
 					vct.getView().begin('edit', {
 						data: {
@@ -1042,7 +998,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 			msg = me.mys.res('act.confirm.delete', Ext.String.ellipsis(rec.get('name'), 40));
 		} else {
 			alert('non cancellando');
-			//msg = me.mys.res('gptasks.confirm.delete.selection');
 		}
 		WT.confirm(msg, function (bid) {
 			if (bid === 'yes') {
@@ -1050,7 +1005,6 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 					callback: function (success) {
 						if (success)
 							sto.remove(rec);
-						//me.reloadTasks();
 					}
 				});
 			}

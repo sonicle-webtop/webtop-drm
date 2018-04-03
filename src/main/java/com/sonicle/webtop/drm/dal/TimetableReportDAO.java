@@ -34,10 +34,10 @@ package com.sonicle.webtop.drm.dal;
 
 import com.sonicle.webtop.core.dal.BaseDAO;
 import com.sonicle.webtop.core.dal.DAOException;
-import com.sonicle.webtop.drm.bol.OEmployeeProfile;
+import com.sonicle.webtop.drm.bol.OTimetableReport;
 import com.sonicle.webtop.drm.jooq.Sequences;
-import static com.sonicle.webtop.drm.jooq.Tables.EMPLOYEE_PROFILES;
-import com.sonicle.webtop.drm.jooq.tables.records.EmployeeProfilesRecord;
+import static com.sonicle.webtop.drm.jooq.Tables.TIMETABLE_REPORT_TEMP;
+import com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord;
 import java.sql.Connection;
 import java.util.List;
 import org.jooq.DSLContext;
@@ -46,90 +46,76 @@ import org.jooq.DSLContext;
  *
  * @author lssndrvs
  */
-public class EmployeeProfileDAO extends BaseDAO {
+public class TimetableReportDAO extends BaseDAO{
+	
+	private final static TimetableReportDAO INSTANCE = new TimetableReportDAO();
 
-	private final static EmployeeProfileDAO INSTANCE = new EmployeeProfileDAO();
-
-	public static EmployeeProfileDAO getInstance() {
+	public static TimetableReportDAO getInstance() {
 		return INSTANCE;
 	}
 	
-	public Long getSequence(Connection con) throws DAOException {
+	public int insert(Connection con, OTimetableReport item) throws DAOException {
 		DSLContext dsl = getDSL(con);
-		Long nextID = dsl.nextval(Sequences.SEQ_EMPLOYEE_PROFILES);
-		return nextID;
-	}
-
-	public int insert(Connection con, OEmployeeProfile item) throws DAOException {
-		DSLContext dsl = getDSL(con);
-		EmployeeProfilesRecord record = dsl.newRecord(EMPLOYEE_PROFILES, item);
-
+		TimetableReportTempRecord record = dsl.newRecord(TIMETABLE_REPORT_TEMP, item);
+		
 		return dsl
-				.insertInto(EMPLOYEE_PROFILES)
+				.insertInto(TIMETABLE_REPORT_TEMP)
 				.set(record)
 				.execute();
 	}
-
-	public List<OEmployeeProfile> selectEmployeeProfileByDomain(Connection con, String domainId) throws DAOException {
-		DSLContext dsl = getDSL(con);
-		return dsl
-				.select()
-				.from(EMPLOYEE_PROFILES)
-				.where(
-						EMPLOYEE_PROFILES.DOMAIN_ID.equal(domainId)
-				)
-				.fetchInto(OEmployeeProfile.class);
-	}
 	
-	public OEmployeeProfile selectEmployeeProfileByDomainUser(Connection con, String domainId, String userId) throws DAOException {
+	public int update(Connection con, OTimetableReport item) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		return dsl
-				.select()
-				.from(EMPLOYEE_PROFILES)
+				.update(TIMETABLE_REPORT_TEMP)
+				.set(TIMETABLE_REPORT_TEMP.WORKING_HOURS, item.getWorkingHours())
+				.set(TIMETABLE_REPORT_TEMP.OVERTIME, item.getOvertime())
+				.set(TIMETABLE_REPORT_TEMP.PAID_LEAVE, item.getPaidLeave())
+				.set(TIMETABLE_REPORT_TEMP.UNPAID_LEAVE, item.getUnpaidLeave())
+				.set(TIMETABLE_REPORT_TEMP.HOLIDAY, item.getHoliday())
+				.set(TIMETABLE_REPORT_TEMP.MEDICAL_VISIT, item.getMedicalVisit())
+				.set(TIMETABLE_REPORT_TEMP.CONTRACTUAL, item.getContractual())
+				.set(TIMETABLE_REPORT_TEMP.CAUSAL, item.getCausal())
+				.set(TIMETABLE_REPORT_TEMP.HOUR, item.getHour())
+				.set(TIMETABLE_REPORT_TEMP.DETAIL, item.getDetail())
+				.set(TIMETABLE_REPORT_TEMP.NOTE, item.getNote())
 				.where(
-						EMPLOYEE_PROFILES.DOMAIN_ID.equal(domainId)
-				)
-				.and(
-						EMPLOYEE_PROFILES.USER_ID.equal(userId)
-				)
-				.fetchOneInto(OEmployeeProfile.class);
-	}
-
-	public OEmployeeProfile selectEmployeeProfileById(Connection con, Integer id) throws DAOException {
-		DSLContext dsl = getDSL(con);
-		return dsl
-				.select()
-				.from(EMPLOYEE_PROFILES)
-				.where(
-						EMPLOYEE_PROFILES.ID.equal(id)
-				)
-				.fetchOneInto(OEmployeeProfile.class);
-	}
-
-	public int update(Connection con, OEmployeeProfile item) throws DAOException {
-		DSLContext dsl = getDSL(con);
-		return dsl
-				.update(EMPLOYEE_PROFILES)
-				.set(EMPLOYEE_PROFILES.EXTRAORDINARY, item.getExtraordinary())
-				.set(EMPLOYEE_PROFILES.ONLY_PRESENCE, item.getOnlyPresence())
-				.set(EMPLOYEE_PROFILES.NUMBER, item.getNumber())
-				.set(EMPLOYEE_PROFILES.TOLERANCE, item.getTolerance())
-				.set(EMPLOYEE_PROFILES.USER_ID, item.getUserId())
-				.set(EMPLOYEE_PROFILES.HOUR_PROFILE_ID, item.getHourProfileId())
-				.where(
-						EMPLOYEE_PROFILES.ID.equal(item.getId())
+						TIMETABLE_REPORT_TEMP.ID.equal(item.getId())
 				)
 				.execute();
 	}
-
-	public int deleteById(Connection con, Integer id) {
+	
+	public List<OTimetableReport> selectByDomainId(Connection con, String domainId) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		return dsl
-			.delete(EMPLOYEE_PROFILES)
-			.where(
-					EMPLOYEE_PROFILES.ID.equal(id)
-			)
-			.execute();
+				.select()
+				.from(TIMETABLE_REPORT_TEMP)
+				.where(TIMETABLE_REPORT_TEMP.DOMAIN_ID.equal(domainId))
+				.orderBy(
+						TIMETABLE_REPORT_TEMP.USER_ID,
+						TIMETABLE_REPORT_TEMP.DATE
+				)
+				.fetchInto(OTimetableReport.class);
 	}
-
+	
+	public int deleteByDomainId(Connection con, String domainId) {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.delete(TIMETABLE_REPORT_TEMP)
+				.where(
+						TIMETABLE_REPORT_TEMP.DOMAIN_ID.equal(domainId)
+				)
+				.execute();
+	}
+	
+	public Long getTimetableReportTempSequence(Connection con) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		Long nextID = dsl.nextval(Sequences.SEQ_TIMETABLE_REPORT_TEMP);
+		return nextID;
+	}
+	
+	public void restartTimetableReportTempSequence(Connection con) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		dsl.alterSequence(Sequences.SEQ_TIMETABLE_REPORT_TEMP).restart().execute();
+	}
 }

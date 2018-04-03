@@ -46,67 +46,67 @@ public class DrmServiceSettings extends BaseServiceSettings {
 	}
 
 	public boolean getUseStatisticCustomer() {
-		return getBoolean(USE_STATISTIC_CUSTOMER, Boolean.FALSE); //ricerca prima a livello di servizio poi di dominio
+		return getBoolean(USE_STATISTIC_CUSTOMER, Boolean.FALSE); 
 	}
 
 	public void setUseStatisticCustomer(boolean enabled) {
-		setBoolean(USE_STATISTIC_CUSTOMER, enabled); //imposta il settings a livello di dominio
+		setBoolean(USE_STATISTIC_CUSTOMER, enabled); 
 	}
 
 	public boolean getPrintDaysTransfert() {
-		return getBoolean(PRINT_DAYS_TRANSFERT, Boolean.FALSE); //ricerca prima a livello di servizio poi di dominio
+		return getBoolean(PRINT_DAYS_TRANSFERT, Boolean.FALSE); 
 	}
 
 	public void setPrintDaysTransfert(boolean enabled) {
-		setBoolean(PRINT_DAYS_TRANSFERT, enabled); //imposta il settings a livello di dominio
+		setBoolean(PRINT_DAYS_TRANSFERT, enabled); 
 	}
 
 	public boolean getPrintTransfertDescription() {
-		return getBoolean(PRINT_TRANSFERT_DESCRIPTION, Boolean.FALSE); //ricerca prima a livello di servizio poi di dominio
+		return getBoolean(PRINT_TRANSFERT_DESCRIPTION, Boolean.FALSE); 
 	}
 
 	public void setPrintTransfertDescription(boolean enabled) {
-		setBoolean(PRINT_TRANSFERT_DESCRIPTION, enabled); //imposta il settings a livello di dominio
+		setBoolean(PRINT_TRANSFERT_DESCRIPTION, enabled); 
 	}
 
 	public boolean getPrintSignature() {
-		return getBoolean(PRINT_SIGNATURE, Boolean.FALSE); //ricerca prima a livello di servizio poi di dominio
+		return getBoolean(PRINT_SIGNATURE, Boolean.FALSE); 
 	}
 
 	public void setPrintSignature(boolean enabled) {
-		setBoolean(PRINT_SIGNATURE, enabled); //imposta il settings a livello di dominio
+		setBoolean(PRINT_SIGNATURE, enabled);
 	}
 
 	public Integer getRoundingHour() {
-		return getInteger(ROUNDING_HOUR, -1); //ricerca prima a livello di servizio poi di dominio
+		return getInteger(ROUNDING_HOUR, -1);
 	}
 
 	public void setRoundingHour(Integer rounding) {
-		setInteger(ROUNDING_HOUR, rounding == null ? -1 : rounding); //imposta il settings a livello di dominio
+		setInteger(ROUNDING_HOUR, rounding == null ? -1 : rounding);
 	}
 
 	public boolean getTracking() {
-		return getBoolean(TRACKING, Boolean.FALSE); //ricerca prima a livello di servizio poi di dominio
+		return getBoolean(TRACKING, Boolean.FALSE);
 	}
 
 	public void setTracking(boolean enabled) {
-		setBoolean(TRACKING, enabled); //imposta il settings a livello di dominio
+		setBoolean(TRACKING, enabled);
 	}
 
 	public boolean getMailTracking() {
-		return getBoolean(MAIL_TRACKING, Boolean.FALSE); //ricerca prima a livello di servizio poi di dominio
+		return getBoolean(MAIL_TRACKING, Boolean.FALSE);
 	}
 
 	public void setMailTracking(boolean enabled) {
-		setBoolean(MAIL_TRACKING, enabled); //imposta il settings a livello di dominio
+		setBoolean(MAIL_TRACKING, enabled);
 	}
 
 	public boolean getCloudTracking() {
-		return getBoolean(CLOUD_TRACKING, Boolean.FALSE); //ricerca prima a livello di servizio poi di dominio
+		return getBoolean(CLOUD_TRACKING, Boolean.FALSE);
 	}
 
 	public void setCloudTracking(boolean enabled) {
-		setBoolean(CLOUD_TRACKING, enabled); //imposta il settings a livello di dominio
+		setBoolean(CLOUD_TRACKING, enabled);
 	}
 	
 	public boolean getDefaultApplySignature() {

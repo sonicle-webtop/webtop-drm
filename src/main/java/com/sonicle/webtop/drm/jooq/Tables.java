@@ -132,6 +132,16 @@ public class Tables {
 	public static final com.sonicle.webtop.drm.jooq.tables.ProfilesSupervisedUsers PROFILES_SUPERVISED_USERS = com.sonicle.webtop.drm.jooq.tables.ProfilesSupervisedUsers.PROFILES_SUPERVISED_USERS;
 
 	/**
+	 * The table drm.timetable_events
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.TimetableEvents TIMETABLE_EVENTS = com.sonicle.webtop.drm.jooq.tables.TimetableEvents.TIMETABLE_EVENTS;
+
+	/**
+	 * The table drm.timetable_report_temp
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.TimetableReportTemp TIMETABLE_REPORT_TEMP = com.sonicle.webtop.drm.jooq.tables.TimetableReportTemp.TIMETABLE_REPORT_TEMP;
+
+	/**
 	 * The table drm.timetable_settings
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.TimetableSettings TIMETABLE_SETTINGS = com.sonicle.webtop.drm.jooq.tables.TimetableSettings.TIMETABLE_SETTINGS;

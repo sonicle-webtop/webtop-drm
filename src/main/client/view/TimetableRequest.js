@@ -267,7 +267,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 									reference: 'fldcancellationrequest',
 									bind: '{record.cancRequest}',
 									boxLabel: me.mys.res('timetableRequest.fld-cancellationRequest.lbl'),
-									boxLabelAlign: 'before',
+									hideEmptyLabel: false,
 									hidden: true,
 									listeners: {
 										change: function (t, newV, oldV, o) {

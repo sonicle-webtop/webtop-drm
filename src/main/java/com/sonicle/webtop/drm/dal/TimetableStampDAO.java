@@ -34,15 +34,21 @@ package com.sonicle.webtop.drm.dal;
 
 import com.sonicle.webtop.core.dal.BaseDAO;
 import com.sonicle.webtop.core.dal.DAOException;
+import com.sonicle.webtop.drm.bol.OTimetableReport;
 import com.sonicle.webtop.drm.bol.OTimetableStamp;
 import static com.sonicle.webtop.drm.jooq.Sequences.SEQ_TIMETABLE_STAMP;
 import static com.sonicle.webtop.drm.jooq.Tables.TIMETABLE_STAMP;
+import static com.sonicle.webtop.drm.jooq.Tables.EMPLOYEE_PROFILES;
+import static com.sonicle.webtop.drm.jooq.Tables.TIMETABLE_SETTINGS;
+import static com.sonicle.webtop.drm.jooq.Tables.COMPANIES_USERS;
 import com.sonicle.webtop.drm.jooq.tables.records.TimetableStampRecord;
 import java.sql.Connection;
+import java.sql.Timestamp;
 import java.util.List;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
 import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.impl.DSL;
 
 /**
  *
@@ -83,13 +89,16 @@ public class TimetableStampDAO extends BaseDAO{
 			.execute();
 	}
 	
-	public List<OTimetableStamp> getDailyStampsByDomainType(Connection con, String domainId, String type) throws DAOException {
+	public List<OTimetableStamp> getDailyStampsByDomainUserIdType(Connection con, String domainId, String userId, String type) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		return dsl
 				.select()
 				.from(TIMETABLE_STAMP)
 				.where(
 						TIMETABLE_STAMP.DOMAIN_ID.equal(domainId)
+				)
+				.and(
+						TIMETABLE_STAMP.USER_ID.equal(userId)
 				)
 				.and(
 						TIMETABLE_STAMP.TYPE.equal(type)
@@ -100,7 +109,7 @@ public class TimetableStampDAO extends BaseDAO{
 				.fetchInto(OTimetableStamp.class);
 	}
 	
-	public List<OTimetableStamp> getDailyStampsByDomain(Connection con, String domainId) throws DAOException {
+	public List<OTimetableStamp> getDailyStampsByDomainUserId(Connection con, String domainId, String userId) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		return dsl
 				.select()
@@ -109,8 +118,67 @@ public class TimetableStampDAO extends BaseDAO{
 						TIMETABLE_STAMP.DOMAIN_ID.equal(domainId)
 				)
 				.and(
+						TIMETABLE_STAMP.USER_ID.equal(userId)
+				)
+				.and(
 						TIMETABLE_STAMP.ENTRANCE.between(new DateTime().withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0), new DateTime().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
 				)
 				.fetchInto(OTimetableStamp.class);
+	}
+	
+	public List<OTimetableReport> getStampsByDomainUserDateRange(Connection con, String domainId, Integer companyId, String userId, Integer fromDay, Integer month, Integer year, String type) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		
+		Field<Integer> workingHours = DSL.field("((DATE_PART('day', {0} - {1}) * 24 + DATE_PART('hour', {0} - {1})) * 60 + DATE_PART('minute', {0} - {1}))", Integer.class, TIMETABLE_STAMP.EXIT, TIMETABLE_STAMP.ENTRANCE);
+		Field<String> detail = DSL.field("'e ' || to_char({0}, 'HH24:MI') || ' u ' || to_char({1}, 'HH24:MI') || ' '", String.class, TIMETABLE_STAMP.ENTRANCE, TIMETABLE_STAMP.EXIT);
+		
+		return dsl
+				.select(
+						TIMETABLE_STAMP.DOMAIN_ID, 
+						COMPANIES_USERS.COMPANY_ID,
+						TIMETABLE_STAMP.USER_ID, 
+						TIMETABLE_STAMP.ENTRANCE.as("date"),
+						workingHours.as("working_hours"),
+						detail.as("detail")
+				)
+				.from(TIMETABLE_STAMP)
+				.leftOuterJoin(
+						EMPLOYEE_PROFILES
+				)
+				.on(
+						EMPLOYEE_PROFILES.USER_ID.equal(TIMETABLE_STAMP.USER_ID)
+				)
+				.join(
+						TIMETABLE_SETTINGS
+				)
+				.on(
+						TIMETABLE_SETTINGS.DOMAIN_ID.equal(TIMETABLE_STAMP.DOMAIN_ID)
+				)
+				.join(
+						COMPANIES_USERS
+				)
+				.on(
+						COMPANIES_USERS.USER_ID.equal(TIMETABLE_STAMP.USER_ID)
+				)
+				.where(
+						TIMETABLE_STAMP.DOMAIN_ID.equal(domainId)
+				)
+				.and(
+						TIMETABLE_STAMP.USER_ID.equal(userId)
+				)
+				.and(
+						TIMETABLE_STAMP.ENTRANCE.between(new DateTime().withYear(year).withMonthOfYear(month).withDayOfMonth(fromDay).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0), new DateTime().withYear(year).withMonthOfYear(month).dayOfMonth().withMaximumValue().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
+				)
+				.and(
+						TIMETABLE_STAMP.EXIT.between(new DateTime().withYear(year).withMonthOfYear(month).withDayOfMonth(fromDay).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0), new DateTime().withYear(year).withMonthOfYear(month).dayOfMonth().withMaximumValue().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
+				)
+				.and(
+						TIMETABLE_STAMP.TYPE.equal(type)
+				)
+				.and(
+						COMPANIES_USERS.COMPANY_ID.equal(companyId)
+				)
+				.orderBy(TIMETABLE_STAMP.USER_ID, TIMETABLE_STAMP.ENTRANCE)
+				.fetchInto(OTimetableReport.class);
 	}
 }

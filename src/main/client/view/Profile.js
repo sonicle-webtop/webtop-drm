@@ -38,7 +38,7 @@ Ext.define('Sonicle.webtop.drm.view.Profile', {
 		'Sonicle.webtop.drm.ux.CustomerGrid'
 	],
 	dockableConfig: {
-		title: '{profile.tit}', //localizzato
+		title: '{profile.tit}',
 		iconCls: 'wtdrm-icon-configuration-profilesconfiguration-xs',
 		width: 500,
 		height: 500
@@ -90,7 +90,7 @@ Ext.define('Sonicle.webtop.drm.view.Profile', {
 					actionsInToolbar: false,
 					width: '100%',
 					bind: {
-						store: '{record.associatedUsers}' //record. nome proprietà con dentro gli utenti
+						store: '{record.associatedUsers}'
 					},
 					listeners: {
 						pick: function (s, vals, recs) {
@@ -116,7 +116,7 @@ Ext.define('Sonicle.webtop.drm.view.Profile', {
 							itemId: 'E',
 							sid: me.mys.ID,
 							bind: {
-								store: '{record.associatedCustomers}' //record. nome proprietà con dentro gli utenti
+								store: '{record.associatedCustomers}'
 							},
 							listeners: {
 								pick: function (s, vals, recs) {
@@ -135,8 +135,7 @@ Ext.define('Sonicle.webtop.drm.view.Profile', {
 							actionsInToolbar: false,
 							width: '100%',
 							bind: {
-								store: '{record.supervisedUsers}' //record. nome proprietà con dentro gli utenti
-										//	,hidden: '{foHiddenCard}'
+								store: '{record.supervisedUsers}'
 							},
 							listeners: {
 								pick: function (s, vals, recs) {
@@ -150,26 +149,7 @@ Ext.define('Sonicle.webtop.drm.view.Profile', {
 					]
 				}
 			]
-		}
-		/*	{
-		 xtype: 'wtdrmusergrid',
-		 title: me.mys.res('profile.gpAssignedUsers.tit'),
-		 sid: me.mys.ID,
-		 actionsInToolbar: false,
-		 width: '100%',
-		 bind: {
-		 store: '{record.associatedUsers}' //record. nome proprietà con dentro gli utenti
-		 },
-		 listeners: {
-		 pick: function (s, vals, recs) {
-		 var mo = me.getModel();
-		 mo.associatedUsers().add({
-		 userId: vals
-		 });
-		 }
-		 }
-		 } */
-		);
+		});
 	}
 });
 

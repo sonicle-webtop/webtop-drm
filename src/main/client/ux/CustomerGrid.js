@@ -104,8 +104,8 @@ Ext.define('Sonicle.webtop.drm.ux.CustomerGrid', {
 			items: [{
 					xtype: 'solistpicker',
 					store: me.lookupStore,
-					enableGrouping: false, //abilita il raggruppamento step 1 vd 
-					valueField: 'id', //sempre 'id' poiche arriva dal SimpleModel
+					enableGrouping: false, 
+					valueField: 'id', 
 					displayField: 'desc',
 					searchField: 'desc',
 					emptyText: WT.res(me.sid, 'grid.empty'),
@@ -142,7 +142,7 @@ Ext.define('Sonicle.webtop.drm.ux.CustomerGrid', {
 			this.removeAction.setDisabled(sel.length === 0);
 		},
 		onStoreRemove: function (s, recs) {
-			this.getSelectionModel().deselect(recs); // Fix for updating selection
+			this.getSelectionModel().deselect(recs);
 		},
 		onAddClick: function () {
 			var me = this;

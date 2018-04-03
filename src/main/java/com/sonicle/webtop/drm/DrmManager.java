@@ -71,6 +71,8 @@ import com.sonicle.webtop.drm.bol.OLeaveRequestType;
 import com.sonicle.webtop.drm.bol.OProfileMasterdata;
 import com.sonicle.webtop.drm.bol.OProfileSupervisedUser;
 import com.sonicle.webtop.drm.bol.OProfileMember;
+import com.sonicle.webtop.drm.bol.OTimetableEvent;
+import com.sonicle.webtop.drm.bol.OTimetableReport;
 import com.sonicle.webtop.drm.bol.OTimetableSetting;
 import com.sonicle.webtop.drm.bol.OTimetableStamp;
 import com.sonicle.webtop.drm.bol.OWorkReport;
@@ -78,7 +80,6 @@ import com.sonicle.webtop.drm.bol.OWorkReportAttachment;
 import com.sonicle.webtop.drm.bol.OWorkReportRow;
 import com.sonicle.webtop.drm.bol.OWorkReportSetting;
 import com.sonicle.webtop.drm.bol.OWorkType;
-import com.sonicle.webtop.drm.bol.model.RBWorkReportRows;
 import com.sonicle.webtop.drm.dal.BusinessTripDao;
 import com.sonicle.webtop.drm.dal.CompanyDAO;
 import com.sonicle.webtop.drm.dal.CompanyPictureDAO;
@@ -101,6 +102,8 @@ import com.sonicle.webtop.drm.dal.LeaveRequestDocumentDAO;
 import com.sonicle.webtop.drm.dal.ProfileMasterdataDAO;
 import com.sonicle.webtop.drm.dal.ProfileSupervisedUserDAO;
 import com.sonicle.webtop.drm.dal.ProfileMemberDAO;
+import com.sonicle.webtop.drm.dal.TimetableEventDAO;
+import com.sonicle.webtop.drm.dal.TimetableReportDAO;
 import com.sonicle.webtop.drm.dal.TimetableSettingDAO;
 import com.sonicle.webtop.drm.dal.TimetableStampDAO;
 import com.sonicle.webtop.drm.dal.WorkReportAttachmentDAO;
@@ -130,6 +133,7 @@ import com.sonicle.webtop.drm.model.LeaveRequestDocument;
 import com.sonicle.webtop.drm.model.ProfileMasterdata;
 import com.sonicle.webtop.drm.model.ProfileSupervisedUser;
 import com.sonicle.webtop.drm.model.ProfileMember;
+import com.sonicle.webtop.drm.model.TimetableReport;
 import com.sonicle.webtop.drm.model.TimetableSetting;
 import com.sonicle.webtop.drm.model.TimetableStamp;
 import com.sonicle.webtop.drm.model.UserForManager;
@@ -146,8 +150,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -162,6 +166,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.imgscalr.Scalr;
 import org.joda.time.Interval;
+import org.joda.time.LocalDate;
 import org.joda.time.Period;
 
 /**
@@ -735,7 +740,6 @@ public class DrmManager extends BaseManager {
 		return oDstat;
 	}
 
-	//qnd arrica dall'api
 	private DocStatus createDocStatus(ODocStatus oDstat) {
 		if (oDstat == null) {
 			return null;
@@ -973,8 +977,6 @@ public class DrmManager extends BaseManager {
 		group.setDescription(oGroup.getDescription());
 		group.setGroupCategory(oGroup.getGroupCategory());
 		group.setGroupType(oGroup.getGroupType());
-//		group.setSupervisiorUserId(oGroup.getSupervisiorUserId());
-//		group.setCustomerId(oGroup.getCustomerId());
 
 		return group;
 	}
@@ -992,8 +994,6 @@ public class DrmManager extends BaseManager {
 		oGroup.setDescription(group.getDescription());
 		oGroup.setGroupCategory(group.getGroupCategory());
 		oGroup.setGroupType(group.getGroupType());
-//		oGroup.setSupervisiorUserId(group.getSupervisiorUserId());
-//		oGroup.setCustomerId(group.getCustomerId());
 
 		return oGroup;
 	}
@@ -1026,7 +1026,6 @@ public class DrmManager extends BaseManager {
 		return oGrpUsr;
 	}
 
-	//-----------------------------------------------------------------
 	public List<ODrmProfile> listProfiles() throws WTException {
 		Connection con = null;
 		DrmProfileDAO pflDao = DrmProfileDAO.getInstance();
@@ -1787,7 +1786,6 @@ public class DrmManager extends BaseManager {
 		return fill;
 	}
 
-	//-----------------------------------------------------------------
 	public List<ODrmFolder> listFolders() throws WTException {
 		Connection con = null;
 		DrmFolderDAO fldDao = DrmFolderDAO.getInstance();
@@ -1952,7 +1950,6 @@ public class DrmManager extends BaseManager {
 		return oFld;
 	}
 
-	//qnd arrica dall'api
 	private DrmFolder createFolder(ODrmFolder oFld) {
 		if (oFld == null) {
 			return null;
@@ -2067,7 +2064,6 @@ public class DrmManager extends BaseManager {
 				wrkDDao.insert(con, newWrkDetail);
 			}
 
-			//INSERT ATTACHMENT IN DB
 			for (WorkReportAttachment attachment : wrkRpt.getAttachments()) {
 				OWorkReportAttachment oAtt = createOWorkReportAttachment(attachment);
 				oAtt.setWorkReportId(newWorkReport.getWorkReportId());
@@ -2083,7 +2079,7 @@ public class DrmManager extends BaseManager {
 			if (!destDir.exists()) {
 				destDir.mkdir();
 			}
-			//TODO CREAZIONE REALE DEL FILE SU FILESYSTEM
+			
 			for (WorkReportAttachment attachment : wrkRpt.getAttachments()) {
 
 				File file = files.get(attachment.getWorkReportAttachmentId());
@@ -2197,14 +2193,12 @@ public class DrmManager extends BaseManager {
 
 		Connection con = null;
 		WorkReportDAO wrkDao = WorkReportDAO.getInstance();
-		//WorkReportRowDAO wrkDDao = WorkReportRowDAO.getInstance();
 
 		try {
 			con = WT.getConnection(SERVICE_ID, false);
 
 			wrkDao.logicalDelete(con, workReportId, createRevisionTimestamp());
 
-			//wrkDDao.deleteByWorkReport(con, workReportId);
 			DbUtils.commitQuietly(con);
 
 		} catch (SQLException | DAOException ex) {
@@ -2536,10 +2530,13 @@ public class DrmManager extends BaseManager {
 	}
 
 	public OLeaveRequest updateLeaveRequest(LeaveRequest item, HashMap<String, File> files) throws WTException {
-
 		Connection con = null;
 		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
 		LeaveRequestDocumentDAO docDao = LeaveRequestDocumentDAO.getInstance();
+		TimetableEventDAO teDao = TimetableEventDAO.getInstance();
+		EmployeeProfileDAO epDao = EmployeeProfileDAO.getInstance();
+		HourProfileDAO hpDao = HourProfileDAO.getInstance();
+		LineHourDAO lhDao = LineHourDAO.getInstance();
 		
 		try {
 			DateTime revisionTimestamp = createRevisionTimestamp();
@@ -2554,6 +2551,44 @@ public class DrmManager extends BaseManager {
 			if(lr.getResult() != null){
 				lr.setManagerRespTimestamp(revisionTimestamp);
 				lr.setStatus("C");
+				
+				if(lr.getResult() == true){
+					//Insert in TimetableEvents
+					List<LocalDate> dts = getDateRange(lr.getFromDate(), lr.getToDate());
+
+					for(LocalDate ld : dts){
+						OTimetableEvent oTe = new OTimetableEvent();
+						oTe.setTimetableEventId(teDao.getSequence(con).intValue());
+						oTe.setDomainId(lr.getDomainId());
+						oTe.setCompanyId(lr.getCompanyId());
+						oTe.setUserId(lr.getUserId());
+						oTe.setType(lr.getType());
+						oTe.setDate(ld);
+
+						String hRange = null;
+						
+						if(lr.getFromHour() == null || lr.getToHour() == null){
+							//Get Hours from Template
+							OEmployeeProfile ep = epDao.selectEmployeeProfileByDomainUser(con, lr.getDomainId(), lr.getUserId());
+							
+							if(ep != null){
+								OHourProfile hp = hpDao.selectHourProfileById(con, ep.getHourProfileId());
+
+								if(hp != null){
+									hRange = lhDao.selectSumLineHourByHourProfileIdDayOfWeek(con, hp.getId(), ld.getDayOfWeek());
+								}
+							}
+						}else{
+							hRange = getHourRange(lr.getFromHour(), lr.getToHour());
+						}
+						
+						if(hRange == null) hRange = "8";
+						
+						oTe.setHour(hRange);
+						
+						teDao.insert(con, oTe);
+					}
+				}
 			}
 			if(lr.getCancResult() != null){
 				lr.setManagerCancRespTimetamp(revisionTimestamp);
@@ -2609,6 +2644,39 @@ public class DrmManager extends BaseManager {
 			DbUtils.closeQuietly(con);
 		}
 	}
+	
+	public static List<LocalDate> getDateRange(LocalDate start, LocalDate end) {
+        List<LocalDate> ret = new ArrayList<LocalDate>();
+        LocalDate tmp = start;
+        while(tmp.isBefore(end) || tmp.equals(end)) {
+            ret.add(tmp);
+            tmp = tmp.plusDays(1);
+        }
+        return ret;
+    }
+	
+	public String getHourRange(String start, String end) {
+        String[] fractions1 = start.split(":");
+		String[] fractions2 = end.split(":");
+		
+		Integer hours1 = Integer.parseInt(fractions1[0]);
+		Integer hours2 = Integer.parseInt(fractions2[0]);
+		Integer minutes1 = Integer.parseInt(fractions1[1]);
+		Integer minutes2 = Integer.parseInt(fractions2[1]); 
+		
+		int hourDiff = hours2- hours1;
+		
+		int minutesDiff = minutes2 - minutes1;
+		
+		if (minutesDiff < 0) {
+			minutesDiff = 60 + minutesDiff;
+			hourDiff--;
+		}
+		if (hourDiff < 0) {
+			hourDiff = 24 + hourDiff ;
+		}
+		return hourDiff + "." + minutesDiff;
+    }
 
 	public void deleteLeaveRequest(Integer leaveRequestId) throws WTException {
 
@@ -3675,8 +3743,8 @@ public class DrmManager extends BaseManager {
 
 			OTimetableStamp oTS = createOTimetableStamp(stamp);
 			
-			//Guardo le timbrature di giornata, se non esite nemmeno una allora insert oggetto nuovo, altrimenti faccio controlli su uscita
-			stamps = tsDao.getDailyStampsByDomainType(con, getTargetProfileId().getDomainId(), oTS.getType());
+			//Check stamps, if not exixt insert a new object, else check exit
+			stamps = tsDao.getDailyStampsByDomainUserIdType(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), oTS.getType());
 			
 			if(stamps.size() > 0){
 				for(OTimetableStamp ts : stamps){
@@ -3730,7 +3798,7 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID);
 
-			tss = tsDao.getDailyStampsByDomain(con, getTargetProfileId().getDomainId());
+			tss = tsDao.getDailyStampsByDomainUserId(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
 
 			return tss;
 
@@ -3739,5 +3807,292 @@ public class DrmManager extends BaseManager {
 		} finally {
 			DbUtils.closeQuietly(con);
 		}
+	}
+	
+	public List<OTimetableReport> generateTimetableReport(TimetableReportQuery query) throws WTException {
+		Connection con = null;
+		List<OTimetableReport> trs = new ArrayList();
+		List<OTimetableReport> ttrs;
+		List<OTimetableReport> trsf = null;
+		List<OTimetableEvent> te = null;
+		
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			TimetableReportDAO trDao = TimetableReportDAO.getInstance();
+			TimetableStampDAO tstmpDao = TimetableStampDAO.getInstance();
+			TimetableEventDAO teDao = TimetableEventDAO.getInstance();
+
+			if(query != null){
+				//Empty Table
+				trDao.deleteByDomainId(con, getTargetProfileId().getDomainId());
+				
+				//Reset Sequence
+				trDao.restartTimetableReportTempSequence(con);
+
+				//Get Data - Calculate Working Hours and Extraordinary (If permits from settings)
+				if(query.userId == null){
+					//Get Data for All Users for Company
+					List<OUser> users = listCompanyUsers(query.companyId);
+					for (OUser usr : users) {
+						ttrs = new ArrayList();
+						
+						trsf = tstmpDao.getStampsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year, "M");
+						te = teDao.getEventsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
+
+						ttrs.addAll(mergeStampByDate(trsf, con));
+						ttrs.addAll(mergeEventByDate(createOTimetableReport(te)));
+						
+						ttrs = mergeStampAndEventByDate(ttrs);
+						
+						trs.addAll(ttrs);
+					}
+				}else{
+					//Get Data for Single User Selected
+					trsf = tstmpDao.getStampsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.userId, query.fromDay, query.month, query.year, "M");
+					te = teDao.getEventsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.userId, query.fromDay, query.month, query.year);
+
+					trs.addAll(mergeStampByDate(trsf, con));
+					trs.addAll(mergeEventByDate(createOTimetableReport(te)));
+					
+					trs = mergeStampAndEventByDate(trs);
+				}
+				
+				//Insert Data in Table
+				for(OTimetableReport otr : trs){
+					otr.setId(trDao.getTimetableReportTempSequence(con).intValue());
+					trDao.insert(con, otr);
+				}
+			}
+			
+			//Select for DomainId
+			trs = trDao.selectByDomainId(con, getTargetProfileId().getDomainId());
+			
+			DbUtils.commitQuietly(con);
+
+			return trs;
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	private List<OTimetableReport> mergeStampByDate(List<OTimetableReport> trsf, Connection con){
+		TimetableSettingDAO tsDao = TimetableSettingDAO.getInstance();
+		EmployeeProfileDAO epDao = EmployeeProfileDAO.getInstance();
+		
+		TimetableSetting setting = createTimetableSetting(tsDao.selectByDomainId(con, getTargetProfileId().getDomainId()));
+		OEmployeeProfile oep = null;
+		Integer tolerance = 0;
+		
+		HashMap<LocalDate, OTimetableReport> hashTr = new HashMap();
+		
+		//Add the minutes worked
+		for(OTimetableReport otr : trsf){
+			if(hashTr.get(otr.getDate().toLocalDate()) == null){
+				hashTr.put(otr.getDate().toLocalDate(), otr);
+			}else{
+				String wh1 = otr.getWorkingHours();
+				String wh2 = hashTr.get(otr.getDate().toLocalDate()).getWorkingHours();
+				
+				
+				Float wh1f = (wh1 != null) ? Float.parseFloat(wh1) : 0.0f;
+				Float wh2f = (wh2 != null) ? Float.parseFloat(wh2) : 0.0f;
+				
+				Float wht = wh1f + wh2f;
+				BigDecimal bd = round(wht, 2);
+				
+				String val = bd.toString();
+				
+				hashTr.get(otr.getDate().toLocalDate()).setWorkingHours(val);
+				hashTr.get(otr.getDate().toLocalDate()).setDetail(hashTr.get(otr.getDate().toLocalDate()).getDetail() + otr.getDetail());
+			}
+		}
+		
+		trsf =  new ArrayList(hashTr.values());
+		
+		//Turn the minutes into hours
+		for(OTimetableReport otr : trsf){
+			oep = epDao.selectEmployeeProfileByDomainUser(con, getTargetProfileId().getDomainId(), otr.getUserId());
+				
+			if(oep != null){
+				if(StringUtils.isEmpty(oep.getTolerance())){
+					if(setting != null){
+						if(!StringUtils.isEmpty(setting.getTotalToleranceInMinutes())){
+							tolerance = Integer.parseInt(setting.getTotalToleranceInMinutes());
+						}
+					}
+				}else{
+					tolerance = Integer.parseInt(oep.getTolerance());
+				}
+			}
+
+			Float wht = (float) (Float.parseFloat(otr.getWorkingHours()) + tolerance) / 60f;
+
+			BigDecimal bd = round(wht, 2);
+			String val = bd.toString();
+
+			if(Integer.parseInt(val.substring(val.length() - 2)) > 50)
+				val = val.substring(0, val.length() - 2) + "30";
+			else if(Integer.parseInt(val.substring(val.length() - 2)) < 50)
+				val = val.substring(0, val.length() - 2) + "00";
+
+			otr.setWorkingHours(val);
+		}
+		
+		return trsf;
+	}
+	
+	private List<OTimetableReport> mergeEventByDate(List<OTimetableReport> trsf){
+		
+		HashMap<LocalDate, OTimetableReport> hashTr = new HashMap();
+	
+		for(OTimetableReport otr : trsf){
+			if(hashTr.get(otr.getDate().toLocalDate()) == null){
+				hashTr.put(otr.getDate().toLocalDate(), otr);
+			}else{
+				if(hashTr.get(otr.getDate().toLocalDate()).getOvertime() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setOvertime(otr.getOvertime());
+				if(hashTr.get(otr.getDate().toLocalDate()).getPaidLeave() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setPaidLeave(otr.getPaidLeave());
+				if(hashTr.get(otr.getDate().toLocalDate()).getUnpaidLeave() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setUnpaidLeave(otr.getUnpaidLeave());
+				if(hashTr.get(otr.getDate().toLocalDate()).getHoliday() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setHoliday(otr.getHoliday());
+				if(hashTr.get(otr.getDate().toLocalDate()).getMedicalVisit() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setMedicalVisit(otr.getMedicalVisit());
+				if(hashTr.get(otr.getDate().toLocalDate()).getContractual() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setContractual(otr.getContractual());
+			}
+		}
+		
+		return new ArrayList(hashTr.values());
+	}
+	
+	private List<OTimetableReport> mergeStampAndEventByDate(List<OTimetableReport> trsf){
+		
+		HashMap<LocalDate, OTimetableReport> hashTr = new HashMap();
+	
+		for(OTimetableReport otr : trsf){
+			if(hashTr.get(otr.getDate().toLocalDate()) == null){
+				hashTr.put(otr.getDate().toLocalDate(), otr);
+			}else{
+				if(hashTr.get(otr.getDate().toLocalDate()).getWorkingHours() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setWorkingHours(otr.getWorkingHours());
+				if(hashTr.get(otr.getDate().toLocalDate()).getCausal() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setCausal(otr.getCausal());
+				if(hashTr.get(otr.getDate().toLocalDate()).getHour() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setHour(otr.getHour());
+				if(hashTr.get(otr.getDate().toLocalDate()).getDetail() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setDetail(otr.getDetail());
+				if(hashTr.get(otr.getDate().toLocalDate()).getNote() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setNote(otr.getNote());
+				if(hashTr.get(otr.getDate().toLocalDate()).getOvertime() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setOvertime(otr.getOvertime());
+				if(hashTr.get(otr.getDate().toLocalDate()).getPaidLeave() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setPaidLeave(otr.getPaidLeave());
+				if(hashTr.get(otr.getDate().toLocalDate()).getUnpaidLeave() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setUnpaidLeave(otr.getUnpaidLeave());
+				if(hashTr.get(otr.getDate().toLocalDate()).getHoliday() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setHoliday(otr.getHoliday());
+				if(hashTr.get(otr.getDate().toLocalDate()).getMedicalVisit() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setMedicalVisit(otr.getMedicalVisit());
+				if(hashTr.get(otr.getDate().toLocalDate()).getContractual() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setContractual(otr.getContractual());
+			}
+		}
+		
+		return new ArrayList(hashTr.values());
+	}
+	
+	public static BigDecimal round(float d, int decimalPlace) {
+        BigDecimal bd = new BigDecimal(Float.toString(d));
+        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_DOWN);       
+		
+        return bd;
+    }
+	
+	private List<OTimetableReport> createOTimetableReport(List<OTimetableEvent> tel){
+		List<OTimetableReport> trl = new ArrayList();
+		OTimetableReport tr = null;
+		
+		for(OTimetableEvent te : tel){
+			tr = new OTimetableReport();
+			
+			tr.setDomainId(te.getDomainId());
+			tr.setCompanyId(te.getCompanyId());
+			tr.setUserId(te.getUserId());
+			tr.setDate(te.getDate().toDateTimeAtStartOfDay());
+			
+			OLeaveRequestType requestType = EnumUtils.forSerializedName(te.getType(), OLeaveRequestType.class);
+			
+			if(OLeaveRequestType.HOLIDAY.equals(requestType)){
+				tr.setHoliday(te.getHour());
+			}else if(OLeaveRequestType.PAID_LEAVE.equals(requestType)){
+				tr.setPaidLeave(te.getHour());
+			}else if(OLeaveRequestType.UNPAID_LEAVE.equals(requestType)){
+				tr.setUnpaidLeave(te.getHour());
+			}else if(OLeaveRequestType.CONTRACTUAL.equals(requestType)){
+				tr.setContractual(te.getHour());
+			}else if(OLeaveRequestType.MEDICAL_VISIT.equals(requestType)){
+				tr.setMedicalVisit(te.getHour());
+			}else if(OLeaveRequestType.OVERTIME.equals(requestType)){
+				tr.setOvertime(te.getHour());
+			}
+			
+			trl.add(tr);
+		}
+		
+		return trl;
+	}
+	
+	public void updateTimetableReport(TimetableReport item) throws WTException {
+		Connection con = null;
+		TimetableReportDAO trDao = TimetableReportDAO.getInstance();
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			OTimetableReport oTr = createOTimetableReport(item);
+
+			trDao.update(con, oTr);
+
+			DbUtils.commitQuietly(con);
+			
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	private OTimetableReport createOTimetableReport(TimetableReport tr) {
+		if (tr == null) {
+			return null;
+		}
+		OTimetableReport oTr = new OTimetableReport();
+		oTr.setId(tr.getId());
+		oTr.setWorkingHours(tr.getWorkingHours());
+		oTr.setOvertime(tr.getOvertime());
+		oTr.setPaidLeave(tr.getPaidLeave());
+		oTr.setUnpaidLeave(tr.getUnpaidLeave());
+		oTr.setHoliday(tr.getHoliday());
+		oTr.setMedicalVisit(tr.getMedicalVisit());
+		oTr.setContractual(tr.getContractual());
+		oTr.setCausal(tr.getCausal());
+		oTr.setHour(tr.getHour());
+		oTr.setDetail(tr.getDetail());
+		oTr.setNote(tr.getNote());
+
+		return oTr;
 	}
 }

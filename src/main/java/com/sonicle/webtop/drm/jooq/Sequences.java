@@ -97,6 +97,16 @@ public class Sequences {
 	public static final org.jooq.Sequence<java.lang.Long> SEQ_PROFILES_USERS = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_profiles_users", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
+	 * The sequence <code>drm.seq_timetable_event</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> SEQ_TIMETABLE_EVENT = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_timetable_event", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
+	 * The sequence <code>drm.seq_timetable_report_temp</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> SEQ_TIMETABLE_REPORT_TEMP = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_timetable_report_temp", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
 	 * The sequence <code>drm.seq_timetable_settings</code>
 	 */
 	public static final org.jooq.Sequence<java.lang.Long> SEQ_TIMETABLE_SETTINGS = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_timetable_settings", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));

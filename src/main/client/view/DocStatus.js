@@ -37,7 +37,7 @@ Ext.define('Sonicle.webtop.drm.view.DocStatus', {
 		'Sonicle.webtop.drm.ux.GroupGrid'
 	],
 	dockableConfig: {
-		title: '{docStatus.tit}', //localizzato
+		title: '{docStatus.tit}',
 		iconCls: 'wtdrm-icon-configuration-statusconfiguration-xs',
 		width: 500,
 		height: 500
@@ -82,14 +82,12 @@ Ext.define('Sonicle.webtop.drm.view.DocStatus', {
 					sid: me.mys.ID,
 					title: me.mys.res('wtdrmgroupgrid.tit'),
 					bind: {
-						store: '{record.associatedGroups}' //il json conterra qst prorpieta con piu id
+						store: '{record.associatedGroups}'
 					},
 					listeners: {
 						pick: function (s, vals, recs) {
-							//evento della griglia che restituisce l'out put del picker
-							var mo = me.getModel(); //modello
+							var mo = me.getModel(); 
 
-							//proprieta del modello che contiene lo store dei dati interessati
 							mo.associatedGroups().add({
 								groupId: vals[0]
 							});

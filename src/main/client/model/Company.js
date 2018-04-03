@@ -45,7 +45,7 @@ Ext.define('Sonicle.webtop.drm.model.Company', {
 	idProperty: 'companyId',
 	fields: [
 		WTF.field('companyId', 'int',true),
-		WTF.field('domainId', 'string',true),//nome,tipo,allowBlank
+		WTF.field('domainId', 'string',true),
 		WTF.field('name', 'string',true),
 		WTF.field('address', 'string',true),
 		WTF.field('postalCode', 'string',true),

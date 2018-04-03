@@ -22,7 +22,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		'Sonicle.webtop.drm.model.GridTimetable',
 		'Sonicle.webtop.drm.ux.TimetableRequestSearch',
 		'Sonicle.webtop.drm.model.GridTimetableRequests',
-		'Sonicle.webtop.drm.view.TimetableRequest'
+		'Sonicle.webtop.drm.view.TimetableRequest',
+		'Sonicle.webtop.drm.ux.TimetableReportGenerate',
+		'Sonicle.webtop.drm.model.GridTimetableReport'
 	],
 	needsReload: true,
 	init: function () {
@@ -483,7 +485,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							columns: [
 								{
 									xtype: 'soiconcolumn',
-									//header: me.res('gpTimetableRequest.approved.lbl'),
 									align: 'center',
 									dataIndex: 'result',
 									getIconCls: function(v, rec) {
@@ -588,7 +589,141 @@ Ext.define('Sonicle.webtop.drm.Service', {
 						}
 					]
 				},
-				{xtype: 'panel'}
+				{
+					xtype: 'container',
+					itemId: 'ttrpt',
+					layout: 'border',
+					items: [
+						{
+							region: 'north',
+							xtype: 'wtdrmtimetablereportgenerate',
+							reference: 'filtersTimetableReport',
+							title: me.res('timetableReport.tit.lbl'),
+							iconCls: 'wtdrm-icon-timetable3-xs',
+							titleCollapse: true,
+							collapsible: true,
+							sid: me.ID,
+							listeners: {
+								generate: function(s, query){
+									WT.confirm(me.res('gpTimetableReport.regeneratereport.lbl'), function (bid) {
+										if (bid === 'yes') {
+											me.reloadTimetableReport(query);
+										}
+									});
+								}
+							}
+						}, {
+							region: 'center',
+							xtype: 'grid',
+							reference: 'gpTimetableReport',
+							modelValidation: true,
+							plugins: [
+								Ext.create('Ext.grid.plugin.CellEditing', {
+									clicksToEdit: 1
+								})
+							],
+							selModel: {
+								selType: 'cellmodel'
+							},
+							store: {
+								autoLoad: true,
+								autoSync: true,
+								model: 'Sonicle.webtop.drm.model.GridTimetableReport',
+								proxy: WTF.apiProxy(me.ID, 'ManageGridTimetableReport')
+							},
+							columns: [
+								{
+									header: me.res('gpTimetableReport.company.lbl'),
+									dataIndex: 'company',
+									editable: false,
+									flex: 1
+								}, {
+									header: me.res('gpTimetableReport.operator.lbl'),
+									dataIndex: 'user',
+									editable: false,
+									flex: 1
+								}, {
+									header: me.res('gpTimetableReport.date.lbl'),
+									dataIndex: 'date',
+									editable: false,
+									flex: 1
+								}, {
+									header: me.res('gpTimetableReport.workingHours.lbl'),
+									dataIndex: 'workingHours',
+									editable: true,
+									editor: 'textfield',
+									flex: 1
+								}, {
+									header: me.res('gpTimetableReport.overtime.lbl'),
+									dataIndex: 'overtime',
+									editable: true,
+									editor: 'textfield',
+									flex: 1
+								}, {
+									header: me.res('gpTimetableReport.paidLeave.lbl'),
+									dataIndex: 'paidLeave',
+									editable: true,
+									editor: 'textfield',
+									flex: 1
+								}, {
+									header: me.res('gpTimetableReport.unpaidLeave.lbl'),
+									dataIndex: 'unpaidLeave',
+									editable: true,
+									editor: 'textfield',
+									flex: 1
+								}, {
+									header: me.res('gpTimetableReport.holiday.lbl'),
+									dataIndex: 'holiday',
+									editable: true,
+									editor: 'textfield',
+									flex: 1
+								}, {
+									header: me.res('gpTimetableReport.medicalVisit.lbl'),
+									dataIndex: 'medicalVisit',
+									editable: true,
+									editor: 'textfield',
+									flex: 1
+								}, {
+									header: me.res('gpTimetableReport.contractual.lbl'),
+									dataIndex: 'contractual',
+									editable: true,
+									editor: 'textfield',
+									flex: 1
+								}, {
+									header: me.res('gpTimetableReport.causal.lbl'),
+									dataIndex: 'causal',
+									editable: true,
+									editor: 'textfield',
+									flex: 1
+								}, {
+									header: me.res('gpTimetableReport.hour.lbl'),
+									dataIndex: 'hour',
+									editable: true,
+									editor: 'textfield',
+									flex: 1
+								}, {
+									header: me.res('gpTimetableReport.detail.lbl'),
+									dataIndex: 'detail',
+									editable: true,
+									editor: 'textfield',
+									flex: 1
+								}, {
+									header: me.res('gpTimetableReport.note.lbl'),
+									dataIndex: 'note',
+									editable: true,
+									editor: 'textfield',
+									flex: 1
+								}
+							],
+							tbar: [
+//								me.getAct('timetableReport', 'save'),
+//								'-',
+								me.getAct('timetableReport', 'print')
+//								me.getAct('timetableReport', 'export')
+							]
+						}
+					]
+				}
 			]
 		}));
 	},
@@ -623,6 +758,18 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	
 	gpTimetableRequestSelected: function () {
 		return this.getMainComponent().lookupReference('gpTimetableRequest').getSelection()[0];
+	},
+	
+	filtersTimetableReport: function () {
+		return this.getMainComponent().lookupReference('filtersTimetableReport');
+	},
+	
+	gpTimetableReport: function () {
+		return this.getMainComponent().lookupReference('gpTimetableReport');
+	},
+	
+	gpTimetableReportSelected: function () {
+		return this.getMainComponent().lookupReference('gpTimetableReportSelected').getSelection()[0];
 	},
 	
 	itemActive: function () {
@@ -773,6 +920,30 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				me.deleteTimetableRequestUI(sel);
 			}
 		});
+		me.addAct('timetableReport', 'save', {
+			text: WT.res('act-save.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-save-xs',
+			handler: function () {
+				
+			}
+		});
+		me.addAct('timetableReport', 'print', {
+			text: WT.res('act-print.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-print-xs',
+			handler: function () {
+				
+			}
+		});
+		me.addAct('timetableReport', 'export', {
+			text: me.res('act-export.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-file-download-xs',
+			handler: function () {
+				
+			}
+		});
 	},
 	
 	initCxm: function () {
@@ -784,7 +955,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 
 		var me = this,
 			vct = WT.createView(me.ID, 'view.WorkReport');
-		vct.getView().on('viewsave', function (s, success, model) { //sender,success,modello
+		vct.getView().on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
 		vct.show(false,
@@ -797,8 +968,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.editWorkReport(rec.get('workReportId'), {
 			callback: function (success, model) {
 				if (success) {
-					//rec.set('text', model.get('name')); //modifico il nodo a livello client senza ricaricare
-					//ottengo lo store del componente 
 					this.gpWorkReport().getStore().load();
 				} else {
 					alert('error');
@@ -837,7 +1006,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					callback: function (success) {
 						if (success)
 							sto.remove(rec);
-						//me.reloadTasks();
 					}
 				});
 			}
@@ -899,7 +1067,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		vct.getView().on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false, //mostro la view
+		vct.show(false, 
 				function () {
 					vct.getView().begin('new');
 				});
@@ -991,7 +1159,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		vct.getView().on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false, //mostro la view
+		vct.show(false, 
 				function () {
 					vct.getView().begin('new');
 				});
@@ -1088,6 +1256,19 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			me.needsReload = true;
 		}
 	},
+	reloadTimetableReport: function (query) {
+		var me = this,
+				pars = {},
+				sto;
+		if (me.isActive() && me.itemActiveId() === 'ttrpt') {
+			sto = me.gpTimetableReport().getStore();
+			if (query !== undefined)
+				Ext.apply(pars, {query: Ext.JSON.encode(query)});
+			WTU.loadWithExtraParams(sto, pars);
+		} else {
+			me.needsReload = true;
+		}
+	},
 	enablingStampButtons: function () {
 		var me = this;
 		WT.ajaxReq(me.ID, 'ChekIpAddressNetwork', {
@@ -1131,6 +1312,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				me.reloadTimetableRequest(me.filtersTimetableRequest().getData());
 				break;
 			case 6:
+				me.reloadTimetableReport(null);
 				break;
 		}
 	}

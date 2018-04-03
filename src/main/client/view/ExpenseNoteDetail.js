@@ -36,7 +36,7 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 		'Sonicle.webtop.drm.model.ExpenseNoteDetail'
 	],
 	dockableConfig: {
-		title: '{expenseNoteDetail.tit}', //localizzato
+		title: '{expenseNoteDetail.tit}',
 		iconCls: 'wtdrm-icon-expensenote-xs',
 		width: 500,
 		height: 370

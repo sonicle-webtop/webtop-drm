@@ -76,6 +76,7 @@ import com.sonicle.webtop.drm.bol.OEmployeeProfile;
 import com.sonicle.webtop.drm.bol.OHourProfile;
 import com.sonicle.webtop.drm.bol.OLeaveRequest;
 import com.sonicle.webtop.drm.bol.OLeaveRequestType;
+import com.sonicle.webtop.drm.bol.OTimetableReport;
 import com.sonicle.webtop.drm.bol.OTimetableStamp;
 import com.sonicle.webtop.drm.bol.OWorkReport;
 import com.sonicle.webtop.drm.bol.OWorkType;
@@ -94,6 +95,7 @@ import com.sonicle.webtop.drm.bol.js.JsGridHourProfile;
 import com.sonicle.webtop.drm.bol.js.JsGridLeaveRequest;
 import com.sonicle.webtop.drm.bol.js.JsGridLineManager;
 import com.sonicle.webtop.drm.bol.js.JsGridProfiles;
+import com.sonicle.webtop.drm.bol.js.JsGridTimetableReport;
 import com.sonicle.webtop.drm.bol.js.JsGridTimetableStamp;
 import com.sonicle.webtop.drm.bol.js.JsGridWorkReports;
 import com.sonicle.webtop.drm.bol.js.JsHourProfile;
@@ -115,6 +117,7 @@ import com.sonicle.webtop.drm.model.GroupCategory;
 import com.sonicle.webtop.drm.model.HourProfile;
 import com.sonicle.webtop.drm.model.LeaveRequest;
 import com.sonicle.webtop.drm.model.LeaveRequestDocument;
+import com.sonicle.webtop.drm.model.TimetableReport;
 import com.sonicle.webtop.drm.model.TimetableSetting;
 import com.sonicle.webtop.drm.model.TimetableStamp;
 import com.sonicle.webtop.drm.model.WorkReport;
@@ -169,16 +172,16 @@ public class Service extends BaseService {
 		RootProgramNode prog = null;
 		ProgramNode subProg = null;
 
-		prog = new RootProgramNode(DrmTreeNode.WORK_REPORT, "wtdrm-icon-workreport-xs");
+		prog = new RootProgramNode(lookupResource(DrmTreeNode.WORK_REPORT), "wtdrm-icon-workreport-xs");
 		programs.put(prog.getId(), prog);
 
-		prog = new RootProgramNode(DrmTreeNode.EXPENSE_NOTE, "wtdrm-icon-expensenote-xs");
+		prog = new RootProgramNode(lookupResource(DrmTreeNode.EXPENSE_NOTE), "wtdrm-icon-expensenote-xs");
 		programs.put(prog.getId(), prog);
 
-		prog = new RootProgramNode(DrmTreeNode.TIMETABLE, "wtdrm-icon-timetable-xs");
-		prog.addSubPrograms(DrmTreeNode.TIMETABLE_STAMP, "wtdrm-icon-timetable1-xs");
-		prog.addSubPrograms(DrmTreeNode.TIMETABLE_REQUEST, "wtdrm-icon-timetable2-xs");
-		prog.addSubPrograms(DrmTreeNode.TIMETABLE_REPORT, "wtdrm-icon-timetable3-xs");
+		prog = new RootProgramNode(lookupResource(DrmTreeNode.TIMETABLE), "wtdrm-icon-timetable-xs");
+		prog.addSubPrograms(lookupResource(DrmTreeNode.TIMETABLE_STAMP), "wtdrm-icon-timetable1-xs");
+		prog.addSubPrograms(lookupResource(DrmTreeNode.TIMETABLE_REQUEST), "wtdrm-icon-timetable2-xs");
+		prog.addSubPrograms(lookupResource(DrmTreeNode.TIMETABLE_REPORT), "wtdrm-icon-timetable3-xs");
 		programs.put(prog.getId(), prog);		
 
 		groupCategories.put(EnumUtils.toSerializedName(GroupCategory.IDENTITY), lookupResource("groupCategory.I"));
@@ -223,7 +226,8 @@ public class Service extends BaseService {
 			
 			new JsonResult(jsUser, meta, jsUser.size()).printTo(out);
 		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupUsers", ex);
 		}
 	}
 	
@@ -239,8 +243,8 @@ public class Service extends BaseService {
 			
 			new JsonResult(jsUser, meta, jsUser.size()).printTo(out);
 		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
 			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupOperators", ex);
 		}
 	}
 
@@ -261,8 +265,8 @@ public class Service extends BaseService {
 				
 			new JsonResult(companies, meta, companies.size()).printTo(out);
 		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
 			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupCompanies", ex);
 		}
 	}
 	
@@ -278,8 +282,8 @@ public class Service extends BaseService {
 			
 			new JsonResult(hourProfiles, hourProfiles.size()).printTo(out);
 		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
 			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupHourProfiles", ex);
 		}
 	}
 	
@@ -296,8 +300,8 @@ public class Service extends BaseService {
 				
 			new JsonResult(companies, meta, companies.size()).printTo(out);
 		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
 			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupAllCompanies", ex);
 		}
 	}
 	
@@ -325,7 +329,8 @@ public class Service extends BaseService {
 				
 			new JsonResult(customers, customers.size()).printTo(out);
 		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupRealCustomers", ex);
 		}
 	}
 	
@@ -342,7 +347,6 @@ public class Service extends BaseService {
 				DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID, new UserProfileId(getEnv().getProfileId().getDomain(), operator));
 
 				chek = manager.checkCustomersByProfileUser(realCustomerId);
-				//if(chek) items = WT.getCoreManager().listChildrenMasterData(realCustomerId, Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER)));
 				items = WT.getCoreManager().listChildrenMasterData(realCustomerId, Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER)));
 				
 				for(MasterData customer : items) {
@@ -359,7 +363,8 @@ public class Service extends BaseService {
 				new JsonResult(customers, meta, customers.size()).printTo(out);
 			
 		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupStatisticCustomers", ex);
 		}
 	}
 	
@@ -386,7 +391,8 @@ public class Service extends BaseService {
 				
 			new JsonResult(customers, customers.size()).printTo(out);
 		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupAllStatisticCustomers", ex);
 		}
 	}
 
@@ -404,7 +410,8 @@ public class Service extends BaseService {
 
 			new JsonResult(docStatuses, meta, docStatuses.size()).printTo(out);
 		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupDocStatuses", ex);
 		}
 	}
 	
@@ -425,8 +432,8 @@ public class Service extends BaseService {
 				
 			new JsonResult(managers, meta, managers.size()).printTo(out);
 		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
 			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupManagers", ex);
 		}
 	}
 	
@@ -454,7 +461,8 @@ public class Service extends BaseService {
 
 			new JsonResult(types, meta, types.size()).printTo(out);
 		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupLeaveRequestType", ex);
 		}
 	}
 
@@ -472,7 +480,8 @@ public class Service extends BaseService {
 
 			new JsonResult(workTypes, meta, workTypes.size()).printTo(out);
 		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupWorkType", ex);
 		}
 	}
 
@@ -487,7 +496,8 @@ public class Service extends BaseService {
 
 			new JsonResult(trips).printTo(out);
 		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupBusinessTrip", ex);
 		}
 	}
 
@@ -507,7 +517,8 @@ public class Service extends BaseService {
 
 			new JsonResult(contacts).printTo(out);
 		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupContacts", ex);
 		}
 	}
 	
@@ -523,8 +534,8 @@ public class Service extends BaseService {
 			}
 			new JsonResult(items, items.size()).printTo(out);
 		} catch (Exception ex) {
-			logger.error("Error in LookupCausals", ex);
 			new JsonResult(ex).printTo(out);
+			logger.error("Error in LookupCausals", ex);
 		}
 	}
 
@@ -546,7 +557,8 @@ public class Service extends BaseService {
 			}
 			new JsonResult(treeNode).printTo(out);
 		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in LoadEnabledProgramTree", ex);
 		}
 
 	}
@@ -680,6 +692,7 @@ public class Service extends BaseService {
 			new JsonResult().printTo(out);
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
+			logger.error("Error in action UpdateConfiguration", ex);
 		} finally {
 		}
 	}
@@ -708,7 +721,8 @@ public class Service extends BaseService {
 			}
 			new JsonResult(treeNode).printTo(out);
 		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LoadGroupsTree", ex);
 		}
 
 	}
@@ -725,7 +739,6 @@ public class Service extends BaseService {
 			} else if (crud.equals(Crud.CREATE)) {
 
 				Payload<MapItem, JsDrmGroup> pl = ServletUtils.getPayload(request, JsDrmGroup.class);
-				//new company
 				manager.addDrmGroup(JsDrmGroup.createDrmGroup(pl.data));
 
 				new JsonResult().printTo(out);
@@ -763,7 +776,8 @@ public class Service extends BaseService {
 
 			new JsonResult(groups).printTo(out);
 		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupGroups", ex);
 		}
 	}
 
@@ -954,7 +968,6 @@ public class Service extends BaseService {
 			} else if (crud.equals(Crud.CREATE)) {
 
 				Payload<MapItem, JsDrmProfile> pl = ServletUtils.getPayload(request, JsDrmProfile.class);
-				//new company
 				manager.addDrmProfile(JsDrmProfile.createDrmProfile(pl.data));
 
 				new JsonResult().printTo(out);
@@ -1045,7 +1058,6 @@ public class Service extends BaseService {
 			} else if (crud.equals(Crud.CREATE)) {
 
 				Payload<MapItem, JsDocStatus> pl = ServletUtils.getPayload(request, JsDocStatus.class);
-				//new company
 				manager.addDocStatus(JsDocStatus.createDocStatus(pl.data));
 
 				new JsonResult().printTo(out);
@@ -1068,7 +1080,6 @@ public class Service extends BaseService {
 			logger.error("Error in action ManageCompany", ex);
 		}
 	}
-//-------------------------------------------------------------------------------------------------------------------------------------------------
 
 	public void processManageGridFolders(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
@@ -1103,7 +1114,6 @@ public class Service extends BaseService {
 			} else if (crud.equals(Crud.CREATE)) {
 
 				Payload<MapItem, JsDrmFolder> pl = ServletUtils.getPayload(request, JsDrmFolder.class);
-				//new company
 				manager.addDrmFolder(JsDrmFolder.createDrmFolder(pl.data));
 
 				new JsonResult().printTo(out);
@@ -1293,7 +1303,6 @@ public class Service extends BaseService {
 			Integer raw = ServletUtils.getIntParameter(request, "raw", 0);
 
 			String fileId = attachmentIds.get(0);
-			//TODO: Implementare download file multipli
 
 			InputStream is = null;
 			FileContent fc = null;
@@ -1632,6 +1641,37 @@ public class Service extends BaseService {
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action ManageGridTimetable", ex);
+		}
+	}
+	
+	public void processManageGridTimetableReport(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			if (crud.equals(Crud.READ)) {
+				String query = ServletUtils.getStringParameter(request, "query", null);
+				
+				TimetableReportQuery trQuery = TimetableReportQuery.fromJson(query);
+				
+				List<JsGridTimetableReport> jsGridTR = new ArrayList();
+				
+				for (OTimetableReport oTR : manager.generateTimetableReport(trQuery)) {
+
+					jsGridTR.add(new JsGridTimetableReport(oTR, manager));
+				}
+				
+				new JsonResult(jsGridTR).printTo(out);
+			}else if(crud.equals(Crud.UPDATE)){
+				Payload<MapItem, JsGridTimetableReport> pl = ServletUtils.getPayload(request, JsGridTimetableReport.class);
+				
+				TimetableReport tr = JsGridTimetableReport.createTimetableReport(pl.data);
+
+				manager.updateTimetableReport(tr);
+
+				new JsonResult().printTo(out);
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageGridTimetableReport", ex);
 		}
 	}
 	

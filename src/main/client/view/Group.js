@@ -37,7 +37,7 @@ Ext.define('Sonicle.webtop.drm.view.Group', {
 		'Sonicle.webtop.drm.ux.UserGrid'
 	],
 	dockableConfig: {
-		title: '{group.tit}', //localizzato
+		title: '{group.tit}',
 		iconCls: 'wtdrm-icon-company-xs',
 		width: 500,
 		height: 500
@@ -147,14 +147,12 @@ Ext.define('Sonicle.webtop.drm.view.Group', {
 							sid: me.mys.ID,
 							title: me.mys.res('wtdrmusergrid.tit'),
 							bind: {
-								store: '{record.associatedUsers}' //il json conterra qst prorpieta con piu id
+								store: '{record.associatedUsers}'
 							},
 							listeners: {
 								pick: function (s, vals, recs) {
-									//evento della griglia che restituisce l'out put del picker
-									var mo = me.getModel(); //modello
-
-									//proprieta del modello che contiene lo store dei dati interessati
+									var mo = me.getModel();
+									
 									mo.associatedUsers().add({
 										userId: vals[0]
 									});
