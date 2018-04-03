@@ -759,6 +759,10 @@ ALTER COLUMN "requests_permits_not_remunered" SET DEFAULT false,
 ALTER COLUMN "requests_permits_medical_visits" SET DEFAULT false,
 ALTER COLUMN "requests_permits_contractuals" SET DEFAULT false;
 
+--------------
+--03/04/2018--
+--------------
+
 CREATE TABLE "drm"."timetable_stamp" (
 "id" int4 NOT NULL,
 "domain_id" varchar(20) NOT NULL,
