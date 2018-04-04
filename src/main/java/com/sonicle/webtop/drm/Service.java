@@ -103,6 +103,7 @@ import com.sonicle.webtop.drm.bol.js.JsLeaveRequest;
 import com.sonicle.webtop.drm.bol.js.JsTimetableSetting;
 import com.sonicle.webtop.drm.bol.js.JsWorkReport;
 import com.sonicle.webtop.drm.bol.js.JsWorkReportSetting;
+import com.sonicle.webtop.drm.bol.model.RBTimetableReport;
 import com.sonicle.webtop.drm.bol.model.RBWorkReport;
 import com.sonicle.webtop.drm.model.Company;
 import com.sonicle.webtop.drm.model.CompanyPicture;
@@ -123,6 +124,7 @@ import com.sonicle.webtop.drm.model.TimetableStamp;
 import com.sonicle.webtop.drm.model.WorkReport;
 import com.sonicle.webtop.drm.model.WorkReportAttachment;
 import com.sonicle.webtop.drm.model.WorkReportSetting;
+import com.sonicle.webtop.drm.rpt.RptTimetableReport;
 import com.sonicle.webtop.drm.rpt.RptWorkReport;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -1541,6 +1543,33 @@ public class Service extends BaseService {
 			
 		} catch(Exception ex) {
 			logger.error("Error in action PrintWorkReport", ex);
+			ex.printStackTrace();
+			ServletUtils.writeErrorHandlingJs(response, ex.getMessage());
+		}
+	}
+	
+	public void processPrintTimetableReport(HttpServletRequest request, HttpServletResponse response) {
+		ArrayList<RBTimetableReport> items = new ArrayList<>();
+		List<OTimetableReport> trs = null;
+		
+		try {
+			String filename = ServletUtils.getStringParameter(request, "filename", "print");
+			
+			trs = manager.getTimetableReport();
+			
+			for(OTimetableReport otr : trs) {
+				items.add(new RBTimetableReport(WT.getCoreManager(), manager, otr));
+			}
+			
+			ReportConfig.Builder builder = reportConfigBuilder();
+			RptTimetableReport rpt = new RptTimetableReport(builder.build());
+			rpt.setDataSource(items);
+			
+			ServletUtils.setFileStreamHeaders(response, filename + ".pdf");
+			WT.generateReportToStream(rpt, AbstractReport.OutputType.PDF, response.getOutputStream());
+			
+		} catch(Exception ex) {
+			logger.error("Error in action PrintTimetableReport", ex);
 			ex.printStackTrace();
 			ServletUtils.writeErrorHandlingJs(response, ex.getMessage());
 		}

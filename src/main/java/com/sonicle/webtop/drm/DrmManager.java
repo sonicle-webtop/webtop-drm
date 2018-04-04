@@ -3882,6 +3882,25 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
+	public List<OTimetableReport> getTimetableReport() throws WTException{
+		Connection con = null;
+		List<OTimetableReport> trs = new ArrayList();
+		TimetableReportDAO trDao = TimetableReportDAO.getInstance();
+
+		try {
+			con = WT.getConnection(SERVICE_ID);
+
+			trs = trDao.selectByDomainId(con, getTargetProfileId().getDomainId());
+
+			return trs;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
 	private List<OTimetableReport> mergeStampByDate(List<OTimetableReport> trsf, Connection con){
 		TimetableSettingDAO tsDao = TimetableSettingDAO.getInstance();
 		EmployeeProfileDAO epDao = EmployeeProfileDAO.getInstance();
@@ -3937,7 +3956,7 @@ public class DrmManager extends BaseManager {
 			BigDecimal bd = round(wht, 2);
 			String val = bd.toString();
 
-			if(Integer.parseInt(val.substring(val.length() - 2)) > 50)
+			if(Integer.parseInt(val.substring(val.length() - 2)) >= 50)
 				val = val.substring(0, val.length() - 2) + "30";
 			else if(Integer.parseInt(val.substring(val.length() - 2)) < 50)
 				val = val.substring(0, val.length() - 2) + "00";

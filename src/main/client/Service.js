@@ -933,7 +933,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			tooltip: null,
 			iconCls: 'wt-icon-print-xs',
 			handler: function () {
-				
+				me.printTimetableReport();
 			}
 		});
 		me.addAct('timetableReport', 'export', {
@@ -1285,6 +1285,11 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				}
 			}
 		});
+	},
+	printTimetableReport: function() {
+		var me = this, url;
+		url = WTF.processBinUrl(me.ID, 'PrintTimetableReport', {});
+		Sonicle.URLMgr.openFile(url, {filename: 'timetablereport', newWindow: true});
 	},
 	
 	configurationView: function () {
