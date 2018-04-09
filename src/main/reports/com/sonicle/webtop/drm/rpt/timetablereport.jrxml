@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.0.final using JasperReports Library version 6.3.0  -->
-<!-- 2018-04-09T14:45:45 -->
+<!-- 2018-04-09T14:55:50 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="timetablereport" printOrder="Horizontal" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="832" leftMargin="5" rightMargin="5" topMargin="5" bottomMargin="5" uuid="0c72a82c-982e-4a49-946e-fff85de6c39f">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
@@ -586,7 +586,10 @@ CONCATENATE(
 )]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="458" y="0" width="82" height="18" uuid="6c73ec5e-b906-423e-bc24-af2c71bfd04c"/>
+					<reportElement x="460" y="0" width="80" height="18" uuid="6c73ec5e-b906-423e-bc24-af2c71bfd04c">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					</reportElement>
 					<textElement textAlignment="Left" verticalAlignment="Top">
 						<font size="7"/>
 					</textElement>
