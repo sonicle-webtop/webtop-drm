@@ -651,43 +651,99 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									header: me.res('gpTimetableReport.workingHours.lbl'),
 									dataIndex: 'workingHours',
 									editable: true,
-									editor: 'textfield',
+									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
+										allowBlank: true,
+										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
+											autoLoad: true
+										}),
+										triggers: {
+											clear: WTF.clearTrigger()
+										}
+									})),
 									flex: 1
 								}, {
 									header: me.res('gpTimetableReport.overtime.lbl'),
 									dataIndex: 'overtime',
 									editable: true,
-									editor: 'textfield',
+									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
+										allowBlank: true,
+										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
+											autoLoad: true
+										}),
+										triggers: {
+											clear: WTF.clearTrigger()
+										}
+									})),
 									flex: 1
 								}, {
 									header: me.res('gpTimetableReport.paidLeave.lbl'),
 									dataIndex: 'paidLeave',
 									editable: true,
-									editor: 'textfield',
+									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
+										allowBlank: true,
+										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
+											autoLoad: true
+										}),
+										triggers: {
+											clear: WTF.clearTrigger()
+										}
+									})),
 									flex: 1
 								}, {
 									header: me.res('gpTimetableReport.unpaidLeave.lbl'),
 									dataIndex: 'unpaidLeave',
 									editable: true,
-									editor: 'textfield',
+									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
+										allowBlank: true,
+										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
+											autoLoad: true
+										}),
+										triggers: {
+											clear: WTF.clearTrigger()
+										}
+									})),
 									flex: 1
 								}, {
 									header: me.res('gpTimetableReport.holiday.lbl'),
 									dataIndex: 'holiday',
 									editable: true,
-									editor: 'textfield',
+									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
+										allowBlank: true,
+										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
+											autoLoad: true
+										}),
+										triggers: {
+											clear: WTF.clearTrigger()
+										}
+									})),
 									flex: 1
 								}, {
 									header: me.res('gpTimetableReport.medicalVisit.lbl'),
 									dataIndex: 'medicalVisit',
 									editable: true,
-									editor: 'textfield',
+									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
+										allowBlank: true,
+										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
+											autoLoad: true
+										}),
+										triggers: {
+											clear: WTF.clearTrigger()
+										}
+									})),
 									flex: 1
 								}, {
 									header: me.res('gpTimetableReport.contractual.lbl'),
 									dataIndex: 'contractual',
 									editable: true,
-									editor: 'textfield',
+									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
+										allowBlank: true,
+										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
+											autoLoad: true
+										}),
+										triggers: {
+											clear: WTF.clearTrigger()
+										}
+									})),
 									flex: 1
 								}, {
 									header: me.res('gpTimetableReport.causal.lbl'),
@@ -699,7 +755,15 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									header: me.res('gpTimetableReport.hour.lbl'),
 									dataIndex: 'hour',
 									editable: true,
-									editor: 'textfield',
+									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
+										allowBlank: true,
+										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
+											autoLoad: true
+										}),
+										triggers: {
+											clear: WTF.clearTrigger()
+										}
+									})),
 									flex: 1
 								}, {
 									header: me.res('gpTimetableReport.detail.lbl'),

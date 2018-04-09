@@ -775,3 +775,10 @@ CREATE TABLE "drm"."timetable_stamp" (
 ALTER TABLE "drm"."timetable_stamp" ADD PRIMARY KEY ("id");
 
 CREATE SEQUENCE "drm"."seq_timetable_stamp";
+
+--------------
+--09/04/2018--
+--------------
+
+ALTER TABLE "drm"."timetable_report_temp"
+ALTER COLUMN "causal" TYPE varchar(500);

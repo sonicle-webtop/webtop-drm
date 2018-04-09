@@ -52,15 +52,15 @@ public class RBTimetableReport {
 	public String userId;
 	public String userDescription;
 	public String date;
-	public String workingHours;
-	public String overtime;
-	public String paidLeave;
-	public String unpaidLeave;
-	public String holiday;
-	public String medicalVisit;
-	public String contractual;
+	public Float workingHours;
+	public Float overtime;
+	public Float paidLeave;
+	public Float unpaidLeave;
+	public Float holiday;
+	public Float medicalVisit;
+	public Float contractual;
 	public String causal;
-	public String hour;
+	public Float hour;
 	public String detail;
 	public String note;
 		
@@ -71,18 +71,35 @@ public class RBTimetableReport {
 		this.userId = otr.getUserId();
 		this.userDescription = WT.getUserData(new UserProfileId(otr.getDomainId(), otr.getUserId())).getDisplayName();
 		this.date = concatDate(otr);
-		this.workingHours = otr.getWorkingHours();
-		this.overtime = otr.getOvertime();
-		this.paidLeave = otr.getPaidLeave();
-		this.unpaidLeave = otr.getUnpaidLeave();
-		this.holiday = otr.getHoliday();
-		this.medicalVisit = otr.getMedicalVisit();
-		this.contractual = otr.getContractual();
+		this.workingHours = convertInMinutes(otr.getWorkingHours());
+		this.overtime = convertInMinutes(otr.getOvertime());
+		this.paidLeave = convertInMinutes(otr.getPaidLeave());
+		this.unpaidLeave = convertInMinutes(otr.getUnpaidLeave());
+		this.holiday = convertInMinutes(otr.getHoliday());
+		this.medicalVisit = convertInMinutes(otr.getMedicalVisit());
+		this.contractual = convertInMinutes(otr.getContractual());
 		this.causal = otr.getCausal();
-		this.hour = otr.getHour();
+		this.hour = convertInMinutes(otr.getHour());
 		this.detail = otr.getDetail();
 		this.note = otr.getNote();
-	}	
+	}
+
+	private Float convertInMinutes(String hour){
+		Integer minutes;
+		
+		if(null == hour){
+			return null;
+		}
+		else {
+			String [] parts = hour.split("\\.");
+			if(parts.length > 1)
+				minutes = ((Integer.parseInt(parts[0])*60) + Integer.parseInt(parts[1]));
+			else 
+				minutes = Integer.parseInt(parts[0])*60;
+			
+			return minutes.floatValue();
+		}
+	}
 	
 	private String concatDate(OTimetableReport otr){		
 		switch(otr.getDate().getDayOfWeek()){
@@ -153,59 +170,59 @@ public class RBTimetableReport {
 		this.date = date;
 	}
 
-	public String getWorkingHours() {
+	public Float getWorkingHours() {
 		return workingHours;
 	}
 
-	public void setWorkingHours(String workingHours) {
+	public void setWorkingHours(Float workingHours) {
 		this.workingHours = workingHours;
 	}
 
-	public String getOvertime() {
+	public Float getOvertime() {
 		return overtime;
 	}
 
-	public void setOvertime(String overtime) {
+	public void setOvertime(Float overtime) {
 		this.overtime = overtime;
 	}
 
-	public String getPaidLeave() {
+	public Float getPaidLeave() {
 		return paidLeave;
 	}
 
-	public void setPaidLeave(String paidLeave) {
+	public void setPaidLeave(Float paidLeave) {
 		this.paidLeave = paidLeave;
 	}
 
-	public String getUnpaidLeave() {
+	public Float getUnpaidLeave() {
 		return unpaidLeave;
 	}
 
-	public void setUnpaidLeave(String unpaidLeave) {
+	public void setUnpaidLeave(Float unpaidLeave) {
 		this.unpaidLeave = unpaidLeave;
 	}
 
-	public String getHoliday() {
+	public Float getHoliday() {
 		return holiday;
 	}
 
-	public void setHoliday(String holiday) {
+	public void setHoliday(Float holiday) {
 		this.holiday = holiday;
 	}
 
-	public String getMedicalVisit() {
+	public Float getMedicalVisit() {
 		return medicalVisit;
 	}
 
-	public void setMedicalVisit(String medicalVisit) {
+	public void setMedicalVisit(Float medicalVisit) {
 		this.medicalVisit = medicalVisit;
 	}
 
-	public String getContractual() {
+	public Float getContractual() {
 		return contractual;
 	}
 
-	public void setContractual(String contractual) {
+	public void setContractual(Float contractual) {
 		this.contractual = contractual;
 	}
 
@@ -217,11 +234,11 @@ public class RBTimetableReport {
 		this.causal = causal;
 	}
 
-	public String getHour() {
+	public Float getHour() {
 		return hour;
 	}
 
-	public void setHour(String hour) {
+	public void setHour(Float hour) {
 		this.hour = hour;
 	}
 

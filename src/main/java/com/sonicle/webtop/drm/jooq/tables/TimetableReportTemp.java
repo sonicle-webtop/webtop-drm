@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableReportTemp extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord> {
 
-	private static final long serialVersionUID = 1121651971;
+	private static final long serialVersionUID = -1808564029;
 
 	/**
 	 * The reference instance of <code>drm.timetable_report_temp</code>
@@ -94,7 +94,7 @@ public class TimetableReportTemp extends org.jooq.impl.TableImpl<com.sonicle.web
 	/**
 	 * The column <code>drm.timetable_report_temp.causal</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord, java.lang.String> CAUSAL = createField("causal", org.jooq.impl.SQLDataType.VARCHAR.length(5), this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord, java.lang.String> CAUSAL = createField("causal", org.jooq.impl.SQLDataType.VARCHAR.length(500), this, "");
 
 	/**
 	 * The column <code>drm.timetable_report_temp.hour</code>.
