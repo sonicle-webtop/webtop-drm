@@ -4026,6 +4026,26 @@ public class DrmManager extends BaseManager {
 			}
 		}
 		
+		//Add empty days into HashMaps
+		if(!trsf.isEmpty()){
+			List<DateTime> dates = new ArrayList();
+			for(int i = trsf.get(0).getDate().dayOfMonth().getMinimumValue(); i <= trsf.get(0).getDate().dayOfMonth().getMaximumValue(); i++){
+				dates.add(trsf.get(0).getDate().withDayOfMonth(i));
+			}
+
+			for(DateTime dt : dates){
+				if(hashTr.get(dt.toLocalDate()) == null){
+					OTimetableReport temp = new OTimetableReport();
+					temp.setDomainId(trsf.get(0).getDomainId());
+					temp.setCompanyId(trsf.get(0).getCompanyId());
+					temp.setUserId(trsf.get(0).getUserId());
+					temp.setDate(dt);
+					
+					hashTr.put(dt.toLocalDate(), temp);
+				}
+			}
+		}
+		
 		return new ArrayList(hashTr.values());
 	}
 	
