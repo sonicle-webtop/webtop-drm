@@ -67,7 +67,7 @@ public class JsGridTimetableReport {
 		this.domainId = tr.getDomainId();
 		this.user = WT.getUserData(new UserProfileId(tr.getDomainId(), tr.getUserId())).getDisplayName();
 		this.company = drmMgr.getCompany(tr.getCompanyId()).getName();
-		this.date = tr.getDate().getDayOfMonth() + "/" + tr.getDate().getMonthOfYear() + "/" + tr.getDate().getYear();
+		this.date = concatDate(tr);
 		this.workingHours =tr.getWorkingHours();
 		this.overtime = tr.getOvertime();
 		this.paidLeave = tr.getPaidLeave();
@@ -98,6 +98,27 @@ public class JsGridTimetableReport {
 		tr.setNote(js.note);
 
 		return tr;
+	}
+	
+	private String concatDate(OTimetableReport otr){		
+		switch(otr.getDate().getDayOfWeek()){
+			case 1:
+				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " Lunedì";
+			case 2: 
+				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " Martedì";
+			case 3: 
+				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " Mercoledì";
+			case 4: 
+				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " Giovedì";
+			case 5: 
+				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " Venerdì";
+			case 6: 
+				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " Sabato";
+			case 7: 
+				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " Domenica";
+			default: 
+				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " ";
+		}
 	}
 
 }
