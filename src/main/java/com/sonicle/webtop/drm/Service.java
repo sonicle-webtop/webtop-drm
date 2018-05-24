@@ -456,9 +456,12 @@ public class Service extends BaseService {
 			types.add(createLeaveRequestJsSimple(OLeaveRequestType.HOLIDAY));
 			types.add(createLeaveRequestJsSimple(OLeaveRequestType.PAID_LEAVE));
 			types.add(createLeaveRequestJsSimple(OLeaveRequestType.OVERTIME));
-			if(ts.getRequestsPermitsNotRemunered())types.add(createLeaveRequestJsSimple(OLeaveRequestType.UNPAID_LEAVE));
-			if(ts.getRequestsPermitsMedicalVisits())types.add(createLeaveRequestJsSimple(OLeaveRequestType.MEDICAL_VISIT));
-			if(ts.getRequestsPermitsContractuals())types.add(createLeaveRequestJsSimple(OLeaveRequestType.CONTRACTUAL));
+			
+			if(ts != null){
+				if(ts.getRequestsPermitsNotRemunered())types.add(createLeaveRequestJsSimple(OLeaveRequestType.UNPAID_LEAVE));
+				if(ts.getRequestsPermitsMedicalVisits())types.add(createLeaveRequestJsSimple(OLeaveRequestType.MEDICAL_VISIT));
+				if(ts.getRequestsPermitsContractuals())types.add(createLeaveRequestJsSimple(OLeaveRequestType.CONTRACTUAL));
+			}
 			
 			String selected = types.isEmpty() ? null : (String) types.get(0).id;
 			ResultMeta meta = new LookupMeta().setSelected(selected);
