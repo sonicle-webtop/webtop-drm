@@ -956,38 +956,46 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	
 	initAction: function () {
 		var me = this;
-		me.addAct('toolbox', 'configurations', {
-			text: me.res('toolbox.configuration.lbl'),
-			tooltip: null,
-			iconCls: 'wtdrm-icon-configuration-xs',
-			handler: function () {
-				me.configurationView();
-			}
-		});
-		me.addAct('toolbox', 'wrSetting', {
-			text: me.res('toolbox.wr-settings.lbl'),
-			tooltip: null,
-			iconCls: 'wt-icon-options-xs',
-			handler: function () {
-				me.workReportSetting();
-			}
-		});
-		me.addAct('toolbox', 'enSetting', {
-			text: me.res('toolbox.en-settings.lbl'),
-			tooltip: null,
-			iconCls: 'wt-icon-options-xs',
-			handler: function () {
-				me.expenseNoteSetting();
-			}
-		});
-		me.addAct('toolbox', 'ttSetting', {
-			text: me.res('toolbox.tt-settings.lbl'),
-			tooltip: null,
-			iconCls: 'wt-icon-options-xs',
-			handler: function () {
-				me.timetableSetting();
-			}
-		});
+		if (WT.isPermitted(me.ID,'CONFIGURATIONS','MANAGE')){
+			me.addAct('toolbox', 'configurations', {
+				text: me.res('toolbox.configuration.lbl'),
+				tooltip: null,
+				iconCls: 'wtdrm-icon-configuration-xs',
+				handler: function () {
+					me.configurationView();
+				}
+			});
+		}
+		if (WT.isPermitted(me.ID,'WORK_REPORT_SETTINGS','MANAGE')){
+			me.addAct('toolbox', 'wrSetting', {
+				text: me.res('toolbox.wr-settings.lbl'),
+				tooltip: null,
+				iconCls: 'wt-icon-options-xs',
+				handler: function () {
+					me.workReportSetting();
+				}
+			});
+		}
+		if (WT.isPermitted(me.ID,'EXPENSE_NOTE_SETTINGS','MANAGE')){
+			me.addAct('toolbox', 'enSetting', {
+				text: me.res('toolbox.en-settings.lbl'),
+				tooltip: null,
+				iconCls: 'wt-icon-options-xs',
+				handler: function () {
+					me.expenseNoteSetting();
+				}
+			});
+		}
+		if (WT.isPermitted(me.ID,'TIMETABLE_SETTINGS','MANAGE')){
+			me.addAct('toolbox', 'ttSetting', {
+				text: me.res('toolbox.tt-settings.lbl'),
+				tooltip: null,
+				iconCls: 'wt-icon-options-xs',
+				handler: function () {
+					me.timetableSetting();
+				}
+			});
+		}
 		me.addAct('workReport', 'add', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
