@@ -34,6 +34,7 @@ package com.sonicle.webtop.drm.dal;
 
 import com.sonicle.webtop.core.dal.BaseDAO;
 import com.sonicle.webtop.core.dal.DAOException;
+import com.sonicle.webtop.drm.TimetableStampQuery;
 import com.sonicle.webtop.drm.bol.OTimetableReport;
 import com.sonicle.webtop.drm.bol.OTimetableStamp;
 import static com.sonicle.webtop.drm.jooq.Sequences.SEQ_TIMETABLE_STAMP;
@@ -46,6 +47,8 @@ import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.List;
 import org.joda.time.DateTime;
+import org.joda.time.LocalTime;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.impl.DSL;
@@ -126,7 +129,28 @@ public class TimetableStampDAO extends BaseDAO{
 				.fetchInto(OTimetableStamp.class);
 	}
 	
-	public List<OTimetableReport> getStampsByDomainUserDateRange(Connection con, String domainId, Integer companyId, String userId, Integer fromDay, Integer month, Integer year, String type) throws DAOException {
+	public List<OTimetableStamp> getStampsListByDomainUserDateRange(Connection con, String domainId, String operatorId, Integer month, Integer year) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		
+		return dsl
+				.select()
+				.from(TIMETABLE_STAMP)
+				.where(
+						TIMETABLE_STAMP.DOMAIN_ID.equal(domainId)
+				)
+				.and(
+						TIMETABLE_STAMP.USER_ID.equal(operatorId)
+				)
+				.and(
+						TIMETABLE_STAMP.ENTRANCE.between(new DateTime().withYear(year).withMonthOfYear(month).withDayOfMonth(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0), new DateTime().withYear(year).withMonthOfYear(month).dayOfMonth().withMaximumValue().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
+				)
+				.and(
+						TIMETABLE_STAMP.EXIT.between(new DateTime().withYear(year).withMonthOfYear(month).withDayOfMonth(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0), new DateTime().withYear(year).withMonthOfYear(month).dayOfMonth().withMaximumValue().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
+				)
+				.fetchInto(OTimetableStamp.class);
+	}
+	
+	public List<OTimetableReport> getStampsByDomainUserDateRange(Connection con, String domainId, Integer companyId, String userId, Integer fromDay, Integer month, Integer year) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		
 		Field<Integer> workingHours = DSL.field("((DATE_PART('day', {0} - {1}) * 24 + DATE_PART('hour', {0} - {1})) * 60 + DATE_PART('minute', {0} - {1}))", Integer.class, TIMETABLE_STAMP.EXIT, TIMETABLE_STAMP.ENTRANCE);
@@ -173,12 +197,22 @@ public class TimetableStampDAO extends BaseDAO{
 						TIMETABLE_STAMP.EXIT.between(new DateTime().withYear(year).withMonthOfYear(month).withDayOfMonth(fromDay).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0), new DateTime().withYear(year).withMonthOfYear(month).dayOfMonth().withMaximumValue().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
 				)
 				.and(
-						TIMETABLE_STAMP.TYPE.equal(type)
+						TIMETABLE_STAMP.TYPE.in(OTimetableStamp.TYPE_MAIN, OTimetableStamp.TYPE_SPECIAL)
 				)
 				.and(
 						COMPANIES_USERS.COMPANY_ID.equal(companyId)
 				)
 				.orderBy(TIMETABLE_STAMP.USER_ID, TIMETABLE_STAMP.ENTRANCE)
 				.fetchInto(OTimetableReport.class);
+	}
+	
+	public int deleteById(Connection con, Integer id) {
+		DSLContext dsl = getDSL(con);
+		return dsl
+			.delete(TIMETABLE_STAMP)
+			.where(
+					TIMETABLE_STAMP.ID.equal(id)
+			)
+			.execute();
 	}
 }

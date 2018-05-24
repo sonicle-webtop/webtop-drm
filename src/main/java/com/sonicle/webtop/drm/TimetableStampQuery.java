@@ -30,17 +30,37 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm.bol;
+package com.sonicle.webtop.drm;
 
-import com.sonicle.webtop.drm.jooq.tables.pojos.TimetableStamp;
+import com.sonicle.commons.web.json.JsonResult;
+import org.joda.time.LocalDate;
 
 /**
  *
  * @author lssndrvs
  */
-public class OTimetableStamp extends TimetableStamp{
-	
-	public final static String TYPE_MAIN = "M";
-	public final static String TYPE_COMPANY = "C";
-	public final static String TYPE_SPECIAL = "S";
+public class TimetableStampQuery {
+
+	public String operatorId;
+	public Integer month;
+	public Integer year;
+
+	public TimetableStampQuery() {
+	}
+
+	public static TimetableStampQuery fromJson(String value) {
+		if (value == null) {
+			return null;
+		}
+
+		return JsonResult.GSON.fromJson(value, TimetableStampQuery.class);
+	}
+
+	public static String toJson(TimetableStampQuery value) {
+		if (value == null) {
+			return null;
+		}
+
+		return JsonResult.GSON.toJson(value, TimetableStampQuery.class);
+	}
 }

@@ -30,17 +30,36 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm.bol;
+package com.sonicle.webtop.drm.bol.js;
 
-import com.sonicle.webtop.drm.jooq.tables.pojos.TimetableStamp;
+import com.sonicle.webtop.core.app.WT;
+import com.sonicle.webtop.core.sdk.UserProfileId;
+import com.sonicle.webtop.drm.bol.OEmployeeProfile;
+import com.sonicle.webtop.drm.bol.OTimetableStamp;
+import org.joda.time.DateTime;
 
 /**
  *
  * @author lssndrvs
  */
-public class OTimetableStamp extends TimetableStamp{
+public class JsGridTimetableStampList {
+		
+	public int id;
+	public String domainId;
+	public String userId;
+	public String type;
+	public String date;
+	public String entrance;
+	public String exit;
 	
-	public final static String TYPE_MAIN = "M";
-	public final static String TYPE_COMPANY = "C";
-	public final static String TYPE_SPECIAL = "S";
+	public JsGridTimetableStampList(OTimetableStamp ts){
+		this.id = ts.getId();
+		this.domainId = ts.getDomainId();
+		this.userId = ts.getUserId();
+		this.type = ts.getType();
+		this.date = (null != ts.getEntrance()) ? ((ts.getEntrance().getDayOfMonth()< 10 ? "0" + ts.getEntrance().getDayOfMonth() : ts.getEntrance().getDayOfMonth()) + "/" + (ts.getEntrance().getMonthOfYear() < 10 ? "0" + ts.getEntrance().getMonthOfYear() : ts.getEntrance().getMonthOfYear()) + "/" + (ts.getEntrance().getYear())) : ("");
+		this.entrance = (null != ts.getEntrance()) ? ((ts.getEntrance().getHourOfDay() < 10 ? "0" + ts.getEntrance().getHourOfDay() : ts.getEntrance().getHourOfDay()) + ":" + (ts.getEntrance().getMinuteOfHour() < 10 ? "0" + ts.getEntrance().getMinuteOfHour() : ts.getEntrance().getMinuteOfHour())) : ("");
+		this.exit = (null != ts.getExit()) ? ((ts.getExit().getHourOfDay() < 10 ? "0" + ts.getExit().getHourOfDay() : ts.getExit().getHourOfDay()) + ":" + (ts.getExit().getMinuteOfHour() < 10 ? "0" + ts.getExit().getMinuteOfHour() : ts.getExit().getMinuteOfHour())) : ("");
+		
+	}
 }

@@ -97,10 +97,12 @@ import com.sonicle.webtop.drm.bol.js.JsGridLineManager;
 import com.sonicle.webtop.drm.bol.js.JsGridProfiles;
 import com.sonicle.webtop.drm.bol.js.JsGridTimetableReport;
 import com.sonicle.webtop.drm.bol.js.JsGridTimetableStamp;
+import com.sonicle.webtop.drm.bol.js.JsGridTimetableStampList;
 import com.sonicle.webtop.drm.bol.js.JsGridWorkReports;
 import com.sonicle.webtop.drm.bol.js.JsHourProfile;
 import com.sonicle.webtop.drm.bol.js.JsLeaveRequest;
 import com.sonicle.webtop.drm.bol.js.JsTimetableSetting;
+import com.sonicle.webtop.drm.bol.js.JsTimetableStamp;
 import com.sonicle.webtop.drm.bol.js.JsWorkReport;
 import com.sonicle.webtop.drm.bol.js.JsWorkReportSetting;
 import com.sonicle.webtop.drm.bol.model.RBTimetableReport;
@@ -1513,6 +1515,32 @@ public class Service extends BaseService {
 		}
 	}
 	
+	public void processManageTimetableStamp(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+
+			if (crud.equals(Crud.CREATE)) {
+				Payload<MapItem, JsTimetableStamp> pl = ServletUtils.getPayload(request, JsTimetableStamp.class);
+				
+				TimetableStamp ts = JsTimetableStamp.createTimetableStamp(pl.data);
+				
+				manager.addTimetableStamp(ts);
+
+				new JsonResult().printTo(out);
+			} else if (crud.equals(Crud.DELETE)) {
+
+				IntegerArray ids = ServletUtils.getObjectParameter(request, "ids", IntegerArray.class, true);
+
+				manager.deleteTimetableStamp(ids.get(0));
+
+				new JsonResult().printTo(out);
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageTimetableStamp", ex);
+		}
+	}
+	
 	public void processPrintWorkReport(HttpServletRequest request, HttpServletResponse response) {
 		ArrayList<RBWorkReport> itemsWr = new ArrayList<>();
 		
@@ -1647,6 +1675,30 @@ public class Service extends BaseService {
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action ManageGridTimetable", ex);
+		}
+	}
+	
+	public void processManageGridTimetableList(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			if (crud.equals(Crud.READ)) {
+				
+				String query = ServletUtils.getStringParameter(request, "query", null);
+				TimetableStampQuery tsQuery = TimetableStampQuery.fromJson(query);
+				
+				List<JsGridTimetableStampList> jsGridTSL = new ArrayList();
+
+				for (OTimetableStamp oTS : manager.listTimetableStamps(tsQuery)) {
+
+					jsGridTSL.add(new JsGridTimetableStampList(oTS));
+				}
+
+				new JsonResult(jsGridTSL).printTo(out);
+
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageGridTimetableList", ex);
 		}
 	}
 	

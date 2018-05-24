@@ -30,17 +30,39 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm.bol;
+package com.sonicle.webtop.drm.bol.js;
 
-import com.sonicle.webtop.drm.jooq.tables.pojos.TimetableStamp;
+import com.sonicle.webtop.drm.model.TimetableStamp;
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  *
  * @author lssndrvs
  */
-public class OTimetableStamp extends TimetableStamp{
-	
-	public final static String TYPE_MAIN = "M";
-	public final static String TYPE_COMPANY = "C";
-	public final static String TYPE_SPECIAL = "S";
+public class JsTimetableStamp {
+
+	public String userId;
+	public String date;
+	public String fromHour;
+	public String toHour;
+
+	public JsTimetableStamp(TimetableStamp ts) {
+		this.userId = ts.getUserId();
+	}
+
+	public static TimetableStamp createTimetableStamp(JsTimetableStamp js) {
+		TimetableStamp newTs = new TimetableStamp();
+		DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss");
+		DateTime entrance = formatter.parseDateTime(js.date + " " + js.fromHour);
+		DateTime exit = formatter.parseDateTime(js.date + " " + js.toHour);
+
+		newTs.setUserId(js.userId);
+		newTs.setEntrance(entrance);
+		newTs.setExit(exit);
+		
+		return newTs;
+	}
 }

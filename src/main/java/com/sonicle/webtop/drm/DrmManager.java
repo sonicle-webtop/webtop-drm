@@ -3809,6 +3809,85 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
+	public List<OTimetableStamp> listTimetableStamps(TimetableStampQuery query) throws WTException {
+		Connection con = null;
+		TimetableStampDAO tsDao = TimetableStampDAO.getInstance();
+		List<OTimetableStamp> tss = null;
+		
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+			
+			query.operatorId = query.operatorId == null ? getTargetProfileId().getUserId() : query.operatorId;
+			query.month = query.month == null ? new DateTime().getMonthOfYear() : query.month;
+			query.year = query.year == null ? new DateTime().getYear() : query.year;
+			
+			tss = tsDao.getStampsListByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.operatorId, query.month, query.year);
+
+			return tss;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public OTimetableStamp addTimetableStamp(TimetableStamp ts) throws WTException {
+		Connection con = null;
+
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			TimetableStampDAO tsDao = TimetableStampDAO.getInstance();
+			OTimetableStamp oTs = createOTimetableStamp(ts);
+			
+			oTs.setId(tsDao.getSequence(con).intValue());
+			oTs.setDomainId(getTargetProfileId().getDomainId());
+			oTs.setType(OTimetableStamp.TYPE_SPECIAL);
+
+
+			tsDao.insert(con, oTs);
+
+			DbUtils.commitQuietly(con);
+
+			return oTs;
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public void deleteTimetableStamp(int id) throws WTException {
+
+		Connection con = null;
+		TimetableStampDAO tsDao = TimetableStampDAO.getInstance();
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			tsDao.deleteById(con, id);
+
+			DbUtils.commitQuietly(con);
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
 	public List<OTimetableReport> generateTimetableReport(TimetableReportQuery query) throws WTException {
 		Connection con = null;
 		List<OTimetableReport> trs = new ArrayList();
@@ -3836,7 +3915,7 @@ public class DrmManager extends BaseManager {
 					for (OUser usr : users) {
 						ttrs = new ArrayList();
 						
-						trsf = tstmpDao.getStampsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year, "M");
+						trsf = tstmpDao.getStampsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
 						te = teDao.getEventsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
 
 						ttrs.addAll(mergeStampByDate(trsf, con));
@@ -3848,7 +3927,7 @@ public class DrmManager extends BaseManager {
 					}
 				}else{
 					//Get Data for Single User Selected
-					trsf = tstmpDao.getStampsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.userId, query.fromDay, query.month, query.year, "M");
+					trsf = tstmpDao.getStampsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.userId, query.fromDay, query.month, query.year);
 					te = teDao.getEventsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.userId, query.fromDay, query.month, query.year);
 
 					trs.addAll(mergeStampByDate(trsf, con));

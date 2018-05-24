@@ -34,6 +34,7 @@
 
 .wtdrm-icon-mainstamp-xs { background-image: url('mainstamp_16.png') !important; }
 .wtdrm-icon-companystamp-xs { background-image: url('companystamp_16.png') !important; }
+.wtdrm-icon-specialstamp-xs { background-image: url('specialstamp_16.png') !important; }
 
 .wtdrm-icon-mainstamp-m { background-image: url('mainstamp_32.png') !important; width: 32px !important; height: 32px !important; }
 .wtdrm-icon-companystamp-m { background-image: url('companystamp_32.png') !important; width: 32px !important; height: 32px !important; }
@@ -41,3 +42,6 @@
 .wtdrm-icon-approvedrequest-xs { background-image: url('approvedrequest_16.png') !important; }
 .wtdrm-icon-notapprovedrequest-xs { background-image: url('notapprovedrequest_16.png') !important; }
 .wtdrm-icon-sendedrequest-xs { background-image: url('sendedrequest_16.png') !important; }
+
+.wtdrm-icon-timetable-timetabledaily-xs { background-image: url('timetable_daily_16.png') !important; }
+.wtdrm-icon-timetable-timetablelist-xs { background-image: url('timetable_list_16.png') !important; }
