@@ -46,7 +46,7 @@ import com.sonicle.commons.web.json.extjs.ExtTreeNode;
 import com.sonicle.commons.web.json.extjs.LookupMeta;
 import com.sonicle.commons.web.json.extjs.ResultMeta;
 import com.sonicle.webtop.contacts.IContactsManager;
-import com.sonicle.webtop.contacts.model.ContactEx;
+import com.sonicle.webtop.contacts.model.ContactItemEx;
 import com.sonicle.webtop.contacts.model.FolderContacts;
 import com.sonicle.webtop.core.CoreUserSettings;
 import com.sonicle.webtop.core.app.WT;
@@ -514,7 +514,7 @@ public class Service extends BaseService {
 			categoryIds = contactManager.listCategoryIds();
 			for(FolderContacts fc : contactManager.listFolderContacts(categoryIds, "", null)){
 				String owner = WT.getUserData(fc.folder.getProfileId()).getDisplayName();
-				for(ContactEx c : fc.contacts){
+				for(ContactItemEx c : fc.contacts){
 					contacts.add(new JsSimpleSource(c.getContactId(), c.getFirstName() + " " + c.getLastName(), "[" + owner + " / " + fc.folder.getName() + "]"));
 				}
 			}
