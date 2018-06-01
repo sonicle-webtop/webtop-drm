@@ -1773,7 +1773,7 @@ public class DrmManager extends BaseManager {
 			Interval interval = new Interval(startDate.getTime(), endDate.getTime());
 			Period period = interval.toPeriod();
 			
-			return period.getHours()+ "";
+			return period.getHours()+ "." + period.getMinutes();
 		}else{
 			return null;
 		}
