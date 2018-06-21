@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableSettings extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord> {
 
-	private static final long serialVersionUID = 1667467396;
+	private static final long serialVersionUID = 1987394465;
 
 	/**
 	 * The reference instance of <code>drm.timetable_settings</code>
@@ -100,6 +100,16 @@ public class TimetableSettings extends org.jooq.impl.TableImpl<com.sonicle.webto
 	 * The column <code>drm.timetable_settings.requests_permits_contractuals</code>.
 	 */
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord, java.lang.Boolean> REQUESTS_PERMITS_CONTRACTUALS = createField("requests_permits_contractuals", org.jooq.impl.SQLDataType.BOOLEAN.defaulted(true), this, "");
+
+	/**
+	 * The column <code>drm.timetable_settings.company_exit</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord, java.lang.Boolean> COMPANY_EXIT = createField("company_exit", org.jooq.impl.SQLDataType.BOOLEAN.defaulted(true), this, "");
+
+	/**
+	 * The column <code>drm.timetable_settings.manage_stamp</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord, java.lang.Boolean> MANAGE_STAMP = createField("manage_stamp", org.jooq.impl.SQLDataType.BOOLEAN.defaulted(true), this, "");
 
 	/**
 	 * Create a <code>drm.timetable_settings</code> table reference

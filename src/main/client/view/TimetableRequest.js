@@ -41,7 +41,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 	dockableConfig: {
 		title: '{timetableRequest.tit}',
 		iconCls: 'wtdrm-icon-timetable2-xs',
-		width: 570,
+		width: 580,
 		height: 470
 	},
 	fieldTitle: 'leaveRequestId',
@@ -53,43 +53,36 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 		Ext.apply(me, {
 			tbar: [
 				'->',
-				{
-					xtype: 'wtform',
-					reference: 'toolbar',
-					modelValidation: true,
-					items: [
-						WTF.localCombo('id', 'desc', {
-							reference: 'flduser',
-							bind: '{record.userId}',
-							store: {
-								autoLoad: true,
-								model: 'WTA.model.Simple',
-								proxy: WTF.proxy(me.mys.ID, 'LookupOperators'),
-								listeners: {
-									load: function (s) {
-										if (me.isMode('new')) {
-											var meta = s.getProxy().getReader().metaData;
-											if (meta.selected) {
-												me.lookupReference('flduser').setValue(meta.selected);
-											}
-											if (s.loadCount === 1) {
-												me.lref('fldcompany').getStore().load();
-												me.lref('fldmanager').getStore().load();
-											}
-										}
+				WTF.localCombo('id', 'desc', {
+					reference: 'flduser',
+					bind: '{record.userId}',
+					anyMatch: true,
+					selectOnFocus: true,
+					store: {
+						autoLoad: true,
+						model: 'WTA.model.Simple',
+						proxy: WTF.proxy(me.mys.ID, 'LookupOperators'),
+						listeners: {
+							load: function (s) {
+								if (me.isMode('new')) {
+									if (s.loadCount === 1) {
+										me.lref('fldcompany').getStore().load();
+										me.lref('fldmanager').getStore().load();
 									}
 								}
-							},
-							listeners: {
-								select: function (s, r) {
-									me.lref('fldcompany').getStore().load();
-									me.lref('fldmanager').getStore().load();
-								}
-							},
-							fieldLabel: me.mys.res('timetableRequest.fld-user.lbl')
-						})
-					]
-				}
+							}
+						}
+					},
+					listeners: {
+						select: function (s, r) {
+							me.lref('fldcompany').getStore().load();
+							me.lref('fldmanager').getStore().load();
+						}
+					},
+					fieldLabel: me.mys.res('timetableRequest.fld-user.lbl'),
+					allowBlank: true,
+					readOnly: true
+				})
 			]
 		});
 		
@@ -217,12 +210,22 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 											reference: 'fldfromdate',
 											bind: '{record.fromDate}',
 											fieldLabel: me.mys.res('timetableRequest.fld-fromDate.lbl'),
+											listeners: {
+												select: function (t, v, o) {
+													if(v > me.lref('fldtodate').getValue()) me.lref('fldtodate').setValue(v);
+												}
+											}
 										},
 										{
 											xtype: 'datefield',
 											reference: 'fldtodate',
 											bind: '{record.toDate}',
 											fieldLabel: me.mys.res('timetableRequest.fld-toDate.lbl'),
+											listeners: {
+												select: function (t, v, o) {
+													if(v < me.lref('fldfromdate').getValue()) me.lref('fldfromdate').setValue(v);
+												}
+											}
 										}
 									]
 								},
@@ -486,6 +489,8 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 		var me = this,
 				mo = me.getModel();
 	
+		if(mo.get('userId') === null) me.lref('flduser').setReadOnly(false);
+	
 		WT.ajaxReq(me.mys.ID, 'IsTimetableRequestPreviousDate', {
 			params: {},
 			callback: function (success, json) {
@@ -556,7 +561,6 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 	
 	onViewInvalid: function (s, mo, errs) {
 		var me = this;
-		WTU.updateFieldsErrors(me.lref('toolbar'), errs);
 		WTU.updateFieldsErrors(me.lref('form'), errs);
 	},
 	

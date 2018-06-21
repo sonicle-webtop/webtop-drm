@@ -45,10 +45,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		
 		me.setToolComponent(Ext.create({
 			xtype: 'panel',
+			layout: 'border',
 			referenceHolder: true,
 			title: me.getName(),
 			items: [
 				{
+					region: 'center',
 					xtype: 'treepanel',
 					reference: 'tree',
 					rootVisible: false,
@@ -443,7 +445,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 										{
 											xtype: 'button',
 											reference: 'btnCompanyStamp',
-											disabled: true,
+											hidden: true,
 											text: me.res('gpTimetable.companystamp.lbl'),
 											iconCls: 'wtdrm-icon-companystamp-m',
 											handler: function () {
@@ -537,12 +539,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 										me.getAct('timetableStamp', 'add'),
 										'-',
 										me.getAct('timetableStamp', 'remove')
-									],
-									listeners: {
-										rowclick: function (s, rec) {
-											me.getAct('timetableStamp', 'remove').setDisabled(false);
-										}
-									}
+									]
 								}
 							]
 						}
@@ -667,9 +664,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							],
 							tbar: [
 								me.getAct('timetableRequest', 'add'),
+								me.getAct('timetableRequest', 'edit'),
 								'-',
-								me.getAct('timetableRequest', 'edit')
-								//me.getAct('timetableRequest', 'remove')
+								me.getAct('timetableRequest', '	approve'),
+								me.getAct('timetableRequest', '	decline'),
+								me.getAct('timetableRequest', 'requestcancellation'),
+								me.getAct('timetableRequest', 'delete'),
 							],
 							listeners: {
 								rowclick: function (s, rec) {
@@ -727,11 +727,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							},
 							columns: [
 								{
-									header: me.res('gpTimetableReport.company.lbl'),
-									dataIndex: 'company',
-									editable: false,
-									flex: 1
-								}, {
 									header: me.res('gpTimetableReport.operator.lbl'),
 									dataIndex: 'user',
 									editable: false,
@@ -1126,6 +1121,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
 			iconCls: 'wt-icon-add-xs',
+			disabled: true,
 			handler: function () {
 				me.addTimetableStamp({
 					callback: function (success) {
@@ -1156,13 +1152,18 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		opts = opts || {};
 
 		var me = this,
+			fwr = me.filtersWorkReport(),
 			vct = WT.createView(me.ID, 'view.WorkReport');
 		vct.getView().on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
 		vct.show(false,
 			function () {
-				vct.getView().begin('new');
+				vct.getView().begin('new', {
+					data: {
+						operatorId: fwr.getOperatorId()
+					}
+				});
 			});
 	},
 	editWorkReportUI: function (rec) {
@@ -1357,13 +1358,18 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		opts = opts || {};
 
 		var me = this,
+				ftr = me.filtersTimetableRequest(),
 				vct = WT.createView(me.ID, 'view.TimetableRequest');
 		vct.getView().on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
 		vct.show(false, 
 				function () {
-					vct.getView().begin('new');
+					vct.getView().begin('new', {
+						data: {
+							userId: ftr.getOperatorId()
+						}
+					});
 				});
 	},
 	editTimetableRequestUI: function (rec) {
@@ -1472,6 +1478,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		}
 	},
 	enablingStampButtons: function () {
+		//Bottoni di timbratura standard
 		var me = this;
 		WT.ajaxReq(me.ID, 'ChekIpAddressNetwork', {
 			params: {},
@@ -1479,10 +1486,39 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				if(success){
 					if(json.data === true){
 						me.getMainComponent().lookupReference('btnMainStamp').setDisabled(false);
-						me.getMainComponent().lookupReference('btnCompanyStamp').setDisabled(false);
+						WT.ajaxReq(me.ID, 'ChekCompanyExitAuthorization', {
+							params: {},
+							callback: function (success, json) {
+								if(success){
+									if(json.data === true){
+										me.getMainComponent().lookupReference('btnCompanyStamp').setHidden(false);
+									}else {
+										me.getMainComponent().lookupReference('btnCompanyStamp').setHidden(true);
+									}
+								}
+							}
+						});
 					}else {
 						me.getMainComponent().lookupReference('btnMainStamp').setDisabled(true);
-						me.getMainComponent().lookupReference('btnCompanyStamp').setDisabled(true);
+						me.getMainComponent().lookupReference('btnCompanyStamp').setHidden(true);
+					}
+				}
+			}
+		});
+	},
+	enablingManageStampsButtons: function () {
+		//Bottoni di inserimento/cancellazione timbratura manuale
+		var me = this;
+		WT.ajaxReq(me.ID, 'ChekManageStampsButtons', {
+			params: {},
+			callback: function (success, json) {
+				if(success){
+					if(json.data === true){
+						me.getAct('timetableStamp', 'add').setDisabled(false);
+						me.getAct('timetableStamp', 'remove').setDisabled(false);
+					}else {
+						me.getAct('timetableStamp', 'add').setDisabled(true);
+						me.getAct('timetableStamp', 'remove').setDisabled(true);
 					}
 				}
 			}
@@ -1511,6 +1547,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		opts = opts || {};
 
 		var me = this,
+				fts = me.filtersTimetableStamp(),
 				vct = WT.createView(me.ID, 'view.TimetableStamp');
 		vct.getView().on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
@@ -1519,7 +1556,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				function () {
 					vct.getView().begin('new', {
 						data: {
-							
+							userId: fts.getOperatorId(),
+							date: fts.getRefDate()
 						}
 					});
 				});
@@ -1531,19 +1569,18 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				msg;
 		if (rec) {
 			msg = me.res('act.confirm.delete', Ext.String.ellipsis(rec.get('id'), 40));
-		} else {
-			msg = me.res('gpTimetableStamp.confirm.delete.selection');
+		
+			WT.confirm(msg, function (bid) {
+				if (bid === 'yes') {
+					me.deleteTimetableStamp(rec.get('id'), {
+						callback: function (success) {
+							if (success)
+								sto.remove(rec);
+						}
+					});
+				}
+			});
 		}
-		WT.confirm(msg, function (bid) {
-			if (bid === 'yes') {
-				me.deleteTimetableStamp(rec.get('id'), {
-					callback: function (success) {
-						if (success)
-							sto.remove(rec);
-					}
-				});
-			}
-		});
 	},
 	deleteTimetableStamp: function (id, opts) {
 		opts = opts || {};
@@ -1578,6 +1615,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				break;
 			case 4:
 				me.enablingStampButtons();
+				me.enablingManageStampsButtons();
 				me.getMainComponent().lookupReference('gpTimetable').getStore().reload();
 				me.reloadTimetableStamp(me.filtersTimetableStamp().getData());
 				break;

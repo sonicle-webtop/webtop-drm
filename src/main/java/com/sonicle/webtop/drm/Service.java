@@ -138,6 +138,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.UnknownHostException;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -1622,6 +1623,53 @@ public class Service extends BaseService {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action SetTimetable", ex);
 		}
+	}
+	
+	public void processChekManageStampsButtons(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			new JsonResult(ChekManageStampsButtons()).printTo(out);
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ChekManageStampsButtons", ex);
+		}
+	}
+	
+	private boolean ChekManageStampsButtons() throws WTException, UnknownHostException, SQLException{
+		boolean enabling = false;
+		TimetableSetting ts = manager.getTimetableSetting();
+		
+		if(ts != null){
+			enabling = ts.getManageStamp();
+			
+			if(!enabling){
+				//Attivo solo se chi è loggato è supervisore
+				if(manager.getDrmProfileMemberByUserId(getEnv().getProfileId().getUserId()).size() > 0) enabling = true;
+			}
+		}else{
+			if(manager.getDrmProfileMemberByUserId(getEnv().getProfileId().getUserId()).size() > 0) enabling = true;
+		}
+		
+		return enabling;
+	}
+	
+	public void processChekCompanyExitAuthorization(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			new JsonResult(ChekCompanyExitAuthorization()).printTo(out);
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ChekCompanyExitAuthorization", ex);
+		}
+	}
+	
+	private boolean ChekCompanyExitAuthorization() throws WTException, UnknownHostException{
+		boolean enabling = false;
+		TimetableSetting ts = manager.getTimetableSetting();
+
+		if(ts != null){
+			enabling = ts.getCompanyExit();
+		}
+		
+		return enabling;
 	}
 	
 	public void processChekIpAddressNetwork(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {

@@ -439,5 +439,9 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 		};
 		
 		return query;
+	},
+	
+	getOperatorId: function () {
+		return this.lookupReference('flduser').getValue();
 	}
 });

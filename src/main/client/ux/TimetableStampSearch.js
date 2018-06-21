@@ -147,5 +147,16 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableStampSearch', {
 		};
 		
 		return query;
+	},
+	
+	getOperatorId: function () {
+		return this.lookupReference('flduser').getValue();
+	},
+	
+	getRefDate: function () {
+		var month = this.lookupReference('fldmonth').getValue();
+		var year = this.lookupReference('fldyear').getValue();
+		
+		return new Date(year, month - 1, 1);
 	}
 });

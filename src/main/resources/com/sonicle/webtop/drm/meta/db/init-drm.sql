@@ -782,3 +782,13 @@ CREATE SEQUENCE "drm"."seq_timetable_stamp";
 
 ALTER TABLE "drm"."timetable_report_temp"
 ALTER COLUMN "causal" TYPE varchar(500);
+
+--------------
+--20/06/2018--
+--------------
+
+ALTER TABLE "drm"."timetable_settings"
+ADD COLUMN "company_exit" bool DEFAULT false;
+
+ALTER TABLE "drm"."timetable_settings"
+ADD COLUMN "manage_stamp" bool DEFAULT false;

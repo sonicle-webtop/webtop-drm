@@ -95,7 +95,13 @@ Ext.define('Sonicle.webtop.drm.view.HourProfile', {
 								autoLoad: true
 							}),
 							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
+								allowBlank: true,
+								editable: true,
+								forceSelection: false,
+								queryMode: 'local',
+								triggerAction: 'all',
+								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
 								})
@@ -111,7 +117,13 @@ Ext.define('Sonicle.webtop.drm.view.HourProfile', {
 								autoLoad: true
 							}),
 							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
+								allowBlank: true,
+								editable: true,
+								forceSelection: false,
+								queryMode: 'local',
+								triggerAction: 'all',
+								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
 								})
@@ -127,7 +139,13 @@ Ext.define('Sonicle.webtop.drm.view.HourProfile', {
 								autoLoad: true
 							}),
 							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
+								allowBlank: true,
+								editable: true,
+								forceSelection: false,
+								queryMode: 'local',
+								triggerAction: 'all',
+								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
 								})
@@ -143,7 +161,13 @@ Ext.define('Sonicle.webtop.drm.view.HourProfile', {
 								autoLoad: true
 							}),
 							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
+								allowBlank: true,
+								editable: true,
+								forceSelection: false,
+								queryMode: 'local',
+								triggerAction: 'all',
+								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
 								})
@@ -159,7 +183,13 @@ Ext.define('Sonicle.webtop.drm.view.HourProfile', {
 								autoLoad: true
 							}),
 							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
+								allowBlank: true,
+								editable: true,
+								forceSelection: false,
+								queryMode: 'local',
+								triggerAction: 'all',
+								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
 								})
@@ -175,7 +205,13 @@ Ext.define('Sonicle.webtop.drm.view.HourProfile', {
 								autoLoad: true
 							}),
 							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
+								allowBlank: true,
+								editable: true,
+								forceSelection: false,
+								queryMode: 'local',
+								triggerAction: 'all',
+								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
 								})
@@ -191,7 +227,13 @@ Ext.define('Sonicle.webtop.drm.view.HourProfile', {
 								autoLoad: true
 							}),
 							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
+								allowBlank: true,
+								editable: true,
+								forceSelection: false,
+								queryMode: 'local',
+								triggerAction: 'all',
+								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
 								})
@@ -207,7 +249,13 @@ Ext.define('Sonicle.webtop.drm.view.HourProfile', {
 								autoLoad: true
 							}),
 							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
+								allowBlank: true,
+								editable: true,
+								forceSelection: false,
+								queryMode: 'local',
+								triggerAction: 'all',
+								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
 								})
@@ -223,7 +271,13 @@ Ext.define('Sonicle.webtop.drm.view.HourProfile', {
 								autoLoad: true
 							}),
 							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
+								allowBlank: true,
+								editable: true,
+								forceSelection: false,
+								queryMode: 'local',
+								triggerAction: 'all',
+								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
 								})
@@ -239,7 +293,13 @@ Ext.define('Sonicle.webtop.drm.view.HourProfile', {
 								autoLoad: true
 							}),
 							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
+								allowBlank: true,
+								editable: true,
+								forceSelection: false,
+								queryMode: 'local',
+								triggerAction: 'all',
+								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
 								})
@@ -255,7 +315,13 @@ Ext.define('Sonicle.webtop.drm.view.HourProfile', {
 								autoLoad: true
 							}),
 							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
+								allowBlank: true,
+								editable: true,
+								forceSelection: false,
+								queryMode: 'local',
+								triggerAction: 'all',
+								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
 								})
@@ -271,7 +337,13 @@ Ext.define('Sonicle.webtop.drm.view.HourProfile', {
 								autoLoad: true
 							}),
 							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
+								allowBlank: true,
+								editable: true,
+								forceSelection: false,
+								queryMode: 'local',
+								triggerAction: 'all',
+								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
 								})
@@ -287,7 +359,13 @@ Ext.define('Sonicle.webtop.drm.view.HourProfile', {
 								autoLoad: true
 							}),
 							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
+								allowBlank: true,
+								editable: true,
+								forceSelection: false,
+								queryMode: 'local',
+								triggerAction: 'all',
+								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
 								})
@@ -303,7 +381,13 @@ Ext.define('Sonicle.webtop.drm.view.HourProfile', {
 								autoLoad: true
 							}),
 							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: false,
+								allowBlank: true,
+								editable: true,
+								forceSelection: false,
+								queryMode: 'local',
+								triggerAction: 'all',
+								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
 								})

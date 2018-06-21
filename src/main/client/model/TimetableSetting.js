@@ -55,6 +55,8 @@ Ext.define('Sonicle.webtop.drm.model.TimetableSetting', {
 		WTF.field('totalToleranceInMinutes', 'string', true),
 		WTF.field('rounding', 'string', true),
 		WTF.field('minimumExtraordinary', 'string', true),
+		WTF.field('companyExit', 'bool', true, {defaultValue: false}),
+		WTF.field('manageStamp', 'bool', true, {defaultValue: false}),
 		WTF.field('breakAnomaly', 'bool', true, {defaultValue: false}),
 		WTF.field('readOnlyEvents', 'bool', true, {defaultValue: false}),
 		WTF.field('requestsPermitsNotRemunered', 'bool', true, {defaultValue: false}),

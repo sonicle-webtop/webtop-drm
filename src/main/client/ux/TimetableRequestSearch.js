@@ -45,8 +45,8 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 			userId: null,
 			companyId: null,
 			type: null,
-			fromDate: Ext.Date.getFirstDateOfMonth(new Date()),
-			toDate: new Date(),
+			fromDate: new Date(),
+			toDate: null,
 			status: null,
 			result: null
 		}
@@ -231,5 +231,9 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 		};
 		
 		return query;
+	},
+	
+	getOperatorId: function () {
+		return this.lookupReference('flduser').getValue();
 	}
 });

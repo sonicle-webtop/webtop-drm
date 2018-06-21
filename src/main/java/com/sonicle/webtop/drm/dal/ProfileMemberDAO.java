@@ -70,6 +70,17 @@ public class ProfileMemberDAO extends BaseDAO {
 				)
 				.fetchInto(OProfileMember.class);
 	}
+	
+	public List<OProfileMember> selectByUserId(Connection con, String userId) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.select()
+				.from(PROFILES_MEMBERS)
+				.where(
+						PROFILES_MEMBERS.USER_ID.equal(userId)
+				)
+				.fetchInto(OProfileMember.class);
+	}
 
 	public int insert(Connection con, OProfileMember item) throws DAOException {
 		DSLContext dsl = getDSL(con);

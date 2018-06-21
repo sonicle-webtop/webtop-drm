@@ -103,21 +103,21 @@ public class JsGridTimetableReport {
 	private String concatDate(OTimetableReport otr){		
 		switch(otr.getDate().getDayOfWeek()){
 			case 1:
-				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " Lunedì";
+				return ((otr.getDate().getDayOfMonth() < 10) ? "0" + otr.getDate().getDayOfMonth() : otr.getDate().getDayOfMonth()) + "/" + ((otr.getDate().getMonthOfYear() < 10) ? "0" + otr.getDate().getMonthOfYear() : otr.getDate().getMonthOfYear()) + "/" + otr.getDate().getYear() + " Lun";
 			case 2: 
-				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " Martedì";
+				return ((otr.getDate().getDayOfMonth() < 10) ? "0" + otr.getDate().getDayOfMonth() : otr.getDate().getDayOfMonth()) + "/" + ((otr.getDate().getMonthOfYear() < 10) ? "0" + otr.getDate().getMonthOfYear() : otr.getDate().getMonthOfYear()) + "/" + otr.getDate().getYear() + " Mar";
 			case 3: 
-				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " Mercoledì";
+				return ((otr.getDate().getDayOfMonth() < 10) ? "0" + otr.getDate().getDayOfMonth() : otr.getDate().getDayOfMonth()) + "/" + ((otr.getDate().getMonthOfYear() < 10) ? "0" + otr.getDate().getMonthOfYear() : otr.getDate().getMonthOfYear()) + "/" + otr.getDate().getYear() + " Mer";
 			case 4: 
-				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " Giovedì";
+				return ((otr.getDate().getDayOfMonth() < 10) ? "0" + otr.getDate().getDayOfMonth() : otr.getDate().getDayOfMonth()) + "/" + ((otr.getDate().getMonthOfYear() < 10) ? "0" + otr.getDate().getMonthOfYear() : otr.getDate().getMonthOfYear()) + "/" + otr.getDate().getYear() + " Gio";
 			case 5: 
-				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " Venerdì";
+				return ((otr.getDate().getDayOfMonth() < 10) ? "0" + otr.getDate().getDayOfMonth() : otr.getDate().getDayOfMonth()) + "/" + ((otr.getDate().getMonthOfYear() < 10) ? "0" + otr.getDate().getMonthOfYear() : otr.getDate().getMonthOfYear()) + "/" + otr.getDate().getYear() + " Ven";
 			case 6: 
-				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " Sabato";
+				return ((otr.getDate().getDayOfMonth() < 10) ? "0" + otr.getDate().getDayOfMonth() : otr.getDate().getDayOfMonth()) + "/" + ((otr.getDate().getMonthOfYear() < 10) ? "0" + otr.getDate().getMonthOfYear() : otr.getDate().getMonthOfYear()) + "/" + otr.getDate().getYear() + " Sab";
 			case 7: 
-				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " Domenica";
+				return ((otr.getDate().getDayOfMonth() < 10) ? "0" + otr.getDate().getDayOfMonth() : otr.getDate().getDayOfMonth()) + "/" + ((otr.getDate().getMonthOfYear() < 10) ? "0" + otr.getDate().getMonthOfYear() : otr.getDate().getMonthOfYear()) + "/" + otr.getDate().getYear() + " Dom";
 			default: 
-				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " ";
+				return ((otr.getDate().getDayOfMonth() < 10) ? "0" + otr.getDate().getDayOfMonth() : otr.getDate().getDayOfMonth()) + "/" + ((otr.getDate().getMonthOfYear() < 10) ? "0" + otr.getDate().getMonthOfYear() : otr.getDate().getMonthOfYear()) + "/" + otr.getDate().getYear() + " ";
 		}
 	}
 

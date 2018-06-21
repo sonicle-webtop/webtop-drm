@@ -53,6 +53,8 @@ public class JsTimetableSetting {
 	public String totalToleranceInMinutes;
 	public String rounding;
 	public String minimumExtraordinary;
+	public Boolean companyExit;
+	public Boolean manageStamp;
 	public Boolean breakAnomaly;
 	public Boolean readOnlyEvents;
 	public Boolean requestsPermitsNotRemunered;
@@ -72,6 +74,8 @@ public class JsTimetableSetting {
 		this.totalToleranceInMinutes = setting.getTotalToleranceInMinutes();
 		this.rounding = setting.getRounding();
 		this.minimumExtraordinary = setting.getMinimumExtraordinary();
+		this.companyExit = setting.getCompanyExit();
+		this.manageStamp = setting.getManageStamp();
 		this.breakAnomaly = setting.getBreakAnomaly();
 		this.readOnlyEvents = setting.getReadOnlyEvents();
 		this.requestsPermitsNotRemunered = setting.getRequestsPermitsNotRemunered();
@@ -95,6 +99,8 @@ public class JsTimetableSetting {
 		tt.setTotalToleranceInMinutes(js.totalToleranceInMinutes);
 		tt.setRounding(js.rounding);
 		tt.setMinimumExtraordinary(js.minimumExtraordinary);
+		tt.setCompanyExit(js.companyExit);
+		tt.setManageStamp(js.manageStamp);
 		tt.setBreakAnomaly(js.breakAnomaly);
 		tt.setReadOnlyEvents(js.readOnlyEvents);
 		tt.setRequestsPermitsNotRemunered(js.requestsPermitsNotRemunered);

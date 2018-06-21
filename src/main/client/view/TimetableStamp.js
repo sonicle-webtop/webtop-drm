@@ -39,7 +39,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableStamp', {
 	dockableConfig: {
 		title: '{timetableStamp.tit}',
 		iconCls: 'wtdrm-icon-timetable1-xs',
-		width: 450,
+		width: 460,
 		height: 140
 	},
 	fieldTitle: 'leaveRequestId',
@@ -50,33 +50,17 @@ Ext.define('Sonicle.webtop.drm.view.TimetableStamp', {
 		Ext.apply(me, {
 			tbar: [
 				'->',
-				{
-					xtype: 'wtform',
-					reference: 'toolbar',
-					modelValidation: true,
-					items: [
-						WTF.localCombo('id', 'desc', {
-							reference: 'flduser',
-							bind: '{record.userId}',
-							store: {
-								autoLoad: true,
-								model: 'WTA.model.Simple',
-								proxy: WTF.proxy(me.mys.ID, 'LookupOperators'),
-								listeners: {
-									load: function (s) {
-										if (me.isMode('new')) {
-											var meta = s.getProxy().getReader().metaData;
-											if (meta.selected) {
-												me.lookupReference('flduser').setValue(meta.selected);
-											}
-										}
-									}
-								}
-							},
-							fieldLabel: me.mys.res('timetableStamp.fld-user.lbl')
-						})
-					]
-				}
+				WTF.localCombo('id', 'desc', {
+					reference: 'flduser',
+					bind: '{record.userId}',
+					store: {
+						autoLoad: true,
+						model: 'WTA.model.Simple',
+						proxy: WTF.proxy(me.mys.ID, 'LookupOperators')
+					},
+					fieldLabel: me.mys.res('timetableStamp.fld-user.lbl'),
+					readOnly: true
+				})
 			]
 		});
 		
@@ -140,12 +124,15 @@ Ext.define('Sonicle.webtop.drm.view.TimetableStamp', {
 	onViewLoad: function(s, success) {
 		if(!success) return;
 		var me = this,
-				mo = me.getModel();
+				mo = me.getModel(),
+				date = me.lookupReference('fldfromdate').getValue();
+		
+		me.lookupReference('fldfromdate').setMinValue(Ext.Date.getFirstDateOfMonth(date));
+		me.lookupReference('fldfromdate').setMaxValue(Ext.Date.getLastDateOfMonth(date));
 	},
 	
 	onViewInvalid: function (s, mo, errs) {
 		var me = this;
-		WTU.updateFieldsErrors(me.lref('toolbar'), errs);
 		WTU.updateFieldsErrors(me.lref('form'), errs);
 	}
 });

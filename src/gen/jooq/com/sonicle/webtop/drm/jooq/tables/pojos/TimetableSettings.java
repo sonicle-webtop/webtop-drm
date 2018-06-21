@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableSettings implements java.io.Serializable {
 
-	private static final long serialVersionUID = 621488301;
+	private static final long serialVersionUID = 1984205453;
 
 	private java.lang.Integer timetableSettingId;
 	private java.lang.String  domainId;
@@ -32,6 +32,8 @@ public class TimetableSettings implements java.io.Serializable {
 	private java.lang.Boolean requestsPermitsNotRemunered;
 	private java.lang.Boolean requestsPermitsMedicalVisits;
 	private java.lang.Boolean requestsPermitsContractuals;
+	private java.lang.Boolean companyExit;
+	private java.lang.Boolean manageStamp;
 
 	public TimetableSettings() {}
 
@@ -49,7 +51,9 @@ public class TimetableSettings implements java.io.Serializable {
 		java.lang.Boolean readOnlyEvents,
 		java.lang.Boolean requestsPermitsNotRemunered,
 		java.lang.Boolean requestsPermitsMedicalVisits,
-		java.lang.Boolean requestsPermitsContractuals
+		java.lang.Boolean requestsPermitsContractuals,
+		java.lang.Boolean companyExit,
+		java.lang.Boolean manageStamp
 	) {
 		this.timetableSettingId = timetableSettingId;
 		this.domainId = domainId;
@@ -65,6 +69,8 @@ public class TimetableSettings implements java.io.Serializable {
 		this.requestsPermitsNotRemunered = requestsPermitsNotRemunered;
 		this.requestsPermitsMedicalVisits = requestsPermitsMedicalVisits;
 		this.requestsPermitsContractuals = requestsPermitsContractuals;
+		this.companyExit = companyExit;
+		this.manageStamp = manageStamp;
 	}
 
 	public java.lang.Integer getTimetableSettingId() {
@@ -177,5 +183,21 @@ public class TimetableSettings implements java.io.Serializable {
 
 	public void setRequestsPermitsContractuals(java.lang.Boolean requestsPermitsContractuals) {
 		this.requestsPermitsContractuals = requestsPermitsContractuals;
+	}
+
+	public java.lang.Boolean getCompanyExit() {
+		return this.companyExit;
+	}
+
+	public void setCompanyExit(java.lang.Boolean companyExit) {
+		this.companyExit = companyExit;
+	}
+
+	public java.lang.Boolean getManageStamp() {
+		return this.manageStamp;
+	}
+
+	public void setManageStamp(java.lang.Boolean manageStamp) {
+		this.manageStamp = manageStamp;
 	}
 }

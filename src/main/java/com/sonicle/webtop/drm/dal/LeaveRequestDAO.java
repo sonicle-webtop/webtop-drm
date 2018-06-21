@@ -92,6 +92,22 @@ public class LeaveRequestDAO extends BaseDAO {
 				)
 				.fetchInto(OLeaveRequest.class);
 	}
+	
+	public List<OLeaveRequest> selectLeaveRequestsForManager(Connection con, LeaveRequestQuery query, String domainId) throws DAOException {
+		DSLContext dsl = getDSL(con);
+
+		Condition searchCndt = ensureConditionForManager(query);
+
+		return dsl
+				.select()
+				.from(LEAVE_REQUESTS)
+				.where(
+						searchCndt
+				).and(
+						LEAVE_REQUESTS.DOMAIN_ID.equal(domainId)
+				)
+				.fetchInto(OLeaveRequest.class);
+	}
 
 	public OLeaveRequest selectById(Connection con, Integer leaveRequestId) throws DAOException {
 		DSLContext dsl = getDSL(con);
@@ -148,6 +164,38 @@ public class LeaveRequestDAO extends BaseDAO {
 	private Condition ensureCondition(LeaveRequestQuery query, boolean isManager) {
 								
 		Condition searchCndt = (isManager) ? LEAVE_REQUESTS.MANAGER_ID.equal(query.userId) : LEAVE_REQUESTS.USER_ID.equal(query.userId);
+		
+		if (query.companyId != null) {
+			searchCndt = searchCndt.and(LEAVE_REQUESTS.COMPANY_ID.equal(query.companyId));
+		}
+		
+		if (query.fromDate != null) {
+			searchCndt = searchCndt.and(LEAVE_REQUESTS.FROM_DATE.greaterOrEqual(query.fromDate));
+		}
+
+		if (query.toDate != null) {
+			searchCndt = searchCndt.and(LEAVE_REQUESTS.TO_DATE.lessOrEqual(query.toDate));
+		}
+		
+		if (query.type  != null) {
+			searchCndt = searchCndt.and(LEAVE_REQUESTS.TYPE.equal(query.type));
+		}
+		
+		if (query.status != null) {
+			searchCndt = searchCndt.and(LEAVE_REQUESTS.STATUS.equal(query.status));
+		}
+		
+		if (query.result != null) {
+			searchCndt = searchCndt.and(LEAVE_REQUESTS.RESULT.equal(query.result));
+		}
+
+		return searchCndt;
+	}
+	
+	private Condition ensureConditionForManager(LeaveRequestQuery query) {
+								
+		Condition searchCndt = LEAVE_REQUESTS.MANAGER_ID.notEqual(query.userId); 
+		searchCndt = searchCndt.and(LEAVE_REQUESTS.USER_ID.equal(query.userId));
 		
 		if (query.companyId != null) {
 			searchCndt = searchCndt.and(LEAVE_REQUESTS.COMPANY_ID.equal(query.companyId));

@@ -116,6 +116,16 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 						},
 						{
 							xtype: 'checkbox',
+							bind: '{record.manageStamp}',
+							boxLabel: me.mys.res('timetable.settings.fld-managestamp.lbl')
+						},
+						{
+							xtype: 'checkbox',
+							bind: '{record.companyExit}',
+							boxLabel: me.mys.res('timetable.settings.fld-companyexit.lbl')
+						},
+						{
+							xtype: 'checkbox',
 							bind: '{record.breakAnomaly}',
 							boxLabel: me.mys.res('timetable.settings.fld-breakanomaly.lbl')
 						},

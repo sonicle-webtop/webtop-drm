@@ -41,7 +41,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 	dockableConfig: {
 		title: '{workReport.tit}',
 		iconCls: 'wtdrm-icon-workreport-xs',
-		width: 910,
+		width: 920,
 		height: 500
 	},
 	fieldTitle: 'workReportNo',
@@ -68,48 +68,39 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 					}
 				}),
 				'->',
-				{
-					xtype: 'wtform',
-					reference: 'toolbar',
-					modelValidation: true,
-					items: [
-						WTF.localCombo('id', 'desc', {
-							reference: 'flduser',
-							bind: '{record.operatorId}',
-							anyMatch: true,
-							selectOnFocus: true,
-							store: {
-								autoLoad: true,
-								model: 'WTA.model.Simple',
-								proxy: WTF.proxy(me.mys.ID, 'LookupOperators'),
-								listeners: {
-									load: function (s) {
-										if (me.isMode('new')) {
-											var meta = s.getProxy().getReader().metaData;
-											if (meta.selected) {
-												me.lookupReference('flduser').setValue(meta.selected);
-											}
-											if (s.loadCount === 1) {
-												me.lref('fldcompany').getStore().load();
-												me.lref('fldmasterdata').getStore().load();
-												me.lref('fldcausal').getStore().load();
-											}
-										}
+				WTF.localCombo('id', 'desc', {
+					reference: 'flduser',
+					bind: '{record.operatorId}',
+					anyMatch: true,
+					selectOnFocus: true,
+					store: {
+						autoLoad: true,
+						model: 'WTA.model.Simple',
+						proxy: WTF.proxy(me.mys.ID, 'LookupOperators'),
+						listeners: {
+							load: function (s) {
+								if (me.isMode('new')) {
+									if (s.loadCount === 1) {
+										me.lref('fldcompany').getStore().load();
+										me.lref('fldmasterdata').getStore().load();
+										me.lref('fldcausal').getStore().load();
 									}
 								}
-							},
-							listeners: {
-								select: function (s, r) {
-									me.lref('fldcompany').getStore().load();
-									me.lref('fldmasterdata').getStore().load();
-									me.lref('fldstatmasterdata').getStore().load();
-									me.lref('fldcausal').getStore().load();
-								}
-							},
-							fieldLabel: me.mys.res('workReport.fld-nominative.lbl')
-						})
-					]
-				}
+							}
+						}
+					},
+					listeners: {
+						select: function (s, r) {
+							me.lref('fldcompany').getStore().load();
+							me.lref('fldmasterdata').getStore().load();
+							me.lref('fldstatmasterdata').getStore().load();
+							me.lref('fldcausal').getStore().load();
+						}
+					},
+					fieldLabel: me.mys.res('workReport.fld-nominative.lbl'),
+					allowBlank: false,
+					readOnly: true
+				})
 			]
 		});
 
@@ -249,7 +240,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 															me.lref('fldtodate').getValue());
 													me.lref('flddaytrasfert').setValue(days);
 												}
-													},
+											},
 											fieldLabel: me.mys.res('workReport.fld-fromDate.lbl'),
 											width: '420px'
 										}, {
@@ -760,6 +751,8 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 			mo.set('freeSupport', me.mys.getVar('defaultFreeSupport'));
 			mo.set('docStatusId', me.mys.getVar('defaultStatus'));
 		}
+		
+		if(mo.get('operatorId') === null) me.lref('flduser').setReadOnly(false);
 	},
 	
 	initActions: function () {
@@ -848,7 +841,6 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 	},
 	onViewInvalid: function (s, mo, errs) {
 		var me = this;
-		WTU.updateFieldsErrors(me.lref('toolbar'), errs);
 		WTU.updateFieldsErrors(me.lref('column1'), errs);
 		WTU.updateFieldsErrors(me.lref('column2'), errs);
 		WTU.updateFieldsErrors(me.lref('otherfields'), errs);

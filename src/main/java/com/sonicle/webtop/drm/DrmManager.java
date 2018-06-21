@@ -1044,6 +1044,21 @@ public class DrmManager extends BaseManager {
 			DbUtils.closeQuietly(con);
 		}
 	}
+	
+	public List<OProfileMember> getDrmProfileMemberByUserId(String userId) throws WTException, SQLException {
+		Connection con = null;
+		ProfileMemberDAO pmDao = ProfileMemberDAO.getInstance();
+		ArrayList<OProfileMember> apf= null;
+		try {
+			con = WT.getConnection(SERVICE_ID);
+			
+			return pmDao.selectByUserId(con, userId);
+		} catch (DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
 
 	public DrmProfile getDrmProfile(String profileId) throws WTException {
 		Connection con = null;
@@ -2429,13 +2444,15 @@ public class DrmManager extends BaseManager {
 		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
 		DrmLineManagerDAO lmDao = DrmLineManagerDAO.getInstance();
 		ODrmLineManager oLm = null;
-		List<OLeaveRequest> lrs = null;
+		List<OLeaveRequest> lrs = new ArrayList<>();
 		
 		try {
 			con = WT.getConnection(SERVICE_ID);
 			
 			oLm = lmDao.selectLineManagerByDomainUserId(con, getTargetProfileId().getDomainId(), query.userId);
 			lrs = lrDao.selectLeaveRequests(con, query, getTargetProfileId().getDomainId(), (oLm != null) ? true : false);
+			
+			if((oLm != null)) lrs.addAll(lrDao.selectLeaveRequestsForManager(con, query, getTargetProfileId().getDomainId()));
 
 			return lrs;
 			
@@ -2867,6 +2884,8 @@ public class DrmManager extends BaseManager {
 		OTimetableSetting oSetting = new OTimetableSetting();
 		oSetting.setTimetableSettingId(tSetting.getTimetableSettingId());
 		oSetting.setDomainId(tSetting.getDomainId());
+		oSetting.setCompanyExit(tSetting.getCompanyExit());
+		oSetting.setManageStamp(tSetting.getManageStamp());
 		oSetting.setAllowedAddresses(tSetting.getAllowedAddresses());
 		oSetting.setAllowedUsers(tSetting.getAllowedUsers());
 		oSetting.setStaffOfficeEmail(tSetting.getStaffOfficeEmail());
@@ -2890,6 +2909,8 @@ public class DrmManager extends BaseManager {
 		TimetableSetting tSetting = new TimetableSetting();
 		tSetting.setTimetableSettingId(oTSetting.getTimetableSettingId());
 		tSetting.setDomainId(oTSetting.getDomainId());
+		tSetting.setCompanyExit(oTSetting.getCompanyExit());
+		tSetting.setManageStamp(oTSetting.getManageStamp());
 		tSetting.setAllowedAddresses(oTSetting.getAllowedAddresses());
 		tSetting.setAllowedUsers(oTSetting.getAllowedUsers());
 		tSetting.setStaffOfficeEmail(oTSetting.getStaffOfficeEmail());
