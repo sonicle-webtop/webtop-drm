@@ -45,3 +45,10 @@
 
 .wtdrm-icon-timetable-timetabledaily-xs { background-image: url('timetable_daily_16.png') !important; }
 .wtdrm-icon-timetable-timetablelist-xs { background-image: url('timetable_list_16.png') !important; }
+
+.wtdrm-icon-approve-xs { background-image: url('approvedrequest_16.png') !important; }
+.wtdrm-icon-decline-xs { background-image: url('notapprovedrequest_16.png') !important; }
+.wtdrm-icon-cancellationrequest-new-xs { background-image: url('cancellationrequest-new_16.png') !important;}
+.wtdrm-icon-cancellationrequest-approved-xs { background-image: url('cancellationrequest-approved_16.png') !important;}
+
+.timetablerequest-grid-row-ownrequests { background-color: rgba(249, 249, 147, 0.6); }

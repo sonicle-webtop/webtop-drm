@@ -2581,6 +2581,7 @@ public class DrmManager extends BaseManager {
 						oTe.setUserId(lr.getUserId());
 						oTe.setType(lr.getType());
 						oTe.setDate(ld);
+						oTe.setLeaveRequestId(lr.getLeaveRequestId());
 
 						String hRange = null;
 						
@@ -2616,39 +2617,41 @@ public class DrmManager extends BaseManager {
 
 			lrDao.update(con, lr);
 
-			LangUtils.CollectionChangeSet<LeaveRequestDocument> changesSet2 = LangUtils.getCollectionChanges(oldLr.getDocuments(), item.getDocuments());
+			if(files != null){
+				LangUtils.CollectionChangeSet<LeaveRequestDocument> changesSet2 = LangUtils.getCollectionChanges(oldLr.getDocuments(), item.getDocuments());
 
-			File destDir = new File(getLeaveRequestPath(item.getLeaveRequestId()));
-			if (!destDir.exists()) {
-				destDir.mkdirs();
+				File destDir = new File(getLeaveRequestPath(item.getLeaveRequestId()));
+				if (!destDir.exists()) {
+					destDir.mkdirs();
+				}
+
+				for (LeaveRequestDocument lrDoc : changesSet2.inserted) {
+
+					OLeaveRequestDocument oLrDoc = createOLeaveRequestDocument(lrDoc);
+
+					oLrDoc.setLeaveRequestId(item.getLeaveRequestId());
+					oLrDoc.setRevisionTimestamp(revisionTimestamp);
+					oLrDoc.setRevisionSequence((short) 1);
+
+					docDao.insert(con, oLrDoc);
+
+					File file = files.get(lrDoc.getLeaveRequestDocumentId());
+					String fileName = PathUtils.addFileExension(file.getName(), FilenameUtils.getExtension(lrDoc.getFileName()));
+					File destFile = new File(destDir, fileName);
+
+					FileUtils.copyFile(file, destFile);
+				}
+
+				for (LeaveRequestDocument lrDoc : changesSet2.deleted) {
+
+					String fileName = PathUtils.addFileExension(lrDoc.getLeaveRequestDocumentId().toString(), FilenameUtils.getExtension(lrDoc.getFileName()));
+					File file = new File(destDir, fileName);
+
+					FileUtils.deleteQuietly(file);
+					docDao.deleteById(con, lrDoc.getLeaveRequestDocumentId());
+				}
 			}
-
-			for (LeaveRequestDocument lrDoc : changesSet2.inserted) {
-
-				OLeaveRequestDocument oLrDoc = createOLeaveRequestDocument(lrDoc);
-
-				oLrDoc.setLeaveRequestId(item.getLeaveRequestId());
-				oLrDoc.setRevisionTimestamp(revisionTimestamp);
-				oLrDoc.setRevisionSequence((short) 1);
-
-				docDao.insert(con, oLrDoc);
-
-				File file = files.get(lrDoc.getLeaveRequestDocumentId());
-				String fileName = PathUtils.addFileExension(file.getName(), FilenameUtils.getExtension(lrDoc.getFileName()));
-				File destFile = new File(destDir, fileName);
-
-				FileUtils.copyFile(file, destFile);
-			}
-
-			for (LeaveRequestDocument lrDoc : changesSet2.deleted) {
-
-				String fileName = PathUtils.addFileExension(lrDoc.getLeaveRequestDocumentId().toString(), FilenameUtils.getExtension(lrDoc.getFileName()));
-				File file = new File(destDir, fileName);
-
-				FileUtils.deleteQuietly(file);
-				docDao.deleteById(con, lrDoc.getLeaveRequestDocumentId());
-			}
-
+			
 			DbUtils.commitQuietly(con);
 
 			return lr;
@@ -2656,6 +2659,36 @@ public class DrmManager extends BaseManager {
 		} catch (SQLException | DAOException ex) {
 			throw new WTException(ex, "DB error");
 		} catch (IOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public void updateCancellationLeaveRequest(int id) throws WTException {
+		Connection con = null;
+		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
+		TimetableEventDAO teDao = TimetableEventDAO.getInstance();
+		
+		try {
+			DateTime revisionTimestamp = createRevisionTimestamp();
+
+			con = WT.getConnection(SERVICE_ID, false);
+
+			OLeaveRequest lr = lrDao.selectById(con, id);
+			
+			lr.setManagerCancRespTimetamp(revisionTimestamp);
+			lr.setCancResult(true);
+			lr.setStatus("D");
+				
+			lrDao.update(con, lr);
+			
+			//Delete in TimetableEvents
+			teDao.deleteByLeaveRequestId(con, id);
+			
+			DbUtils.commitQuietly(con);
+			
+		} catch (SQLException | DAOException ex) {
 			throw new WTException(ex, "DB error");
 		} finally {
 			DbUtils.closeQuietly(con);
@@ -2810,7 +2843,7 @@ public class DrmManager extends BaseManager {
 
 	}
 
-	public LeaveRequestDocument getLeaveRequesDocument(String leaveRequestDocumentId) throws WTException {
+	public LeaveRequestDocument getLeaveRequestDocument(String leaveRequestDocumentId) throws WTException {
 		Connection con = null;
 		LeaveRequestDocumentDAO docDao = LeaveRequestDocumentDAO.getInstance();
 		LeaveRequestDocument doc = null;
@@ -2829,9 +2862,9 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	public FileContent getLeaveRequesDocumentContent(String leaveRequestDocumentId) throws WTException {
+	public FileContent getLeaveRequestDocumentContent(String leaveRequestDocumentId) throws WTException {
 
-		LeaveRequestDocument doc = getLeaveRequesDocument(leaveRequestDocumentId);
+		LeaveRequestDocument doc = getLeaveRequestDocument(leaveRequestDocumentId);
 
 		if (doc == null) {
 			return null;
@@ -3904,6 +3937,31 @@ public class DrmManager extends BaseManager {
 		} catch (Exception ex) {
 			DbUtils.rollbackQuietly(con);
 			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public void timetableRequestCancellation(Integer id, String cancellationReason) throws WTException {
+		Connection con = null;
+
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
+
+			lrDao.updateRequestCancellation(con, id, cancellationReason, createRevisionTimestamp());
+
+			DbUtils.commitQuietly(con);
+			
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+
 		} finally {
 			DbUtils.closeQuietly(con);
 		}

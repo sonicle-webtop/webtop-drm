@@ -45,7 +45,9 @@ public class JsGridLeaveRequest {
 	public Integer leaveRequestId;
 	public String domainId;
 	public String userId;
+	public String user;
 	public String managerId;
+	public String manager;
 	public String type;
 	public String fromDate;
 	public String toDate;
@@ -53,11 +55,14 @@ public class JsGridLeaveRequest {
 	public String toHour;
 	public String status;
 	public Boolean result;
+	public Boolean employeeCancReq;
 
 	public JsGridLeaveRequest(OLeaveRequest lr) {
 		this.leaveRequestId = lr.getLeaveRequestId();
-		this.userId = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getUserId())).getDisplayName();
-		this.managerId = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getManagerId())).getDisplayName();
+		this.user = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getUserId())).getDisplayName();
+		this.manager = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getManagerId())).getDisplayName();
+		this.userId = lr.getUserId();
+		this.managerId = lr.getManagerId();
 		this.type = lr.getType();
 		this.fromDate = lr.getFromDate().toString();
 		this.toDate = lr.getToDate().toString();
@@ -65,6 +70,7 @@ public class JsGridLeaveRequest {
 		this.toHour = lr.getToHour();
 		this.status = lr.getStatus();
 		this.result = lr.getResult();
+		this.employeeCancReq = lr.getEmployeeCancReq();
 	}
 
 }

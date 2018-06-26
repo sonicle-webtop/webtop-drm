@@ -792,3 +792,10 @@ ADD COLUMN "company_exit" bool DEFAULT false;
 
 ALTER TABLE "drm"."timetable_settings"
 ADD COLUMN "manage_stamp" bool DEFAULT false;
+
+--------------
+--25/06/2018--
+--------------
+
+ALTER TABLE "drm"."timetable_events"
+ADD COLUMN "leave_request_id" int4 NOT NULL;

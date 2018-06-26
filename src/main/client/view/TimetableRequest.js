@@ -42,7 +42,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 		title: '{timetableRequest.tit}',
 		iconCls: 'wtdrm-icon-timetable2-xs',
 		width: 580,
-		height: 470
+		height: 360
 	},
 	fieldTitle: 'leaveRequestId',
 	modelName: 'Sonicle.webtop.drm.model.TimetableRequest',
@@ -266,51 +266,13 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 									width: '555px'
 								},
 								{
-									xtype: 'checkbox',
-									reference: 'fldcancellationrequest',
-									bind: '{record.cancRequest}',
-									boxLabel: me.mys.res('timetableRequest.fld-cancellationRequest.lbl'),
-									hideEmptyLabel: false,
-									hidden: true,
-									listeners: {
-										change: function (t, newV, oldV, o) {
-											if(newV === true){
-												me.lref('fldcancellationreason').setHidden(false);
-											}else{
-												me.lref('fldcancellationreason').setValue('');
-												me.lref('fldcancellationreason').setHidden(true);
-											}
-										}
-									}
-								},
-								{
 									xtype: 'textarea',
 									reference: 'fldcancellationreason',
 									bind: '{record.cancReason}',
 									fieldLabel: me.mys.res('timetableRequest.fld-cancellationReason.lbl'),
 									width: '555px',
 									hidden: true
-								},
-								WTF.lookupCombo('id', 'desc', {
-									reference: 'fldapprove',
-									bind: '{record.result}',
-									store: Ext.create('Sonicle.webtop.drm.store.ApprovedType', {
-										autoLoad: true
-									}),
-									fieldLabel: me.mys.res('timetableRequest.fld-approve.lbl'),
-									width: '555px',
-									hidden: true
-								}),
-								WTF.lookupCombo('id', 'desc', {
-									reference: 'fldapprovecanc',
-									bind: '{record.canceResult}',
-									store: Ext.create('Sonicle.webtop.drm.store.ApprovedType', {
-										autoLoad: true
-									}),
-									fieldLabel: me.mys.res('timetableRequest.fld-approvecanc.lbl'),
-									width: '555px',
-									hidden: true
-								})
+								}
 							]
 						}
 					]
@@ -490,6 +452,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 				mo = me.getModel();
 	
 		if(mo.get('userId') === null) me.lref('flduser').setReadOnly(false);
+		if(mo.get('cancRequest') === true) me.lref('fldcancellationreason').setHidden(false);
 	
 		WT.ajaxReq(me.mys.ID, 'IsTimetableRequestPreviousDate', {
 			params: {},
@@ -502,60 +465,13 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 				}
 			}
 		});
+		
 		if(me.isMode(me.MODE_VIEW)){
 			me.getAct('saveClose').setDisabled(true);
-			me.lref('fldcancellationrequest').setHidden(false);
-			me.lref('fldapprove').setHidden(false);
-			me.lref('fldapprovecanc').setHidden(false);
 		}else if(me.isMode(me.MODE_EDIT)) {
 			me.lref('flduser').setReadOnly(true);
 			me.lref('fldcompany').setReadOnly(true);
 			me.lref('fldmanager').setReadOnly(true);
-			me.lref('fldcancellationrequest').setHidden(false);
-			
-			if(me.lref('fldcancellationrequest').getValue() === true){
-				me.lref('fldtype').setReadOnly(true);
-				me.lref('fldfromdate').setReadOnly(true);
-				me.lref('fldtodate').setReadOnly(true);
-				me.lref('fldfromhour').setReadOnly(true);
-				me.lref('fldtohour').setReadOnly(true);
-				me.lref('fldnotes').setReadOnly(true);
-				me.lref('fldcancellationrequest').setReadOnly(true);
-				me.lref('fldcancellationreason').setReadOnly(true);
-			}
-			
-			WT.ajaxReq(me.mys.ID, 'IsLineManagerLogged', {
-				params: {},
-				callback: function (success, json) {
-					if(success){
-						if(json.data == true){
-							me.lref('fldtype').setReadOnly(true);
-							me.lref('fldfromdate').setReadOnly(true);
-							me.lref('fldtodate').setReadOnly(true);
-							me.lref('fldfromhour').setReadOnly(true);
-							me.lref('fldtohour').setReadOnly(true);
-							me.lref('fldnotes').setReadOnly(true);
-							me.lref('fldcancellationreason').setReadOnly(true);
-							
-							if(mo.get('userId') === mo.get('managerId')){
-								if(me.lref('fldcancellationrequest').getValue() === true){
-									me.lref('fldcancellationrequest').setReadOnly(true);
-								}else{
-									me.lref('fldcancellationrequest').setReadOnly(false);
-								}
-							}else{
-								me.lref('fldcancellationrequest').setReadOnly(true);
-							}
-							
-							if(mo.get('cancRequest') === true){
-								me.lref('fldapprovecanc').setHidden(false);
-							}else{
-								me.lref('fldapprove').setHidden(false);
-							}
-						}
-					}
-				}
-			});
 		}
 	},
 	

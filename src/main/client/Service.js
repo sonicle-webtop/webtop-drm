@@ -568,6 +568,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							region: 'center',
 							xtype: 'grid',
 							reference: 'gpTimetableRequest',
+							viewConfig: {
+								getRowClass: function(r, rowIndex, rp, ds) {
+									if(r.get('userId') === WT.getVar('userId'))
+										return 'timetablerequest-grid-row-ownrequests';
+								} 
+							}, 
 							store: {
 								autoLoad: false,
 								model: 'Sonicle.webtop.drm.model.GridTimetableRequests',
@@ -579,10 +585,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									align: 'center',
 									dataIndex: 'result',
 									getIconCls: function(v, rec) {
-										return me.cssIconCls((rec.get('result') === true) ? 'approvedrequest' : (rec.get('result') === false) ? 'notapprovedrequest' : 'sendedrequest', 'xs');
+										return me.cssIconCls((rec.get('status') === 'D') ? 'cancellationrequest-approved' : ((rec.get('result') === true || rec.get('result') === false) && rec.get('employeeCancReq') === true) ? 'cancellationrequest-new' : (rec.get('result') === true) ? 'approvedrequest' : (rec.get('result') === false) ? 'notapprovedrequest' : 'sendedrequest', 'xs');
 									},
 									iconSize: WTU.imgSizeToPx('xs'),
-									width: 30
+									width: 30,
+									cls: 'resultCls',
+									tdCls: 'resultTdCls'
 								}, {
 									header: me.res('gpTimetableRequest.type.lbl'),
 									dataIndex: 'type',
@@ -614,11 +622,11 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									}
 								}, {
 									header: me.res('gpTimetableRequest.requestBy.lbl'),
-									dataIndex: 'userId',
+									dataIndex: 'user',
 									flex: 1
 								}, {
 									header: me.res('gpTimetableRequest.manager.lbl'),
-									dataIndex: 'managerId',
+									dataIndex: 'manager',
 									flex: 1
 								}, {
 									header: me.res('gpTimetableRequest.fromDate.lbl'),
@@ -665,19 +673,104 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							tbar: [
 								me.getAct('timetableRequest', 'add'),
 								me.getAct('timetableRequest', 'edit'),
+								me.getAct('timetableRequest', 'remove'),
 								'-',
-								me.getAct('timetableRequest', '	approve'),
-								me.getAct('timetableRequest', '	decline'),
+								me.getAct('timetableRequest', 'approve'),
+								me.getAct('timetableRequest', 'decline'),
 								me.getAct('timetableRequest', 'requestcancellation'),
-								me.getAct('timetableRequest', 'delete'),
+								me.getAct('timetableRequest', 'cancel')
 							],
 							listeners: {
 								rowclick: function (s, rec) {
-									me.getAct('timetableRequest', 'edit').setDisabled(false);
-									me.getAct('timetableRequest', 'remove').setDisabled(false);
+									if(rec.get("userId") === WT.getVar('userId')){
+										//se sono l'utente loggato ad aver effettuato la richiesta disabilito pulsanti del supervisore
+										me.getAct('timetableRequest', 'approve').setDisabled(true);
+										me.getAct('timetableRequest', 'decline').setDisabled(true);
+										me.getAct('timetableRequest', 'cancel').setDisabled(true);
+										if(rec.get('status') === 'D'){
+											//e se la richiesta è stata cancellata, disabilito tutti i pulsanti
+											me.getAct('timetableRequest', 'edit').setDisabled(true);
+											me.getAct('timetableRequest', 'remove').setDisabled(true);
+											me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
+										}else if(rec.get('result') === null){
+											//e se il supervisore non ha ancora gestito la richiesta, abilito update, delete e disabilito request delete
+											me.getAct('timetableRequest', 'edit').setDisabled(false);
+											me.getAct('timetableRequest', 'remove').setDisabled(false);
+											me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
+										}else if(rec.get('result') !== null){
+											//e se il supervisore ha già gestito la richiesta, disabilito update, delete e abilito request delete
+											me.getAct('timetableRequest', 'edit').setDisabled(true);
+											me.getAct('timetableRequest', 'remove').setDisabled(true);
+											me.getAct('timetableRequest', 'requestcancellation').setDisabled(false);
+										}
+									}else if(rec.get("managerId") === WT.getVar('userId')){
+										//se sono l'utente loggato ad essere il supervisore
+										if(rec.get("userId") !== WT.getVar('userId')){
+											//e se non sono su una mia richiesta
+											if(rec.get('status') === 'D'){
+												//e se la richiesta è stata cancellata, disabilito tutti i pulsanti
+												me.getAct('timetableRequest', 'edit').setDisabled(true);
+												me.getAct('timetableRequest', 'remove').setDisabled(true);
+												me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
+												me.getAct('timetableRequest', 'approve').setDisabled(true);
+												me.getAct('timetableRequest', 'decline').setDisabled(true);
+												me.getAct('timetableRequest', 'cancel').setDisabled(true);
+											}else if(rec.get('result') === null){
+												//e se non ho ancora gestito la richiesta, abilito approve e decline e disabilito tutto il resto
+												me.getAct('timetableRequest', 'approve').setDisabled(false);
+												me.getAct('timetableRequest', 'decline').setDisabled(false);
+												me.getAct('timetableRequest', 'edit').setDisabled(true);
+												me.getAct('timetableRequest', 'remove').setDisabled(true);
+												me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
+												me.getAct('timetableRequest', 'cancel').setDisabled(true);
+											}else if(rec.get('result') !== null){
+												//e se ho già gestito la richiesta, disabilito tutto
+												me.getAct('timetableRequest', 'edit').setDisabled(true);
+												me.getAct('timetableRequest', 'remove').setDisabled(true);
+												me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
+												me.getAct('timetableRequest', 'approve').setDisabled(true);
+												me.getAct('timetableRequest', 'decline').setDisabled(true);
+												me.getAct('timetableRequest', 'cancel').setDisabled(true);
+												if(rec.get('employeeCancReq') === true && rec.get('status') === 'C'){
+													//ma se lo status della richiesta è chiuso ed è stata richiesta la cancellazione, abilito pulsante cancel
+													me.getAct('timetableRequest', 'cancel').setDisabled(false);
+												}
+											}
+										}
+									}
 								},
 								rowdblclick: function (s, rec) {
 									me.editTimetableRequestUI(rec);
+								},
+								afterrender: function (t) {
+									WT.ajaxReq(me.ID, 'IsLineManagerLogged', {
+										params: {},
+										callback: function (success, json) {
+											if(success){
+												if(json.data == true){
+													me.getAct('timetableRequest', 'approve').setHidden(false);
+													me.getAct('timetableRequest', 'decline').setHidden(false);
+													me.getAct('timetableRequest', 'cancel').setHidden(false);
+												}
+											}
+										}
+									});
+								},
+								render: function(grid) {
+									var view = grid.getView();
+									grid.tip = Ext.create('Ext.tip.ToolTip', {
+										target: view.getId(),
+										delegate: view.itemSelector + ' .resultTdCls',
+										trackMouse: true,
+										listeners: {
+											beforeshow: function updateTipBody(tip) {
+												var tipGridView = tip.target.component;
+												var rec = tipGridView.getRecord(tip.triggerElement);
+
+												tip.update((rec.get('status') === 'D') ? me.res('gpTimetableRequest.tip.result.delete.lbl') : ((rec.get('result') === true || rec.get('result') === false) && rec.get('employeeCancReq') === true) ? me.res('gpTimetableRequest.tip.result.requestcancellation.lbl') : (rec.get('result') === true) ? me.res('gpTimetableRequest.tip.result.approved.lbl') : (rec.get('result') === false) ? me.res('gpTimetableRequest.tip.result.notapproved.lbl') : me.res('gpTimetableRequest.tip.result.sended.lbl'));
+											}
+										}
+									});
 								}
 							}
 						}
@@ -1093,6 +1186,49 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				me.deleteTimetableRequestUI(sel);
 			}
 		});
+		me.addAct('timetableRequest', 'approve', {
+			text: me.res('timetablerequest.approve.lbl'),
+			tooltip: null,
+			iconCls: 'wtdrm-icon-approve-xs',
+			disabled: true,
+			hidden: true,
+			handler: function () {
+				var sel = me.gpTimetableRequestSelected();
+				me.approveDeclineTimetableRequestUI(sel, true);
+			}
+		});
+		me.addAct('timetableRequest', 'decline', {
+			text: me.res('timetablerequest.decline.lbl'),
+			tooltip: null,
+			iconCls: 'wtdrm-icon-decline-xs',
+			disabled: true,
+			hidden: true,
+			handler: function () {
+				var sel = me.gpTimetableRequestSelected();
+				me.approveDeclineTimetableRequestUI(sel, false);
+			}
+		});
+		me.addAct('timetableRequest', 'cancel', {
+			text: me.res('timetablerequest.cancel.lbl'),
+			tooltip: null,
+			iconCls: 'wtdrm-icon-cancellationrequest-approved-xs',
+			disabled: true,
+			hidden: true,
+			handler: function () {
+				var sel = me.gpTimetableRequestSelected();
+				me.cancelTimetableRequestUI(sel);
+			}
+		});
+		me.addAct('timetableRequest', 'requestcancellation', {
+			text: me.res('timetablerequest.requestcancellation.lbl'),
+			tooltip: null,
+			iconCls: 'wtdrm-icon-cancellationrequest-new-xs',
+			disabled: true,
+			handler: function () {
+				var sel = me.gpTimetableRequestSelected();
+				me.timetableRequestCancellationUI(sel);
+			}
+		});
 		me.addAct('timetableReport', 'save', {
 			text: WT.res('act-save.lbl'),
 			tooltip: null,
@@ -1374,7 +1510,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	},
 	editTimetableRequestUI: function (rec) {
 		var me = this;
-		me.editTimetableRequest(rec.get('leaveRequestId'), rec.get('status'), {
+		me.editTimetableRequest(rec.get('leaveRequestId'), rec.get('status'), rec.get('userId'), {
 			callback: function (success, model) {
 				if (success) {
 					this.gpTimetableRequest().getStore().load();
@@ -1384,9 +1520,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			}
 		});
 	},
-	editTimetableRequest: function (leaveRequestId, status, opts) {
+	editTimetableRequest: function (leaveRequestId, status, userId, opts) {
 		opts = opts || {};
-		var mode = (status === 'C' || status === 'D') ? 'view' : 'edit';
+		var mode = (status === 'C' || status === 'D') ? 'view' : (userId !== WT.getVar('userId')) ? 'view' : 'edit';
 		var me = this,
 				vct = WT.createView(me.ID, 'view.TimetableRequest');
 		vct.getView().on('viewsave', function (s, success, model) {
@@ -1427,6 +1563,114 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		WT.ajaxReq(me.ID, 'ManageLeaveRequest', {
 			params: {
 				crud: 'delete',
+				leaveRequestIds: WTU.arrayAsParam(leaveRequestId)
+			},
+			callback: function (success, json) {
+				Ext.callback(opts.callback, opts.scope || me, [success, json]);
+			}
+		});
+	},
+	approveDeclineTimetableRequestUI: function (rec,choice) {
+		var me = this,
+				sto = me.gpTimetableRequest().getStore(),
+				msg;
+		if (rec) {
+			msg = (choice === true) ? me.res('timetableRequest.act.approve') : me.res('timetableRequest.act.decline');
+		}
+		WT.confirm(msg, function (bid) {
+			if (bid === 'yes') {
+				me.approveDeclineTimetableRequest(rec.get('leaveRequestId'), choice, {
+					callback: function (success) {
+						if (success) {
+							this.gpTimetableRequest().getStore().load();
+						} else {
+							alert('error');
+						}
+					}
+				});
+			}
+		});
+	},
+	approveDeclineTimetableRequest: function (leaveRequestId, choice, opts) {
+		opts = opts || {};
+		var me = this;
+		WT.ajaxReq(me.ID, 'ManageLeaveRequestSupervisorChoice', {
+			params: {
+				leaveRequestIds: WTU.arrayAsParam(leaveRequestId),
+				choice: choice
+			},
+			callback: function (success, json) {
+				Ext.callback(opts.callback, opts.scope || me, [success, json]);
+			}
+		});
+	},
+	timetableRequestCancellationUI: function (rec) {
+		var me = this;
+		me.timetableRequestCancellation(rec.get('leaveRequestId'), {
+			callback: function (success, model) {
+				if (success) {
+					this.gpTimetableRequest().getStore().load();
+				} else {
+					alert('error');
+				}
+			}
+		});
+	},
+	timetableRequestCancellation: function (leaveRequestId, opts) {
+		opts = opts || {};
+		var me = this;
+		
+		WT.prompt('',{
+			title: me.res("timetableRequestCancellation.tit"),
+			fn: function(btn, text, cfg) {
+				if (btn=='ok') {
+					if(Ext.isEmpty(text)){
+						Ext.MessageBox.show(Ext.apply({}, {msg: cfg.msg}, cfg));
+					}else{
+						WT.ajaxReq(me.ID, 'ManageTimetableRequestCancellation', {
+							params: {
+								leaveRequestId: leaveRequestId,
+								cancellationReason: text
+							},
+							callback: function (success, json) {
+								Ext.callback(opts.callback, opts.scope || me, [success, json]);
+							}
+						});
+					}
+				}
+			},
+			scope: me,
+			width: 600,
+			multiline: 200,
+			value: ''
+		});
+	},
+	cancelTimetableRequestUI: function (rec) {
+		var me = this,
+				sto = me.gpTimetableRequest().getStore(),
+				msg;
+		if (rec) {
+			msg = me.res('timetableRequest.act.cancel');
+		}
+		WT.confirm(msg, function (bid) {
+			if (bid === 'yes') {
+				me.cancelTimetableRequest(rec.get('leaveRequestId'), {
+					callback: function (success) {
+						if (success) {
+							this.gpTimetableRequest().getStore().load();
+						} else {
+							alert('error');
+						}
+					}
+				});
+			}
+		});
+	},
+	cancelTimetableRequest: function (leaveRequestId, opts) {
+		opts = opts || {};
+		var me = this;
+		WT.ajaxReq(me.ID, 'ManageCancellationLeaveRequest', {
+			params: {
 				leaveRequestIds: WTU.arrayAsParam(leaveRequestId)
 			},
 			callback: function (success, json) {

@@ -223,4 +223,18 @@ public class LeaveRequestDAO extends BaseDAO {
 
 		return searchCndt;
 	}
+
+	public int updateRequestCancellation(Connection con, Integer leaveRequestId, String cancellationReason, DateTime revisionTimestamp) {
+		DSLContext dsl = getDSL(con);
+		
+		return dsl
+				.update(LEAVE_REQUESTS)
+				.set(LEAVE_REQUESTS.EMPLOYEE_CANC_REQ, true)
+				.set(LEAVE_REQUESTS.EMPLOYEE_CANC_REQ_TIMESTAMP, revisionTimestamp)
+				.set(LEAVE_REQUESTS.CANC_REASON, cancellationReason)
+				.where(
+						LEAVE_REQUESTS.LEAVE_REQUEST_ID.equal(leaveRequestId)
+				)
+				.execute();
+	}
 }

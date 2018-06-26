@@ -105,4 +105,24 @@ public class TimetableEventDAO extends BaseDAO {
 				)
 				.fetchInto(OTimetableEvent.class);
 	}
+	
+	public int deleteById(Connection con, Integer id) {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.delete(TIMETABLE_EVENTS)
+				.where(
+						TIMETABLE_EVENTS.TIMETABLE_EVENT_ID.equal(id)
+				)
+				.execute();
+	}
+	
+	public int deleteByLeaveRequestId(Connection con, Integer leaveRequestId) {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.delete(TIMETABLE_EVENTS)
+				.where(
+						TIMETABLE_EVENTS.LEAVE_REQUEST_ID.equal(leaveRequestId)
+				)
+				.execute();
+	}
 }

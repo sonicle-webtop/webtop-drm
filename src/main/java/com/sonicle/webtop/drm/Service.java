@@ -1302,6 +1302,38 @@ public class Service extends BaseService {
 			logger.error("Error in action ManageLeaveRequest", ex);
 		}
 	}
+	
+	public void processManageLeaveRequestSupervisorChoice(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			IntegerArray ids = ServletUtils.getObjectParameter(request, "leaveRequestIds", IntegerArray.class, true);
+			Boolean choice = ServletUtils.getBooleanParameter(request, "choice", false);
+
+			LeaveRequest lr = manager.getLeaveRequest(ids.get(0));
+			lr.setResult(choice);
+			
+			manager.updateLeaveRequest(lr, null);
+
+			new JsonResult().printTo(out);
+
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageLeaveRequestSupervisorChoice", ex);
+		}
+	}
+	
+	public void processManageCancellationLeaveRequest(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			
+			IntegerArray ids = ServletUtils.getObjectParameter(request, "leaveRequestIds", IntegerArray.class, true);
+
+			manager.updateCancellationLeaveRequest(ids.get(0));
+
+			new JsonResult().printTo(out);
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageCancellationLeaveRequest", ex);
+		}
+	}
 
 	public void processDownloadWorkReportAttachment(HttpServletRequest request, HttpServletResponse response) {
 
@@ -1359,7 +1391,7 @@ public class Service extends BaseService {
 				if (hasUploadedFile(fileId)) {
 					fc = toFileContent(getUploadedFile(fileId));
 				} else {
-					fc = manager.getLeaveRequesDocumentContent(fileId);
+					fc = manager.getLeaveRequestDocumentContent(fileId);
 				}
 
 				is = fc.getStream();
@@ -1542,6 +1574,21 @@ public class Service extends BaseService {
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action ManageTimetableStamp", ex);
+		}
+	}
+	
+	public void processManageTimetableRequestCancellation(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			
+			Integer id = ServletUtils.getIntParameter(request, "leaveRequestId", true);
+			String cancellationReason = ServletUtils.getStringParameter(request, "cancellationReason", true);
+
+			manager.timetableRequestCancellation(id, cancellationReason);
+
+			new JsonResult().printTo(out);
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageTimetableRequestCancellation", ex);
 		}
 	}
 	

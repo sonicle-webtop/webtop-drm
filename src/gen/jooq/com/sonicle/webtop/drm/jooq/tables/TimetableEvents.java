@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableEvents extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.TimetableEventsRecord> {
 
-	private static final long serialVersionUID = -1124226362;
+	private static final long serialVersionUID = 381647993;
 
 	/**
 	 * The reference instance of <code>drm.timetable_events</code>
@@ -65,6 +65,11 @@ public class TimetableEvents extends org.jooq.impl.TableImpl<com.sonicle.webtop.
 	 * The column <code>drm.timetable_events.hour</code>.
 	 */
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableEventsRecord, java.lang.String> HOUR = createField("hour", org.jooq.impl.SQLDataType.VARCHAR.length(36).nullable(false), this, "");
+
+	/**
+	 * The column <code>drm.timetable_events.leave_request_id</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableEventsRecord, java.lang.Integer> LEAVE_REQUEST_ID = createField("leave_request_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
 	 * Create a <code>drm.timetable_events</code> table reference

@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableEvents implements java.io.Serializable {
 
-	private static final long serialVersionUID = -1370231761;
+	private static final long serialVersionUID = 1708773889;
 
 	private java.lang.Integer       timetableEventId;
 	private java.lang.String        domainId;
@@ -25,6 +25,7 @@ public class TimetableEvents implements java.io.Serializable {
 	private java.lang.String        type;
 	private org.joda.time.LocalDate date;
 	private java.lang.String        hour;
+	private java.lang.Integer       leaveRequestId;
 
 	public TimetableEvents() {}
 
@@ -35,7 +36,8 @@ public class TimetableEvents implements java.io.Serializable {
 		java.lang.String        userId,
 		java.lang.String        type,
 		org.joda.time.LocalDate date,
-		java.lang.String        hour
+		java.lang.String        hour,
+		java.lang.Integer       leaveRequestId
 	) {
 		this.timetableEventId = timetableEventId;
 		this.domainId = domainId;
@@ -44,6 +46,7 @@ public class TimetableEvents implements java.io.Serializable {
 		this.type = type;
 		this.date = date;
 		this.hour = hour;
+		this.leaveRequestId = leaveRequestId;
 	}
 
 	public java.lang.Integer getTimetableEventId() {
@@ -100,5 +103,13 @@ public class TimetableEvents implements java.io.Serializable {
 
 	public void setHour(java.lang.String hour) {
 		this.hour = hour;
+	}
+
+	public java.lang.Integer getLeaveRequestId() {
+		return this.leaveRequestId;
+	}
+
+	public void setLeaveRequestId(java.lang.Integer leaveRequestId) {
+		this.leaveRequestId = leaveRequestId;
 	}
 }

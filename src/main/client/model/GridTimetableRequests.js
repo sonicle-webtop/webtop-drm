@@ -44,6 +44,7 @@ Ext.define('Sonicle.webtop.drm.model.GridTimetableRequests', {
 		WTF.roField('fromHour', 'string'),
 		WTF.roField('toHour', 'string'),
 		WTF.roField('status', 'string'),
-		WTF.roField('result', 'bool')
+		WTF.roField('result', 'bool'),
+		WTF.roField('employeeCancReq', 'bool')
 	]
 });
