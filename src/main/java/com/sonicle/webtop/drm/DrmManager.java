@@ -44,6 +44,7 @@ import com.sonicle.webtop.core.bol.OUser;
 import com.sonicle.webtop.core.dal.DAOException;
 import com.sonicle.webtop.core.dal.UserDAO;
 import com.sonicle.webtop.core.sdk.BaseManager;
+import com.sonicle.webtop.core.sdk.UserProfile;
 import com.sonicle.webtop.core.sdk.UserProfileId;
 import com.sonicle.webtop.core.sdk.WTException;
 import com.sonicle.webtop.core.util.IdentifierUtils;
@@ -142,7 +143,9 @@ import com.sonicle.webtop.drm.model.WorkReportAttachment;
 import com.sonicle.webtop.drm.model.WorkReportRow;
 import com.sonicle.webtop.drm.model.WorkReportSetting;
 import com.sonicle.webtop.drm.model.WorkType;
+import com.sonicle.webtop.drm.util.EmailNotification;
 import eu.medsea.mimeutil.MimeType;
+import freemarker.template.TemplateException;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -158,6 +161,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import javax.imageio.ImageIO;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -2533,6 +2539,8 @@ public class DrmManager extends BaseManager {
 
 			DbUtils.commitQuietly(con);
 
+			notifyLeaveRequest(newLr);
+			
 			return newLr;
 
 		} catch (SQLException | DAOException ex) {
@@ -2546,7 +2554,7 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	public OLeaveRequest updateLeaveRequest(LeaveRequest item, HashMap<String, File> files) throws WTException {
+	public OLeaveRequest updateLeaveRequest(LeaveRequest item, HashMap<String, File> files, boolean sendMail) throws WTException, MessagingException, TemplateException {
 		Connection con = null;
 		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
 		LeaveRequestDocumentDAO docDao = LeaveRequestDocumentDAO.getInstance();
@@ -2653,7 +2661,9 @@ public class DrmManager extends BaseManager {
 			}
 			
 			DbUtils.commitQuietly(con);
-
+			
+			if(sendMail) notifyLeaveRequest(lr);
+			
 			return lr;
 
 		} catch (SQLException | DAOException ex) {
@@ -4066,6 +4076,7 @@ public class DrmManager extends BaseManager {
 		TimetableSetting setting = createTimetableSetting(tsDao.selectByDomainId(con, getTargetProfileId().getDomainId()));
 		OEmployeeProfile oep = null;
 		Integer tolerance = 0;
+		Integer rounding = 0;
 		
 		HashMap<LocalDate, OTimetableReport> hashTr = new HashMap();
 		
@@ -4113,11 +4124,26 @@ public class DrmManager extends BaseManager {
 
 			BigDecimal bd = round(wht, 2);
 			String val = bd.toString();
-
-			if(Integer.parseInt(val.substring(val.length() - 2)) >= 50)
-				val = val.substring(0, val.length() - 2) + "30";
-			else if(Integer.parseInt(val.substring(val.length() - 2)) < 50)
+			
+			rounding = Integer.parseInt(setting.getRounding());
+			
+			if(rounding == 15){
+				if(Integer.parseInt(val.substring(val.length() - 2)) >= 25 && Integer.parseInt(val.substring(val.length() - 2)) < 50)
+					val = val.substring(0, val.length() - 2) + "15";
+				else if(Integer.parseInt(val.substring(val.length() - 2)) >= 50 && Integer.parseInt(val.substring(val.length() - 2)) < 75)
+					val = val.substring(0, val.length() - 2) + "30";
+				else if(Integer.parseInt(val.substring(val.length() - 2)) >= 75 && Integer.parseInt(val.substring(val.length() - 2)) < 100)
+					val = val.substring(0, val.length() - 2) + "45";
+				else if(Integer.parseInt(val.substring(val.length() - 2)) < 25)
+					val = val.substring(0, val.length() - 2) + "00";
+			}else if(rounding == 30){
+				if(Integer.parseInt(val.substring(val.length() - 2)) >= 50)
+					val = val.substring(0, val.length() - 2) + "30";
+				else if(Integer.parseInt(val.substring(val.length() - 2)) < 50)
+					val = val.substring(0, val.length() - 2) + "00";
+			} else if(rounding == 60){
 				val = val.substring(0, val.length() - 2) + "00";
+			}			
 
 			otr.setWorkingHours(val);
 		}
@@ -4291,5 +4317,31 @@ public class DrmManager extends BaseManager {
 		oTr.setNote(tr.getNote());
 
 		return oTr;
+	}
+	
+	private void notifyLeaveRequest(OLeaveRequest lr) throws MessagingException, IOException, TemplateException {		
+		UserProfile.Data udFrom = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getUserId()));
+		InternetAddress from = udFrom.getPersonalEmail();
+		UserProfile.Data udTo = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getManagerId()));
+		InternetAddress to = udTo.getPersonalEmail();
+		
+		Session session = getMailSession();
+
+		try {
+			String bodyHeader = TplHelper.buildLeaveRequestTitle(udTo.getLocale(), lr);
+			String html = TplHelper.buildLeaveRequestBody(udTo.getLocale(), lr);
+			String source = EmailNotification.buildSource(udTo.getLocale(), SERVICE_ID);
+			String because = WT.lookupResource(SERVICE_ID, udTo.getLocale(), DrmLocale.EMAIL_REMINDER_FOOTER_BECAUSE);
+
+			String msgSubject = EmailNotification.buildSubject(udTo.getLocale(), SERVICE_ID, bodyHeader);
+			String msgBody = new EmailNotification.BecauseBuilder()
+					.withCustomBody(bodyHeader, html)
+					.build(udTo.getLocale(), source, because, to.getAddress()).write();
+
+			WT.sendEmail(session, true, from, to, msgSubject, msgBody);
+
+		} catch (IOException | TemplateException | MessagingException ex) {
+			logger.error("Unable to notify recipient after leave request modification [{}]", ex, to.getAddress());
+		}
 	}
 }

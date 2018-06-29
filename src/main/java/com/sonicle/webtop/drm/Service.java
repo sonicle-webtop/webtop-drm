@@ -1285,7 +1285,7 @@ public class Service extends BaseService {
 					}
 				}
 
-				manager.updateLeaveRequest(lr, files);
+				manager.updateLeaveRequest(lr, files, false);
 
 				new JsonResult().printTo(out);
 
@@ -1311,7 +1311,7 @@ public class Service extends BaseService {
 			LeaveRequest lr = manager.getLeaveRequest(ids.get(0));
 			lr.setResult(choice);
 			
-			manager.updateLeaveRequest(lr, null);
+			manager.updateLeaveRequest(lr, null, true);
 
 			new JsonResult().printTo(out);
 
