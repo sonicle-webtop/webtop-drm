@@ -2675,7 +2675,7 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
-	public void updateCancellationLeaveRequest(int id) throws WTException {
+	public void updateCancellationLeaveRequest(int id) throws WTException, MessagingException, IOException, TemplateException {
 		Connection con = null;
 		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
 		TimetableEventDAO teDao = TimetableEventDAO.getInstance();
@@ -2697,6 +2697,8 @@ public class DrmManager extends BaseManager {
 			teDao.deleteByLeaveRequestId(con, id);
 			
 			DbUtils.commitQuietly(con);
+			
+			notifyLeaveRequestCancellation(lr);
 			
 		} catch (SQLException | DAOException ex) {
 			throw new WTException(ex, "DB error");
@@ -3959,10 +3961,15 @@ public class DrmManager extends BaseManager {
 			con = WT.getConnection(SERVICE_ID, false);
 			
 			LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
-
+			
+			OLeaveRequest lr = lrDao.selectById(con, id);
+			lr.setCancReason(cancellationReason);
+			
 			lrDao.updateRequestCancellation(con, id, cancellationReason, createRevisionTimestamp());
 
 			DbUtils.commitQuietly(con);
+			
+			notifyLeaveRequestCancellation(lr);
 			
 		} catch (SQLException | DAOException ex) {
 			DbUtils.rollbackQuietly(con);
@@ -4334,14 +4341,64 @@ public class DrmManager extends BaseManager {
 			String because = WT.lookupResource(SERVICE_ID, udTo.getLocale(), DrmLocale.EMAIL_REMINDER_FOOTER_BECAUSE);
 
 			String msgSubject = EmailNotification.buildSubject(udTo.getLocale(), SERVICE_ID, bodyHeader);
-			String msgBody = new EmailNotification.BecauseBuilder()
-					.withCustomBody(bodyHeader, html)
-					.build(udTo.getLocale(), source, because, to.getAddress()).write();
-
+			
+			EmailNotification.BecauseBuilder builder = new EmailNotification.BecauseBuilder().withCustomBody(bodyHeader, html);
+			
+			if(lr.getResult() != null){
+				from = udTo.getPersonalEmail();
+				to = udFrom.getPersonalEmail();
+				
+				if (lr.getResult() == true) {
+					builder.greenMessage(lookupResource(udTo.getLocale(), DrmLocale.TPL_EMAIL_RESPONSEUPDATE_MSG_APPROVE));
+				} else if (lr.getResult() == false) {
+					builder.redMessage(lookupResource(udTo.getLocale(), DrmLocale.TPL_EMAIL_RESPONSEUPDATE_MSG_DECLINE));
+				}
+			}
+			
+			String msgBody = builder.build(udTo.getLocale(), source, because, to.getAddress()).write();
+			
 			WT.sendEmail(session, true, from, to, msgSubject, msgBody);
 
 		} catch (IOException | TemplateException | MessagingException ex) {
-			logger.error("Unable to notify recipient after leave request modification [{}]", ex, to.getAddress());
+			logger.error("Unable to notify recipient after leave request [{}]", ex, to.getAddress());
+		}
+	}
+	
+	private void notifyLeaveRequestCancellation(OLeaveRequest lr) throws MessagingException, IOException, TemplateException {		
+		UserProfile.Data udFrom = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getUserId()));
+		InternetAddress from = udFrom.getPersonalEmail();
+		UserProfile.Data udTo = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getManagerId()));
+		InternetAddress to = udTo.getPersonalEmail();
+		
+		Session session = getMailSession();
+
+		try {
+			String bodyHeader = TplHelper.buildLeaveRequestCancellationTitle(udTo.getLocale(), lr);
+			String html = TplHelper.buildLeaveRequestCancellationBody(udTo.getLocale(), lr);
+			String source = EmailNotification.buildSource(udTo.getLocale(), SERVICE_ID);
+			String because = WT.lookupResource(SERVICE_ID, udTo.getLocale(), DrmLocale.EMAIL_REMINDER_FOOTER_BECAUSE);
+
+			String msgSubject = EmailNotification.buildSubject(udTo.getLocale(), SERVICE_ID, bodyHeader);
+			
+			EmailNotification.BecauseBuilder builder = new EmailNotification.BecauseBuilder().withCustomBody(bodyHeader, html);
+				
+			if(lr.getCancResult() != null){
+				from = udTo.getPersonalEmail();
+				to = udFrom.getPersonalEmail();
+				
+				if (lr.getCancResult() == true) {
+					builder.greenMessage(lookupResource(udTo.getLocale(), DrmLocale.TPL_EMAIL_RESPONSEUPDATE_MSG_APPROVE));
+				} else if (lr.getCancResult() == false) {
+					builder.redMessage(lookupResource(udTo.getLocale(), DrmLocale.TPL_EMAIL_RESPONSEUPDATE_MSG_DECLINE));
+				}
+			}
+			
+			String msgBody = builder.build(udTo.getLocale(), source, because, to.getAddress()).write();
+			
+			WT.sendEmail(session, true, from, to, msgSubject, msgBody);
+
+		} catch (IOException | TemplateException | MessagingException ex) {
+			logger.error("Unable to notify recipient after leave request cancellation [{}]", ex, to.getAddress());
 		}
 	}
 }
