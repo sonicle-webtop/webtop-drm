@@ -74,6 +74,7 @@
 		<controllerClassName>DrmController</controllerClassName>
 		<managerClassName>DrmManager</managerClassName>
 		<serviceClassName>Service</serviceClassName>
+		<publicServiceClassName>PublicService</publicServiceClassName>
 		<!--<userOptions>
 			<serviceClassName>UserOptionsService</serviceClassName>
 			<viewJsClassName>view.UserOptions</viewJsClassName>

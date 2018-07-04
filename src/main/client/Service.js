@@ -1671,7 +1671,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		var me = this;
 		WT.ajaxReq(me.ID, 'ManageCancellationLeaveRequest', {
 			params: {
-				leaveRequestIds: WTU.arrayAsParam(leaveRequestId)
+				leaveRequestIds: WTU.arrayAsParam(leaveRequestId),
+				choice: true
 			},
 			callback: function (success, json) {
 				Ext.callback(opts.callback, opts.scope || me, [success, json]);

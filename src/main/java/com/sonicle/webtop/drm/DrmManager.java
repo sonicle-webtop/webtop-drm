@@ -2675,7 +2675,7 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
-	public void updateCancellationLeaveRequest(int id) throws WTException, MessagingException, IOException, TemplateException {
+	public void updateCancellationLeaveRequest(int id, Boolean choice) throws WTException, MessagingException, IOException, TemplateException {
 		Connection con = null;
 		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
 		TimetableEventDAO teDao = TimetableEventDAO.getInstance();
@@ -2688,8 +2688,8 @@ public class DrmManager extends BaseManager {
 			OLeaveRequest lr = lrDao.selectById(con, id);
 			
 			lr.setManagerCancRespTimetamp(revisionTimestamp);
-			lr.setCancResult(true);
-			lr.setStatus("D");
+			lr.setCancResult(choice);
+			if(choice)lr.setStatus("D");
 				
 			lrDao.update(con, lr);
 			
@@ -4326,17 +4326,21 @@ public class DrmManager extends BaseManager {
 		return oTr;
 	}
 	
-	private void notifyLeaveRequest(OLeaveRequest lr) throws MessagingException, IOException, TemplateException {		
+	private void notifyLeaveRequest(OLeaveRequest lr) throws MessagingException, IOException, TemplateException {	
 		UserProfile.Data udFrom = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getUserId()));
 		InternetAddress from = udFrom.getPersonalEmail();
 		UserProfile.Data udTo = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getManagerId()));
 		InternetAddress to = udTo.getPersonalEmail();
 		
+		String servicePublicUrl = WT.getServicePublicUrl(lr.getDomainId(), SERVICE_ID);
+		
 		Session session = getMailSession();
 
 		try {
+			boolean answer = (lr.getResult() == null);
+			
 			String bodyHeader = TplHelper.buildLeaveRequestTitle(udTo.getLocale(), lr);
-			String html = TplHelper.buildLeaveRequestBody(udTo.getLocale(), lr);
+			String html = TplHelper.buildLeaveRequestBody(udTo.getLocale(), lr, to.getAddress(), answer, servicePublicUrl);
 			String source = EmailNotification.buildSource(udTo.getLocale(), SERVICE_ID);
 			String because = WT.lookupResource(SERVICE_ID, udTo.getLocale(), DrmLocale.EMAIL_REMINDER_FOOTER_BECAUSE);
 
@@ -4364,17 +4368,21 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
-	private void notifyLeaveRequestCancellation(OLeaveRequest lr) throws MessagingException, IOException, TemplateException {		
+	private void notifyLeaveRequestCancellation(OLeaveRequest lr) throws MessagingException, IOException, TemplateException {
 		UserProfile.Data udFrom = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getUserId()));
 		InternetAddress from = udFrom.getPersonalEmail();
 		UserProfile.Data udTo = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getManagerId()));
 		InternetAddress to = udTo.getPersonalEmail();
 		
+		String servicePublicUrl = WT.getServicePublicUrl(lr.getDomainId(), SERVICE_ID);
+		
 		Session session = getMailSession();
 
 		try {
+			boolean answer = (lr.getCancResult() == null);
+			
 			String bodyHeader = TplHelper.buildLeaveRequestCancellationTitle(udTo.getLocale(), lr);
-			String html = TplHelper.buildLeaveRequestCancellationBody(udTo.getLocale(), lr);
+			String html = TplHelper.buildLeaveRequestCancellationBody(udTo.getLocale(), lr, to.getAddress(), answer, servicePublicUrl);
 			String source = EmailNotification.buildSource(udTo.getLocale(), SERVICE_ID);
 			String because = WT.lookupResource(SERVICE_ID, udTo.getLocale(), DrmLocale.EMAIL_REMINDER_FOOTER_BECAUSE);
 
@@ -4400,5 +4408,10 @@ public class DrmManager extends BaseManager {
 		} catch (IOException | TemplateException | MessagingException ex) {
 			logger.error("Unable to notify recipient after leave request cancellation [{}]", ex, to.getAddress());
 		}
+	}
+	
+	public static String buildLeaveRequestReplyPublicUrl(String publicBaseUrl, String leaveRequestPublicId, String recipientEmail, String crud, String resp) {
+		String s = PublicService.PUBPATH_CONTEXT_LEAVE_REQUEST + "/" + leaveRequestPublicId + "/" + PublicService.LeaveRequestUrlPath.TOKEN_REPLY + "?aid=" + recipientEmail + "&crud=" + crud + "&resp=" + resp;
+		return PathUtils.concatPaths(publicBaseUrl, s);
 	}
 }

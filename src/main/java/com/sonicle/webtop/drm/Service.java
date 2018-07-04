@@ -1325,8 +1325,9 @@ public class Service extends BaseService {
 		try {
 			
 			IntegerArray ids = ServletUtils.getObjectParameter(request, "leaveRequestIds", IntegerArray.class, true);
-
-			manager.updateCancellationLeaveRequest(ids.get(0));
+			Boolean choice = ServletUtils.getBooleanParameter(request, "choice", false);
+			
+			manager.updateCancellationLeaveRequest(ids.get(0), choice);
 
 			new JsonResult().printTo(out);
 		} catch (Exception ex) {

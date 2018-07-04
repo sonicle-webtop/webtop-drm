@@ -60,46 +60,56 @@ public class TplHelper {
 		return WT.lookupResource(SERVICE_ID, locale, MessageFormat.format(DrmLocale.EMAIL_REQUEST_CANCELLATION_SUBJECT_X, lr.getType()));
 	}
 
-	public static String buildLeaveRequestBody(Locale locale, OLeaveRequest lr) throws IOException, TemplateException, AddressException {
+	public static String buildLeaveRequestBody(Locale locale, OLeaveRequest lr, String recipientEmail, boolean answer, String servicePublicUrl) throws IOException, TemplateException, AddressException {
 		DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");
 		
 		MapItem i18n = new MapItem();
 		i18n.put("whenStart", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_EMAIL_REQUEST_WHEN_START));
 		i18n.put("whenEnd", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_EMAIL_REQUEST_WHEN_END));
 		i18n.put("notes", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_EMAIL_REQUEST_NOTES));
+		i18n.put("approve", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_EMAIL_REQUEST_APPROVE));
+		i18n.put("approveYes", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_EMAIL_REQUEST_APPROVE_YES));
+		i18n.put("approveNo", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_EMAIL_REQUEST_APPROVE_NO));
 
 		MapItem req = new MapItem();
 		req.put("user", WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getUserId())).getDisplayName());
 		req.put("startDate", lr.getFromDate().toString(fmt) + " " + ((lr.getFromHour() != null) ? lr.getFromHour() : ""));
 		req.put("endDate", lr.getToDate().toString(fmt) + " " + ((lr.getToHour() != null) ? lr.getToHour() : ""));
 		req.put("notes", (lr.getNotes() != null) ? lr.getNotes() : "");
-		req.put("occurs", null);
 
 		MapItem vars = new MapItem();
 		vars.put("i18n", i18n);
+		vars.put("answer", answer);
 		vars.put("request", req);
+		vars.put("approveYesUrl", DrmManager.buildLeaveRequestReplyPublicUrl(servicePublicUrl, lr.getLeaveRequestId().toString(), recipientEmail, "new", "yes"));
+		vars.put("approveNoUrl", DrmManager.buildLeaveRequestReplyPublicUrl(servicePublicUrl, lr.getLeaveRequestId().toString(), recipientEmail, "new", "no"));
 
 		return WT.buildTemplate(SERVICE_ID, "tpl/email/leaveRequest-body.html", vars);
 	}
 	
-	public static String buildLeaveRequestCancellationBody(Locale locale, OLeaveRequest lr) throws IOException, TemplateException, AddressException {
+	public static String buildLeaveRequestCancellationBody(Locale locale, OLeaveRequest lr, String recipientEmail, boolean answer, String servicePublicUrl) throws IOException, TemplateException, AddressException {
 		DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");
 		
 		MapItem i18n = new MapItem();
 		i18n.put("whenStart", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_EMAIL_REQUEST_WHEN_START));
 		i18n.put("whenEnd", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_EMAIL_REQUEST_WHEN_END));
 		i18n.put("notes", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_EMAIL_REQUEST_NOTES));
+		i18n.put("approve", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_EMAIL_REQUEST_APPROVE));
+		i18n.put("approveYes", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_EMAIL_REQUEST_APPROVE_YES));
+		i18n.put("approveNo", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_EMAIL_REQUEST_APPROVE_NO));
 
 		MapItem req = new MapItem();
 		req.put("user", WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getUserId())).getDisplayName());
 		req.put("startDate", lr.getFromDate().toString(fmt) + " " + ((lr.getFromHour() != null) ? lr.getFromHour() : ""));
 		req.put("endDate", lr.getToDate().toString(fmt) + " " + ((lr.getToHour() != null) ? lr.getToHour() : ""));
 		req.put("notes", (lr.getCancReason() != null) ? lr.getCancReason() : "");
-		req.put("occurs", null);
 
 		MapItem vars = new MapItem();
 		vars.put("i18n", i18n);
+		vars.put("answer", answer);
 		vars.put("request", req);
+		vars.put("approveYesUrl", DrmManager.buildLeaveRequestReplyPublicUrl(servicePublicUrl, lr.getLeaveRequestId().toString(), recipientEmail, "delete", "yes"));
+		vars.put("approveNoUrl", DrmManager.buildLeaveRequestReplyPublicUrl(servicePublicUrl, lr.getLeaveRequestId().toString(), recipientEmail, "delete", "no"));
 
 		return WT.buildTemplate(SERVICE_ID, "tpl/email/leaveRequest-body.html", vars);
 	}

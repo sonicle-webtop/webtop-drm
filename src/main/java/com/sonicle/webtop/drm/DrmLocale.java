@@ -49,4 +49,7 @@ public class DrmLocale {
 	public static final String TPL_EMAIL_RESPONSEUPDATE_MSG_APPROVE = "tpl.email.responseUpdate.msg.approve";
 	public static final String TPL_EMAIL_RESPONSEUPDATE_MSG_DECLINE = "tpl.email.responseUpdate.msg.decline";
 	public static final String EMAIL_REMINDER_FOOTER_BECAUSE = "email.reminder.footer.because";
+	public static final String TPL_EMAIL_REQUEST_APPROVE = "tpl.email.request.approve";
+	public static final String TPL_EMAIL_REQUEST_APPROVE_YES = "tpl.email.request.approve.yes";
+	public static final String TPL_EMAIL_REQUEST_APPROVE_NO = "tpl.email.request.approve.no";
 }
