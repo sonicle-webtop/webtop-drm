@@ -1594,12 +1594,14 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	approveDeclineTimetableRequest: function (leaveRequestId, choice, opts) {
 		opts = opts || {};
 		var me = this;
+		me.getMainComponent().setLoading(me.res('waiting'));
 		WT.ajaxReq(me.ID, 'ManageLeaveRequestSupervisorChoice', {
 			params: {
 				leaveRequestIds: WTU.arrayAsParam(leaveRequestId),
 				choice: choice
 			},
 			callback: function (success, json) {
+				me.getMainComponent().setLoading(false);
 				Ext.callback(opts.callback, opts.scope || me, [success, json]);
 			}
 		});
@@ -1627,12 +1629,14 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					if(Ext.isEmpty(text)){
 						Ext.MessageBox.show(Ext.apply({}, {msg: cfg.msg}, cfg));
 					}else{
+						me.getMainComponent().setLoading(me.res('waiting'));
 						WT.ajaxReq(me.ID, 'ManageTimetableRequestCancellation', {
 							params: {
 								leaveRequestId: leaveRequestId,
 								cancellationReason: text
 							},
 							callback: function (success, json) {
+								me.getMainComponent().setLoading(false);
 								Ext.callback(opts.callback, opts.scope || me, [success, json]);
 							}
 						});
@@ -1669,12 +1673,14 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	cancelTimetableRequest: function (leaveRequestId, opts) {
 		opts = opts || {};
 		var me = this;
+		me.getMainComponent().setLoading(me.res('waiting'));
 		WT.ajaxReq(me.ID, 'ManageCancellationLeaveRequest', {
 			params: {
 				leaveRequestIds: WTU.arrayAsParam(leaveRequestId),
 				choice: true
 			},
 			callback: function (success, json) {
+				me.getMainComponent().setLoading(false);
 				Ext.callback(opts.callback, opts.scope || me, [success, json]);
 			}
 		});

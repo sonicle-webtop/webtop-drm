@@ -42,7 +42,6 @@ import com.sonicle.webtop.core.sdk.UserProfileId;
 import com.sonicle.webtop.core.sdk.WTException;
 import com.sonicle.webtop.core.servlet.ServletHelper;
 import static com.sonicle.webtop.drm.Service.logger;
-import com.sonicle.webtop.drm.bol.OLeaveRequest;
 import com.sonicle.webtop.drm.model.LeaveRequest;
 import freemarker.template.TemplateException;
 import java.io.IOException;
@@ -101,16 +100,21 @@ public class PublicService extends BasePublicService {
 							
 							LeaveRequest lr = adminDrmMgr.getLeaveRequest(Integer.valueOf(lrUrlPath.getPublicUid()));
 							
-							if("new".equals(crud)){
-								lr.setResult(responseStatus);
-								adminDrmMgr.updateLeaveRequest(lr, null, true);
-							} else if("delete".equals(crud)){
-								adminDrmMgr.updateCancellationLeaveRequest(Integer.valueOf(lrUrlPath.getPublicUid()), responseStatus);
-							} else{
-								throw new WTException("Invalid crud [{0}]", crud);
-							}	
-							
-							writeLeaveRequestPage(request, response, wts, resp);
+							if(lr != null){
+								if("new".equals(crud)){
+									lr.setResult(responseStatus);
+									adminDrmMgr.updateLeaveRequest(lr, null, true);
+								} else if("delete".equals(crud)){
+									adminDrmMgr.updateCancellationLeaveRequest(Integer.valueOf(lrUrlPath.getPublicUid()), responseStatus);
+								} else{
+									throw new WTException("Invalid crud [{0}]", crud);
+								}	
+
+								writeLeaveRequestPage(request, response, wts, resp);
+							} else {
+								logger.trace("Invalid id [{}]", lrUrlPath.getPublicUid());
+								writeLeaveRequestPage(request, response, wts, "notfound");
+							}
 						}
 					}					
 
