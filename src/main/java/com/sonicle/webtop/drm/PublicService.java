@@ -119,12 +119,12 @@ public class PublicService extends BasePublicService {
 					}					
 
 				} else {
-					logger.trace("Invalid context [{}]", path.getContext());
+					logger.error("Invalid context [{}]", path.getContext());
 					writeErrorPage(request, response, wts, "badrequest");
 				}
 				
 			} catch(Exception ex) {
-				logger.trace("Error", ex);
+				logger.error("Error", ex);
 				writeErrorPage(request, response, wts, "badrequest");
 			}
 		} catch(Throwable t) {
