@@ -83,6 +83,8 @@
 		
 		<permissions>
 			<permission group="CONFIGURATIONS" actions="MANAGE" />
+			<permission group="OPPORTUNITY" actions="READ,DELETE,UPDATE" />
+			<permission group="OPPORTUNITY_SETTINGS" actions="MANAGE" />
 			<permission group="WORK_REPORT" actions="READ,DELETE,UPDATE" />
 			<permission group="WORK_REPORT_SETTINGS" actions="MANAGE" />
 			<permission group="EXPENSE_NOTE" actions="READ,DELETE,UPDATE" />

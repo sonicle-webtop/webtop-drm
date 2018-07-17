@@ -175,7 +175,9 @@ public class Service extends BaseService {
 		ss = new DrmServiceSettings(SERVICE_ID, pid.getDomainId());
 
 		RootProgramNode prog = null;
-		ProgramNode subProg = null;
+		
+		prog = new RootProgramNode(lookupResource(DrmTreeNode.OPPORTUNITY), "wtdrm-icon-opportunity-xs");
+		programs.put(prog.getId(), prog);
 
 		prog = new RootProgramNode(lookupResource(DrmTreeNode.WORK_REPORT), "wtdrm-icon-workreport-xs");
 		programs.put(prog.getId(), prog);
@@ -1429,6 +1431,10 @@ public class Service extends BaseService {
 		}
 	}
 
+	public void processManageOpportunitySetting(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		
+	}
+	
 	public void processManageWorkReportSetting(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		JsWorkReportSetting item = null;
 		try {

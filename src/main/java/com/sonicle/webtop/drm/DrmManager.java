@@ -2745,6 +2745,7 @@ public class DrmManager extends BaseManager {
 		Connection con = null;
 		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
 		LeaveRequestDocumentDAO docDao = LeaveRequestDocumentDAO.getInstance();
+		TimetableEventDAO teDao = TimetableEventDAO.getInstance();
 		
 		try {
 			con = WT.getConnection(SERVICE_ID, false);
@@ -2752,6 +2753,9 @@ public class DrmManager extends BaseManager {
 			lrDao.deleteById(con, leaveRequestId);
 
 			docDao.deleteByLeaveRequest(con, leaveRequestId);
+			
+			//Delete in TimetableEvents
+			teDao.deleteByLeaveRequestId(con, leaveRequestId);
 			
 			DbUtils.commitQuietly(con);
 
@@ -4342,7 +4346,7 @@ public class DrmManager extends BaseManager {
 			String bodyHeader = TplHelper.buildLeaveRequestTitle(udTo.getLocale(), lr);
 			String html = TplHelper.buildLeaveRequestBody(udTo.getLocale(), lr, to.getAddress(), answer, servicePublicUrl);
 			String source = EmailNotification.buildSource(udTo.getLocale(), SERVICE_ID);
-			String because = WT.lookupResource(SERVICE_ID, udTo.getLocale(), DrmLocale.EMAIL_REMINDER_FOOTER_BECAUSE);
+			String because = WT.lookupResource(SERVICE_ID, udTo.getLocale(), DrmLocale.EMAIL_REMINDER_SUPERVISOR_FOOTER_BECAUSE);
 
 			String msgSubject = EmailNotification.buildSubject(udTo.getLocale(), SERVICE_ID, bodyHeader);
 			
@@ -4351,6 +4355,8 @@ public class DrmManager extends BaseManager {
 			if(lr.getResult() != null){
 				from = udTo.getPersonalEmail();
 				to = udFrom.getPersonalEmail();
+				
+				because = WT.lookupResource(SERVICE_ID, udTo.getLocale(), DrmLocale.EMAIL_REMINDER_USER_FOOTER_BECAUSE);
 				
 				if (lr.getResult() == true) {
 					builder.greenMessage(lookupResource(udTo.getLocale(), DrmLocale.TPL_EMAIL_RESPONSEUPDATE_MSG_APPROVE));
@@ -4384,7 +4390,7 @@ public class DrmManager extends BaseManager {
 			String bodyHeader = TplHelper.buildLeaveRequestCancellationTitle(udTo.getLocale(), lr);
 			String html = TplHelper.buildLeaveRequestCancellationBody(udTo.getLocale(), lr, to.getAddress(), answer, servicePublicUrl);
 			String source = EmailNotification.buildSource(udTo.getLocale(), SERVICE_ID);
-			String because = WT.lookupResource(SERVICE_ID, udTo.getLocale(), DrmLocale.EMAIL_REMINDER_FOOTER_BECAUSE);
+			String because = WT.lookupResource(SERVICE_ID, udTo.getLocale(), DrmLocale.EMAIL_REMINDER_SUPERVISOR_FOOTER_BECAUSE);
 
 			String msgSubject = EmailNotification.buildSubject(udTo.getLocale(), SERVICE_ID, bodyHeader);
 			
@@ -4393,6 +4399,8 @@ public class DrmManager extends BaseManager {
 			if(lr.getCancResult() != null){
 				from = udTo.getPersonalEmail();
 				to = udFrom.getPersonalEmail();
+				
+				because = WT.lookupResource(SERVICE_ID, udTo.getLocale(), DrmLocale.EMAIL_REMINDER_USER_FOOTER_BECAUSE);
 				
 				if (lr.getCancResult() == true) {
 					builder.greenMessage(lookupResource(udTo.getLocale(), DrmLocale.TPL_EMAIL_RESPONSEUPDATE_MSG_APPROVE));

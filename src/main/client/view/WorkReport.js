@@ -226,6 +226,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											}
 										}), {
 											xtype: 'datefield',
+											startDay: WT.getStartDay(),
 											reference: 'fldfromdate',
 											bind: '{record.fromDate}',
 											format: WT.getShortDateFmt(),
@@ -309,6 +310,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 										}),
 										{
 											xtype: 'datefield',
+											startDay: WT.getStartDay(),
 											reference: 'fldtodate',
 											bind: '{record.toDate}',
 											tabIndex: 106,
@@ -365,6 +367,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 										}),
 										{
 											xtype: 'datefield',
+											startDay: WT.getStartDay(),
 											bind: '{record.ddtDate}',
 											format: WT.getShortDateFmt(),
 											fieldLabel: me.mys.res('workReport.fld-ddtToDate.lbl'),

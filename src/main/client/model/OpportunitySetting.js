@@ -30,58 +30,23 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.TimetableRequest', {
+Ext.define('Sonicle.webtop.drm.model.OpportunitySetting', {
 	extend: 'WTA.ux.data.BaseModel',
 	requires: [
-		'Sonicle.data.writer.Json',
-		'Sonicle.webtop.drm.model.LeaveRequestDocument'
+		'Sonicle.data.writer.Json'
 	],
-	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageLeaveRequest', 'data', {
+	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageOpportunitySetting', 'data', {
 		writer: {
 			type: 'sojson',
 			writeAssociations: true
 		}
 	}),
 	identifier: 'negative',
-	idProperty: 'leaveRequestId',
+	idProperty: 'id',
 	fields: [
-		WTF.field('leaveRequestId', 'int', true),
-		WTF.field('domainId', 'string', true),
-		WTF.field('companyId', 'int', false),
-		WTF.field('userId', 'string', false),
-		WTF.field('managerId', 'string', false),
-		WTF.field('type', 'string', false),
-		WTF.field('fromDate', 'date', false, {dateFormat: 'Y-m-d', defaultValue: new Date()}),
-		WTF.field('toDate', 'date', false, {dateFormat: 'Y-m-d', defaultValue: new Date()}),
-		WTF.field('fromHour', 'string', true),
-		WTF.field('toHour', 'string', true),
-		WTF.field('status', 'string', true),
-		WTF.field('notes', 'string', true),
-		WTF.field('result', 'bool', true),
-		WTF.field('cancRequest', 'bool', true),
-		WTF.field('cancReason', 'string', true),
-		WTF.field('cancResult', 'bool', true)
+		WTF.field('id', 'string', true),
+		WTF.field('domainId', 'string', true)
 	],
 	hasMany: [
-		WTF.hasMany('documents', 'Sonicle.webtop.drm.model.LeaveRequestDocument')
-	],
-	
-	setFromDate: function(date) {
-		var me = this,
-				dt = Ext.isDate(date) ? date : new Date(),
-				end = me.get('toDate'), v;
-		
-		v = me.setDatePart('fromDate', dt);
-		if (!Ext.isDate(end)) return;
-		if (v > end) me.set('toDate', v);
-	},	
-	setToDate: function(date) {
-		var me = this,
-				dt = Ext.isDate(date) ? date : new Date(),
-				sta = me.get('fromDate'), v;
-		
-		v = me.setDatePart('toDate', dt);
-		if (!Ext.isDate(sta)) return;
-		if (v < sta) me.set('fromDate', v);
-	}
+	]
 });

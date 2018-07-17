@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.0.final using JasperReports Library version 6.3.0  -->
-<!-- 2018-04-09T17:59:45 -->
+<!-- 2018-07-17T14:06:19 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="timetablereport" printOrder="Horizontal" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="832" leftMargin="5" rightMargin="5" topMargin="5" bottomMargin="5" uuid="0c72a82c-982e-4a49-946e-fff85de6c39f">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
@@ -188,7 +188,7 @@
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font size="8" isBold="true"/>
 					</textElement>
-					<text><![CDATA[Malattia]]></text>
+					<text><![CDATA[Visita medica]]></text>
 				</staticText>
 				<staticText>
 					<reportElement x="405" y="16" width="53" height="12" uuid="eb14cce2-2232-4bd2-abf2-b95529e2b0f1"/>

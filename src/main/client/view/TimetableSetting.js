@@ -171,6 +171,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 							dataIndex: 'date',
 							editor: {
 								xtype: 'datefield',
+								startDay: WT.getStartDay(),
 								allowBlank: false,
 								selectOnFocus: true
 							},

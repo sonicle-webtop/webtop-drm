@@ -79,6 +79,10 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			items: [
 				{xtype: 'panel'},
 				{
+					//Opportunity
+					xtype: 'panel'
+				},
+				{
 					xtype: 'container',
 					itemId: 'wr',
 					layout: 'border',
@@ -681,63 +685,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								me.getAct('timetableRequest', 'cancel')
 							],
 							listeners: {
-								rowclick: function (s, rec) {
-									if(rec.get("userId") === WT.getVar('userId')){
-										//se sono l'utente loggato ad aver effettuato la richiesta disabilito pulsanti del supervisore
-										me.getAct('timetableRequest', 'approve').setDisabled(true);
-										me.getAct('timetableRequest', 'decline').setDisabled(true);
-										me.getAct('timetableRequest', 'cancel').setDisabled(true);
-										if(rec.get('status') === 'D'){
-											//e se la richiesta è stata cancellata, disabilito tutti i pulsanti
-											me.getAct('timetableRequest', 'edit').setDisabled(true);
-											me.getAct('timetableRequest', 'remove').setDisabled(true);
-											me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
-										}else if(rec.get('result') === null){
-											//e se il supervisore non ha ancora gestito la richiesta, abilito update, delete e disabilito request delete
-											me.getAct('timetableRequest', 'edit').setDisabled(false);
-											me.getAct('timetableRequest', 'remove').setDisabled(false);
-											me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
-										}else if(rec.get('result') !== null){
-											//e se il supervisore ha già gestito la richiesta, disabilito update, delete e abilito request delete
-											me.getAct('timetableRequest', 'edit').setDisabled(true);
-											me.getAct('timetableRequest', 'remove').setDisabled(true);
-											me.getAct('timetableRequest', 'requestcancellation').setDisabled(false);
-										}
-									}else if(rec.get("managerId") === WT.getVar('userId')){
-										//se sono l'utente loggato ad essere il supervisore
-										if(rec.get("userId") !== WT.getVar('userId')){
-											//e se non sono su una mia richiesta
-											if(rec.get('status') === 'D'){
-												//e se la richiesta è stata cancellata, disabilito tutti i pulsanti
-												me.getAct('timetableRequest', 'edit').setDisabled(true);
-												me.getAct('timetableRequest', 'remove').setDisabled(true);
-												me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
-												me.getAct('timetableRequest', 'approve').setDisabled(true);
-												me.getAct('timetableRequest', 'decline').setDisabled(true);
-												me.getAct('timetableRequest', 'cancel').setDisabled(true);
-											}else if(rec.get('result') === null){
-												//e se non ho ancora gestito la richiesta, abilito approve e decline e disabilito tutto il resto
-												me.getAct('timetableRequest', 'approve').setDisabled(false);
-												me.getAct('timetableRequest', 'decline').setDisabled(false);
-												me.getAct('timetableRequest', 'edit').setDisabled(true);
-												me.getAct('timetableRequest', 'remove').setDisabled(true);
-												me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
-												me.getAct('timetableRequest', 'cancel').setDisabled(true);
-											}else if(rec.get('result') !== null){
-												//e se ho già gestito la richiesta, disabilito tutto
-												me.getAct('timetableRequest', 'edit').setDisabled(true);
-												me.getAct('timetableRequest', 'remove').setDisabled(true);
-												me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
-												me.getAct('timetableRequest', 'approve').setDisabled(true);
-												me.getAct('timetableRequest', 'decline').setDisabled(true);
-												me.getAct('timetableRequest', 'cancel').setDisabled(true);
-												if(rec.get('employeeCancReq') === true && rec.get('status') === 'C'){
-													//ma se lo status della richiesta è chiuso ed è stata richiesta la cancellazione, abilito pulsante cancel
-													me.getAct('timetableRequest', 'cancel').setDisabled(false);
-												}
-											}
-										}
-									}
+								selectionchange: function (t, recs) {
+									me.updateTimetableRequestAction(recs[0]);
+									
 								},
 								rowdblclick: function (s, rec) {
 									me.editTimetableRequestUI(rec);
@@ -1054,6 +1004,16 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				}
 			});
 		}
+		if (WT.isPermitted(me.ID,'OPPORTUNITY_SETTINGS','MANAGE')){
+			me.addAct('toolbox', 'opSetting', {
+				text: me.res('toolbox.op-settings.lbl'),
+				tooltip: null,
+				iconCls: 'wt-icon-options-xs',
+				handler: function () {
+					me.opportunitySetting();
+				}
+			});
+		}
 		if (WT.isPermitted(me.ID,'WORK_REPORT_SETTINGS','MANAGE')){
 			me.addAct('toolbox', 'wrSetting', {
 				text: me.res('toolbox.wr-settings.lbl'),
@@ -1363,6 +1323,23 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			}
 		});
 	},
+	opportunitySetting: function (opts) {
+		opts = opts || {};
+
+		var me = this,
+				vct = WT.createView(me.ID, 'view.OpportunitySetting');
+		vct.getView().on('viewsave', function (s, success, model) { 
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vct.show(false,
+				function () {
+					vct.getView().begin('edit', {
+						data: {
+							id: 'op'
+						}
+					});
+				});
+	},
 	workReportSetting: function (opts) {
 		opts = opts || {};
 
@@ -1490,6 +1467,68 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			me.needsReload = true;
 		}
 	},
+	updateTimetableRequestAction: function (sel){
+		var me = this;
+		
+		if(sel){
+			if(sel.get("userId") === WT.getVar('userId')){
+				//se sono l'utente loggato ad aver effettuato la richiesta disabilito pulsanti del supervisore
+				me.getAct('timetableRequest', 'approve').setDisabled(true);
+				me.getAct('timetableRequest', 'decline').setDisabled(true);
+				me.getAct('timetableRequest', 'cancel').setDisabled(true);
+				if(sel.get('status') === 'D'){
+					//e se la richiesta è stata cancellata, disabilito tutti i pulsanti
+					me.getAct('timetableRequest', 'edit').setDisabled(true);
+					me.getAct('timetableRequest', 'remove').setDisabled(true);
+					me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
+				}else if(sel.get('result') === null){
+					//e se il supervisore non ha ancora gestito la richiesta, abilito update, delete e disabilito request delete
+					me.getAct('timetableRequest', 'edit').setDisabled(false);
+					me.getAct('timetableRequest', 'remove').setDisabled(false);
+					me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
+				}else if(sel.get('result') !== null){
+					//e se il supervisore ha già gestito la richiesta, disabilito update, delete e abilito request delete
+					me.getAct('timetableRequest', 'edit').setDisabled(true);
+					me.getAct('timetableRequest', 'remove').setDisabled(true);
+					me.getAct('timetableRequest', 'requestcancellation').setDisabled(false);
+				}
+			}else if(sel.get("managerId") === WT.getVar('userId')){
+				//se sono l'utente loggato ad essere il supervisore
+				if(sel.get("userId") !== WT.getVar('userId')){
+					//e se non sono su una mia richiesta
+					if(sel.get('status') === 'D'){
+						//e se la richiesta è stata cancellata, disabilito tutti i pulsanti
+						me.getAct('timetableRequest', 'edit').setDisabled(true);
+						me.getAct('timetableRequest', 'remove').setDisabled(true);
+						me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
+						me.getAct('timetableRequest', 'approve').setDisabled(true);
+						me.getAct('timetableRequest', 'decline').setDisabled(true);
+						me.getAct('timetableRequest', 'cancel').setDisabled(true);
+					}else if(sel.get('result') === null){
+						//e se non ho ancora gestito la richiesta, abilito approve e decline e disabilito tutto il resto
+						me.getAct('timetableRequest', 'approve').setDisabled(false);
+						me.getAct('timetableRequest', 'decline').setDisabled(false);
+						me.getAct('timetableRequest', 'edit').setDisabled(true);
+						me.getAct('timetableRequest', 'remove').setDisabled(true);
+						me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
+						me.getAct('timetableRequest', 'cancel').setDisabled(true);
+					}else if(sel.get('result') !== null){
+						//e se ho già gestito la richiesta, disabilito tutto
+						me.getAct('timetableRequest', 'edit').setDisabled(true);
+						me.getAct('timetableRequest', 'remove').setDisabled(true);
+						me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
+						me.getAct('timetableRequest', 'approve').setDisabled(true);
+						me.getAct('timetableRequest', 'decline').setDisabled(true);
+						me.getAct('timetableRequest', 'cancel').setDisabled(true);
+						if(sel.get('employeeCancReq') === true && sel.get('status') === 'C'){
+							//ma se lo status della richiesta è chiuso ed è stata richiesta la cancellazione, abilito pulsante cancel
+							me.getAct('timetableRequest', 'cancel').setDisabled(false);
+						}
+					}
+				}
+			}
+		}
+	},
 	addTimetableRequest: function (opts) {
 		opts = opts || {};
 
@@ -1583,6 +1622,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					callback: function (success) {
 						if (success) {
 							this.gpTimetableRequest().getStore().load();
+							me.getAct('timetableRequest', 'approve').setDisabled(true);
+							me.getAct('timetableRequest', 'decline').setDisabled(true);
 						} else {
 							alert('error');
 						}
@@ -1662,6 +1703,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					callback: function (success) {
 						if (success) {
 							this.gpTimetableRequest().getStore().load();
+							me.getAct('timetableRequest', 'cancel').setDisabled(true);
 						} else {
 							alert('error');
 						}
@@ -1858,22 +1900,24 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		
 		switch (tabIndex){
 			case 1:
-				me.reloadWorkReport(me.filtersWorkReport().getData());
 				break;
 			case 2:
+				me.reloadWorkReport(me.filtersWorkReport().getData());
 				break;
 			case 3:
 				break;
 			case 4:
+				break;
+			case 5:
 				me.enablingStampButtons();
 				me.enablingManageStampsButtons();
 				me.getMainComponent().lookupReference('gpTimetable').getStore().reload();
 				me.reloadTimetableStamp(me.filtersTimetableStamp().getData());
 				break;
-			case 5:
+			case 6:
 				me.reloadTimetableRequest(me.filtersTimetableRequest().getData());
 				break;
-			case 6:
+			case 7:
 				me.reloadTimetableReport(null);
 				break;
 		}
