@@ -146,7 +146,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReportSetting', {
 						me.addAct('delete', {
 							text: WT.res('act-delete.lbl'),
 							tooltip: null,
-							iconCls: 'wt-icon-delete-xs',
+							iconCls: 'wt-icon-delete',
 							handler: function () {
 								var sm = me.lref('gpWorkType').getSelectionModel();
 								me.deleteType(sm.getSelection());
@@ -202,7 +202,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReportSetting', {
 						me.addAct('delete', {
 							text: WT.res('act-delete.lbl'),
 							tooltip: null,
-							iconCls: 'wt-icon-delete-xs',
+							iconCls: 'wt-icon-delete',
 							handler: function () {
 								var sm = me.lref('gpBusinessTrip').getSelectionModel();
 								me.deleteBusinessTrip(sm.getSelection());

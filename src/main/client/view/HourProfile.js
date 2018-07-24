@@ -410,7 +410,7 @@ Ext.define('Sonicle.webtop.drm.view.HourProfile', {
 						me.addAct('delete', {
 							text: WT.res('act-delete.lbl'),
 							tooltip: null,
-							iconCls: 'wt-icon-delete-xs',
+							iconCls: 'wt-icon-delete',
 							handler: function () {
 								var sm = me.lref('gpLineHours').getSelectionModel();
 								me.deleteLineHour(sm.getSelection());
