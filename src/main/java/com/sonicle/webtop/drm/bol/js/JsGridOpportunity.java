@@ -48,7 +48,7 @@ public class JsGridOpportunity {
 	public String operatorId;
 	public String date;
 	public String fromHour;
-	public String toHous;
+	public String toHour;
 
 	public JsGridOpportunity(OOpportunity o) {
 		this.id = o.getId();
@@ -57,7 +57,7 @@ public class JsGridOpportunity {
 		this.operatorId = o.getOperatorId();
 		this.date = o.getDate().toString();
 		this.fromHour = o.getFromHour();
-		this.toHous = o.getToHour();
+		this.toHour = o.getToHour();
 	}
 
 }
