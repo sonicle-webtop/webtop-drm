@@ -65,7 +65,7 @@ public class OpportunityActionDocumentDAO extends BaseDAO {
 				.fetchInto(OOpportunityActionDocument.class);
 	}
 	
-	public OOpportunityActionDocument select(Connection con, int id) throws DAOException {
+	public OOpportunityActionDocument select(Connection con, String id) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		return dsl
 				.select()
@@ -87,7 +87,7 @@ public class OpportunityActionDocumentDAO extends BaseDAO {
 				.execute();
 	}
 
-	public int deleteById(Connection con, int id) {
+	public int deleteById(Connection con, String id) {
 		DSLContext dsl = getDSL(con);
 
 		return dsl

@@ -33,14 +33,13 @@
 package com.sonicle.webtop.drm.bol.js;
 
 import com.sonicle.webtop.drm.model.OpportunityActionDocument;
-import com.sonicle.webtop.drm.model.OpportunityDocument;
 /**
  *
  * @author lssndrvs
  */
 public class JsGridOpportunityActionDocument {
 
-	public Integer id;
+	public String id;
 	public Integer opportunityActionId;
 	public String fileName;
 	public Integer size;

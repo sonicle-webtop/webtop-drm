@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Drm extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = 1854442583;
+	private static final long serialVersionUID = 89911386;
 
 	/**
 	 * The reference instance of <code>drm</code>
@@ -52,10 +52,8 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_LEAVE_REQUESTS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_LINE_HOURS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_OPPORTUNITIES,
-			com.sonicle.webtop.drm.jooq.Sequences.SEQ_OPPORTUNITY_ACTION_DOCUMENTS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_OPPORTUNITY_ACTION_INTERLOCUTORS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_OPPORTUNITY_ACTIONS,
-			com.sonicle.webtop.drm.jooq.Sequences.SEQ_OPPORTUNITY_DOCUMENTS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_OPPORTUNITY_INTERLOCUTORS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_MASTERDATA,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_MEMBERS,

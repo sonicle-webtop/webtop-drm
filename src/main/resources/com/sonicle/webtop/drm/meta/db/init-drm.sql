@@ -871,7 +871,7 @@ PRIMARY KEY ("id")
 CREATE SEQUENCE "drm"."seq_opportunities";
 
 CREATE TABLE "drm"."opportunity_documents" (
-"id" int4 NOT NULL,
+"id" varchar(36) NOT NULL,
 "opportunity_id" int4 NOT NULL,
 "revision_timestamp" timestamptz(6) NOT NULL,
 "revision_sequence" int2 NOT NULL,
@@ -880,8 +880,6 @@ CREATE TABLE "drm"."opportunity_documents" (
 "media_tpye" varchar(100) NOT NULL,
 PRIMARY KEY ("id")
 );
-
-CREATE SEQUENCE "drm"."seq_opportunity_documents";
 
 CREATE TABLE "drm"."opportunity_interlocutors" (
 "id" int4 NOT NULL,
@@ -919,7 +917,7 @@ PRIMARY KEY ("id")
 CREATE SEQUENCE "drm"."seq_opportunity_action_interlocutors";
 
 CREATE TABLE "drm"."opportunity_action_documents" (
-"id" int4 NOT NULL,
+"id" varchar(36) NOT NULL,
 "opportunity_action_id" int4 NOT NULL,
 "revision_timestamp" timestamptz(6) NOT NULL,
 "revision_sequence" int2 NOT NULL,
@@ -928,5 +926,3 @@ CREATE TABLE "drm"."opportunity_action_documents" (
 "media_tpye" varchar(100) NOT NULL,
 PRIMARY KEY ("id")
 );
-
-CREATE SEQUENCE "drm"."seq_opportunity_action_documents";

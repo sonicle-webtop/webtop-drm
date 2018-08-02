@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OpportunityActionDocuments extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.OpportunityActionDocumentsRecord> {
 
-	private static final long serialVersionUID = -1795784128;
+	private static final long serialVersionUID = 1943644660;
 
 	/**
 	 * The reference instance of <code>drm.opportunity_action_documents</code>
@@ -34,7 +34,7 @@ public class OpportunityActionDocuments extends org.jooq.impl.TableImpl<com.soni
 	/**
 	 * The column <code>drm.opportunity_action_documents.id</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.OpportunityActionDocumentsRecord, java.lang.Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.OpportunityActionDocumentsRecord, java.lang.String> ID = createField("id", org.jooq.impl.SQLDataType.VARCHAR.length(36).nullable(false), this, "");
 
 	/**
 	 * The column <code>drm.opportunity_action_documents.opportunity_action_id</code>.

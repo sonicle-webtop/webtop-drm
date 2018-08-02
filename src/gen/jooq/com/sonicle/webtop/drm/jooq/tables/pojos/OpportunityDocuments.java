@@ -16,9 +16,9 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OpportunityDocuments implements java.io.Serializable {
 
-	private static final long serialVersionUID = 1432487030;
+	private static final long serialVersionUID = -324776134;
 
-	private java.lang.Integer      id;
+	private java.lang.String       id;
 	private java.lang.Integer      opportunityId;
 	private org.joda.time.DateTime revisionTimestamp;
 	private java.lang.Short        revisionSequence;
@@ -29,7 +29,7 @@ public class OpportunityDocuments implements java.io.Serializable {
 	public OpportunityDocuments() {}
 
 	public OpportunityDocuments(
-		java.lang.Integer      id,
+		java.lang.String       id,
 		java.lang.Integer      opportunityId,
 		org.joda.time.DateTime revisionTimestamp,
 		java.lang.Short        revisionSequence,
@@ -46,11 +46,11 @@ public class OpportunityDocuments implements java.io.Serializable {
 		this.mediaTpye = mediaTpye;
 	}
 
-	public java.lang.Integer getId() {
+	public java.lang.String getId() {
 		return this.id;
 	}
 
-	public void setId(java.lang.Integer id) {
+	public void setId(java.lang.String id) {
 		this.id = id;
 	}
 

@@ -35,7 +35,7 @@ Ext.define('Sonicle.webtop.drm.model.OpportunityDocument', {
 	identifier: 'negative',
 	idProperty: 'id',
 	fields: [
-		WTF.field('id', 'int', false),
+		WTF.field('id', 'string', false),
 		WTF.field('opportunityId', 'int', false),
 		WTF.field('revisionTimestamp', 'date', false, {dateFormat: 'Y-m-d H:i:s'}),
 		WTF.field('revisionSequence', 'int', true),

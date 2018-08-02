@@ -1232,7 +1232,7 @@ public class Service extends BaseService {
 
 				StringArray ids = ServletUtils.getObjectParameter(request, "ids", StringArray.class, true);
 
-				manager.deleteWorkReport(ids.get(0));
+				manager.deleteOpportunity(Integer.parseInt(ids.get(0)));
 
 				new JsonResult().printTo(out);
 			}

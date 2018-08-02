@@ -82,11 +82,6 @@ public class Sequences {
 	public static final org.jooq.Sequence<java.lang.Long> SEQ_OPPORTUNITIES = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_opportunities", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
-	 * The sequence <code>drm.seq_opportunity_action_documents</code>
-	 */
-	public static final org.jooq.Sequence<java.lang.Long> SEQ_OPPORTUNITY_ACTION_DOCUMENTS = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_opportunity_action_documents", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
-
-	/**
 	 * The sequence <code>drm.seq_opportunity_action_interlocutors</code>
 	 */
 	public static final org.jooq.Sequence<java.lang.Long> SEQ_OPPORTUNITY_ACTION_INTERLOCUTORS = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_opportunity_action_interlocutors", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
@@ -95,11 +90,6 @@ public class Sequences {
 	 * The sequence <code>drm.seq_opportunity_actions</code>
 	 */
 	public static final org.jooq.Sequence<java.lang.Long> SEQ_OPPORTUNITY_ACTIONS = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_opportunity_actions", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
-
-	/**
-	 * The sequence <code>drm.seq_opportunity_documents</code>
-	 */
-	public static final org.jooq.Sequence<java.lang.Long> SEQ_OPPORTUNITY_DOCUMENTS = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_opportunity_documents", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
 	 * The sequence <code>drm.seq_opportunity_interlocutors</code>

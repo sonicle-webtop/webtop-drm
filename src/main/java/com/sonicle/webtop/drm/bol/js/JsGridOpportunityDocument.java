@@ -39,7 +39,7 @@ import com.sonicle.webtop.drm.model.OpportunityDocument;
  */
 public class JsGridOpportunityDocument {
 
-	public Integer id;
+	public String id;
 	public Integer opportunityId;
 	public String fileName;
 	public Integer size;

@@ -2692,7 +2692,7 @@ public class DrmManager extends BaseManager {
 
 	}
 
-	public OpportunityDocument getOpportunityDocument(Integer opportunityDocumentId) throws WTException {
+	public OpportunityDocument getOpportunityDocument(String opportunityDocumentId) throws WTException {
 		Connection con = null;
 		OpportunityDocumentDAO oDDao = OpportunityDocumentDAO.getInstance();
 		OpportunityDocument doc = null;
@@ -2711,7 +2711,7 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	public FileContent getOpportunityDocumentContent(Integer opportunityDocumentId) throws WTException {
+	public FileContent getOpportunityDocumentContent(String opportunityDocumentId) throws WTException {
 
 		OpportunityDocument doc = getOpportunityDocument(opportunityDocumentId);
 
@@ -2740,7 +2740,7 @@ public class DrmManager extends BaseManager {
 
 	}
 
-	public OpportunityActionDocument getOpportunityActionDocument(Integer opportunityActionDocumentId) throws WTException {
+	public OpportunityActionDocument getOpportunityActionDocument(String opportunityActionDocumentId) throws WTException {
 		Connection con = null;
 		OpportunityActionDocumentDAO oADDao = OpportunityActionDocumentDAO.getInstance();
 		OpportunityActionDocument actDoc = null;
@@ -2759,7 +2759,7 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	public FileContent getOpportunityActionDocumentContent(Integer opportunityActionDocumentId) throws WTException {
+	public FileContent getOpportunityActionDocumentContent(String opportunityActionDocumentId) throws WTException {
 
 		OpportunityActionDocument actDoc = getOpportunityActionDocument(opportunityActionDocumentId);
 
