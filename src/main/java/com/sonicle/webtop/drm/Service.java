@@ -1433,6 +1433,46 @@ public class Service extends BaseService {
 			logger.error("Error in action ManageCancellationLeaveRequest", ex);
 		}
 	}
+	
+	public void processDownloadOpportunityDocument(HttpServletRequest request, HttpServletResponse response) {
+
+		try {
+			StringArray documentIds = ServletUtils.getObjectParameter(request, "documentIds", StringArray.class, true);
+
+			Integer raw = ServletUtils.getIntParameter(request, "raw", 0);
+
+			String fileId = documentIds.get(0);
+
+			InputStream is = null;
+			FileContent fc = null;
+			try {
+
+				if (hasUploadedFile(fileId)) {
+					fc = toFileContent(getUploadedFile(fileId));
+				} else {
+					fc = manager.getOpportunityDocumentContent(fileId);
+				}
+
+				is = fc.getStream();
+
+				OutputStream os = response.getOutputStream();
+				ServletUtils.setContentLengthHeader(response, fc.getSize());
+				if (raw == 1) {
+					ServletUtils.setFileStreamHeadersForceDownload(response, fc.getFilename());
+				} else {
+					ServletUtils.setFileStreamHeaders(response, fc.getMediaType(), fc.getFilename());
+				}
+				IOUtils.copy(is, os);
+
+			} finally {
+				IOUtils.closeQuietly(is);
+			}
+
+		} catch (Exception ex) {
+			logger.error("Error in action DownloadFiles", ex);
+			ServletUtils.writeErrorHandlingJs(response, ex.getMessage());
+		}
+	}
 
 	public void processDownloadWorkReportAttachment(HttpServletRequest request, HttpServletResponse response) {
 
