@@ -1335,7 +1335,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('timetableReport', 'print', {
 			text: WT.res('act-print.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-print-xs',
+			iconCls: 'wt-icon-print',
 			handler: function () {
 				me.printTimetableReport();
 			}
