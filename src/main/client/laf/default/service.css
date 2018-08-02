@@ -8,6 +8,11 @@
 .wtdrm-icon-openAttachment-xs { background-image: url('file-open_16.png') !important; }
 .wtdrm-icon-deleteAttachment-xs { background-image: url('file-delete_16.png') !important; }
 
+.wtdrm-icon-downloadDocument-xs { background-image: url('file-download_16.png') !important; }
+.wtdrm-icon-openDocument-xs { background-image: url('file-open_16.png') !important; }
+.wtdrm-icon-deleteDocument-xs { background-image: url('file-delete_16.png') !important; }
+
+.wtdrm-icon-opportunity-xs { background-image: url('opportunity_16.png') !important; }
 .wtdrm-icon-workreport-xs { background-image: url('work_report_16.png') !important; }
 .wtdrm-icon-expensenote-xs { background-image: url('expense_note_16.png') !important; }
 .wtdrm-icon-timetable-xs { background-image: url('timetable_16.png') !important; }
@@ -53,4 +58,5 @@
 
 .timetablerequest-grid-row-ownrequests { background-color: rgba(249, 249, 147, 0.6); }
 
+.wtdrm-icon-opportunity-initializefields-xs { background-image: url('opportunity_initializefields_16.png') !important; }
 .wtdrm-icon-opportunity-xs { background-image: url('opportunity_16.png') !important; }

@@ -112,6 +112,41 @@ public class Tables {
 	public static final com.sonicle.webtop.drm.jooq.tables.LineManagers LINE_MANAGERS = com.sonicle.webtop.drm.jooq.tables.LineManagers.LINE_MANAGERS;
 
 	/**
+	 * The table drm.opportunities
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.Opportunities OPPORTUNITIES = com.sonicle.webtop.drm.jooq.tables.Opportunities.OPPORTUNITIES;
+
+	/**
+	 * The table drm.opportunity_action_documents
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.OpportunityActionDocuments OPPORTUNITY_ACTION_DOCUMENTS = com.sonicle.webtop.drm.jooq.tables.OpportunityActionDocuments.OPPORTUNITY_ACTION_DOCUMENTS;
+
+	/**
+	 * The table drm.opportunity_action_interlocutors
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.OpportunityActionInterlocutors OPPORTUNITY_ACTION_INTERLOCUTORS = com.sonicle.webtop.drm.jooq.tables.OpportunityActionInterlocutors.OPPORTUNITY_ACTION_INTERLOCUTORS;
+
+	/**
+	 * The table drm.opportunity_actions
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.OpportunityActions OPPORTUNITY_ACTIONS = com.sonicle.webtop.drm.jooq.tables.OpportunityActions.OPPORTUNITY_ACTIONS;
+
+	/**
+	 * The table drm.opportunity_documents
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.OpportunityDocuments OPPORTUNITY_DOCUMENTS = com.sonicle.webtop.drm.jooq.tables.OpportunityDocuments.OPPORTUNITY_DOCUMENTS;
+
+	/**
+	 * The table drm.opportunity_fields
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.OpportunityFields OPPORTUNITY_FIELDS = com.sonicle.webtop.drm.jooq.tables.OpportunityFields.OPPORTUNITY_FIELDS;
+
+	/**
+	 * The table drm.opportunity_interlocutors
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.OpportunityInterlocutors OPPORTUNITY_INTERLOCUTORS = com.sonicle.webtop.drm.jooq.tables.OpportunityInterlocutors.OPPORTUNITY_INTERLOCUTORS;
+
+	/**
 	 * The table drm.profiles
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.Profiles PROFILES = com.sonicle.webtop.drm.jooq.tables.Profiles.PROFILES;

@@ -30,25 +30,18 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.OpportunitySetting', {
+Ext.define('Sonicle.webtop.drm.model.OpportunityField', {
 	extend: 'WTA.ux.data.BaseModel',
-	requires: [
-		'Sonicle.data.writer.Json'
-	],
-	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageOpportunitySetting', 'data', {
-		writer: {
-			type: 'sojson',
-			writeAssociations: true
-		}
-	}),
 	identifier: 'negative',
-	idProperty: 'id',
+	idProperty: 'fieldId',
 	fields: [
-		WTF.field('id', 'string', false)
-	],
-	hasMany: [
-		WTF.hasMany('generalFields', 'Sonicle.webtop.drm.model.OpportunityField'),
-		WTF.hasMany('visitReportFields', 'Sonicle.webtop.drm.model.OpportunityField'),
-		WTF.hasMany('notesSignatureFields', 'Sonicle.webtop.drm.model.OpportunityField')
+		WTF.field('domainId', 'string', false),
+		WTF.field('tab', 'string', false),
+		WTF.field('fieldId', 'string', false),
+		WTF.field('visible', 'bool', false),
+		WTF.field('requires', 'bool', false),
+		WTF.field('order', 'int', false),
+		WTF.field('label', 'string', false)
 	]
 });
+

@@ -32,6 +32,10 @@
  */
 Ext.define('Sonicle.webtop.drm.view.OpportunitySetting', {
 	extend: 'WTA.sdk.ModelView',
+	requires: [
+		'Sonicle.webtop.drm.model.OpportunityField',
+		'Sonicle.grid.plugin.DDOrdering'
+	],
 	dockableConfig: {
 		title: '{opportunity.config.tit}',
 		iconCls: 'wtdrm-icon-configuration-generalconfiguration-xs',
@@ -42,11 +46,217 @@ Ext.define('Sonicle.webtop.drm.view.OpportunitySetting', {
 	initComponent: function () {
 		var me = this;
 		me.callParent(arguments);
+		me.initActions();
 		me.add({
 			region: 'center',
-			xtype: 'panel',
+			xtype: 'tabpanel',
 			items: [
+				{
+					xtype: 'tabpanel',
+					title: me.mys.res('opportunity.configurationfield.tit'),
+					items: [
+						{
+							xtype: 'grid',
+							reference: 'generalFieldsGrid',
+							title: me.mys.res('opportunity.configurationfield.main.tit'),
+							modelValidation: true,
+							flex: 1,
+							border: true,
+							viewConfig: {
+								plugins: [{
+									ptype: 'sogridviewddordering',
+									orderField: 'order'
+								}]
+							},
+							plugins: [
+								Ext.create('Ext.grid.plugin.CellEditing', {
+									clicksToEdit: 1
+								})
+							],
+							bind: {
+								store: '{record.generalFields}'
+							},
+							columns: [
+								{
+									dataIndex: 'fieldId',
+									header: me.mys.res('gpOpportunityFields.field.lbl'),
+									flex: 1
+								},
+								{
+									dataIndex: 'label',
+									flex: 1,
+									editor: {
+										xtype: 'textfield',
+										selectOnFocus: true
+									},
+									header: me.mys.res('gpOpportunityFields.label.lbl')
+								},
+								{
+									dataIndex: 'visible',
+									xtype: 'checkcolumn',
+									width: '25',
+									editor: {
+										xtype: 'checkbox',
+										matchFieldWidth: true
+									},
+									header: me.mys.res('gpOpportunityFields.visible.lbl')
+								},
+								{
+									dataIndex: 'required',
+									xtype: 'checkcolumn',
+									width: '25',
+									editor: {
+										xtype: 'checkbox',
+										matchFieldWidth: true
+									},
+									header: me.mys.res('gpOpportunityFields.required.lbl')
+								}
+							]
+						},
+						{
+							xtype: 'grid',
+							reference: 'visitReportFieldsGrid',
+							title: me.mys.res('opportunity.configurationfield.visitreport.tit'),
+							modelValidation: true,
+							flex: 1,
+							border: true,
+							viewConfig: {
+								plugins: [{
+									ptype: 'sogridviewddordering',
+									orderField: 'order'
+								}]
+							},
+							plugins: [
+								Ext.create('Ext.grid.plugin.CellEditing', {
+									clicksToEdit: 1
+								})
+							],
+							bind: {
+								store: '{record.visitReportFields}'
+							},
+							columns: [
+								{
+									dataIndex: 'fieldId',
+									header: me.mys.res('gpOpportunityFields.field.lbl'),
+									flex: 1
+								},
+								{
+									dataIndex: 'label',
+									flex: 1,
+									editor: {
+										xtype: 'textfield',
+										selectOnFocus: true
+									},
+									header: me.mys.res('gpOpportunityFields.label.lbl')
+								},
+								{
+									dataIndex: 'visible',
+									xtype: 'checkcolumn',
+									width: '25',
+									editor: {
+										xtype: 'checkbox',
+										matchFieldWidth: true
+									},
+									header: me.mys.res('gpOpportunityFields.visible.lbl')
+								},
+								{
+									dataIndex: 'required',
+									xtype: 'checkcolumn',
+									width: '25',
+									editor: {
+										xtype: 'checkbox',
+										matchFieldWidth: true
+									},
+									header: me.mys.res('gpOpportunityFields.required.lbl')
+								}
+							]
+						},
+						{
+							xtype: 'grid',
+							reference: 'notesSignatureFieldsGrid',
+							title: me.mys.res('opportunity.configurationfield.notessignature.tit'),
+							modelValidation: true,
+							flex: 1,
+							border: true,
+							viewConfig: {
+								plugins: [{
+									ptype: 'sogridviewddordering',
+									orderField: 'order'
+								}]
+							},
+							plugins: [
+								Ext.create('Ext.grid.plugin.CellEditing', {
+									clicksToEdit: 1
+								})
+							],
+							bind: {
+								store: '{record.notesSignatureFields}'
+							},
+							columns: [
+								{
+									dataIndex: 'fieldId',
+									header: me.mys.res('gpOpportunityFields.field.lbl'),
+									flex: 1
+								},
+								{
+									dataIndex: 'label',
+									flex: 1,
+									editor: {
+										xtype: 'textfield',
+										allowBlank: false,
+										selectOnFocus: true
+									},
+									header: me.mys.res('gpOpportunityFields.label.lbl')
+								},
+								{
+									dataIndex: 'visible',
+									xtype: 'checkcolumn',
+									editor: {
+										xtype: 'checkbox',
+										matchFieldWidth: true
+									},
+									header: me.mys.res('gpOpportunityFields.visible.lbl')
+								},
+								{
+									dataIndex: 'required',
+									xtype: 'checkcolumn',
+									editor: {
+										xtype: 'checkbox',
+										matchFieldWidth: true
+									},
+									header: me.mys.res('gpOpportunityFields.required.lbl')
+								}
+							]
+						}
+					],
+					tbar: [
+						me.getAct('initializeFields')
+					]
+				}
 			]
+		});
+	},
+	initActions: function () {
+		var me = this;
+		
+		me.addAct('initializeFields', {
+			text: me.mys.res('act-initializefields.lbl'),
+			tooltip: null,
+			iconCls: 'wtdrm-icon-opportunity-initializefields-xs',
+			handler: function () {
+				WT.confirm(me.mys.res('opportunity.configurationfield.confirm.initializefields'), function(bid) {
+					if (bid === 'yes') {
+						WT.ajaxReq(me.mys.ID, 'InitializeOpportunityFields', {
+							params: {},
+							callback: function (success, json) {
+								if(success){
+									me.closeView(true);
+								}
+							}
+						});
+					}
+				}, this);
+			}
 		});
 	}
 });
