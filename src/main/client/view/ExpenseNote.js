@@ -141,6 +141,7 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 										}),
 										{
 											xtype: 'datefield',
+											startDay: WT.getStartDay(),
 											reference: 'fldfromdate',
 											bind: '{record.fromDate}',
 											fieldLabel: me.mys.res('expenseNote.fld-fromDate.lbl'),
@@ -191,6 +192,7 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 										},
 										{
 											xtype: 'datefield',
+											startDay: WT.getStartDay(),
 											reference: 'fldtodate',
 											bind: '{record.toDate}',
 											fieldLabel: me.mys.res('expenseNote.fld-toDate.lbl'),

@@ -11,6 +11,7 @@ package com.sonicle.webtop.drm;
  */
 public class DrmTreeNode {
 
+	public static final String OPPORTUNITY = "opportunity.tit"; 
 	public static final String WORK_REPORT = "workreport.tit"; 
 	public static final String EXPENSE_NOTE = "expensenote.tit";
 	public static final String TIMETABLE = "timetable.tit";

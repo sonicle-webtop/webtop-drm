@@ -69,6 +69,13 @@ import com.sonicle.webtop.drm.bol.OHourProfile;
 import com.sonicle.webtop.drm.bol.OLeaveRequest;
 import com.sonicle.webtop.drm.bol.OLeaveRequestDocument;
 import com.sonicle.webtop.drm.bol.OLeaveRequestType;
+import com.sonicle.webtop.drm.bol.OOpportunity;
+import com.sonicle.webtop.drm.bol.OOpportunityAction;
+import com.sonicle.webtop.drm.bol.OOpportunityActionDocument;
+import com.sonicle.webtop.drm.bol.OOpportunityActionInterlocutor;
+import com.sonicle.webtop.drm.bol.OOpportunityDocument;
+import com.sonicle.webtop.drm.bol.OOpportunityField;
+import com.sonicle.webtop.drm.bol.OOpportunityInterlocutor;
 import com.sonicle.webtop.drm.bol.OProfileMasterdata;
 import com.sonicle.webtop.drm.bol.OProfileSupervisedUser;
 import com.sonicle.webtop.drm.bol.OProfileMember;
@@ -100,6 +107,13 @@ import com.sonicle.webtop.drm.dal.HolidayDateDAO;
 import com.sonicle.webtop.drm.dal.HourProfileDAO;
 import com.sonicle.webtop.drm.dal.LeaveRequestDAO;
 import com.sonicle.webtop.drm.dal.LeaveRequestDocumentDAO;
+import com.sonicle.webtop.drm.dal.OpportunityActionDAO;
+import com.sonicle.webtop.drm.dal.OpportunityActionDocumentDAO;
+import com.sonicle.webtop.drm.dal.OpportunityActionInterlocutorDAO;
+import com.sonicle.webtop.drm.dal.OpportunityDAO;
+import com.sonicle.webtop.drm.dal.OpportunityDocumentDAO;
+import com.sonicle.webtop.drm.dal.OpportunityFieldDAO;
+import com.sonicle.webtop.drm.dal.OpportunityInterlocutorDAO;
 import com.sonicle.webtop.drm.dal.ProfileMasterdataDAO;
 import com.sonicle.webtop.drm.dal.ProfileSupervisedUserDAO;
 import com.sonicle.webtop.drm.dal.ProfileMemberDAO;
@@ -131,6 +145,14 @@ import com.sonicle.webtop.drm.model.HolidayDate;
 import com.sonicle.webtop.drm.model.HourProfile;
 import com.sonicle.webtop.drm.model.LeaveRequest;
 import com.sonicle.webtop.drm.model.LeaveRequestDocument;
+import com.sonicle.webtop.drm.model.Opportunity;
+import com.sonicle.webtop.drm.model.OpportunityAction;
+import com.sonicle.webtop.drm.model.OpportunityActionDocument;
+import com.sonicle.webtop.drm.model.OpportunityActionInterlocutor;
+import com.sonicle.webtop.drm.model.OpportunityDocument;
+import com.sonicle.webtop.drm.model.OpportunityField;
+import com.sonicle.webtop.drm.model.OpportunityInterlocutor;
+import com.sonicle.webtop.drm.model.OpportunitySetting;
 import com.sonicle.webtop.drm.model.ProfileMasterdata;
 import com.sonicle.webtop.drm.model.ProfileSupervisedUser;
 import com.sonicle.webtop.drm.model.ProfileMember;
@@ -2028,6 +2050,736 @@ public class DrmManager extends BaseManager {
 			DbUtils.closeQuietly(con);
 		}
 	}
+	
+	public List<OOpportunity> listOpportunities(OpportunityQuery query) throws WTException {
+		Connection con = null;
+		OpportunityDAO oDao = OpportunityDAO.getInstance();
+		List<OOpportunity> opportunities = null
+				;
+		try {
+			con = WT.getConnection(SERVICE_ID);
+			opportunities = oDao.selectOpportunities(con, query);
+
+			return opportunities;
+			
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public Opportunity getOpportunity(Integer id) throws WTException {
+		Connection con = null;
+		OpportunityDAO oDao = OpportunityDAO.getInstance();
+		OpportunityActionDAO oADao = OpportunityActionDAO.getInstance();
+		OpportunityActionInterlocutorDAO oAIDao = OpportunityActionInterlocutorDAO.getInstance();
+		OpportunityActionDocumentDAO oADDao = OpportunityActionDocumentDAO.getInstance();
+		OpportunityInterlocutorDAO oIDao = OpportunityInterlocutorDAO.getInstance();
+		OpportunityDocumentDAO oDDao = OpportunityDocumentDAO.getInstance();
+		
+		Opportunity o = null;
+		
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			o = createOpportunity(oDao.selectById(con, id));
+
+			for (OOpportunityAction oAct : oADao.selectByOpportunity(con, id)) {
+				OpportunityAction act = createOpportunityAction(oAct);
+				
+				for (OOpportunityActionInterlocutor oActInt : oAIDao.selectByOpportunityAction(con, act.getId())) {
+					act.getActionInterlocutors().add(createOpportunityActionInterlocutor(oActInt));
+				}
+
+				for (OOpportunityActionDocument oActDoc : oADDao.selectByOpportunityAction(con, act.getId())) {
+					act.getActionDocuments().add(createOpportunityActionDocument(oActDoc));
+				}
+				o.getActions().add(act);
+			}
+			
+			for (OOpportunityInterlocutor oInt : oIDao.selectByOpportunity(con, id)) {
+				o.getInterlocutors().add(createOpportunityInterlocutor(oInt));
+			}
+
+			for (OOpportunityDocument oDoc : oDDao.selectByOpportunity(con, id)) {
+				o.getDocuments().add(createOpportunityDocument(oDoc));
+			}
+
+			return o;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public OOpportunity addOpportunity(Opportunity o, HashMap<String, File> files) throws WTException {
+		Connection con = null;
+		OpportunityDAO oDao = OpportunityDAO.getInstance();
+		OpportunityActionDAO oADao = OpportunityActionDAO.getInstance();
+		OpportunityActionInterlocutorDAO oAIDao = OpportunityActionInterlocutorDAO.getInstance();
+		OpportunityActionDocumentDAO oADDao = OpportunityActionDocumentDAO.getInstance();
+		OpportunityInterlocutorDAO oIDao = OpportunityInterlocutorDAO.getInstance();
+		OpportunityDocumentDAO oDDao = OpportunityDocumentDAO.getInstance();
+		
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			DateTime revisionTimestamp = createRevisionTimestamp();
+
+			OOpportunity newO = createOOpportunity(o);
+			newO.setId(oDao.getOpportunitySequence(con).intValue());
+			newO.setDomainId(getTargetProfileId().getDomainId());
+
+			OOpportunityAction newOAct = null;
+			for (OpportunityAction oAct : o.getActions()) {
+				
+				OOpportunityActionInterlocutor newOActInt = null;
+				for (OpportunityActionInterlocutor oActInt : oAct.getActionInterlocutors()) {
+					newOActInt = createOOpportunityActionInterlocutor(oActInt);
+					newOActInt.setId(oAIDao.getSequence(con).intValue());
+					newOActInt.setOpportunityActionId(oAct.getId());
+
+					oAIDao.insert(con, newOActInt);
+				}
+				
+				OOpportunityActionDocument newOActDoc = null;
+				for (OpportunityActionDocument oActDoc : oAct.getActionDocuments()) {
+					newOActDoc = createOOpportunityActionDocument(oActDoc);
+					newOActDoc.setOpportunityActionId(oAct.getId());
+					newOActDoc.setRevisionTimestamp(revisionTimestamp);
+					newOActDoc.setRevisionSequence((short) 1);
+
+					oADDao.insert(con, newOActDoc);
+				}
+				
+				newOAct = createOOpportunityAction(oAct);
+				newOAct.setId(oADao.getSequence(con).intValue());
+				newOAct.setOpportunityId(newO.getId());
+
+				oADao.insert(con, newOAct);
+			}
+			
+			OOpportunityInterlocutor newOInt = null;
+			for (OpportunityInterlocutor oInt : o.getInterlocutors()) {
+				newOInt = createOOpportunityInterlocutor(oInt);
+				newOInt.setId(oIDao.getSequence(con).intValue());
+				newOInt.setOpportunityId(newO.getId());
+
+				oIDao.insert(con, newOInt);
+			}
+
+			for (OpportunityDocument doc : o.getDocuments()) {
+				OOpportunityDocument oDoc = createOOpportunityDocument(doc);
+				oDoc.setOpportunityId(newO.getId());
+				oDoc.setRevisionTimestamp(revisionTimestamp);
+				oDoc.setRevisionSequence((short) 1);
+
+				oDDao.insert(con, oDoc);
+			}
+
+			oDao.insert(con, newO);
+
+			File destDir = new File(getOpportunityPath(newO.getId()));
+			if (!destDir.exists()) {
+				destDir.mkdir();
+			}
+			
+			for (OpportunityDocument doc : o.getDocuments()) {
+
+				File file = files.get(doc.getId());
+				String fileName = PathUtils.addFileExension(file.getName(), FilenameUtils.getExtension(doc.getFileName()));
+				File destFile = new File(destDir, fileName);
+
+				FileUtils.copyFile(file, destFile);
+			}
+
+			DbUtils.commitQuietly(con);
+
+			return newO;
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public OOpportunity updateOpportunity(Opportunity item, HashMap<String, File> files) throws WTException {
+		Connection con = null;
+		OpportunityDAO oDao = OpportunityDAO.getInstance();
+		OpportunityActionDAO oADao = OpportunityActionDAO.getInstance();
+		OpportunityActionInterlocutorDAO oAIDao = OpportunityActionInterlocutorDAO.getInstance();
+		OpportunityActionDocumentDAO oADDao = OpportunityActionDocumentDAO.getInstance();
+		OpportunityInterlocutorDAO oIDao = OpportunityInterlocutorDAO.getInstance();
+		OpportunityDocumentDAO oDDao = OpportunityDocumentDAO.getInstance();
+		
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			DateTime revisionTimestamp = createRevisionTimestamp();
+			
+			Opportunity oldO = getOpportunity(item.getId());
+
+			OOpportunity o = createOOpportunity(item);
+			
+			//Opportunity
+			oDao.update(con, o);
+			
+			//Opportunity Actions
+			LangUtils.CollectionChangeSet<OpportunityAction> changesSet1 = LangUtils.getCollectionChanges(oldO.getActions(), item.getActions());
+			
+			for (OpportunityAction oAct : changesSet1.inserted) {
+				
+				OOpportunityActionInterlocutor newOActInt = null;
+				for (OpportunityActionInterlocutor oActInt : oAct.getActionInterlocutors()) {
+					newOActInt = createOOpportunityActionInterlocutor(oActInt);
+					newOActInt.setId(oAIDao.getSequence(con).intValue());
+					newOActInt.setOpportunityActionId(oAct.getId());
+
+					oAIDao.insert(con, newOActInt);
+				}
+				
+				OOpportunityActionDocument newOActDoc = null;
+				for (OpportunityActionDocument oActDoc : oAct.getActionDocuments()) {
+					newOActDoc = createOOpportunityActionDocument(oActDoc);
+					newOActDoc.setOpportunityActionId(oAct.getId());
+					newOActDoc.setRevisionTimestamp(revisionTimestamp);
+					newOActDoc.setRevisionSequence((short) 1);
+
+					oADDao.insert(con, newOActDoc);
+				}
+				
+				OOpportunityAction oOAct = createOOpportunityAction(oAct);
+
+				oOAct.setId(oADao.getSequence(con).intValue());
+				oOAct.setOpportunityId(item.getId());
+
+				oADao.insert(con, oOAct);
+			}
+
+			for (OpportunityAction oAct : changesSet1.deleted) {
+				oAIDao.deleteByOpportunityAction(con, oAct.getId());
+				oADDao.deleteByOpportunityAction(con, oAct.getId());
+				oADao.deleteById(con, oAct.getId());
+			}
+
+			for (OpportunityAction oAct : changesSet1.updated) {
+				
+				List <OpportunityActionInterlocutor> oldActInt = null;
+				for(OOpportunityActionInterlocutor oOActInt : oAIDao.selectByOpportunityAction(con, oAct.getId())){
+					oldActInt.add(createOpportunityActionInterlocutor(oOActInt));
+				}
+				
+				//Opportunity Action Interlocutors
+				LangUtils.CollectionChangeSet<OpportunityActionInterlocutor> changesSet4 = LangUtils.getCollectionChanges(oldActInt, oAct.getActionInterlocutors());
+				
+				for (OpportunityActionInterlocutor oActInt : changesSet4.inserted) {
+
+					OOpportunityActionInterlocutor oOActInt = createOOpportunityActionInterlocutor(oActInt);
+
+					oOActInt.setId(oAIDao.getSequence(con).intValue());
+					oOActInt.setOpportunityActionId(oAct.getId());
+
+					oAIDao.insert(con, oOActInt);
+				}
+
+				for (OpportunityActionInterlocutor oActInt : changesSet4.deleted) {
+					oAIDao.deleteById(con, oActInt.getId());
+				}
+
+				for (OpportunityActionInterlocutor oActInt : changesSet4.updated) {
+					OOpportunityActionInterlocutor oOActInt = createOOpportunityActionInterlocutor(oActInt);
+					oOActInt.setOpportunityActionId(oAct.getId());
+
+					oAIDao.update(con, oOActInt);
+				}
+				
+				List <OpportunityActionDocument> oldActDoc = null;
+				for(OOpportunityActionDocument oOActDoc : oADDao.selectByOpportunityAction(con, oAct.getId())){
+					oldActDoc.add(createOpportunityActionDocument(oOActDoc));
+				}
+				
+				//Opportunity Action Documents
+				LangUtils.CollectionChangeSet<OpportunityActionDocument> changesSet5 = LangUtils.getCollectionChanges(oldActDoc, oAct.getActionDocuments());
+				
+				File destDir = new File(getOpportunityActionPath(oAct.getId()));
+				if (!destDir.exists()) {
+					destDir.mkdirs();
+				}
+
+				for (OpportunityActionDocument oActDoc : changesSet5.inserted) {
+
+					OOpportunityActionDocument oOActDoc = createOOpportunityActionDocument(oActDoc);
+
+					oOActDoc.setOpportunityActionId(oAct.getId());
+					oOActDoc.setRevisionTimestamp(revisionTimestamp);
+					oOActDoc.setRevisionSequence((short) 1);
+
+					oADDao.insert(con, oOActDoc);
+
+					File file = files.get(oActDoc.getId());
+					String fileName = PathUtils.addFileExension(file.getName(), FilenameUtils.getExtension(oActDoc.getFileName()));
+					File destFile = new File(destDir, fileName);
+
+					FileUtils.copyFile(file, destFile);
+				}
+
+				for (OpportunityActionDocument oActDoc : changesSet5.deleted) {
+
+					String fileName = PathUtils.addFileExension(oActDoc.getId().toString(), FilenameUtils.getExtension(oActDoc.getFileName()));
+					File file = new File(destDir, fileName);
+
+					FileUtils.deleteQuietly(file);
+					oADDao.deleteById(con, oActDoc.getId());
+				}
+				
+				OOpportunityAction oOAct = createOOpportunityAction(oAct);
+				oOAct.setOpportunityId(item.getId());
+
+				oADao.update(con, oOAct);
+			}
+			
+			//Opportunity Interlocutors
+			LangUtils.CollectionChangeSet<OpportunityInterlocutor> changesSet2 = LangUtils.getCollectionChanges(oldO.getInterlocutors(), item.getInterlocutors());
+			
+			for (OpportunityInterlocutor oInt : changesSet2.inserted) {
+
+				OOpportunityInterlocutor oOInt = createOOpportunityInterlocutor(oInt);
+
+				oOInt.setId(oIDao.getSequence(con).intValue());
+				oOInt.setOpportunityId(item.getId());
+
+				oIDao.insert(con, oOInt);
+			}
+
+			for (OpportunityInterlocutor oInt : changesSet2.deleted) {
+				oIDao.deleteById(con, oInt.getId());
+			}
+
+			for (OpportunityInterlocutor oInt : changesSet2.updated) {
+				OOpportunityInterlocutor oOInt = createOOpportunityInterlocutor(oInt);
+				oOInt.setOpportunityId(item.getId());
+
+				oIDao.update(con, oOInt);
+			}
+
+			//Opportunity Documents
+			LangUtils.CollectionChangeSet<OpportunityDocument> changesSet3 = LangUtils.getCollectionChanges(oldO.getDocuments(), item.getDocuments());
+
+			File destDir = new File(getOpportunityPath(item.getId()));
+			if (!destDir.exists()) {
+				destDir.mkdirs();
+			}
+
+			for (OpportunityDocument oDoc : changesSet3.inserted) {
+
+				OOpportunityDocument oODoc = createOOpportunityDocument(oDoc);
+
+				oODoc.setOpportunityId(item.getId());
+				oODoc.setRevisionTimestamp(revisionTimestamp);
+				oODoc.setRevisionSequence((short) 1);
+
+				oDDao.insert(con, oODoc);
+
+				File file = files.get(oDoc.getId());
+				String fileName = PathUtils.addFileExension(file.getName(), FilenameUtils.getExtension(oDoc.getFileName()));
+				File destFile = new File(destDir, fileName);
+
+				FileUtils.copyFile(file, destFile);
+			}
+
+			for (OpportunityDocument oDoc : changesSet3.deleted) {
+
+				String fileName = PathUtils.addFileExension(oDoc.getId().toString(), FilenameUtils.getExtension(oDoc.getFileName()));
+				File file = new File(destDir, fileName);
+
+				FileUtils.deleteQuietly(file);
+				oDDao.deleteById(con, oDoc.getId());
+			}
+
+			DbUtils.commitQuietly(con);
+
+			return o;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} catch (IOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public void deleteOpportunity(Integer id) throws WTException {
+		Connection con = null;
+		OpportunityDAO oDao = OpportunityDAO.getInstance();
+		OpportunityActionDAO oADao = OpportunityActionDAO.getInstance();
+		OpportunityActionInterlocutorDAO oAIDao = OpportunityActionInterlocutorDAO.getInstance();
+		OpportunityActionDocumentDAO oADDao = OpportunityActionDocumentDAO.getInstance();
+		OpportunityInterlocutorDAO oIDao = OpportunityInterlocutorDAO.getInstance();
+		OpportunityDocumentDAO oDDao = OpportunityDocumentDAO.getInstance();
+		
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			for(OOpportunityAction oppAct : oADao.selectByOpportunity(con, id)){
+				oADDao.deleteByOpportunityAction(con, oppAct.getId());
+				oAIDao.deleteByOpportunityAction(con, oppAct.getId());
+			}
+			
+			oADao.deleteByOpportunity(con, id);
+			oIDao.deleteByOpportunity(con, id);
+			oDDao.deleteByOpportunity(con, id);
+			oDao.deleteById(con, id);
+			
+			DbUtils.commitQuietly(con);
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	private Opportunity createOpportunity(OOpportunity oOpt) {
+		if (oOpt == null) {
+			return null;
+		}
+		Opportunity o = new Opportunity();
+		o.setId(oOpt.getId());
+		o.setDomainId(oOpt.getDomainId());
+		o.setCompanyId(oOpt.getCompanyId());
+		o.setOperatorId(oOpt.getOperatorId());
+		o.setDate(oOpt.getDate());
+		o.setFromHour(oOpt.getFromHour());
+		o.setToHour(oOpt.getToHour());
+		o.setExecutedWith(oOpt.getExecutedWith());
+		o.setCustomerId(oOpt.getCustomerId());
+		o.setCustomerStatId(oOpt.getCustomerStatId());
+		o.setSector(oOpt.getSector());
+		o.setDescription(oOpt.getDescription());
+		o.setPlace(oOpt.getPlace());
+		o.setObjective(oOpt.getObjective());
+		o.setCausalId(oOpt.getCausalId());
+		o.setActivityId(oOpt.getActivityId());
+		o.setObjective2(oOpt.getObjective_2());
+		o.setResult(oOpt.getResult());
+		o.setDiscoveries(oOpt.getDiscoveries());
+		o.setCustomerPotential(oOpt.getCustomerPotential());
+		o.setNotes(oOpt.getNotes());
+		o.setStatusId(oOpt.getStatusId());
+		o.setSignedBy(oOpt.getSignedBy());
+		o.setSignature(oOpt.getSignature());
+		o.setWon(oOpt.getWon());
+
+		return o;
+	}
+
+	private OOpportunity createOOpportunity(Opportunity o) {
+		if (o == null) {
+			return null;
+		}
+		OOpportunity oOpt = new OOpportunity();
+		oOpt.setId(o.getId());
+		oOpt.setDomainId(o.getDomainId());
+		oOpt.setCompanyId(o.getCompanyId());
+		oOpt.setOperatorId(o.getOperatorId());
+		oOpt.setDate(o.getDate());
+		oOpt.setFromHour(o.getFromHour());
+		oOpt.setToHour(o.getToHour());
+		oOpt.setExecutedWith(o.getExecutedWith());
+		oOpt.setCustomerId(o.getCustomerId());
+		oOpt.setCustomerStatId(o.getCustomerStatId());
+		oOpt.setSector(o.getSector());
+		oOpt.setDescription(o.getDescription());
+		oOpt.setPlace(o.getPlace());
+		oOpt.setObjective(o.getObjective());
+		oOpt.setCausalId(o.getCausalId());
+		oOpt.setActivityId(o.getActivityId());
+		oOpt.setObjective_2(o.getObjective2());
+		oOpt.setResult(o.getResult());
+		oOpt.setDiscoveries(o.getDiscoveries());
+		oOpt.setCustomerPotential(o.getCustomerPotential());
+		oOpt.setNotes(o.getNotes());
+		oOpt.setStatusId(o.getStatusId());
+		oOpt.setSignedBy(o.getSignedBy());
+		oOpt.setSignature(o.getSignature());
+		oOpt.setWon(o.getWon());
+
+		return oOpt;
+	}
+	
+	private OOpportunityAction createOOpportunityAction(OpportunityAction act) {
+
+		if (act == null) {
+			return null;
+		}
+
+		OOpportunityAction oAct = new OOpportunityAction();
+		oAct.setId(act.getId());
+		oAct.setOpportunityId(act.getOpportunityId());
+		oAct.setOperatorId(act.getOperatorId());
+		oAct.setStatusId(act.getStatusId());
+		oAct.setDate(act.getDate());
+		oAct.setFromHour(act.getFromHour());
+		oAct.setToHour(act.getToHour());
+		oAct.setDescription(act.getDescription());
+		oAct.setPlace(act.getPlace());
+		oAct.setSubsequentActions(act.getSubsequentActions());
+		oAct.setActivityId(act.getActivityId());
+
+		return oAct;
+	}
+
+	private OpportunityAction createOpportunityAction(OOpportunityAction oAct) {
+
+		if (oAct == null) {
+			return null;
+		}
+
+		OpportunityAction act = new OpportunityAction();
+		act.setId(oAct.getId());
+		act.setOpportunityId(oAct.getOpportunityId());
+		act.setOperatorId(oAct.getOperatorId());
+		act.setStatusId(oAct.getStatusId());
+		act.setDate(oAct.getDate());
+		act.setFromHour(oAct.getFromHour());
+		act.setToHour(oAct.getToHour());
+		act.setDescription(oAct.getDescription());
+		act.setPlace(oAct.getPlace());
+		act.setSubsequentActions(oAct.getSubsequentActions());
+		act.setActivityId(oAct.getActivityId());
+
+		return act;
+	}
+	
+	private OOpportunityActionInterlocutor createOOpportunityActionInterlocutor(OpportunityActionInterlocutor actInterl) {
+
+		if (actInterl == null) {
+			return null;
+		}
+
+		OOpportunityActionInterlocutor oActInterl = new OOpportunityActionInterlocutor();
+		oActInterl.setId(actInterl.getId());
+		oActInterl.setOpportunityActionId(actInterl.getOpportunityActionId());
+		oActInterl.setContactId(actInterl.getContactId());
+
+		return oActInterl;
+	}
+
+	private OpportunityActionInterlocutor createOpportunityActionInterlocutor(OOpportunityActionInterlocutor oActInterl) {
+
+		if (oActInterl == null) {
+			return null;
+		}
+
+		OpportunityActionInterlocutor actInterl = new OpportunityActionInterlocutor();
+		actInterl.setId(oActInterl.getId());
+		actInterl.setOpportunityActionId(oActInterl.getOpportunityActionId());
+		actInterl.setContactId(oActInterl.getContactId());
+
+		return actInterl;
+	}
+	
+	private OOpportunityActionDocument createOOpportunityActionDocument(OpportunityActionDocument actDoc) {
+
+		if (actDoc == null) {
+			return null;
+		}
+
+		OOpportunityActionDocument oActDoc = new OOpportunityActionDocument();
+		oActDoc.setId(actDoc.getId());
+		oActDoc.setOpportunityActionId(actDoc.getOpportunityActionId());
+		oActDoc.setFilename(actDoc.getFileName());
+		oActDoc.setSize(actDoc.getSize());
+		oActDoc.setMediaTpye(actDoc.getMediaType());
+
+		return oActDoc;
+	}
+
+	private OpportunityActionDocument createOpportunityActionDocument(OOpportunityActionDocument oActDoc) {
+
+		if (oActDoc == null) {
+			return null;
+		}
+
+		OpportunityActionDocument actDoc = new OpportunityActionDocument();
+		actDoc.setId(oActDoc.getId());
+		actDoc.setOpportunityActionId(oActDoc.getOpportunityActionId());
+		actDoc.setFileName(oActDoc.getFilename());
+		actDoc.setSize(oActDoc.getSize());
+		actDoc.setMediaType(oActDoc.getMediaTpye());
+
+		return actDoc;
+	}
+	
+	private OOpportunityInterlocutor createOOpportunityInterlocutor(OpportunityInterlocutor interl) {
+
+		if (interl == null) {
+			return null;
+		}
+
+		OOpportunityInterlocutor oInterl = new OOpportunityInterlocutor();
+		oInterl.setId(interl.getId());
+		oInterl.setOpportunityId(interl.getOpportunityId());
+		oInterl.setContactId(interl.getContactId());
+
+		return oInterl;
+	}
+
+	private OpportunityInterlocutor createOpportunityInterlocutor(OOpportunityInterlocutor oInterl) {
+
+		if (oInterl == null) {
+			return null;
+		}
+
+		OpportunityInterlocutor interl = new OpportunityInterlocutor();
+		interl.setId(oInterl.getId());
+		interl.setOpportunityId(oInterl.getOpportunityId());
+		interl.setContactId(oInterl.getContactId());
+
+		return interl;
+	}
+	
+	private OOpportunityDocument createOOpportunityDocument(OpportunityDocument doc) {
+
+		if (doc == null) {
+			return null;
+		}
+
+		OOpportunityDocument oDoc = new OOpportunityDocument();
+		oDoc.setId(doc.getId());
+		oDoc.setOpportunityId(doc.getOpportunityId());
+		oDoc.setFilename(doc.getFileName());
+		oDoc.setSize(doc.getSize());
+		oDoc.setMediaTpye(doc.getMediaType());
+
+		return oDoc;
+	}
+
+	private OpportunityDocument createOpportunityDocument(OOpportunityDocument oDoc) {
+
+		if (oDoc == null) {
+			return null;
+		}
+
+		OpportunityDocument doc = new OpportunityDocument();
+		doc.setId(oDoc.getId());
+		doc.setOpportunityId(oDoc.getOpportunityId());
+		doc.setFileName(oDoc.getFilename());
+		doc.setSize(oDoc.getSize());
+		doc.setMediaType(oDoc.getMediaTpye());
+
+		return doc;
+	}
+	
+	public String getOpportunityPath(Integer id) {
+
+		return PathUtils.concatPathParts(WT.getServiceHomePath(getTargetProfileId().getDomainId(), SERVICE_ID),
+				"Opportunity", id.toString());
+
+	}
+
+	public OpportunityDocument getOpportunityDocument(String opportunityDocumentId) throws WTException {
+		Connection con = null;
+		OpportunityDocumentDAO oDDao = OpportunityDocumentDAO.getInstance();
+		OpportunityDocument doc = null;
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			doc = createOpportunityDocument(oDDao.select(con, opportunityDocumentId));
+
+			return doc;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public FileContent getOpportunityDocumentContent(String opportunityDocumentId) throws WTException {
+
+		OpportunityDocument doc = getOpportunityDocument(opportunityDocumentId);
+
+		if (doc == null) {
+			return null;
+		}
+
+		File file = new File(getOpportunityPath(doc.getOpportunityId()),
+				PathUtils.addFileExension(doc.getId().toString(),
+						PathUtils.getFileExtension(doc.getFileName())));
+
+		if (!file.canRead() || !file.exists()) {
+			throw new WTException("File not exists or not readable [{0}]", file.getAbsolutePath());
+		}
+		try {
+			return new FileContent(doc.getFileName(), file.length(), doc.getMediaType(), new FileInputStream(file));
+		} catch (FileNotFoundException ex) {
+			throw new WTException("File not found", ex);
+		}
+	}
+	
+	public String getOpportunityActionPath(Integer id) {
+
+		return PathUtils.concatPathParts(WT.getServiceHomePath(getTargetProfileId().getDomainId(), SERVICE_ID),
+				"OpportunityAction", id.toString());
+
+	}
+
+	public OpportunityActionDocument getOpportunityActionDocument(String opportunityActionDocumentId) throws WTException {
+		Connection con = null;
+		OpportunityActionDocumentDAO oADDao = OpportunityActionDocumentDAO.getInstance();
+		OpportunityActionDocument actDoc = null;
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			actDoc = createOpportunityActionDocument(oADDao.select(con, opportunityActionDocumentId));
+
+			return actDoc;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public FileContent getOpportunityActionDocumentContent(String opportunityActionDocumentId) throws WTException {
+
+		OpportunityActionDocument actDoc = getOpportunityActionDocument(opportunityActionDocumentId);
+
+		if (actDoc == null) {
+			return null;
+		}
+
+		File file = new File(getOpportunityActionPath(actDoc.getOpportunityActionId()),
+				PathUtils.addFileExension(actDoc.getId().toString(),
+						PathUtils.getFileExtension(actDoc.getFileName())));
+
+		if (!file.canRead() || !file.exists()) {
+			throw new WTException("File not exists or not readable [{0}]", file.getAbsolutePath());
+		}
+		try {
+			return new FileContent(actDoc.getFileName(), file.length(), actDoc.getMediaType(), new FileInputStream(file));
+		} catch (FileNotFoundException ex) {
+			throw new WTException("File not found", ex);
+		}
+	}
 
 	public WorkReport getWorkReport(String workReportId) throws WTException {
 		Connection con = null;
@@ -2412,6 +3164,133 @@ public class DrmManager extends BaseManager {
 			throw new WTException("File not found", ex);
 		}
 	}
+	
+	private OpportunityField createOpportunityField(OOpportunityField oOField) {
+
+		if (oOField == null) {
+			return null;
+		}
+
+		OpportunityField oField = new OpportunityField();
+		
+		oField.setDomainId(oOField.getDomainId());
+		oField.setTab(EnumUtils.forSerializedName(oOField.getTabId(), OpportunityField.Tab.class));
+		oField.setFieldId(oOField.getFieldId());
+		oField.setVisible(oOField.getVisible());
+		oField.setRequired(oOField.getRequired());
+		oField.setOrder(oOField.getOrder());
+		oField.setLabel(oOField.getLabel());
+
+		return oField;
+	}
+
+	private OOpportunityField createOOpportunityField(OpportunityField oField) {
+
+		if (oField == null) {
+			return null;
+		}
+
+		OOpportunityField oOField = new OOpportunityField();
+		oOField.setDomainId(oField.getDomainId());
+		oOField.setTabId(EnumUtils.toSerializedName(oField.getTab()));
+		oOField.setFieldId(oField.getFieldId());
+		oOField.setVisible(oField.getVisible());
+		oOField.setRequired(oField.getRequired());
+		oOField.setOrder(oField.getOrder());		
+		oOField.setLabel(oField.getLabel());		
+
+		return oOField;
+	}
+	
+	public OpportunitySetting getOpportunitySetting() throws WTException {
+		Connection con = null;
+		OpportunityFieldDAO ofDao = OpportunityFieldDAO.getInstance();
+
+		OpportunitySetting setting = null;
+		try {
+			con = WT.getConnection(SERVICE_ID);
+
+			setting = new OpportunitySetting();
+			
+			if (setting != null) {
+				for (OOpportunityField oOField : ofDao.selectByDomainIdTabId(con, getTargetProfileId().getDomainId(), EnumUtils.toSerializedName(OpportunityField.Tab.MAIN))) {
+					setting.getGeneralFields().add(createOpportunityField(oOField));
+				}
+
+				for (OOpportunityField oOField : ofDao.selectByDomainIdTabId(con, getTargetProfileId().getDomainId(), EnumUtils.toSerializedName(OpportunityField.Tab.VISIT_REPORT))) {
+					setting.getVisitReportFields().add(createOpportunityField(oOField));
+				}
+				
+				for (OOpportunityField oOField : ofDao.selectByDomainIdTabId(con, getTargetProfileId().getDomainId(), EnumUtils.toSerializedName(OpportunityField.Tab.NOTES_SIGNATURE))) {
+					setting.getNotesSignatureFields().add(createOpportunityField(oOField));
+				}
+			}
+			
+			return setting;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public void updateOpportunitySetting(OpportunitySetting item) throws WTException {
+		Connection con = null;
+		OpportunityFieldDAO ofDao = OpportunityFieldDAO.getInstance();
+
+		try {
+
+			con = WT.getConnection(SERVICE_ID, false);
+
+			for (OpportunityField field : item.getGeneralFields()) {
+
+				OOpportunityField oField = createOOpportunityField(field);
+
+				ofDao.update(con, oField);
+			}
+			
+			for (OpportunityField field : item.getVisitReportFields()) {
+
+				OOpportunityField oField = createOOpportunityField(field);
+
+				ofDao.update(con, oField);
+			}
+			
+			for (OpportunityField field : item.getNotesSignatureFields()) {
+
+				OOpportunityField oField = createOOpportunityField(field);
+
+				ofDao.update(con, oField);
+			}
+
+			DbUtils.commitQuietly(con);
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public void initializeOpportunityFields() throws WTException {
+		Connection con = null;
+		OpportunityFieldDAO ofDao = OpportunityFieldDAO.getInstance();
+		
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			ofDao.deleteByDomainId(con, getTargetProfileId().getDomainId());
+			ofDao.insertByDomainIdDefault(con, getTargetProfileId().getDomainId());
+			
+			DbUtils.commitQuietly(con);
+			
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
 
 	public WorkReportSetting getWorkReportSetting() throws WTException {
 		Connection con = null;
@@ -2745,6 +3624,7 @@ public class DrmManager extends BaseManager {
 		Connection con = null;
 		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
 		LeaveRequestDocumentDAO docDao = LeaveRequestDocumentDAO.getInstance();
+		TimetableEventDAO teDao = TimetableEventDAO.getInstance();
 		
 		try {
 			con = WT.getConnection(SERVICE_ID, false);
@@ -2752,6 +3632,9 @@ public class DrmManager extends BaseManager {
 			lrDao.deleteById(con, leaveRequestId);
 
 			docDao.deleteByLeaveRequest(con, leaveRequestId);
+			
+			//Delete in TimetableEvents
+			teDao.deleteByLeaveRequestId(con, leaveRequestId);
 			
 			DbUtils.commitQuietly(con);
 
@@ -4342,7 +5225,7 @@ public class DrmManager extends BaseManager {
 			String bodyHeader = TplHelper.buildLeaveRequestTitle(udTo.getLocale(), lr);
 			String html = TplHelper.buildLeaveRequestBody(udTo.getLocale(), lr, to.getAddress(), answer, servicePublicUrl);
 			String source = EmailNotification.buildSource(udTo.getLocale(), SERVICE_ID);
-			String because = WT.lookupResource(SERVICE_ID, udTo.getLocale(), DrmLocale.EMAIL_REMINDER_FOOTER_BECAUSE);
+			String because = WT.lookupResource(SERVICE_ID, udTo.getLocale(), DrmLocale.EMAIL_REMINDER_SUPERVISOR_FOOTER_BECAUSE);
 
 			String msgSubject = EmailNotification.buildSubject(udTo.getLocale(), SERVICE_ID, bodyHeader);
 			
@@ -4351,6 +5234,8 @@ public class DrmManager extends BaseManager {
 			if(lr.getResult() != null){
 				from = udTo.getPersonalEmail();
 				to = udFrom.getPersonalEmail();
+				
+				because = WT.lookupResource(SERVICE_ID, udTo.getLocale(), DrmLocale.EMAIL_REMINDER_USER_FOOTER_BECAUSE);
 				
 				if (lr.getResult() == true) {
 					builder.greenMessage(lookupResource(udTo.getLocale(), DrmLocale.TPL_EMAIL_RESPONSEUPDATE_MSG_APPROVE));
@@ -4384,7 +5269,7 @@ public class DrmManager extends BaseManager {
 			String bodyHeader = TplHelper.buildLeaveRequestCancellationTitle(udTo.getLocale(), lr);
 			String html = TplHelper.buildLeaveRequestCancellationBody(udTo.getLocale(), lr, to.getAddress(), answer, servicePublicUrl);
 			String source = EmailNotification.buildSource(udTo.getLocale(), SERVICE_ID);
-			String because = WT.lookupResource(SERVICE_ID, udTo.getLocale(), DrmLocale.EMAIL_REMINDER_FOOTER_BECAUSE);
+			String because = WT.lookupResource(SERVICE_ID, udTo.getLocale(), DrmLocale.EMAIL_REMINDER_SUPERVISOR_FOOTER_BECAUSE);
 
 			String msgSubject = EmailNotification.buildSubject(udTo.getLocale(), SERVICE_ID, bodyHeader);
 			
@@ -4393,6 +5278,8 @@ public class DrmManager extends BaseManager {
 			if(lr.getCancResult() != null){
 				from = udTo.getPersonalEmail();
 				to = udFrom.getPersonalEmail();
+				
+				because = WT.lookupResource(SERVICE_ID, udTo.getLocale(), DrmLocale.EMAIL_REMINDER_USER_FOOTER_BECAUSE);
 				
 				if (lr.getCancResult() == true) {
 					builder.greenMessage(lookupResource(udTo.getLocale(), DrmLocale.TPL_EMAIL_RESPONSEUPDATE_MSG_APPROVE));

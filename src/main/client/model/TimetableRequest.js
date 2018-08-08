@@ -64,5 +64,24 @@ Ext.define('Sonicle.webtop.drm.model.TimetableRequest', {
 	],
 	hasMany: [
 		WTF.hasMany('documents', 'Sonicle.webtop.drm.model.LeaveRequestDocument')
-	]
+	],
+	
+	setFromDate: function(date) {
+		var me = this,
+				dt = Ext.isDate(date) ? date : new Date(),
+				end = me.get('toDate'), v;
+		
+		v = me.setDatePart('fromDate', dt);
+		if (!Ext.isDate(end)) return;
+		if (v > end) me.set('toDate', v);
+	},	
+	setToDate: function(date) {
+		var me = this,
+				dt = Ext.isDate(date) ? date : new Date(),
+				sta = me.get('fromDate'), v;
+		
+		v = me.setDatePart('toDate', dt);
+		if (!Ext.isDate(sta)) return;
+		if (v < sta) me.set('fromDate', v);
+	}
 });

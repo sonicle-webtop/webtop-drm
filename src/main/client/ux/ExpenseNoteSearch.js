@@ -96,6 +96,7 @@ Ext.define('Sonicle.webtop.drm.ux.ExpenseNoteSearch', {
 				}),
 				{
 					xtype: 'datefield',
+					startDay: WT.getStartDay(),
 					reference: 'fldfrom',
 					bind: '{from}',
 					triggers: {
@@ -161,6 +162,7 @@ Ext.define('Sonicle.webtop.drm.ux.ExpenseNoteSearch', {
 				}),
 				{
 					xtype: 'datefield',
+					startDay: WT.getStartDay(),
 					reference: 'fldto',
 					bind: '{to}',
 					triggers: {

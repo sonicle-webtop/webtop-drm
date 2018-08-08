@@ -171,6 +171,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 							dataIndex: 'date',
 							editor: {
 								xtype: 'datefield',
+								startDay: WT.getStartDay(),
 								allowBlank: false,
 								selectOnFocus: true
 							},
@@ -203,7 +204,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 						me.addAct('delete', {
 							text: WT.res('act-delete.lbl'),
 							tooltip: null,
-							iconCls: 'wt-icon-delete-xs',
+							iconCls: 'wt-icon-delete',
 							handler: function () {
 								var sm = me.lref('gpHolidayDate').getSelectionModel();
 								me.deleteHolidayDate(sm.getSelection());
@@ -299,7 +300,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 						me.addAct('delete', {
 							text: WT.res('act-delete.lbl'),
 							tooltip: null,
-							iconCls: 'wt-icon-delete-xs',
+							iconCls: 'wt-icon-delete',
 							handler: function () {
 								var sel = me.lref('gpEmployeeProfile').getSelection()[0];
 								me.deleteEmployeeProfileUI(sel);
@@ -367,7 +368,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 						me.addAct('delete', {
 							text: WT.res('act-delete.lbl'),
 							tooltip: null,
-							iconCls: 'wt-icon-delete-xs',
+							iconCls: 'wt-icon-delete',
 							handler: function () {
 								var sel = me.lref('gpHourProfile').getSelection()[0];
 								me.deleteHourProfileUI(sel);

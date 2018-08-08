@@ -62,7 +62,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 				me.addAct('printWorkReport', {
 					text: null,
 					tooltip: WT.res('act-print.lbl'),
-					iconCls: 'wt-icon-print-xs',
+					iconCls: 'wt-icon-print',
 					handler: function() {
 						me.printWorkReport(me.getModel().getId());
 					}
@@ -226,6 +226,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											}
 										}), {
 											xtype: 'datefield',
+											startDay: WT.getStartDay(),
 											reference: 'fldfromdate',
 											bind: '{record.fromDate}',
 											format: WT.getShortDateFmt(),
@@ -309,6 +310,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 										}),
 										{
 											xtype: 'datefield',
+											startDay: WT.getStartDay(),
 											reference: 'fldtodate',
 											bind: '{record.toDate}',
 											tabIndex: 106,
@@ -365,6 +367,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 										}),
 										{
 											xtype: 'datefield',
+											startDay: WT.getStartDay(),
 											bind: '{record.ddtDate}',
 											format: WT.getShortDateFmt(),
 											fieldLabel: me.mys.res('workReport.fld-ddtToDate.lbl'),
@@ -519,7 +522,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 										me.addAct('delete', {
 											text: WT.res('act-delete.lbl'),
 											tooltip: null,
-											iconCls: 'wt-icon-delete-xs',
+											iconCls: 'wt-icon-delete',
 											handler: function () {
 												var sm = me.lref('gpReportRows').getSelectionModel();
 												me.deleteDetail(sm.getSelection());

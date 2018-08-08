@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Drm extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = -355026722;
+	private static final long serialVersionUID = 89911386;
 
 	/**
 	 * The reference instance of <code>drm</code>
@@ -51,6 +51,10 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_LEAVE_REQUEST_DOCUMENTS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_LEAVE_REQUESTS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_LINE_HOURS,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_OPPORTUNITIES,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_OPPORTUNITY_ACTION_INTERLOCUTORS,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_OPPORTUNITY_ACTIONS,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_OPPORTUNITY_INTERLOCUTORS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_MASTERDATA,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_MEMBERS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_SUPERVISED_USERS,
@@ -94,6 +98,13 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.tables.LineHours.LINE_HOURS,
 			com.sonicle.webtop.drm.jooq.tables.LineManagerUsers.LINE_MANAGER_USERS,
 			com.sonicle.webtop.drm.jooq.tables.LineManagers.LINE_MANAGERS,
+			com.sonicle.webtop.drm.jooq.tables.Opportunities.OPPORTUNITIES,
+			com.sonicle.webtop.drm.jooq.tables.OpportunityActionDocuments.OPPORTUNITY_ACTION_DOCUMENTS,
+			com.sonicle.webtop.drm.jooq.tables.OpportunityActionInterlocutors.OPPORTUNITY_ACTION_INTERLOCUTORS,
+			com.sonicle.webtop.drm.jooq.tables.OpportunityActions.OPPORTUNITY_ACTIONS,
+			com.sonicle.webtop.drm.jooq.tables.OpportunityDocuments.OPPORTUNITY_DOCUMENTS,
+			com.sonicle.webtop.drm.jooq.tables.OpportunityFields.OPPORTUNITY_FIELDS,
+			com.sonicle.webtop.drm.jooq.tables.OpportunityInterlocutors.OPPORTUNITY_INTERLOCUTORS,
 			com.sonicle.webtop.drm.jooq.tables.Profiles.PROFILES,
 			com.sonicle.webtop.drm.jooq.tables.ProfilesMasterdata.PROFILES_MASTERDATA,
 			com.sonicle.webtop.drm.jooq.tables.ProfilesMembers.PROFILES_MEMBERS,

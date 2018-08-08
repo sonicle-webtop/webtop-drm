@@ -799,3 +799,130 @@ ADD COLUMN "manage_stamp" bool DEFAULT false;
 
 ALTER TABLE "drm"."timetable_events"
 ADD COLUMN "leave_request_id" int4 NOT NULL;
+
+--------------
+--25/07/2018--
+--------------
+
+CREATE TABLE "drm"."opportunity_fields" (
+"domain_id" varchar(20) NOT NULL,
+"tab_id" varchar(32) NOT NULL,
+"field_id" varchar(32) NOT NULL,
+"visible" bool NOT NULL,
+"required" bool NOT NULL,
+"order" int4 NOT NULL,
+"label" varchar(32),
+PRIMARY KEY ("domain_id", "tab_id", "field_id")
+);
+
+INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'main','activity', 't', 't', '9', 'Attività');
+INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'main', 'causal', 't', 't', '8', 'Causale');
+INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'main', 'customer', 't', 't', '2', 'Cliente');
+INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'visit_report', 'customer_potential', 't', 't', '4', 'Potenzialità del Cliente');
+INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'main', 'description', 't', 't', '5', 'Descrizione');
+INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'visit_report', 'discoveries', 't', 't', '3', 'Scoperte');
+INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'main', 'executed_with', 't', 't', '1', 'Eseguito con');
+INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'main', 'interlocutors', 't', 't', '10', 'Interlocutori');
+INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'notes_signature', 'notes', 't', 't', '1', 'Note');
+INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'main', 'objective', 't', 't', '7', 'Obiettivo');
+INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'visit_report', 'objective', 't', 't', '1', 'Obiettivo');
+INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'main', 'place', 't', 't', '6', 'Luogo');
+INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'visit_report', 'result', 't', 't', '2', 'Esito');
+INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'main', 'sector', 't', 't', '4', 'Settore');
+INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'notes_signature', 'signature', 't', 't', '4', 'Firma');
+INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'notes_signature', 'signed_by', 't', 't', '3', 'Firmato da');
+INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'main', 'statistic_customer', 't', 't', '3', 'Destinazione');
+INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'notes_signature', 'status', 't', 't', '2', 'Status');
+INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'notes_signature', 'won', 't', 't', '5', 'Vinto');
+
+--------------
+--26/0/2018--
+--------------
+
+CREATE TABLE "drm"."opportunities" (
+"id" int4 NOT NULL,
+"domain_id" varchar(20) NOT NULL,
+"company_id" int4 NOT NULL,
+"operator_id" varchar(36) NOT NULL,
+"date" date NOT NULL,
+"from_hour" varchar(5),
+"to_hour" varchar(5),
+"executed_with" varchar(36),
+"customer_id" varchar(36),
+"customer_stat_id" varchar(36),
+"sector" varchar(255),
+"description" varchar(255),
+"place" varchar(36),
+"objective" text,
+"causal_id" int4,
+"activity_id" int4,
+"objective_2" text,
+"result" text,
+"discoveries" text,
+"customer_potential" text,
+"notes" text,
+"status_id" int4,
+"signed_by" varchar(36),
+"signature" bool,
+"won" bool,
+PRIMARY KEY ("id")
+);
+
+CREATE SEQUENCE "drm"."seq_opportunities";
+
+CREATE TABLE "drm"."opportunity_documents" (
+"id" varchar(36) NOT NULL,
+"opportunity_id" int4 NOT NULL,
+"revision_timestamp" timestamptz(6) NOT NULL,
+"revision_sequence" int2 NOT NULL,
+"filename" varchar(255) NOT NULL,
+"size" int4 NOT NULL,
+"media_tpye" varchar(100) NOT NULL,
+PRIMARY KEY ("id")
+);
+
+CREATE TABLE "drm"."opportunity_interlocutors" (
+"id" int4 NOT NULL,
+"opportunity_id" int4 NOT NULL,
+"contact_id" int4 NOT NULL,
+PRIMARY KEY ("id")
+);
+
+CREATE SEQUENCE "drm"."seq_opportunity_interlocutors";
+
+CREATE TABLE "drm"."opportunity_actions" (
+"id" int4 NOT NULL,
+"opportunity_id" int4 NOT NULL,
+"operator_id" varchar(36) NOT NULL,
+"status_id" int4,
+"date" date NOT NULL,
+"from_hour" varchar(5),
+"to_hour" varchar(5),
+"description" varchar(255),
+"place" varchar(36),
+"subsequent_actions" text,
+"activity_id" int4,
+PRIMARY KEY ("id")
+);
+
+CREATE SEQUENCE "drm"."seq_opportunity_actions";
+
+CREATE TABLE "drm"."opportunity_action_interlocutors" (
+"id" int4 NOT NULL,
+"opportunity_action_id" int4 NOT NULL,
+"contact_id" int4 NOT NULL,
+PRIMARY KEY ("id")
+);
+
+CREATE SEQUENCE "drm"."seq_opportunity_action_interlocutors";
+
+CREATE TABLE "drm"."opportunity_action_documents" (
+"id" varchar(36) NOT NULL,
+"opportunity_action_id" int4 NOT NULL,
+"revision_timestamp" timestamptz(6) NOT NULL,
+"revision_sequence" int2 NOT NULL,
+"filename" varchar(255) NOT NULL,
+"size" int4 NOT NULL,
+"media_tpye" varchar(100) NOT NULL,
+PRIMARY KEY ("id")
+);

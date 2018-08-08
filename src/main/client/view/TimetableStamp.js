@@ -92,6 +92,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableStamp', {
 							items: [
 								{
 									xtype: 'datefield',
+									startDay: WT.getStartDay(),
 									reference: 'fldfromdate',
 									bind: '{record.date}',
 									width: 105

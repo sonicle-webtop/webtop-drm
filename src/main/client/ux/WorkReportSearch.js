@@ -158,6 +158,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 				}),
 				{
 					xtype: 'datefield',
+					startDay: WT.getStartDay(),
 					reference: 'fldfrom',
 					bind: '{from}',
 					tabIndex: 5,
@@ -310,6 +311,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 				}),
 				{
 					xtype: 'datefield',
+					startDay: WT.getStartDay(),
 					reference: 'fldto',
 					bind: '{to}',
 					tabIndex: 6,

@@ -46,6 +46,33 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 	},
 	fieldTitle: 'leaveRequestId',
 	modelName: 'Sonicle.webtop.drm.model.TimetableRequest',
+	
+	constructor: function(cfg) {
+		var me = this;
+		me.callParent([cfg]);
+		
+		WTU.applyFormulas(me.getVM(), {
+			fromDate: {
+				bind: {bindTo: '{record.fromDate}'},
+				get: function(val) {
+					return (val) ? Ext.Date.clone(val): null;
+				},
+				set: function(val) {
+					this.get('record').setFromDate(val);
+				}
+			},
+			toDate: {
+				bind: {bindTo: '{record.toDate}'},
+				get: function(val) {
+					return (val) ? Ext.Date.clone(val): null;
+				},
+				set: function(val) {
+					this.get('record').setToDate(val);
+				}
+			}
+		});
+	},
+	
 	initComponent: function () {
 		var me = this,
 			gpId = Ext.id(null, 'gridpanel');
@@ -207,25 +234,17 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 									items: [
 										{
 											xtype: 'datefield',
+											startDay: WT.getStartDay(),
 											reference: 'fldfromdate',
-											bind: '{record.fromDate}',
-											fieldLabel: me.mys.res('timetableRequest.fld-fromDate.lbl'),
-											listeners: {
-												select: function (t, v, o) {
-													if(v > me.lref('fldtodate').getValue()) me.lref('fldtodate').setValue(v);
-												}
-											}
+											bind: '{fromDate}',
+											fieldLabel: me.mys.res('timetableRequest.fld-fromDate.lbl')
 										},
 										{
 											xtype: 'datefield',
+											startDay: WT.getStartDay(),
 											reference: 'fldtodate',
-											bind: '{record.toDate}',
-											fieldLabel: me.mys.res('timetableRequest.fld-toDate.lbl'),
-											listeners: {
-												select: function (t, v, o) {
-													if(v < me.lref('fldfromdate').getValue()) me.lref('fldfromdate').setValue(v);
-												}
-											}
+											bind: '{toDate}',
+											fieldLabel: me.mys.res('timetableRequest.fld-toDate.lbl')
 										}
 									]
 								},

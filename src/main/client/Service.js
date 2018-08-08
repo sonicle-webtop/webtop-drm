@@ -12,6 +12,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		'WTA.ux.data.EmptyModel',
 		'WTA.ux.data.SimpleModel',
 		'WTA.ux.panel.Fields',
+		'Sonicle.webtop.drm.model.GridOpportunities',
+		'Sonicle.webtop.drm.ux.OpportunitySearch',
+		'Sonicle.webtop.drm.view.Opportunity',
 		'Sonicle.webtop.drm.model.GridWorkReports',
 		'Sonicle.webtop.drm.ux.WorkReportSearch',
 		'Sonicle.webtop.drm.view.WorkReport',
@@ -79,6 +82,96 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			items: [
 				{xtype: 'panel'},
 				{
+					xtype: 'container',
+					itemId: 'op',
+					layout: 'border',
+					items: [
+						{
+							region: 'north',
+							xtype: 'wtdrmopportunitysearch',
+							reference: 'filtersOpportunity',
+							title: me.res('gpOpportunity.tit.lbl'),
+							iconCls: 'wtdrm-icon-opportunity-xs',
+							titleCollapse: true,
+							collapsible: true,
+							sid: me.ID,
+							listeners: {
+								search: function(s, query){
+									me.reloadOpportunity(query);
+								}
+							}
+						},
+						{
+							region: 'center',
+							xtype: 'grid',
+							reference: 'gpOpportunity',
+							store: {
+								autoLoad: false,
+								model: 'Sonicle.webtop.drm.model.GridOpportunities',
+								proxy: WTF.apiProxy(me.ID, 'ManageGridOpportunity')
+							},
+							columns: [
+								{
+									xtype: 'solookupcolumn',
+									dataIndex: 'companyId',
+									store: {
+										autoLoad: true,
+										model: 'WTA.model.Simple',
+										proxy: WTF.proxy(me.ID, 'LookupAllCompanies')
+									},
+									header: me.res('gpOpportunity.company.lbl'),
+									displayField: 'desc',
+									flex: 1,
+									hidden: true
+								},
+								{
+									xtype: 'solookupcolumn',
+									dataIndex: 'operatorId',
+									store: {
+										autoLoad: true,
+										model: 'WTA.model.Simple',
+										proxy: WTF.proxy(WT.ID, 'LookupDomainUsers')
+									},
+									header: me.res('gpOpportunity.user.lbl'),
+									displayField: 'desc',
+									flex: 1
+								},
+								{
+									dataIndex: 'date',
+									header: me.res('gpOpportunity.date.lbl'),
+									xtype: 'datecolumn',
+									format: WT.getShortDateFmt(),
+									flex: 1
+								},
+								{
+									dataIndex: 'fromHour',
+									header: me.res('gpOpportunity.fromhour.lbl'),
+									flex: 1
+								},
+								{
+									dataIndex: 'toHour',
+									header: me.res('gpOpportunity.tohour.lbl'),
+									flex: 1
+								}
+							],
+							tbar: [
+								me.getAct('opportunity', 'add'),
+								'-',
+								me.getAct('opportunity', 'edit'),
+								me.getAct('opportunity', 'remove')
+							],
+							listeners: {
+								rowclick: function (s, rec) {
+									me.getAct('opportunity', 'edit').setDisabled(false);
+									me.getAct('opportunity', 'remove').setDisabled(false);
+								},
+								rowdblclick: function (s, rec) {
+									me.editOpportunityUI(rec);
+								}
+							}
+						}
+					]
+				},{
 					xtype: 'container',
 					itemId: 'wr',
 					layout: 'border',
@@ -681,63 +774,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								me.getAct('timetableRequest', 'cancel')
 							],
 							listeners: {
-								rowclick: function (s, rec) {
-									if(rec.get("userId") === WT.getVar('userId')){
-										//se sono l'utente loggato ad aver effettuato la richiesta disabilito pulsanti del supervisore
-										me.getAct('timetableRequest', 'approve').setDisabled(true);
-										me.getAct('timetableRequest', 'decline').setDisabled(true);
-										me.getAct('timetableRequest', 'cancel').setDisabled(true);
-										if(rec.get('status') === 'D'){
-											//e se la richiesta è stata cancellata, disabilito tutti i pulsanti
-											me.getAct('timetableRequest', 'edit').setDisabled(true);
-											me.getAct('timetableRequest', 'remove').setDisabled(true);
-											me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
-										}else if(rec.get('result') === null){
-											//e se il supervisore non ha ancora gestito la richiesta, abilito update, delete e disabilito request delete
-											me.getAct('timetableRequest', 'edit').setDisabled(false);
-											me.getAct('timetableRequest', 'remove').setDisabled(false);
-											me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
-										}else if(rec.get('result') !== null){
-											//e se il supervisore ha già gestito la richiesta, disabilito update, delete e abilito request delete
-											me.getAct('timetableRequest', 'edit').setDisabled(true);
-											me.getAct('timetableRequest', 'remove').setDisabled(true);
-											me.getAct('timetableRequest', 'requestcancellation').setDisabled(false);
-										}
-									}else if(rec.get("managerId") === WT.getVar('userId')){
-										//se sono l'utente loggato ad essere il supervisore
-										if(rec.get("userId") !== WT.getVar('userId')){
-											//e se non sono su una mia richiesta
-											if(rec.get('status') === 'D'){
-												//e se la richiesta è stata cancellata, disabilito tutti i pulsanti
-												me.getAct('timetableRequest', 'edit').setDisabled(true);
-												me.getAct('timetableRequest', 'remove').setDisabled(true);
-												me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
-												me.getAct('timetableRequest', 'approve').setDisabled(true);
-												me.getAct('timetableRequest', 'decline').setDisabled(true);
-												me.getAct('timetableRequest', 'cancel').setDisabled(true);
-											}else if(rec.get('result') === null){
-												//e se non ho ancora gestito la richiesta, abilito approve e decline e disabilito tutto il resto
-												me.getAct('timetableRequest', 'approve').setDisabled(false);
-												me.getAct('timetableRequest', 'decline').setDisabled(false);
-												me.getAct('timetableRequest', 'edit').setDisabled(true);
-												me.getAct('timetableRequest', 'remove').setDisabled(true);
-												me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
-												me.getAct('timetableRequest', 'cancel').setDisabled(true);
-											}else if(rec.get('result') !== null){
-												//e se ho già gestito la richiesta, disabilito tutto
-												me.getAct('timetableRequest', 'edit').setDisabled(true);
-												me.getAct('timetableRequest', 'remove').setDisabled(true);
-												me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
-												me.getAct('timetableRequest', 'approve').setDisabled(true);
-												me.getAct('timetableRequest', 'decline').setDisabled(true);
-												me.getAct('timetableRequest', 'cancel').setDisabled(true);
-												if(rec.get('employeeCancReq') === true && rec.get('status') === 'C'){
-													//ma se lo status della richiesta è chiuso ed è stata richiesta la cancellazione, abilito pulsante cancel
-													me.getAct('timetableRequest', 'cancel').setDisabled(false);
-												}
-											}
-										}
-									}
+								selectionchange: function (t, recs) {
+									me.updateTimetableRequestAction(recs[0]);
+									
 								},
 								rowdblclick: function (s, rec) {
 									me.editTimetableRequestUI(rec);
@@ -974,6 +1013,18 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		}));
 	},
 	
+	filtersOpportunity: function () {
+		return this.getMainComponent().lookupReference('filtersOpportunity');
+	},
+	
+	gpOpportunity: function () {
+		return this.getMainComponent().lookupReference('gpOpportunity');
+	},
+	
+	gpOpportunitySelected: function () {
+		return this.getMainComponent().lookupReference('gpOpportunity').getSelection()[0];
+	},
+	
 	filtersWorkReport: function () {
 		return this.getMainComponent().lookupReference('filtersWorkReport');
 	},
@@ -1054,6 +1105,16 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				}
 			});
 		}
+		if (WT.isPermitted(me.ID,'OPPORTUNITY_SETTINGS','MANAGE')){
+			me.addAct('toolbox', 'opSetting', {
+				text: me.res('toolbox.op-settings.lbl'),
+				tooltip: null,
+				iconCls: 'wt-icon-options-xs',
+				handler: function () {
+					me.opportunitySetting();
+				}
+			});
+		}
 		if (WT.isPermitted(me.ID,'WORK_REPORT_SETTINGS','MANAGE')){
 			me.addAct('toolbox', 'wrSetting', {
 				text: me.res('toolbox.wr-settings.lbl'),
@@ -1084,6 +1145,40 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				}
 			});
 		}
+		me.addAct('opportunity', 'add', {
+			text: WT.res('act-add.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-add-xs',
+			handler: function () {
+				me.addOpportunity({
+					callback: function (success) {
+						if (success) {
+							me.filtersOpportunity().extractData();
+						}
+					}
+				});
+			}
+		});
+		me.addAct('opportunity', 'edit', {
+			text: WT.res('act-edit.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-edit-xs',
+			disabled: true,
+			handler: function () {
+				var sel = me.gpOpportunitySelected();
+				me.editOpportunityUI(sel);
+			}
+		});
+		me.addAct('opportunity', 'remove', {
+			text: WT.res('act-remove.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-remove-xs',
+			disabled: true,
+			handler: function () {
+				var sel = me.gpOpportunitySelected();
+				me.deleteOpportunityUI(sel);
+			}
+		});
 		me.addAct('workReport', 'add', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
@@ -1240,7 +1335,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('timetableReport', 'print', {
 			text: WT.res('act-print.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-print-xs',
+			iconCls: 'wt-icon-print',
 			handler: function () {
 				me.printTimetableReport();
 			}
@@ -1284,6 +1379,103 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		var me = this;
 	},
 
+	addOpportunity: function (opts) {
+		opts = opts || {};
+
+		var me = this,
+			fop = me.filtersOpportunity(),
+			vct = WT.createView(me.ID, 'view.Opportunity');
+		vct.getView().on('viewsave', function (s, success, model) {
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vct.show(false,
+			function () {
+				vct.getView().begin('new', {
+					data: {
+						operatorId: fop.getOperatorId()
+					}
+				});
+			});
+	},
+	editOpportunityUI: function (rec) {
+		var me = this;
+		me.editOpportunity(rec.get('id'), {
+			callback: function (success, model) {
+				if (success) {
+					this.gpOpportunity().getStore().load();
+				} else {
+					alert('error');
+				}
+			}
+		});
+	},
+	editOpportunity: function (id, opts) {
+		opts = opts || {};
+		var me = this,
+				vct = WT.createView(me.ID, 'view.Opportunity');
+		vct.getView().on('viewsave', function (s, success, model) {
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vct.show(false,
+				function () {
+					vct.getView().begin('edit', {
+						data: {
+							id: id
+						}
+					});
+				});
+	},
+	deleteOpportunityUI: function (rec) {
+		var me = this,
+				sto = me.gpOpportunity().getStore(),
+				msg;
+		if (rec) {
+			msg = me.res('act.confirm.delete', Ext.String.ellipsis(rec.get('id'), 40));
+		} else {
+			msg = me.res('gpOpportunity.confirm.delete.selection');
+		}
+		WT.confirm(msg, function (bid) {
+			if (bid === 'yes') {
+				me.deleteOpportunity(rec.get('id'), {
+					callback: function (success) {
+						if (success)
+							sto.remove(rec);
+					}
+				});
+			}
+		});
+	},
+	deleteOpportunity: function (id, opts) {
+		opts = opts || {};
+		var me = this;
+		WT.ajaxReq(me.ID, 'ManageOpportunity', {
+			params: {
+				crud: 'delete',
+				ids: WTU.arrayAsParam(id)
+			},
+			callback: function (success, json) {
+				Ext.callback(opts.callback, opts.scope || me, [success, json]);
+			}
+		});
+	},
+	opportunitySetting: function (opts) {
+		opts = opts || {};
+
+		var me = this,
+				vct = WT.createView(me.ID, 'view.OpportunitySetting');
+		vct.getView().on('viewsave', function (s, success, model) { 
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vct.show(false,
+				function () {
+					vct.getView().begin('edit', {
+						data: {
+							id: 'op'
+						}
+					});
+				});
+	},
+	
 	addWorkReport: function (opts) {
 		opts = opts || {};
 
@@ -1379,6 +1571,19 @@ Ext.define('Sonicle.webtop.drm.Service', {
 						}
 					});
 				});
+	},
+	reloadOpportunity: function (query) {
+		var me = this,
+				pars = {},
+				sto;
+		if (me.isActive() && me.itemActiveId() === 'op') {
+			sto = me.gpOpportunity().getStore();
+			if (query !== undefined)
+				Ext.apply(pars, {query: Ext.JSON.encode(query)});
+			WTU.loadWithExtraParams(sto, pars);
+		} else {
+			me.needsReload = true;
+		}
 	},
 	reloadWorkReport: function (query) {
 		var me = this,
@@ -1490,6 +1695,68 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			me.needsReload = true;
 		}
 	},
+	updateTimetableRequestAction: function (sel){
+		var me = this;
+		
+		if(sel){
+			if(sel.get("userId") === WT.getVar('userId')){
+				//se sono l'utente loggato ad aver effettuato la richiesta disabilito pulsanti del supervisore
+				me.getAct('timetableRequest', 'approve').setDisabled(true);
+				me.getAct('timetableRequest', 'decline').setDisabled(true);
+				me.getAct('timetableRequest', 'cancel').setDisabled(true);
+				if(sel.get('status') === 'D'){
+					//e se la richiesta è stata cancellata, disabilito tutti i pulsanti
+					me.getAct('timetableRequest', 'edit').setDisabled(true);
+					me.getAct('timetableRequest', 'remove').setDisabled(true);
+					me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
+				}else if(sel.get('result') === null){
+					//e se il supervisore non ha ancora gestito la richiesta, abilito update, delete e disabilito request delete
+					me.getAct('timetableRequest', 'edit').setDisabled(false);
+					me.getAct('timetableRequest', 'remove').setDisabled(false);
+					me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
+				}else if(sel.get('result') !== null){
+					//e se il supervisore ha già gestito la richiesta, disabilito update, delete e abilito request delete
+					me.getAct('timetableRequest', 'edit').setDisabled(true);
+					me.getAct('timetableRequest', 'remove').setDisabled(true);
+					me.getAct('timetableRequest', 'requestcancellation').setDisabled(false);
+				}
+			}else if(sel.get("managerId") === WT.getVar('userId')){
+				//se sono l'utente loggato ad essere il supervisore
+				if(sel.get("userId") !== WT.getVar('userId')){
+					//e se non sono su una mia richiesta
+					if(sel.get('status') === 'D'){
+						//e se la richiesta è stata cancellata, disabilito tutti i pulsanti
+						me.getAct('timetableRequest', 'edit').setDisabled(true);
+						me.getAct('timetableRequest', 'remove').setDisabled(true);
+						me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
+						me.getAct('timetableRequest', 'approve').setDisabled(true);
+						me.getAct('timetableRequest', 'decline').setDisabled(true);
+						me.getAct('timetableRequest', 'cancel').setDisabled(true);
+					}else if(sel.get('result') === null){
+						//e se non ho ancora gestito la richiesta, abilito approve e decline e disabilito tutto il resto
+						me.getAct('timetableRequest', 'approve').setDisabled(false);
+						me.getAct('timetableRequest', 'decline').setDisabled(false);
+						me.getAct('timetableRequest', 'edit').setDisabled(true);
+						me.getAct('timetableRequest', 'remove').setDisabled(true);
+						me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
+						me.getAct('timetableRequest', 'cancel').setDisabled(true);
+					}else if(sel.get('result') !== null){
+						//e se ho già gestito la richiesta, disabilito tutto
+						me.getAct('timetableRequest', 'edit').setDisabled(true);
+						me.getAct('timetableRequest', 'remove').setDisabled(true);
+						me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
+						me.getAct('timetableRequest', 'approve').setDisabled(true);
+						me.getAct('timetableRequest', 'decline').setDisabled(true);
+						me.getAct('timetableRequest', 'cancel').setDisabled(true);
+						if(sel.get('employeeCancReq') === true && sel.get('status') === 'C'){
+							//ma se lo status della richiesta è chiuso ed è stata richiesta la cancellazione, abilito pulsante cancel
+							me.getAct('timetableRequest', 'cancel').setDisabled(false);
+						}
+					}
+				}
+			}
+		}
+	},
 	addTimetableRequest: function (opts) {
 		opts = opts || {};
 
@@ -1583,6 +1850,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					callback: function (success) {
 						if (success) {
 							this.gpTimetableRequest().getStore().load();
+							me.getAct('timetableRequest', 'approve').setDisabled(true);
+							me.getAct('timetableRequest', 'decline').setDisabled(true);
 						} else {
 							alert('error');
 						}
@@ -1662,6 +1931,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					callback: function (success) {
 						if (success) {
 							this.gpTimetableRequest().getStore().load();
+							me.getAct('timetableRequest', 'cancel').setDisabled(true);
 						} else {
 							alert('error');
 						}
@@ -1858,22 +2128,24 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		
 		switch (tabIndex){
 			case 1:
-				me.reloadWorkReport(me.filtersWorkReport().getData());
 				break;
 			case 2:
+				me.reloadWorkReport(me.filtersWorkReport().getData());
 				break;
 			case 3:
 				break;
 			case 4:
+				break;
+			case 5:
 				me.enablingStampButtons();
 				me.enablingManageStampsButtons();
 				me.getMainComponent().lookupReference('gpTimetable').getStore().reload();
 				me.reloadTimetableStamp(me.filtersTimetableStamp().getData());
 				break;
-			case 5:
+			case 6:
 				me.reloadTimetableRequest(me.filtersTimetableRequest().getData());
 				break;
-			case 6:
+			case 7:
 				me.reloadTimetableReport(null);
 				break;
 		}

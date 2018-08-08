@@ -98,6 +98,7 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 				}),
 				{
 					xtype: 'datefield',
+					startDay: WT.getStartDay(),
 					reference: 'fldfrom',
 					bind: '{fromDate}',
 					triggers: {
@@ -175,6 +176,7 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 				}),
 				{
 					xtype: 'datefield',
+					startDay: WT.getStartDay(),
 					reference: 'fldto',
 					bind: '{toDate}',
 					triggers: {

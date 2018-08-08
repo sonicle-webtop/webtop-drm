@@ -142,16 +142,6 @@ public class PublicService extends BasePublicService {
 		}
 	}
 	
-	private void writeEventPage(HttpServletRequest request, HttpServletResponse response, WebTopSession wts, String view) throws IOException, TemplateException {
-		writeEventPage(request, response, wts, view, new JsWTSPublic.Vars());
-	}
-	
-	private void writeEventPage(HttpServletRequest request, HttpServletResponse response, WebTopSession wts, String view, JsWTSPublic.Vars vars) throws IOException, TemplateException {
-		vars.put("view", view);
-		vars.put("eventData", buildEventData());
-		writePage(response, wts, vars, ServletHelper.getBaseUrl(request));
-	}
-	
 	private void writeErrorPage(HttpServletRequest request, HttpServletResponse response, WebTopSession wts, String reskey) throws IOException, TemplateException {
 		JsWTSPublic.Vars vars = new JsWTSPublic.Vars();
 		vars.put("view", "Error");
@@ -164,10 +154,6 @@ public class PublicService extends BasePublicService {
 		vars.put("view", "LeaveRequest");
 		vars.put("reskey", reskey);
 		writePage(response, wts, vars, ServletHelper.getBaseUrl(request));
-	}
-	
-	private String buildEventData() {
-		return JsonResult.GSON.toJson(true);
 	}
 	
 	public static class LeaveRequestUrlPath extends BasePublicService.UrlPathTokens {

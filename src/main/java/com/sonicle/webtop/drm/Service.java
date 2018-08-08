@@ -76,6 +76,7 @@ import com.sonicle.webtop.drm.bol.OEmployeeProfile;
 import com.sonicle.webtop.drm.bol.OHourProfile;
 import com.sonicle.webtop.drm.bol.OLeaveRequest;
 import com.sonicle.webtop.drm.bol.OLeaveRequestType;
+import com.sonicle.webtop.drm.bol.OOpportunity;
 import com.sonicle.webtop.drm.bol.OTimetableReport;
 import com.sonicle.webtop.drm.bol.OTimetableStamp;
 import com.sonicle.webtop.drm.bol.OWorkReport;
@@ -94,6 +95,7 @@ import com.sonicle.webtop.drm.bol.js.JsGridFolders;
 import com.sonicle.webtop.drm.bol.js.JsGridHourProfile;
 import com.sonicle.webtop.drm.bol.js.JsGridLeaveRequest;
 import com.sonicle.webtop.drm.bol.js.JsGridLineManager;
+import com.sonicle.webtop.drm.bol.js.JsGridOpportunity;
 import com.sonicle.webtop.drm.bol.js.JsGridProfiles;
 import com.sonicle.webtop.drm.bol.js.JsGridTimetableReport;
 import com.sonicle.webtop.drm.bol.js.JsGridTimetableStamp;
@@ -101,6 +103,8 @@ import com.sonicle.webtop.drm.bol.js.JsGridTimetableStampList;
 import com.sonicle.webtop.drm.bol.js.JsGridWorkReports;
 import com.sonicle.webtop.drm.bol.js.JsHourProfile;
 import com.sonicle.webtop.drm.bol.js.JsLeaveRequest;
+import com.sonicle.webtop.drm.bol.js.JsOpportunity;
+import com.sonicle.webtop.drm.bol.js.JsOpportunitySetting;
 import com.sonicle.webtop.drm.bol.js.JsTimetableSetting;
 import com.sonicle.webtop.drm.bol.js.JsTimetableStamp;
 import com.sonicle.webtop.drm.bol.js.JsWorkReport;
@@ -120,6 +124,9 @@ import com.sonicle.webtop.drm.model.GroupCategory;
 import com.sonicle.webtop.drm.model.HourProfile;
 import com.sonicle.webtop.drm.model.LeaveRequest;
 import com.sonicle.webtop.drm.model.LeaveRequestDocument;
+import com.sonicle.webtop.drm.model.Opportunity;
+import com.sonicle.webtop.drm.model.OpportunityDocument;
+import com.sonicle.webtop.drm.model.OpportunitySetting;
 import com.sonicle.webtop.drm.model.TimetableReport;
 import com.sonicle.webtop.drm.model.TimetableSetting;
 import com.sonicle.webtop.drm.model.TimetableStamp;
@@ -175,7 +182,9 @@ public class Service extends BaseService {
 		ss = new DrmServiceSettings(SERVICE_ID, pid.getDomainId());
 
 		RootProgramNode prog = null;
-		ProgramNode subProg = null;
+		
+		prog = new RootProgramNode(lookupResource(DrmTreeNode.OPPORTUNITY), "wtdrm-icon-opportunity-xs");
+		programs.put(prog.getId(), prog);
 
 		prog = new RootProgramNode(lookupResource(DrmTreeNode.WORK_REPORT), "wtdrm-icon-workreport-xs");
 		programs.put(prog.getId(), prog);
@@ -1143,6 +1152,95 @@ public class Service extends BaseService {
 			logger.error("Error in action ManageCompany", ex);
 		}
 	}
+	
+	public void processManageGridOpportunity(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			DateTimeZone ptz = getEnv().getProfile().getTimeZone();
+			if (crud.equals(Crud.READ)) {
+
+				String query = ServletUtils.getStringParameter(request, "query", null);
+				OpportunityQuery oQuery = OpportunityQuery.fromJson(query);
+				List<JsGridOpportunity> jsGridOpportunity = new ArrayList();
+
+				for (OOpportunity o : manager.listOpportunities(oQuery)) {
+					jsGridOpportunity.add(new JsGridOpportunity(o));
+				}
+
+				new JsonResult(jsGridOpportunity).printTo(out);
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageGridOpportunity", ex);
+		}
+	}
+	
+	public void processManageOpportunity(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		JsOpportunity item = null;
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			HashMap<String, File> files = new HashMap<>();
+			if (crud.equals(Crud.READ)) {
+
+				Integer id = ServletUtils.getIntParameter(request, "id", true);
+
+				Opportunity o = manager.getOpportunity(id);
+
+				item = new JsOpportunity(o);
+
+				new JsonResult(item).printTo(out);
+
+			} else if (crud.equals(Crud.CREATE)) {
+
+				Payload<MapItem, JsOpportunity> pl = ServletUtils.getPayload(request, JsOpportunity.class);
+
+				Opportunity o = JsOpportunity.createOpportunity(pl.data);
+				
+				for (OpportunityDocument doc : o.getDocuments()) {
+
+					WebTopSession.UploadedFile uf = getUploadedFile(doc.getId().toString());
+
+					if (uf != null) {
+						files.put(uf.getUploadId(), uf.getFile());
+					}
+				}
+
+				manager.addOpportunity(o, files);
+
+				new JsonResult().printTo(out);
+
+			} else if (crud.equals(Crud.UPDATE)) {
+
+				Payload<MapItem, JsOpportunity> pl = ServletUtils.getPayload(request, JsOpportunity.class);
+
+				Opportunity o = JsOpportunity.createOpportunity(pl.data);
+				
+				for (OpportunityDocument doc : o.getDocuments()) {
+
+					WebTopSession.UploadedFile uf = getUploadedFile(doc.getId().toString());
+
+					if (uf != null) {
+						files.put(uf.getUploadId(), uf.getFile());
+					}
+				}
+
+				manager.updateOpportunity(o, files);
+
+				new JsonResult().printTo(out);
+
+			} else if (crud.equals(Crud.DELETE)) {
+
+				StringArray ids = ServletUtils.getObjectParameter(request, "ids", StringArray.class, true);
+
+				manager.deleteOpportunity(Integer.parseInt(ids.get(0)));
+
+				new JsonResult().printTo(out);
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageOpportunity", ex);
+		}
+	}
 
 	public void processManageGridWorkReport(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
@@ -1335,6 +1433,86 @@ public class Service extends BaseService {
 			logger.error("Error in action ManageCancellationLeaveRequest", ex);
 		}
 	}
+	
+	public void processDownloadOpportunityDocument(HttpServletRequest request, HttpServletResponse response) {
+
+		try {
+			StringArray documentIds = ServletUtils.getObjectParameter(request, "documentIds", StringArray.class, true);
+
+			Integer raw = ServletUtils.getIntParameter(request, "raw", 0);
+
+			String fileId = documentIds.get(0);
+
+			InputStream is = null;
+			FileContent fc = null;
+			try {
+
+				if (hasUploadedFile(fileId)) {
+					fc = toFileContent(getUploadedFile(fileId));
+				} else {
+					fc = manager.getOpportunityDocumentContent(fileId);
+				}
+
+				is = fc.getStream();
+
+				OutputStream os = response.getOutputStream();
+				ServletUtils.setContentLengthHeader(response, fc.getSize());
+				if (raw == 1) {
+					ServletUtils.setFileStreamHeadersForceDownload(response, fc.getFilename());
+				} else {
+					ServletUtils.setFileStreamHeaders(response, fc.getMediaType(), fc.getFilename());
+				}
+				IOUtils.copy(is, os);
+
+			} finally {
+				IOUtils.closeQuietly(is);
+			}
+
+		} catch (Exception ex) {
+			logger.error("Error in action DownloadFiles", ex);
+			ServletUtils.writeErrorHandlingJs(response, ex.getMessage());
+		}
+	}
+	
+	public void processDownloadOpportunityActionDocument(HttpServletRequest request, HttpServletResponse response) {
+
+		try {
+			StringArray documentIds = ServletUtils.getObjectParameter(request, "documentIds", StringArray.class, true);
+
+			Integer raw = ServletUtils.getIntParameter(request, "raw", 0);
+
+			String fileId = documentIds.get(0);
+
+			InputStream is = null;
+			FileContent fc = null;
+			try {
+
+				if (hasUploadedFile(fileId)) {
+					fc = toFileContent(getUploadedFile(fileId));
+				} else {
+					fc = manager.getOpportunityActionDocumentContent(fileId);
+				}
+
+				is = fc.getStream();
+
+				OutputStream os = response.getOutputStream();
+				ServletUtils.setContentLengthHeader(response, fc.getSize());
+				if (raw == 1) {
+					ServletUtils.setFileStreamHeadersForceDownload(response, fc.getFilename());
+				} else {
+					ServletUtils.setFileStreamHeaders(response, fc.getMediaType(), fc.getFilename());
+				}
+				IOUtils.copy(is, os);
+
+			} finally {
+				IOUtils.closeQuietly(is);
+			}
+
+		} catch (Exception ex) {
+			logger.error("Error in action DownloadFiles", ex);
+			ServletUtils.writeErrorHandlingJs(response, ex.getMessage());
+		}
+	}
 
 	public void processDownloadWorkReportAttachment(HttpServletRequest request, HttpServletResponse response) {
 
@@ -1428,7 +1606,52 @@ public class Service extends BaseService {
 			throw new WTException("File non found", ex);
 		}
 	}
+	
+	public void processInitializeOpportunityFields(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try{
+			manager.initializeOpportunityFields();
 
+			new JsonResult(true).printTo(out);
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action InitializeOpportunityFields", ex);
+		}
+	}
+
+	public void processManageOpportunitySetting(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		JsOpportunitySetting item = null;
+		
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+
+			if (crud.equals(Crud.READ)) {
+
+				OpportunitySetting setting = manager.getOpportunitySetting();
+
+				if (setting != null) {
+					item = new JsOpportunitySetting(setting);
+				} else {
+					item = new JsOpportunitySetting(new OpportunitySetting());
+				}
+
+				new JsonResult(item).printTo(out);
+
+			} else if (crud.equals(Crud.UPDATE)) {
+
+				Payload<MapItem, JsOpportunitySetting> pl = ServletUtils.getPayload(request, JsOpportunitySetting.class);
+
+				OpportunitySetting setting = JsOpportunitySetting.createOpportunitySetting(pl.data);
+				
+				manager.updateOpportunitySetting(setting);
+
+				new JsonResult().printTo(out);
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageOpportunitySetting", ex);
+		}
+	}
+	
 	public void processManageWorkReportSetting(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		JsWorkReportSetting item = null;
 		try {
