@@ -40,7 +40,7 @@ import com.sonicle.webtop.core.bol.js.JsWTSPublic;
 import com.sonicle.webtop.core.sdk.BasePublicService;
 import com.sonicle.webtop.core.sdk.UserProfileId;
 import com.sonicle.webtop.core.sdk.WTException;
-import com.sonicle.webtop.core.servlet.ServletHelper;
+import com.sonicle.webtop.core.app.servlet.ServletHelper;
 import static com.sonicle.webtop.drm.Service.logger;
 import com.sonicle.webtop.drm.model.LeaveRequest;
 import freemarker.template.TemplateException;
