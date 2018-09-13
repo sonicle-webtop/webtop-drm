@@ -37,7 +37,8 @@ Ext.define('Sonicle.webtop.drm.model.OpportunityInterlocutor', {
 	fields: [
 		WTF.field('id', 'int', false),
 		WTF.field('opportunityId', 'int', false),
-		WTF.field('contactId', 'int', false)
+		WTF.field('contactId', 'int', false),
+		WTF.field('desc', 'string', false)
 	]
 });
 

@@ -36,19 +36,25 @@ Ext.define('Sonicle.webtop.drm.model.OpportunityAction', {
 		'Sonicle.webtop.drm.model.OpportunityActionInterlocutor',
 		'Sonicle.webtop.drm.model.OpportunityActionDocument'
 	],
+	proxy: WTF.memoryProxy('data', {
+		writer: {
+			type: 'sojson',
+			writeAssociations: true
+		}
+	}),
 	identifier: 'negative',
 	idProperty: 'id',
 	fields: [
 		WTF.field('id', 'int', false),
-		WTF.field('opportunityId', 'int', false),
+		WTF.field('opportunityId', 'int', true),
 		WTF.field('operatorId', 'string', false),
-		WTF.field('statusId', 'int', true),
+		WTF.field('statusId', 'int', false),
 		WTF.field('date', 'date', false, {dateFormat: 'Y-m-d', defaultValue: new Date()}),
-		WTF.field('fromHour', 'string', true),
-		WTF.field('toHour', 'string', true),
-		WTF.field('description', 'string', true),
+		WTF.field('fromHour', 'string', false),
+		WTF.field('toHour', 'string', false),
+		WTF.field('description', 'string', false),
 		WTF.field('place', 'string', true),
-		WTF.field('subsequentActions', 'string', true),
+		WTF.field('subsequentActions', 'string', false),
 		WTF.field('activityId', 'string', true)
 	],
 	hasMany: [

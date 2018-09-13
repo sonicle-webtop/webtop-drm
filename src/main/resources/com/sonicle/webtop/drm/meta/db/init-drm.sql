@@ -836,7 +836,7 @@ INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'notes_signature', 'status',
 INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'notes_signature', 'won', 't', 't', '5', 'Vinto');
 
 --------------
---26/0/2018--
+--26/07/2018--
 --------------
 
 CREATE TABLE "drm"."opportunities" (

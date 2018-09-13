@@ -517,7 +517,7 @@ public class Service extends BaseService {
 			logger.error("Error in action LookupBusinessTrip", ex);
 		}
 	}
-
+	
 	public void processLookupContacts(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			List<JsSimpleSource> contacts = new ArrayList();

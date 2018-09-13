@@ -59,4 +59,5 @@
 .timetablerequest-grid-row-ownrequests { background-color: rgba(249, 249, 147, 0.6); }
 
 .wtdrm-icon-opportunity-initializefields-xs { background-image: url('opportunity_initializefields_16.png') !important; }
-.wtdrm-icon-opportunity-xs { background-image: url('opportunity_16.png') !important; }
+
+.wtdrm-icon-opportunityaction-xs { background-image: url('opportunityaction_16.png') !important; }

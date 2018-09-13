@@ -40,7 +40,8 @@ Ext.define('Sonicle.webtop.drm.view.HourProfile', {
 		iconCls: 'wtdrm-icon-configuration-ourprofile-xs',
 		width: 1160,
 		height: 500,
-		modal: true
+		modal: true,
+		minimizable: false
 	},
 	fieldTitle: 'description',
 	modelName: 'Sonicle.webtop.drm.model.HourProfile',
