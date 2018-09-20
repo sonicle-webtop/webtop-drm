@@ -445,7 +445,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 		vct.show(false, function() {
 			vct.getView().begin('edit', {
 				data: {
-					id: me.gpOpportunityActionSelected().get('id')
+					id: rec.get('id')
 				}
 			});
 		});
@@ -455,7 +455,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 				sto = me.gpOpportunityAction().getStore(),
 				msg;
 		if (rec) {
-			msg = me.res('act.confirm.delete', Ext.String.ellipsis(rec.get('id'), 40));
+			msg = me.res('act.confirm.delete', Ext.String.ellipsis(rec.get('description'), 40));
 		} else {
 			msg = me.res('gpOpportunityActions.confirm.delete.selection');
 		}
@@ -473,7 +473,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 	deleteOpportunityAction: function (id, opts) {
 		opts = opts || {};
 		var me = this;
-		WT.ajaxReq(me.ID, 'ManageOpportunityAction', {
+		WT.ajaxReq(me.mys.ID, 'ManageOpportunityAction', {
 			params: {
 				crud: 'delete',
 				ids: WTU.arrayAsParam(id)
@@ -588,8 +588,8 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 			iconCls: 'wt-icon-delete',
 			disabled: true,
 			handler: function () {
-				var sm = me.lref('gpOpportunityActions').getSelectionModel();
-				me.deleteOpportunityActionUI(sm.getSelection());
+				var rec = me.gpOpportunityActionSelected();
+				me.deleteOpportunityActionUI(rec);
 			},
 			scope: me
 		});
