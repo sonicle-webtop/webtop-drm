@@ -109,7 +109,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 									reference: 'column1',
 									modelValidation: true,
 									defaults: {
-										labelWidth: 120
+										labelWidth: 150
 									},
 									items: [
 										WTF.localCombo('id', 'desc', {
@@ -164,7 +164,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 									reference: 'column2',
 									modelValidation: true,
 									defaults: {
-										labelWidth: 120
+										labelWidth: 150
 									},
 									items: [
 										{
@@ -197,23 +197,47 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 									]
 								}
 							]
+						},
+						{
+							xtype: 'container',
+							layout: 'border',
+							refernceHolder: true,
+							flex: 1,
+							width: '100%',
+							items: [
+								Ext.create({
+									xtype: 'wtform',
+									reference: 'mainForm',
+									modelValidation: true,
+									region: 'center',
+									defaults: {
+										labelWidth: 150
+									},
+									items: [
+									]
+								})
+							]
 						}
 					]
 				},{
 					title: me.mys.res('opportunity.visitreport.tit'),
 					xtype: 'container',
 					layout: 'border',
+					refernceHolder: true,
 					flex: 1,
 					width: '100%',
 					items: [
-					]
-				},{
-					title: me.mys.res('opportunity.notessignature.tit'),
-					xtype: 'container',
-					layout: 'border',
-					flex: 1,
-					width: '100%',
-					items: [
+						Ext.create({
+							xtype: 'wtform',
+							reference: 'visitReportForm',
+							modelValidation: true,
+							region: 'center',
+							defaults: {
+								labelWidth: 150
+							},
+							items: [
+							]
+						})
 					]
 				},{
 					title: me.mys.res('opportunity.opportunityactions.tit'),
@@ -335,9 +359,21 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 					title: me.mys.res('opportunity.notessignature.tit'),
 					xtype: 'container',
 					layout: 'border',
+					refernceHolder: true,
 					flex: 1,
 					width: '100%',
 					items: [
+						Ext.create({
+							xtype: 'wtform',
+							reference: 'notesSignatureForm',
+							modelValidation: true,
+							region: 'center',
+							defaults: {
+								labelWidth: 150
+							},
+							items: [
+							]
+						})
 					]
 				},{
 					title: me.mys.res('opportunity.documents.tit'),
@@ -407,9 +443,28 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 			]
 		});
 
+		//Additional Opportunity Fields
+		Ext.each(me.mys.opportunityRequiredFields.mainFields, function(element) {
+			var cfg = me.mys.opportunityStructureFields.mainFields[element.field];
+			cfg.fieldLabel = element.label;
+			//gestire required
+			 me.lref('mainForm').add(Ext.create(cfg));
+		});
+		Ext.each(me.mys.opportunityRequiredFields.visitReportFields, function(element) {
+			var cfg = me.mys.opportunityStructureFields.visitReportFields[element.field];
+			cfg.fieldLabel = element.label;
+			//gestire required
+			 me.lref('visitReportForm').add(Ext.create(cfg));
+		});
+		Ext.each(me.mys.opportunityRequiredFields.notesSignatureFields, function(element) {
+			var cfg = me.mys.opportunityStructureFields.notesSignatureFields[element.field];
+			cfg.fieldLabel = element.label;
+			//gestire required
+			 me.lref('notesSignatureForm').add(Ext.create(cfg));
+		});
+
 		me.on('viewinvalid', me.onViewInvalid);
 		me.on('viewload', me.onViewLoad);
-		me.on('beforerender', me.onBeforerender);
 	},
 	addOpportunityActionUI: function() {
 		var me = this;
@@ -677,15 +732,5 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 	},
 	onViewInvalid: function (s, mo, errs) {
 		var me = this;
-	},
-	onBeforerender: function (t, eOpts) {
-		var me = this;
-		
-		WT.ajaxReq(me.ID, 'GetOpportunityConfigurationFields', {
-			params: {},
-			callback: function (success, json) {
-				if(success) alert("Ok!");
-			}
-		});
-	} 
+	}
 });

@@ -108,6 +108,7 @@ import com.sonicle.webtop.drm.bol.js.JsHourProfile;
 import com.sonicle.webtop.drm.bol.js.JsLeaveRequest;
 import com.sonicle.webtop.drm.bol.js.JsOpportunity;
 import com.sonicle.webtop.drm.bol.js.JsOpportunityAction;
+import com.sonicle.webtop.drm.bol.js.JsOpportunityField;
 import com.sonicle.webtop.drm.bol.js.JsOpportunitySetting;
 import com.sonicle.webtop.drm.bol.js.JsTimetableSetting;
 import com.sonicle.webtop.drm.bol.js.JsTimetableStamp;
@@ -159,6 +160,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.joda.time.DateTimeZone;
@@ -231,8 +233,42 @@ public class Service extends BaseService {
 		vs.put("defaultChargeTo", ss.getDefaultChargeTo());
 		vs.put("defaultFreeSupport", ss.getDefaultFreeSupport());
 		vs.put("defaultStatus", ss.getDefaultDocStatusId());
-
+		
+		try {
+			vs.put("opportunityRequiredFields", getOpportunityRequiredFields());
+		} catch (WTException ex) {
+			java.util.logging.Logger.getLogger(Service.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		
 		return vs;
+	}
+
+	private HashMap<String,ArrayList<JsOpportunityField>> getOpportunityRequiredFields() throws WTException {
+		try{
+			HashMap<String,ArrayList<JsOpportunityField>> opportunityRequiredFields = new HashMap<>();
+			ArrayList<JsOpportunityField> mainFields=new ArrayList<>();
+			ArrayList<JsOpportunityField> visitReportFields=new ArrayList<>();
+			ArrayList<JsOpportunityField> notesSignatureFields=new ArrayList<>();
+
+			for(OOpportunityField OOf : manager.getActiveOpportunityFieldsByDomainIdTabId(getEnv().getProfileId().getDomainId(), EnumUtils.toSerializedName(OpportunityField.Tab.MAIN))){
+				mainFields.add(new JsOpportunityField(OOf));
+			}
+			for(OOpportunityField OOf : manager.getActiveOpportunityFieldsByDomainIdTabId(getEnv().getProfileId().getDomainId(), EnumUtils.toSerializedName(OpportunityField.Tab.VISIT_REPORT))){
+				visitReportFields.add(new JsOpportunityField(OOf));
+			}
+			for(OOpportunityField OOf : manager.getActiveOpportunityFieldsByDomainIdTabId(getEnv().getProfileId().getDomainId(), EnumUtils.toSerializedName(OpportunityField.Tab.NOTES_SIGNATURE))){
+				notesSignatureFields.add(new JsOpportunityField(OOf));
+			}
+
+			opportunityRequiredFields.put("mainFields", mainFields);
+			opportunityRequiredFields.put("visitReportFields", visitReportFields);
+			opportunityRequiredFields.put("notesSignatureFields", notesSignatureFields);
+
+			return opportunityRequiredFields;
+			
+		} catch (Exception ex) {
+			throw new WTException("Error in getOpportunityConfigurationFields", ex);
+		}
 	}
 
 	public void processLookupUsers(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
@@ -2196,19 +2232,6 @@ public class Service extends BaseService {
 			Boolean isLineManagerLogged = (lm != null) ? true : false;
 
 			new JsonResult(isLineManagerLogged).printTo(out);
-		} catch (Exception ex) {
-			new JsonResult(ex).printTo(out);
-			logger.error("Error in action ManageGridTimetable", ex);
-		}
-	}
-	
-	public void processGetOpportunityConfigurationFields(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
-		try{
-			List<OOpportunityField> oOf;
-			
-			oOf = manager.getOpportunityFields(getEnv().getProfileId().getDomainId());
-
-			new JsonResult(oOf).printTo(out);
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action ManageGridTimetable", ex);

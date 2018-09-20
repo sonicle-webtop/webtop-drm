@@ -33,6 +33,114 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		'Sonicle.webtop.drm.view.TimetableStamp'
 	],
 	needsReload: true,
+	opportunityRequiredFields: null,
+	opportunityStructureFields: {
+		mainFields: {
+			executed_with: {
+				xtype: 'textfield',
+				reference: 'executedWith',
+				bind: '{record.executedWith}',
+				width: '420px'
+			}, customer: {
+				xtype: 'textfield',
+				reference: 'customer',
+				bind: '{record.customerId}',
+				width: '420px'
+			}, statistic_customer: {
+				xtype: 'textfield',
+				reference: 'statisticCustomer',
+				bind: '{record.customerStatId}',
+				width: '420px'
+			}, sector: {
+				xtype: 'textfield',
+				reference: 'sector',
+				bind: '{record.sector}',
+				width: '420px'
+			}, description: {
+				xtype: 'textfield',
+				reference: 'description',
+				bind: '{record.description}',
+				width: '420px'
+			}, place: {
+				xtype: 'textfield',
+				reference: 'place',
+				bind: '{record.place}',
+				width: '420px'
+			}, objective: {
+				xtype: 'textfield',
+				reference: 'objective',
+				bind: '{record.objective}',
+				width: '420px'
+			}, causal: {
+				xtype: 'textfield',
+				reference: 'causal',
+				bind: '{record.causalId}',
+				width: '420px'
+			}, activity: {
+				xtype: 'textfield',
+				reference: 'activity',
+				bind: '{record.activityId}',
+				width: '420px'
+			}, interlocutors: {
+				xtype: 'textfield',
+				reference: 'interlocutors',
+				bind: '{record.interlocutors}',
+				width: '420px'
+			}
+		},
+		visitReportFields: {
+			objective: {
+				xtype: 'textfield',
+				reference: 'objective2',
+				bind: '{record.objective2}',
+				width: '420px'
+			}, result: {
+				xtype: 'textfield',
+				reference: 'result',
+				bind: '{record.result}',
+				width: '420px'
+			}, discoveries: {
+				xtype: 'textfield',
+				reference: 'discoveries',
+				bind: '{record.discoveries}',
+				width: '420px'
+			}, customer_potential: {
+				xtype: 'textfield',
+				reference: 'customerPotential',
+				bind: '{record.customerPotential}',
+				width: '420px'
+			}
+		},
+		notesSignatureFields: {
+			notes: {
+				xtype: 'textfield',
+				reference: 'notes',
+				bind: '{record.notes}',
+				width: '420px'
+			}, status: {
+				xtype: 'textfield',
+				reference: 'status',
+				bind: '{record.statusId}',
+				width: '420px'
+			}, signed_by: {
+				xtype: 'textfield',
+				reference: 'signedBy',
+				bind: '{record.signedBy}',
+				width: '420px'
+			}, signature: {
+				xtype: 'textfield',
+				reference: 'signature',
+				bind: '{record.signature}',
+				width: '420px'
+			}, won: {
+				xtype: 'textfield',
+				reference: 'won',
+				bind: '{record.won}',
+				width: '420px'
+			}
+		}
+	},
+	
 	init: function () {
 
 		var me = this;
@@ -1011,6 +1119,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				}
 			]
 		}));
+		
+		//Opportunity Fields
+		me.opportunityRequiredFields = me.getVar('opportunityRequiredFields');
 	},
 	
 	filtersOpportunity: function () {
