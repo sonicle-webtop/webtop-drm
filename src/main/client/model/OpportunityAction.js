@@ -36,7 +36,7 @@ Ext.define('Sonicle.webtop.drm.model.OpportunityAction', {
 		'Sonicle.webtop.drm.model.OpportunityActionInterlocutor',
 		'Sonicle.webtop.drm.model.OpportunityActionDocument'
 	],
-	proxy: WTF.memoryProxy('data', {
+	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageOpportunityAction', 'data', {
 		writer: {
 			type: 'sojson',
 			writeAssociations: true

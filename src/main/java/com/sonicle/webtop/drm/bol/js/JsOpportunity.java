@@ -73,7 +73,6 @@ public class JsOpportunity {
 	public Boolean won;
 
 	public List<JsGridOpportunityInterlocutor> interlocutors = new ArrayList();
-	public List<JsGridOpportunityAction> actions = new ArrayList();
 	public List<JsGridOpportunityDocument> documents = new ArrayList();
 
 	public JsOpportunity(Opportunity o) {
@@ -105,10 +104,6 @@ public class JsOpportunity {
 
 		for (OpportunityInterlocutor oInt : o.getInterlocutors()) {
 			this.interlocutors.add(new JsGridOpportunityInterlocutor(oInt));
-		}
-		
-		for (OpportunityAction oAct : o.getActions()) {
-			this.actions.add(new JsGridOpportunityAction(oAct));
 		}
 		
 		for (OpportunityDocument oDoc : o.getDocuments()) {
@@ -148,12 +143,6 @@ public class JsOpportunity {
 		for (JsGridOpportunityInterlocutor jsGridOppInt : js.interlocutors) {
 
 			o.getInterlocutors().add(JsGridOpportunityInterlocutor.createOpportunityInterlocutor(jsGridOppInt));
-
-		}
-		
-		for (JsGridOpportunityAction jsGridOppAct : js.actions) {
-
-			o.getActions().add(JsGridOpportunityAction.createOpportunityAction(jsGridOppAct));
 
 		}
 		

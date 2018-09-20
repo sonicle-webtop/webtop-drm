@@ -2072,9 +2072,6 @@ public class DrmManager extends BaseManager {
 	public Opportunity getOpportunity(Integer id) throws WTException {
 		Connection con = null;
 		OpportunityDAO oDao = OpportunityDAO.getInstance();
-		OpportunityActionDAO oADao = OpportunityActionDAO.getInstance();
-		OpportunityActionInterlocutorDAO oAIDao = OpportunityActionInterlocutorDAO.getInstance();
-		OpportunityActionDocumentDAO oADDao = OpportunityActionDocumentDAO.getInstance();
 		OpportunityInterlocutorDAO oIDao = OpportunityInterlocutorDAO.getInstance();
 		OpportunityDocumentDAO oDDao = OpportunityDocumentDAO.getInstance();
 		
@@ -2085,19 +2082,6 @@ public class DrmManager extends BaseManager {
 			con = WT.getConnection(SERVICE_ID);
 
 			o = createOpportunity(oDao.selectById(con, id));
-
-			for (OOpportunityAction oAct : oADao.selectByOpportunity(con, id)) {
-				OpportunityAction act = createOpportunityAction(oAct);
-				
-				for (OOpportunityActionInterlocutor oActInt : oAIDao.selectByOpportunityAction(con, act.getId())) {
-					act.getActionInterlocutors().add(createOpportunityActionInterlocutor(oActInt));
-				}
-
-				for (OOpportunityActionDocument oActDoc : oADDao.selectByOpportunityAction(con, act.getId())) {
-					act.getActionDocuments().add(createOpportunityActionDocument(oActDoc));
-				}
-				o.getActions().add(act);
-			}
 			
 			for (OOpportunityInterlocutor oInt : oIDao.selectByOpportunity(con, id)) {
 				o.getInterlocutors().add(createOpportunityInterlocutor(oInt));
@@ -2119,9 +2103,6 @@ public class DrmManager extends BaseManager {
 	public OOpportunity addOpportunity(Opportunity o, HashMap<String, File> files) throws WTException {
 		Connection con = null;
 		OpportunityDAO oDao = OpportunityDAO.getInstance();
-		OpportunityActionDAO oADao = OpportunityActionDAO.getInstance();
-		OpportunityActionInterlocutorDAO oAIDao = OpportunityActionInterlocutorDAO.getInstance();
-		OpportunityActionDocumentDAO oADDao = OpportunityActionDocumentDAO.getInstance();
 		OpportunityInterlocutorDAO oIDao = OpportunityInterlocutorDAO.getInstance();
 		OpportunityDocumentDAO oDDao = OpportunityDocumentDAO.getInstance();
 		
@@ -2133,35 +2114,6 @@ public class DrmManager extends BaseManager {
 			OOpportunity newO = createOOpportunity(o);
 			newO.setId(oDao.getOpportunitySequence(con).intValue());
 			newO.setDomainId(getTargetProfileId().getDomainId());
-
-			OOpportunityAction newOAct = null;
-			for (OpportunityAction oAct : o.getActions()) {
-				
-				OOpportunityActionInterlocutor newOActInt = null;
-				for (OpportunityActionInterlocutor oActInt : oAct.getActionInterlocutors()) {
-					newOActInt = createOOpportunityActionInterlocutor(oActInt);
-					newOActInt.setId(oAIDao.getSequence(con).intValue());
-					newOActInt.setOpportunityActionId(oAct.getId());
-
-					oAIDao.insert(con, newOActInt);
-				}
-				
-				OOpportunityActionDocument newOActDoc = null;
-				for (OpportunityActionDocument oActDoc : oAct.getActionDocuments()) {
-					newOActDoc = createOOpportunityActionDocument(oActDoc);
-					newOActDoc.setOpportunityActionId(oAct.getId());
-					newOActDoc.setRevisionTimestamp(revisionTimestamp);
-					newOActDoc.setRevisionSequence((short) 1);
-
-					oADDao.insert(con, newOActDoc);
-				}
-				
-				newOAct = createOOpportunityAction(oAct);
-				newOAct.setId(oADao.getSequence(con).intValue());
-				newOAct.setOpportunityId(newO.getId());
-
-				oADao.insert(con, newOAct);
-			}
 			
 			OOpportunityInterlocutor newOInt = null;
 			for (OpportunityInterlocutor oInt : o.getInterlocutors()) {
@@ -2215,9 +2167,6 @@ public class DrmManager extends BaseManager {
 	public OOpportunity updateOpportunity(Opportunity item, HashMap<String, File> files) throws WTException {
 		Connection con = null;
 		OpportunityDAO oDao = OpportunityDAO.getInstance();
-		OpportunityActionDAO oADao = OpportunityActionDAO.getInstance();
-		OpportunityActionInterlocutorDAO oAIDao = OpportunityActionInterlocutorDAO.getInstance();
-		OpportunityActionDocumentDAO oADDao = OpportunityActionDocumentDAO.getInstance();
 		OpportunityInterlocutorDAO oIDao = OpportunityInterlocutorDAO.getInstance();
 		OpportunityDocumentDAO oDDao = OpportunityDocumentDAO.getInstance();
 		
@@ -2232,120 +2181,6 @@ public class DrmManager extends BaseManager {
 			
 			//Opportunity
 			oDao.update(con, o);
-			
-			//Opportunity Actions
-			LangUtils.CollectionChangeSet<OpportunityAction> changesSet1 = LangUtils.getCollectionChanges(oldO.getActions(), item.getActions());
-			
-			for (OpportunityAction oAct : changesSet1.inserted) {
-				
-				OOpportunityActionInterlocutor newOActInt = null;
-				for (OpportunityActionInterlocutor oActInt : oAct.getActionInterlocutors()) {
-					newOActInt = createOOpportunityActionInterlocutor(oActInt);
-					newOActInt.setId(oAIDao.getSequence(con).intValue());
-					newOActInt.setOpportunityActionId(oAct.getId());
-
-					oAIDao.insert(con, newOActInt);
-				}
-				
-				OOpportunityActionDocument newOActDoc = null;
-				for (OpportunityActionDocument oActDoc : oAct.getActionDocuments()) {
-					newOActDoc = createOOpportunityActionDocument(oActDoc);
-					newOActDoc.setOpportunityActionId(oAct.getId());
-					newOActDoc.setRevisionTimestamp(revisionTimestamp);
-					newOActDoc.setRevisionSequence((short) 1);
-
-					oADDao.insert(con, newOActDoc);
-				}
-				
-				OOpportunityAction oOAct = createOOpportunityAction(oAct);
-
-				oOAct.setId(oADao.getSequence(con).intValue());
-				oOAct.setOpportunityId(item.getId());
-
-				oADao.insert(con, oOAct);
-			}
-
-			for (OpportunityAction oAct : changesSet1.deleted) {
-				oAIDao.deleteByOpportunityAction(con, oAct.getId());
-				oADDao.deleteByOpportunityAction(con, oAct.getId());
-				oADao.deleteById(con, oAct.getId());
-			}
-
-			for (OpportunityAction oAct : changesSet1.updated) {
-				
-				List <OpportunityActionInterlocutor> oldActInt = null;
-				for(OOpportunityActionInterlocutor oOActInt : oAIDao.selectByOpportunityAction(con, oAct.getId())){
-					oldActInt.add(createOpportunityActionInterlocutor(oOActInt));
-				}
-				
-				//Opportunity Action Interlocutors
-				LangUtils.CollectionChangeSet<OpportunityActionInterlocutor> changesSet4 = LangUtils.getCollectionChanges(oldActInt, oAct.getActionInterlocutors());
-				
-				for (OpportunityActionInterlocutor oActInt : changesSet4.inserted) {
-
-					OOpportunityActionInterlocutor oOActInt = createOOpportunityActionInterlocutor(oActInt);
-
-					oOActInt.setId(oAIDao.getSequence(con).intValue());
-					oOActInt.setOpportunityActionId(oAct.getId());
-
-					oAIDao.insert(con, oOActInt);
-				}
-
-				for (OpportunityActionInterlocutor oActInt : changesSet4.deleted) {
-					oAIDao.deleteById(con, oActInt.getId());
-				}
-
-				for (OpportunityActionInterlocutor oActInt : changesSet4.updated) {
-					OOpportunityActionInterlocutor oOActInt = createOOpportunityActionInterlocutor(oActInt);
-					oOActInt.setOpportunityActionId(oAct.getId());
-
-					oAIDao.update(con, oOActInt);
-				}
-				
-				List <OpportunityActionDocument> oldActDoc = null;
-				for(OOpportunityActionDocument oOActDoc : oADDao.selectByOpportunityAction(con, oAct.getId())){
-					oldActDoc.add(createOpportunityActionDocument(oOActDoc));
-				}
-				
-				//Opportunity Action Documents
-				LangUtils.CollectionChangeSet<OpportunityActionDocument> changesSet5 = LangUtils.getCollectionChanges(oldActDoc, oAct.getActionDocuments());
-				
-				File destDir = new File(getOpportunityActionPath(oAct.getId()));
-				if (!destDir.exists()) {
-					destDir.mkdirs();
-				}
-
-				for (OpportunityActionDocument oActDoc : changesSet5.inserted) {
-
-					OOpportunityActionDocument oOActDoc = createOOpportunityActionDocument(oActDoc);
-
-					oOActDoc.setOpportunityActionId(oAct.getId());
-					oOActDoc.setRevisionTimestamp(revisionTimestamp);
-					oOActDoc.setRevisionSequence((short) 1);
-
-					oADDao.insert(con, oOActDoc);
-
-					File file = files.get(oActDoc.getId());
-					String fileName = PathUtils.addFileExension(file.getName(), FilenameUtils.getExtension(oActDoc.getFileName()));
-					File destFile = new File(destDir, fileName);
-
-					FileUtils.copyFile(file, destFile);
-				}
-
-				for (OpportunityActionDocument oActDoc : changesSet5.deleted) {
-
-					String fileName = PathUtils.addFileExension(oActDoc.getId().toString(), FilenameUtils.getExtension(oActDoc.getFileName()));
-					File file = new File(destDir, fileName);
-
-					FileUtils.deleteQuietly(file);
-					oADDao.deleteById(con, oActDoc.getId());
-				}
-				
-				OOpportunityAction oOAct = createOOpportunityAction(oAct);
-				oOAct.setOpportunityId(item.getId());
-
-				oADao.update(con, oOAct);
-			}
 			
 			//Opportunity Interlocutors
 			LangUtils.CollectionChangeSet<OpportunityInterlocutor> changesSet2 = LangUtils.getCollectionChanges(oldO.getInterlocutors(), item.getInterlocutors());
@@ -2439,6 +2274,234 @@ public class DrmManager extends BaseManager {
 			oIDao.deleteByOpportunity(con, id);
 			oDDao.deleteByOpportunity(con, id);
 			oDao.deleteById(con, id);
+			
+			DbUtils.commitQuietly(con);
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public List<OOpportunityAction> listOpportunityActions(Integer opportunityId) throws WTException {
+		Connection con = null;
+		OpportunityActionDAO oActDao = OpportunityActionDAO.getInstance();
+		List<OOpportunityAction> oActs = null
+				;
+		try {
+			con = WT.getConnection(SERVICE_ID);
+			oActs = oActDao.selectByOpportunity(con, opportunityId);
+
+			return oActs;
+			
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public OpportunityAction getOpportunityAction(Integer id) throws WTException {
+		Connection con = null;
+		OpportunityActionDAO oADao = OpportunityActionDAO.getInstance();
+		OpportunityActionInterlocutorDAO oAIDao = OpportunityActionInterlocutorDAO.getInstance();
+		OpportunityActionDocumentDAO oADDao = OpportunityActionDocumentDAO.getInstance();
+		
+		OpportunityAction oAct = null;
+		
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			oAct = createOpportunityAction(oADao.select(con, id));
+
+			for (OOpportunityActionInterlocutor oActInt : oAIDao.selectByOpportunityAction(con, oAct.getId())) {
+				oAct.getActionInterlocutors().add(createOpportunityActionInterlocutor(oActInt));
+			}
+
+			for (OOpportunityActionDocument oActDoc : oADDao.selectByOpportunityAction(con, oAct.getId())) {
+				oAct.getActionDocuments().add(createOpportunityActionDocument(oActDoc));
+			}
+
+			return oAct;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public OOpportunityAction addOpportunityAction(OpportunityAction oAct, HashMap<String, File> files) throws WTException {
+		Connection con = null;
+		OpportunityActionDAO oActDao = OpportunityActionDAO.getInstance();
+		OpportunityActionInterlocutorDAO oActIntDao = OpportunityActionInterlocutorDAO.getInstance();
+		OpportunityActionDocumentDAO oActDocDao = OpportunityActionDocumentDAO.getInstance();
+		
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			DateTime revisionTimestamp = createRevisionTimestamp();
+
+			OOpportunityAction newOOAct = createOOpportunityAction(oAct);
+			newOOAct.setId(oActDao.getSequence(con).intValue());
+			
+			OOpportunityActionInterlocutor newOActInt = null;
+			for (OpportunityActionInterlocutor oActInt : oAct.getActionInterlocutors()) {
+				newOActInt = createOOpportunityActionInterlocutor(oActInt);
+				newOActInt.setId(oActIntDao.getSequence(con).intValue());
+				newOActInt.setOpportunityActionId(newOOAct.getId());
+
+				oActIntDao.insert(con, newOActInt);
+			}
+
+			for (OpportunityActionDocument doc : oAct.getActionDocuments()) {
+				OOpportunityActionDocument oActDoc = createOOpportunityActionDocument(doc);
+				oActDoc.setOpportunityActionId(newOOAct.getId());
+				oActDoc.setRevisionTimestamp(revisionTimestamp);
+				oActDoc.setRevisionSequence((short) 1);
+
+				oActDocDao.insert(con, oActDoc);
+			}
+
+			oActDao.insert(con, newOOAct);
+
+			File destDir = new File(getOpportunityPath(newOOAct.getId()));
+			if (!destDir.exists()) {
+				destDir.mkdir();
+			}
+			
+			for (OpportunityActionDocument doc : oAct.getActionDocuments()) {
+
+				File file = files.get(doc.getId());
+				String fileName = PathUtils.addFileExension(file.getName(), FilenameUtils.getExtension(doc.getFileName()));
+				File destFile = new File(destDir, fileName);
+
+				FileUtils.copyFile(file, destFile);
+			}
+
+			DbUtils.commitQuietly(con);
+
+			return newOOAct;
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public OOpportunityAction updateOpportunityAction(OpportunityAction item, HashMap<String, File> files) throws WTException {
+		Connection con = null;
+		OpportunityActionDAO oActDao = OpportunityActionDAO.getInstance();
+		OpportunityActionInterlocutorDAO oActIntDao = OpportunityActionInterlocutorDAO.getInstance();
+		OpportunityActionDocumentDAO oActDocDao = OpportunityActionDocumentDAO.getInstance();
+		
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			DateTime revisionTimestamp = createRevisionTimestamp();
+			
+			OpportunityAction oldOAct = getOpportunityAction(item.getId());
+
+			OOpportunityAction oOAct = createOOpportunityAction(item);
+			
+			//Opportunity Action
+			oActDao.update(con, oOAct);
+			
+			
+			//Opportunity Action Interlocutors
+			LangUtils.CollectionChangeSet<OpportunityActionInterlocutor> changesSet2 = LangUtils.getCollectionChanges(oldOAct.getActionInterlocutors(), item.getActionInterlocutors());
+			
+			for (OpportunityActionInterlocutor oActInt : changesSet2.inserted) {
+
+				OOpportunityActionInterlocutor oOActInt = createOOpportunityActionInterlocutor(oActInt);
+
+				oOActInt.setId(oActIntDao.getSequence(con).intValue());
+				oOActInt.setOpportunityActionId(item.getId());
+
+				oActIntDao.insert(con, oOActInt);
+			}
+
+			for (OpportunityActionInterlocutor oActInt : changesSet2.deleted) {
+				oActIntDao.deleteById(con, oActInt.getId());
+			}
+
+			for (OpportunityActionInterlocutor oActInt : changesSet2.updated) {
+				OOpportunityActionInterlocutor oOActInt = createOOpportunityActionInterlocutor(oActInt);
+				oOActInt.setOpportunityActionId(item.getId());
+
+				oActIntDao.update(con, oOActInt);
+			}
+
+			//Opportunity Action Documents
+			LangUtils.CollectionChangeSet<OpportunityActionDocument> changesSet3 = LangUtils.getCollectionChanges(oldOAct.getActionDocuments(), item.getActionDocuments());
+
+			File destDir = new File(getOpportunityPath(item.getId()));
+			if (!destDir.exists()) {
+				destDir.mkdirs();
+			}
+
+			for (OpportunityActionDocument oActDoc : changesSet3.inserted) {
+
+				OOpportunityActionDocument oOActDoc = createOOpportunityActionDocument(oActDoc);
+
+				oOActDoc.setOpportunityActionId(item.getId());
+				oOActDoc.setRevisionTimestamp(revisionTimestamp);
+				oOActDoc.setRevisionSequence((short) 1);
+
+				oActDocDao.insert(con, oOActDoc);
+
+				File file = files.get(oActDoc.getId());
+				String fileName = PathUtils.addFileExension(file.getName(), FilenameUtils.getExtension(oActDoc.getFileName()));
+				File destFile = new File(destDir, fileName);
+
+				FileUtils.copyFile(file, destFile);
+			}
+
+			for (OpportunityActionDocument oActDoc : changesSet3.deleted) {
+
+				String fileName = PathUtils.addFileExension(oActDoc.getId().toString(), FilenameUtils.getExtension(oActDoc.getFileName()));
+				File file = new File(destDir, fileName);
+
+				FileUtils.deleteQuietly(file);
+				oActDocDao.deleteById(con, oActDoc.getId());
+			}
+
+			DbUtils.commitQuietly(con);
+
+			return oOAct;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} catch (IOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public void deleteOpportunityAction(Integer id) throws WTException {
+		Connection con = null;
+		OpportunityActionDAO oActDao = OpportunityActionDAO.getInstance();
+		OpportunityActionInterlocutorDAO oActIntDao = OpportunityActionInterlocutorDAO.getInstance();
+		OpportunityActionDocumentDAO oActDocDao = OpportunityActionDocumentDAO.getInstance();
+		
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			oActIntDao.deleteByOpportunityAction(con, id);
+			oActDocDao.deleteByOpportunityAction(con, id);
+			oActDao.deleteById(con, id);
 			
 			DbUtils.commitQuietly(con);
 
@@ -5300,5 +5363,26 @@ public class DrmManager extends BaseManager {
 	public static String buildLeaveRequestReplyPublicUrl(String publicBaseUrl, String leaveRequestPublicId, String recipientEmail, String crud, String resp) {
 		String s = PublicService.PUBPATH_CONTEXT_LEAVE_REQUEST + "/" + leaveRequestPublicId + "/" + PublicService.LeaveRequestUrlPath.TOKEN_REPLY + "?aid=" + recipientEmail + "&crud=" + crud + "&resp=" + resp;
 		return PathUtils.concatPaths(publicBaseUrl, s);
+	}
+	
+	public List<OOpportunityField> getOpportunityFields(String domainId) throws WTException {
+		Connection con = null;
+		OpportunityFieldDAO oFDao = OpportunityFieldDAO.getInstance();
+		List<OOpportunityField> oFields = null;
+		
+		try {
+			con = WT.getConnection(SERVICE_ID);
+
+			oFields = oFDao.selectByDomain(con, domainId);
+			
+			if(oFields == null) oFields = oFDao.selectByDomain(con, "*");
+			
+			return oFields;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
 	}
 }

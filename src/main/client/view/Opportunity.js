@@ -219,8 +219,15 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 					title: me.mys.res('opportunity.opportunityactions.tit'),
 					xtype: 'grid',
 					reference: 'gpOpportunityActions',
-					bind: {
-						store: '{record.actions}'
+					disabled: true,
+					store: {
+						autoLoad: false,
+						model: 'Sonicle.webtop.drm.model.OpportunityAction',
+						proxy: WTF.apiProxy(me.mys.ID, 'ManageGridOpportunityAction', null, {
+							extraParams: {
+								opportunityId: null
+							}
+						})
 					},
 					columns: [
 						{
@@ -402,14 +409,13 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 
 		me.on('viewinvalid', me.onViewInvalid);
 		me.on('viewload', me.onViewLoad);
-
+		me.on('beforerender', me.onBeforerender);
 	},
-	
 	addOpportunityActionUI: function() {
 		var me = this;
 		me.addOpportunityAction({}, {
 			callback: function(success, model) {
-				if (success) me.addOpportunityActionRec(model.getData());
+				if (success) me.gpOpportunityAction().getStore().reload();
 			}
 		});
 	},
@@ -423,80 +429,59 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 		vct.show(false, function() {
 			vct.getView().begin('new', {
 				data: {
+					opportunityId: me.getModel().get('id'),
 					operatorId: me.lref('flduser').getValue()
 				}
 			});
 		});
-	},
-	addOpportunityActionRec: function(data) {
-		var me = this,
-				sto = me.gpOpportunityAction().getStore();
-		sto.add(sto.createModel(data));
 	},
 	editOpportunityActionUI: function(rec) {
 		var me = this,
 				vct = WT.createView(me.mys.ID, 'view.OpportunityAction');
 		
 		vct.getView().on('viewsave', function(s, success, model) {
-			if (success) me.updateOpportunityActionRec(model.getId(), model.getData());
+			if (success) me.gpOpportunityAction().getStore().reload();
 		});
 		vct.show(false, function() {
 			vct.getView().begin('edit', {
-				data: me.toOpportunityActionData(rec.getData())
+				data: {
+					id: me.gpOpportunityActionSelected().get('id')
+				}
 			});
 		});
 	},
-	updateOpportunityActionRec: function(id, data) {
+	deleteOpportunityActionUI: function (rec) {
 		var me = this,
 				sto = me.gpOpportunityAction().getStore(),
-				rec = sto.getById(id);
+				msg;
 		if (rec) {
-			rec.set(me.fromOpportunityActionData(data));
+			msg = me.res('act.confirm.delete', Ext.String.ellipsis(rec.get('id'), 40));
+		} else {
+			msg = me.res('gpOpportunityActions.confirm.delete.selection');
 		}
-	},
-	deleteOpportunityAction: function (rec) {
-		var me = this,
-				grid = me.lref('gpOpportunityActions'),
-				sto = grid.getStore();
-
-		WT.confirm(WT.res('confirm.delete'), function (bid) {
+		WT.confirm(msg, function (bid) {
 			if (bid === 'yes') {
-				sto.remove(rec);
+				me.deleteOpportunityAction(rec.get('id'), {
+					callback: function (success) {
+						if (success)
+							sto.remove(rec);
+					}
+				});
 			}
-		}, me);
+		});
 	},
-	toOpportunityActionData: function(data) {
-		return {
-			id: data.id,
-			opportunityId: data.opportunityId,
-			operatorId: data.operatorId,
-			statusId: data.statusId,
-			date: data.date,
-			fromHour: data.fromHour,
-			toHour: data.toHour,
-			description: data.description,
-			place: data.place,
-			subsequentActions: data.subsequentActions,
-			activityId: data.activityId,
-			actionInterlocutors: data.actionInterlocutors,
-			actionDocuments: data.actionDocuments
-		};
-	},
-	fromOpportunityActionData: function(data) {
-		return {
-			opportunityId: data.opportunityId,
-			operatorId: data.operatorId,
-			statusId: data.statusId,
-			date: data.date,
-			fromHour: data.fromHour,
-			toHour: data.toHour,
-			description: data.description,
-			place: data.place,
-			subsequentActions: data.subsequentActions,
-			activityId: data.activityId,
-			actionInterlocutors: data.actionInterlocutors,
-			actionDocuments: data.actionDocuments
-		};
+	deleteOpportunityAction: function (id, opts) {
+		opts = opts || {};
+		var me = this;
+		WT.ajaxReq(me.ID, 'ManageOpportunityAction', {
+			params: {
+				crud: 'delete',
+				ids: WTU.arrayAsParam(id)
+			},
+			callback: function (success, json) {
+				Ext.callback(opts.callback, opts.scope || me, [success, json]);
+			}
+		});
 	},
 	gpDocument: function () {
 		this.lref('gpDocument');
@@ -545,28 +530,30 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 			documentIds: WTU.arrayAsParam(documentIds)
 		}));
 	},
-	
 	onViewLoad: function(s, success) {
 		if(!success) return;
 		var me = this,
 				mo = me.getModel();
 		
 		if(mo.get('operatorId') === null) me.lref('flduser').setReadOnly(false);
+		
+		if(me.isMode(me.MODE_EDIT)) {
+			me.lref('gpOpportunityActions').setDisabled(false);
+			WTU.loadWithExtraParams(me.lref('gpOpportunityActions').getStore(), {
+				opportunityId: me.getModel().get('id')
+			});
+		}
 	},
-	
 	gpOpportunityAction: function () {
 		var me = this;
 		
 		return me.lref('gpOpportunityActions');
 	},
-	
 	gpOpportunityActionSelected: function () {
 		var me = this;
 		
 		return me.lref('gpOpportunityActions').getSelection()[0];
 	},
-	
-	
 	initActions: function () {
 		var me = this;
 		me.addAct('addOpportunityAction', {
@@ -602,7 +589,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 			disabled: true,
 			handler: function () {
 				var sm = me.lref('gpOpportunityActions').getSelectionModel();
-				me.deleteOpportunityAction(sm.getSelection());
+				me.deleteOpportunityActionUI(sm.getSelection());
 			},
 			scope: me
 		});
@@ -690,6 +677,15 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 	},
 	onViewInvalid: function (s, mo, errs) {
 		var me = this;
+	},
+	onBeforerender: function (t, eOpts) {
+		var me = this;
 		
-	}
+		WT.ajaxReq(me.ID, 'GetOpportunityConfigurationFields', {
+			params: {},
+			callback: function (success, json) {
+				if(success) alert("Ok!");
+			}
+		});
+	} 
 });

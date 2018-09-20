@@ -32,6 +32,12 @@
  */
 Ext.define('Sonicle.webtop.drm.model.OpportunityActionInterlocutor', {
 	extend: 'WTA.ux.data.BaseModel',
+	proxy: WTF.memoryProxy('data', {
+		writer: {
+			type: 'sojson',
+			writeAssociations: true
+		}
+	}),
 	identifier: 'negative',
 	idProperty: 'id',
 	fields: [

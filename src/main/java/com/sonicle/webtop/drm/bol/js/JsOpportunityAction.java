@@ -32,18 +32,18 @@
  */
 package com.sonicle.webtop.drm.bol.js;
 
-import com.sonicle.webtop.drm.bol.OOpportunityAction;
 import com.sonicle.webtop.drm.model.OpportunityAction;
 import com.sonicle.webtop.drm.model.OpportunityActionDocument;
 import com.sonicle.webtop.drm.model.OpportunityActionInterlocutor;
 import java.util.ArrayList;
 import java.util.List;
 import org.joda.time.LocalDate;
+
 /**
  *
  * @author lssndrvs
  */
-public class JsGridOpportunityAction {
+public class JsOpportunityAction {
 
 	public Integer id;
 	public Integer opportunityId;
@@ -60,17 +60,55 @@ public class JsGridOpportunityAction {
 	private List<JsGridOpportunityActionInterlocutor> actionInterlocutors = new ArrayList();
 	private List<JsGridOpportunityActionDocument> actionDocuments = new ArrayList();
 
-	public JsGridOpportunityAction(OOpportunityAction oOAct) {
-		this.id = oOAct.getId();
-		this.opportunityId = oOAct.getOpportunityId();
-		this.operatorId = oOAct.getOperatorId();
-		this.statusId = oOAct.getStatusId();
-		this.date = oOAct.getDate();
-		this.fromHour = oOAct.getFromHour();
-		this.toHour = oOAct.getToHour();
-		this.description = oOAct.getDescription();
-		this.place = oOAct.getPlace();
-		this.subsequentActions = oOAct.getSubsequentActions();
-		this.activityId = oOAct.getActivityId();
+	public JsOpportunityAction(OpportunityAction oAct) {
+		this.id = oAct.getId();
+		this.opportunityId = oAct.getOpportunityId();
+		this.operatorId = oAct.getOperatorId();
+		this.statusId = oAct.getStatusId();
+		this.date = oAct.getDate();
+		this.fromHour = oAct.getFromHour();
+		this.toHour = oAct.getToHour();
+		this.description = oAct.getDescription();
+		this.place = oAct.getPlace();
+		this.subsequentActions = oAct.getSubsequentActions();
+		this.activityId = oAct.getActivityId();
+
+		for (OpportunityActionInterlocutor oActInt : oAct.getActionInterlocutors()) {
+			this.actionInterlocutors.add(new JsGridOpportunityActionInterlocutor(oActInt));
+		}
+		
+		for (OpportunityActionDocument oActDoc : oAct.getActionDocuments()) {
+			this.actionDocuments.add(new JsGridOpportunityActionDocument(oActDoc));
+		}
+	}
+
+	public static OpportunityAction createOpportunityAction(JsOpportunityAction js) {
+
+		OpportunityAction oAct = new OpportunityAction();
+		oAct.setId(js.id);
+		oAct.setOpportunityId(js.opportunityId);
+		oAct.setOperatorId(js.operatorId);
+		oAct.setStatusId(js.statusId);
+		oAct.setDate(js.date);
+		oAct.setFromHour(js.fromHour);
+		oAct.setToHour(js.toHour);
+		oAct.setDescription(js.description);
+		oAct.setPlace(js.place);
+		oAct.setSubsequentActions(js.subsequentActions);
+		oAct.setActivityId(js.activityId);
+		
+		for (JsGridOpportunityActionInterlocutor jsGridOppActInt : js.actionInterlocutors) {
+
+			oAct.getActionInterlocutors().add(JsGridOpportunityActionInterlocutor.createOpportunityActionInterlocutor(jsGridOppActInt));
+
+		}
+		
+		for (JsGridOpportunityActionDocument jsGridOppActDoc : js.actionDocuments) {
+
+			oAct.getActionDocuments().add(JsGridOpportunityActionDocument.createOpportunityActionDocument(jsGridOppActDoc));
+
+		}
+
+		return oAct;
 	}
 }

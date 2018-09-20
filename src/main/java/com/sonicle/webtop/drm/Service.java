@@ -77,6 +77,8 @@ import com.sonicle.webtop.drm.bol.OHourProfile;
 import com.sonicle.webtop.drm.bol.OLeaveRequest;
 import com.sonicle.webtop.drm.bol.OLeaveRequestType;
 import com.sonicle.webtop.drm.bol.OOpportunity;
+import com.sonicle.webtop.drm.bol.OOpportunityAction;
+import com.sonicle.webtop.drm.bol.OOpportunityField;
 import com.sonicle.webtop.drm.bol.OTimetableReport;
 import com.sonicle.webtop.drm.bol.OTimetableStamp;
 import com.sonicle.webtop.drm.bol.OWorkReport;
@@ -96,6 +98,7 @@ import com.sonicle.webtop.drm.bol.js.JsGridHourProfile;
 import com.sonicle.webtop.drm.bol.js.JsGridLeaveRequest;
 import com.sonicle.webtop.drm.bol.js.JsGridLineManager;
 import com.sonicle.webtop.drm.bol.js.JsGridOpportunity;
+import com.sonicle.webtop.drm.bol.js.JsGridOpportunityAction;
 import com.sonicle.webtop.drm.bol.js.JsGridProfiles;
 import com.sonicle.webtop.drm.bol.js.JsGridTimetableReport;
 import com.sonicle.webtop.drm.bol.js.JsGridTimetableStamp;
@@ -104,6 +107,7 @@ import com.sonicle.webtop.drm.bol.js.JsGridWorkReports;
 import com.sonicle.webtop.drm.bol.js.JsHourProfile;
 import com.sonicle.webtop.drm.bol.js.JsLeaveRequest;
 import com.sonicle.webtop.drm.bol.js.JsOpportunity;
+import com.sonicle.webtop.drm.bol.js.JsOpportunityAction;
 import com.sonicle.webtop.drm.bol.js.JsOpportunitySetting;
 import com.sonicle.webtop.drm.bol.js.JsTimetableSetting;
 import com.sonicle.webtop.drm.bol.js.JsTimetableStamp;
@@ -125,7 +129,10 @@ import com.sonicle.webtop.drm.model.HourProfile;
 import com.sonicle.webtop.drm.model.LeaveRequest;
 import com.sonicle.webtop.drm.model.LeaveRequestDocument;
 import com.sonicle.webtop.drm.model.Opportunity;
+import com.sonicle.webtop.drm.model.OpportunityAction;
+import com.sonicle.webtop.drm.model.OpportunityActionDocument;
 import com.sonicle.webtop.drm.model.OpportunityDocument;
+import com.sonicle.webtop.drm.model.OpportunityField;
 import com.sonicle.webtop.drm.model.OpportunitySetting;
 import com.sonicle.webtop.drm.model.TimetableReport;
 import com.sonicle.webtop.drm.model.TimetableSetting;
@@ -1156,7 +1163,7 @@ public class Service extends BaseService {
 	public void processManageGridOpportunity(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			String crud = ServletUtils.getStringParameter(request, "crud", true);
-			DateTimeZone ptz = getEnv().getProfile().getTimeZone();
+			
 			if (crud.equals(Crud.READ)) {
 
 				String query = ServletUtils.getStringParameter(request, "query", null);
@@ -1172,6 +1179,30 @@ public class Service extends BaseService {
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action ManageGridOpportunity", ex);
+		}
+	}
+	
+	public void processManageGridOpportunityAction(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			
+			if (crud.equals(Crud.READ)) {
+
+				Integer opportunityId = ServletUtils.getIntParameter(request, "opportunityId", null);
+				
+				List<JsGridOpportunityAction> jsGridOpportunityAction = new ArrayList();
+
+				if(opportunityId != null){
+					for (OOpportunityAction oAct : manager.listOpportunityActions(opportunityId)) {
+						jsGridOpportunityAction.add(new JsGridOpportunityAction(oAct));
+					}
+				}
+				
+				new JsonResult(jsGridOpportunityAction).printTo(out);
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageGridOpportunityAction", ex);
 		}
 	}
 	
@@ -1239,6 +1270,73 @@ public class Service extends BaseService {
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action ManageOpportunity", ex);
+		}
+	}
+	
+	public void processManageOpportunityAction(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		JsOpportunityAction item = null;
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			HashMap<String, File> files = new HashMap<>();
+			if (crud.equals(Crud.READ)) {
+
+				Integer id = ServletUtils.getIntParameter(request, "id", true);
+
+				OpportunityAction oAct = manager.getOpportunityAction(id);
+
+				item = new JsOpportunityAction(oAct);
+
+				new JsonResult(item).printTo(out);
+
+			} else if (crud.equals(Crud.CREATE)) {
+
+				Payload<MapItem, JsOpportunityAction> pl = ServletUtils.getPayload(request, JsOpportunityAction.class);
+
+				OpportunityAction oAct = JsOpportunityAction.createOpportunityAction(pl.data);
+				
+				for (OpportunityActionDocument doc : oAct.getActionDocuments()) {
+
+					WebTopSession.UploadedFile uf = getUploadedFile(doc.getId().toString());
+
+					if (uf != null) {
+						files.put(uf.getUploadId(), uf.getFile());
+					}
+				}
+
+				manager.addOpportunityAction(oAct, files);
+
+				new JsonResult().printTo(out);
+
+			} else if (crud.equals(Crud.UPDATE)) {
+
+				Payload<MapItem, JsOpportunityAction> pl = ServletUtils.getPayload(request, JsOpportunityAction.class);
+
+				OpportunityAction oAct = JsOpportunityAction.createOpportunityAction(pl.data);
+				
+				for (OpportunityActionDocument doc : oAct.getActionDocuments()) {
+
+					WebTopSession.UploadedFile uf = getUploadedFile(doc.getId().toString());
+
+					if (uf != null) {
+						files.put(uf.getUploadId(), uf.getFile());
+					}
+				}
+
+				manager.updateOpportunityAction(oAct, files);
+
+				new JsonResult().printTo(out);
+
+			} else if (crud.equals(Crud.DELETE)) {
+
+				StringArray ids = ServletUtils.getObjectParameter(request, "ids", StringArray.class, true);
+
+				manager.deleteOpportunityAction(Integer.parseInt(ids.get(0)));
+
+				new JsonResult().printTo(out);
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageOpportunityAction", ex);
 		}
 	}
 
@@ -2098,6 +2196,19 @@ public class Service extends BaseService {
 			Boolean isLineManagerLogged = (lm != null) ? true : false;
 
 			new JsonResult(isLineManagerLogged).printTo(out);
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageGridTimetable", ex);
+		}
+	}
+	
+	public void processGetOpportunityConfigurationFields(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try{
+			List<OOpportunityField> oOf;
+			
+			oOf = manager.getOpportunityFields(getEnv().getProfileId().getDomainId());
+
+			new JsonResult(oOf).printTo(out);
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action ManageGridTimetable", ex);

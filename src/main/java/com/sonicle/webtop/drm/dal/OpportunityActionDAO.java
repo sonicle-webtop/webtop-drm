@@ -60,13 +60,24 @@ public class OpportunityActionDAO extends BaseDAO {
 		return nextID;
 	}
 
-	public List<OOpportunityAction> selectByOpportunity(Connection con, int id) throws DAOException {
+	public OOpportunityAction select(Connection con, int id) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		return dsl
 				.select()
 				.from(OPPORTUNITY_ACTIONS)
 				.where(
 						OPPORTUNITY_ACTIONS.ID.equal(id)
+				)
+				.fetchOneInto(OOpportunityAction.class);
+	}
+	
+	public List<OOpportunityAction> selectByOpportunity(Connection con, int id) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.select()
+				.from(OPPORTUNITY_ACTIONS)
+				.where(
+						OPPORTUNITY_ACTIONS.OPPORTUNITY_ID.equal(id)
 				)
 				.fetchInto(OOpportunityAction.class);
 	}

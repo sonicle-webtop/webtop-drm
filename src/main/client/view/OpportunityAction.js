@@ -327,7 +327,6 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 
 		me.on('viewinvalid', me.onViewInvalid);
 		me.on('viewload', me.onViewLoad);
-
 	},
 	
 	gpDocument: function () {

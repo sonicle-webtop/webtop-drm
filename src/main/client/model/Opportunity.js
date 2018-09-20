@@ -75,7 +75,6 @@ Ext.define('Sonicle.webtop.drm.model.Opportunity', {
 	],
 	hasMany: [
 		WTF.hasMany('interlocutors', 'Sonicle.webtop.drm.model.OpportunityInterlocutor'),
-		WTF.hasMany('actions', 'Sonicle.webtop.drm.model.OpportunityAction'),
 		WTF.hasMany('documents', 'Sonicle.webtop.drm.model.OpportunityDocument')
 	]
 });
