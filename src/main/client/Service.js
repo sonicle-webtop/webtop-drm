@@ -34,112 +34,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	],
 	needsReload: true,
 	opportunityRequiredFields: null,
-	opportunityStructureFields: {
-		mainFields: {
-			executed_with: {
-				xtype: 'textfield',
-				reference: 'executedWith',
-				bind: '{record.executedWith}',
-				width: '420px'
-			}, customer: {
-				xtype: 'textfield',
-				reference: 'customer',
-				bind: '{record.customerId}',
-				width: '420px'
-			}, statistic_customer: {
-				xtype: 'textfield',
-				reference: 'statisticCustomer',
-				bind: '{record.customerStatId}',
-				width: '420px'
-			}, sector: {
-				xtype: 'textfield',
-				reference: 'sector',
-				bind: '{record.sector}',
-				width: '420px'
-			}, description: {
-				xtype: 'textfield',
-				reference: 'description',
-				bind: '{record.description}',
-				width: '420px'
-			}, place: {
-				xtype: 'textfield',
-				reference: 'place',
-				bind: '{record.place}',
-				width: '420px'
-			}, objective: {
-				xtype: 'textfield',
-				reference: 'objective',
-				bind: '{record.objective}',
-				width: '420px'
-			}, causal: {
-				xtype: 'textfield',
-				reference: 'causal',
-				bind: '{record.causalId}',
-				width: '420px'
-			}, activity: {
-				xtype: 'textfield',
-				reference: 'activity',
-				bind: '{record.activityId}',
-				width: '420px'
-			}, interlocutors: {
-				xtype: 'textfield',
-				reference: 'interlocutors',
-				bind: '{record.interlocutors}',
-				width: '420px'
-			}
-		},
-		visitReportFields: {
-			objective: {
-				xtype: 'textfield',
-				reference: 'objective2',
-				bind: '{record.objective2}',
-				width: '420px'
-			}, result: {
-				xtype: 'textfield',
-				reference: 'result',
-				bind: '{record.result}',
-				width: '420px'
-			}, discoveries: {
-				xtype: 'textfield',
-				reference: 'discoveries',
-				bind: '{record.discoveries}',
-				width: '420px'
-			}, customer_potential: {
-				xtype: 'textfield',
-				reference: 'customerPotential',
-				bind: '{record.customerPotential}',
-				width: '420px'
-			}
-		},
-		notesSignatureFields: {
-			notes: {
-				xtype: 'textfield',
-				reference: 'notes',
-				bind: '{record.notes}',
-				width: '420px'
-			}, status: {
-				xtype: 'textfield',
-				reference: 'status',
-				bind: '{record.statusId}',
-				width: '420px'
-			}, signed_by: {
-				xtype: 'textfield',
-				reference: 'signedBy',
-				bind: '{record.signedBy}',
-				width: '420px'
-			}, signature: {
-				xtype: 'textfield',
-				reference: 'signature',
-				bind: '{record.signature}',
-				width: '420px'
-			}, won: {
-				xtype: 'textfield',
-				reference: 'won',
-				bind: '{record.won}',
-				width: '420px'
-			}
-		}
-	},
+	opportunityStructureFields: null,
 	
 	init: function () {
 
@@ -1122,6 +1017,254 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		
 		//Opportunity Fields
 		me.opportunityRequiredFields = me.getVar('opportunityRequiredFields');
+		me.opportunityStructureFields = {
+			mainFields: {
+				executed_with: 
+					WTF.localCombo('id', 'desc', {
+					reference: 'executedWith',
+					bind: '{record.executedWith}',
+					anyMatch: true,
+					selectOnFocus: true,
+					width: '420px',
+					store: {
+						autoLoad: true,
+						model: 'WTA.model.Simple',
+						proxy: WTF.proxy(me.ID, 'LookupOperators')
+					}
+				}), customer: 
+					WTF.localCombo('id', 'desc', {
+					reference: 'customer',
+					bind: '{record.customerId}',
+					autoLoadOnValue: true,
+					selectOnFocus: true,
+					width: '420px',
+					store: {
+						model: 'WTA.model.Simple',
+						proxy: WTF.proxy(me.ID, 'LookupRealCustomers', null, {
+							extraParams: {
+								operator: null
+							}
+						}),
+						listeners: {
+							beforeload: function(s,op) {
+								WTU.applyExtraParams(op.getProxy(), {operator: me.getModel().get('operatorId')});
+							}
+						}
+					},
+					listeners: {
+						select: function (s, r) {
+							me.getViewModel().set('customerStatId', null);
+							WTU.loadWithExtraParams(me.lref('customer').getStore(), {
+								realCustomer: r.id
+							});
+							WTU.loadWithExtraParams(me.lref('causal').getStore(), {
+								masterDataId: r.id
+							});
+						}
+					}
+				}), statistic_customer:
+					WTF.localCombo('id', 'desc', {
+					reference: 'statisticCustomer',
+					bind: '{record.customerStatId}',
+					autoLoadOnValue: true,
+					selectOnFocus: true,
+					width: '420px',
+					store: {
+						model: 'WTA.model.Simple',
+						proxy: WTF.proxy(me.ID, 'LookupStatisticCustomers', null, {
+							extraParams: {
+								operator: null,
+								realCustomer: null
+							}
+						}),
+						listeners: {
+							load: function (s) {
+								if (me.isMode('new')) {
+									var meta = s.getProxy().getReader().metaData;
+									if(meta){
+										if (meta.selected) {
+											me.lookupReference('customer').setValue(meta.selected);
+										}
+									}
+								}
+							},
+							beforeload: function(s,op) {
+								WTU.applyExtraParams(op.getProxy(), {
+									operator: me.getModel().get('operatorId'),
+									realCustomer: me.getModel().get('customerId')
+								});
+							}
+						}
+					}
+				}), sector: {
+					xtype: 'textfield',
+					reference: 'sector',
+					bind: '{record.sector}',
+					width: '420px'
+				}, description: {
+					xtype: 'textfield',
+					reference: 'description',
+					bind: '{record.description}',
+					width: '420px'
+				}, place: {
+					xtype: 'textfield',
+					reference: 'place',
+					bind: '{record.place}',
+					width: '420px'
+				}, objective: {
+					xtype: 'textareafield',
+					reference: 'objective',
+					bind: '{record.objective}',
+					width: '420px'
+				}, causal: WTF.localCombo('id', 'desc', {
+					reference: 'causal',
+					bind: '{record.causalId}',
+					autoLoadOnValue: true,
+					selectOnFocus: true,
+					width: '420px',
+					store: {
+						model: 'WTA.model.CausalLkp',
+						proxy: WTF.proxy(WT.ID, 'LookupCausals', null, {
+							extraParams: {
+								profileId: null,
+								masterDataId: null
+							}
+						}),
+						filters: [{
+							filterFn: function (rec) {
+								if (rec.get('readOnly')) {
+									if (rec.getId() !== me.lref('causal').getValue()) {
+										return null;
+									}
+								}
+								return rec;
+							}
+						}],
+						listeners: {
+							beforeload: function(s,op) {
+								WTU.applyExtraParams(op.getProxy(), {
+									profileId: WT.toPid(WT.getVar('domainId'), me.getModel().get('operatorId')),
+									masterDataId: me.getModel().get('customerId')
+								});
+							}
+						}
+					},
+					triggers: {
+						clear: WTF.clearTrigger()
+					}
+				}), activity: WTF.remoteCombo('id', 'desc', {
+					reference: 'activity',
+					bind: '{record.activityId}',
+					autoLoadOnValue: true,
+					width: '420px',
+					store: {
+						model: 'WTA.model.ActivityLkp',
+						//Rimuovere gli extraParams quando Matteo m fa la modifica
+						proxy: WTF.proxy(WT.ID, 'LookupActivities', null, {
+							extraParams: {
+								profileId: WT.getVar('profileId')
+							}
+						}),
+						filters: [{
+							filterFn: function(rec) {
+								if(rec.get('readOnly')) {
+									if(rec.getId() !== me.lref('activity').getValue()) {
+										return null;
+									}
+								}
+								return rec;
+							}
+						}]
+					},
+					triggers: {
+						clear: WTF.clearTrigger()
+					}
+				}), interlocutors:{
+					xtype: 'wtdrmcontactgrid',
+					reference: 'interlocutors',
+					sid: me.ID,
+					actionsInToolbar: false,
+					width: '100%',
+					height: 100,
+					flex: 1,
+					border: true,
+					style: 'margin-bottom: 5px;',
+					bind: {
+						store: '{record.interlocutors}'
+					},
+					listeners: {
+						pick: function (s, vals, recs) {
+							var mo = me.getModel();
+							mo.interlocutors().add({
+								contactId: recs[0].getId(),
+								desc: recs[0].get('desc')
+							});
+						}
+					}
+				}
+			},
+			visitReportFields: {
+				objective: {
+					xtype: 'textareafield',
+					reference: 'objective2',
+					bind: '{record.objective2}',
+					width: '420px'
+				}, result: {
+					xtype: 'textareafield',
+					reference: 'result',
+					bind: '{record.result}',
+					width: '420px'
+				}, discoveries: {
+					xtype: 'textareafield',
+					reference: 'discoveries',
+					bind: '{record.discoveries}',
+					width: '420px'
+				}, customer_potential: {
+					xtype: 'textareafield',
+					reference: 'customerPotential',
+					bind: '{record.customerPotential}',
+					width: '420px'
+				}
+			},
+			notesSignatureFields: {
+				notes: {
+					xtype: 'textareafield',
+					reference: 'notes',
+					bind: '{record.notes}',
+					width: '420px'
+				}, status: WTF.localCombo('id', 'desc', {
+					reference: 'status',
+					bind: '{record.statusId}',
+					width: '420px',
+					store: {
+						autoLoad: true,
+						model: 'WTA.model.Simple',
+						proxy: WTF.proxy(me.ID, 'LookupDocStatuses')
+					}
+				}), signed_by: WTF.localCombo('id', 'desc', {
+					reference: 'signedBy',
+					bind: '{record.signedBy}',
+					anyMatch: true,
+					selectOnFocus: true,
+					width: '420px',
+					store: {
+						autoLoad: true,
+						model: 'WTA.model.Simple',
+						proxy: WTF.proxy(me.ID, 'LookupOperators')
+					}
+				}), signature: {
+					xtype: 'checkbox',
+					reference: 'signature',
+					bind: '{record.signature}',
+					boxLabelAlign: 'before'
+				}, won: {
+					xtype: 'checkbox',
+					reference: 'won',
+					bind: '{record.won}',
+					boxLabelAlign: 'before'
+				}
+			}
+		}
 	},
 	
 	filtersOpportunity: function () {

@@ -33,6 +33,7 @@
 Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 	extend: 'WTA.sdk.ModelView',
 	requires: [
+		'Sonicle.webtop.drm.ux.ContactGrid',
 		'Sonicle.webtop.drm.model.Opportunity',
 		'WTA.ux.data.SimpleSourceModel',
 		'Sonicle.Bytes',
@@ -42,7 +43,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 		title: '{opportunity.tit}',
 		iconCls: 'wtdrm-icon-opportunity-xs',
 		width: 920,
-		height: 500
+		height: 550
 	},
 	fieldTitle: 'id',
 	modelName: 'Sonicle.webtop.drm.model.Opportunity',
@@ -55,7 +56,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 			tbar: [
 				'->',
 				WTF.localCombo('id', 'desc', {
-					reference: 'flduser',
+					reference: 'user',
 					bind: '{record.operatorId}',
 					anyMatch: true,
 					selectOnFocus: true,
@@ -67,7 +68,9 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 							load: function (s) {
 								if (me.isMode('new')) {
 									if (s.loadCount === 1) {
-										me.lref('fldcompany').getStore().load();
+										me.lref('company').getStore().load();
+										me.lref('customer').getStore().load();
+										me.lref('causal').getStore().load();
 									}
 								}
 							}
@@ -75,7 +78,10 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 					},
 					listeners: {
 						select: function (s, r) {
-							me.lref('fldcompany').getStore().load();
+							me.lref('company').getStore().load();
+							me.lref('customer').getStore().load();
+							me.lref('statisticCustomer').getStore().load();
+							me.lref('causal').getStore().load();
 						}
 					},
 					fieldLabel: me.mys.res('opportunity.fld-nominative.lbl'),
@@ -113,7 +119,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 									},
 									items: [
 										WTF.localCombo('id', 'desc', {
-											reference: 'fldcompany',
+											reference: 'company',
 											bind: '{record.companyId}',
 											autoLoadOnValue: true,
 											tabIndex: 101,
@@ -133,7 +139,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 														if (me.isMode('new')) {
 															var meta = s.getProxy().getReader().metaData;
 															if (meta.selected) {
-																me.lookupReference('fldcompany').setValue(meta.selected);
+																me.lookupReference('company').setValue(meta.selected);
 															}
 														}
 													}
@@ -447,6 +453,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 		Ext.each(me.mys.opportunityRequiredFields.mainFields, function(element) {
 			var cfg = me.mys.opportunityStructureFields.mainFields[element.field];
 			cfg.fieldLabel = element.label;
+			cfg.title = element.label;	//Solo per Griglia Interlocutori
 			//gestire required
 			 me.lref('mainForm').add(Ext.create(cfg));
 		});
@@ -485,7 +492,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 			vct.getView().begin('new', {
 				data: {
 					opportunityId: me.getModel().get('id'),
-					operatorId: me.lref('flduser').getValue()
+					operatorId: me.lref('user').getValue()
 				}
 			});
 		});
@@ -590,7 +597,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 		var me = this,
 				mo = me.getModel();
 		
-		if(mo.get('operatorId') === null) me.lref('flduser').setReadOnly(false);
+		if(mo.get('operatorId') === null) me.lref('user').setReadOnly(false);
 		
 		if(me.isMode(me.MODE_EDIT)) {
 			me.lref('gpOpportunityActions').setDisabled(false);
