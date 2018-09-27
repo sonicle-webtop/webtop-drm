@@ -5365,7 +5365,7 @@ public class DrmManager extends BaseManager {
 		return PathUtils.concatPaths(publicBaseUrl, s);
 	}
 	
-	public List<OOpportunityField> getActiveOpportunityFieldsByDomainIdTabId(String domainId, String tabId) throws WTException {
+	public List<OOpportunityField> getOpportunityFieldsByDomainIdTabId(String domainId, String tabId) throws WTException {
 		Connection con = null;
 		OpportunityFieldDAO oFDao = OpportunityFieldDAO.getInstance();
 		List<OOpportunityField> oFields = null;
@@ -5373,9 +5373,9 @@ public class DrmManager extends BaseManager {
 		try {
 			con = WT.getConnection(SERVICE_ID);
 
-			oFields = oFDao.selectActiveByDomainIdTabId(con, domainId, tabId);
+			oFields = oFDao.selectByDomainIdTabId(con, domainId, tabId);
 			
-			if(oFields == null) oFields = oFDao.selectActiveByDomainIdTabId(con, "*", tabId);
+			if(oFields == null) oFields = oFDao.selectByDomainIdTabId(con, "*", tabId);
 			
 			return oFields;
 

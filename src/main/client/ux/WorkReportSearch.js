@@ -74,7 +74,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 					reference: 'flduser',
 					bind: '{operatorId}',
 					anyMatch: true,
-					tabIndex: 1,
+					tabIndex: 101,
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -130,7 +130,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 					reference: 'fldmasterdata',
 					bind: '{realCustomerId}',
 					autoLoadOnValue: true,
-					tabIndex: 3,
+					tabIndex: 103,
 					store: {
 						model: 'WTA.model.Simple',
 						proxy: WTF.proxy(me.sid, 'LookupRealCustomers', null, {
@@ -161,7 +161,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 					startDay: WT.getStartDay(),
 					reference: 'fldfrom',
 					bind: '{from}',
-					tabIndex: 5,
+					tabIndex: 105,
 					triggers: {
 						clear: WTF.clearTrigger()
 					},
@@ -172,7 +172,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 					xtype: 'textfield',
 					reference: 'fldreference',
 					bind: '{referenceNo}',
-					tabIndex: 7,
+					tabIndex: 107,
 					triggers: {
 						clear: WTF.clearTrigger()
 					},
@@ -182,7 +182,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 				WTF.localCombo('id', 'desc', {
 					reference: 'fldbusinesstrip',
 					bind: '{businessTripId}',
-					tabIndex: 9,
+					tabIndex: 109,
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -198,7 +198,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 					xtype: 'textfield',
 					reference: 'flddescription',
 					bind: '{description}',
-					tabIndex: 10,
+					tabIndex: 110,
 					triggers: {
 						clear: WTF.clearTrigger()
 					},
@@ -208,7 +208,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 				WTF.localCombo('id', 'desc', {
 					reference: 'flddocstatus',
 					bind: '{docStatusId}',
-					tabIndex: 12,
+					tabIndex: 112,
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -224,7 +224,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 					xtype: 'combo',
 					reference: 'fldyear',
 					bind: '{year}',
-					tabIndex: 14,
+					tabIndex: 114,
 					store: Ext.create('Sonicle.webtop.drm.store.YearStore', {
 						autoLoad: true
 
@@ -255,7 +255,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 				WTF.localCombo('id', 'desc', {
 					reference: 'fldcompany',
 					bind: '{companyId}',
-					tabIndex: 2,
+					tabIndex: 102,
 					store: {
 						autoLoad: false,
 						model: 'WTA.model.Simple',
@@ -283,7 +283,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 					reference: 'fldstatmasterdata',
 					bind: '{statisticCustomerId}',
 					autoLoadOnValue: true,
-					tabIndex: 4,
+					tabIndex: 104,
 					store: {
 						model: 'WTA.model.Simple',
 						proxy: WTF.proxy(me.sid, 'LookupStatisticCustomers', null, {
@@ -314,7 +314,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 					startDay: WT.getStartDay(),
 					reference: 'fldto',
 					bind: '{to}',
-					tabIndex: 6,
+					tabIndex: 106,
 					triggers: {
 						clear: WTF.clearTrigger()
 					},
@@ -325,7 +325,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 					reference: 'fldcausal',
 					bind: '{causalId}',
 					autoLoadOnValue: false,
-					tabIndex: 8,
+					tabIndex: 108,
 					store: {
 						model: 'WTA.model.CausalLkp',
 						proxy: WTF.proxy(WT.ID, 'LookupCausals', null, {
@@ -358,7 +358,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 					xtype: 'textfield',
 					reference: 'fldnotes',
 					bind: '{notes}',
-					tabIndex: 11,
+					tabIndex: 111,
 					triggers: {
 						clear: WTF.clearTrigger()
 					},
@@ -368,7 +368,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 				WTF.localCombo('id', 'desc', {
 					reference: 'fldchargeto',
 					bind: '{chargeTo}',
-					tabIndex: 13,
+					tabIndex: 113,
 					store: Ext.create('Sonicle.webtop.drm.store.Charged', {
 						autoLoad: true
 					}),
@@ -382,7 +382,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 					xtype: 'textfield',
 					reference: 'fldworkreportno',
 					bind: '{workReportNo}',
-					tabIndex: 15,
+					tabIndex: 115,
 					triggers: {
 						clear: WTF.clearTrigger()
 					},

@@ -250,13 +250,13 @@ public class Service extends BaseService {
 			ArrayList<JsOpportunityField> visitReportFields=new ArrayList<>();
 			ArrayList<JsOpportunityField> notesSignatureFields=new ArrayList<>();
 
-			for(OOpportunityField OOf : manager.getActiveOpportunityFieldsByDomainIdTabId(getEnv().getProfileId().getDomainId(), EnumUtils.toSerializedName(OpportunityField.Tab.MAIN))){
+			for(OOpportunityField OOf : manager.getOpportunityFieldsByDomainIdTabId(getEnv().getProfileId().getDomainId(), EnumUtils.toSerializedName(OpportunityField.Tab.MAIN))){
 				mainFields.add(new JsOpportunityField(OOf));
 			}
-			for(OOpportunityField OOf : manager.getActiveOpportunityFieldsByDomainIdTabId(getEnv().getProfileId().getDomainId(), EnumUtils.toSerializedName(OpportunityField.Tab.VISIT_REPORT))){
+			for(OOpportunityField OOf : manager.getOpportunityFieldsByDomainIdTabId(getEnv().getProfileId().getDomainId(), EnumUtils.toSerializedName(OpportunityField.Tab.VISIT_REPORT))){
 				visitReportFields.add(new JsOpportunityField(OOf));
 			}
-			for(OOpportunityField OOf : manager.getActiveOpportunityFieldsByDomainIdTabId(getEnv().getProfileId().getDomainId(), EnumUtils.toSerializedName(OpportunityField.Tab.NOTES_SIGNATURE))){
+			for(OOpportunityField OOf : manager.getOpportunityFieldsByDomainIdTabId(getEnv().getProfileId().getDomainId(), EnumUtils.toSerializedName(OpportunityField.Tab.NOTES_SIGNATURE))){
 				notesSignatureFields.add(new JsOpportunityField(OOf));
 			}
 

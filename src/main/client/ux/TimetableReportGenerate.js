@@ -89,7 +89,8 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableReportGenerate', {
 						clear: WTF.clearTrigger()
 					},
 					fieldLabel: WT.res(me.sid, 'timetableReportGenerate.fld-operator.lbl'),
-					width: '420px'
+					width: '420px',
+					tabIndex: 101
 				}),
 				{
 					xtype: 'fieldcontainer',
@@ -106,7 +107,8 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableReportGenerate', {
 								autoLoad: true
 							}),
 							fieldLabel: WT.res(me.sid, 'timetableReportGenerate.fld-monthyear.lbl'),
-							width: 270
+							width: 270,
+							tabIndex: 103
 
 						}),
 						WTF.lookupCombo('year', 'year', {
@@ -115,7 +117,8 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableReportGenerate', {
 							store: Ext.create('Sonicle.webtop.drm.store.YearStore', {
 								autoLoad: true
 							}),
-							width: 145
+							width: 145,
+							tabIndex: 104
 						})
 					]
 				},
@@ -157,7 +160,8 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableReportGenerate', {
 						}
 					},
 					fieldLabel: WT.res(me.sid, 'timetableReportGenerate.fld-company.lbl'),
-					width: '420px'
+					width: '420px',
+					tabIndex: 102
 				}),
 				 {
                     xtype: 'numberfield',
@@ -167,7 +171,8 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableReportGenerate', {
 					editable: false,
                     minValue: 1,
                     maxValue: 31,
-					fieldLabel: WT.res(me.sid, 'timetableReportGenerate.fld-fromday.lbl')
+					fieldLabel: WT.res(me.sid, 'timetableReportGenerate.fld-fromday.lbl'),
+					tabIndex: 105
                 }
 			]
 		});

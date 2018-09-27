@@ -94,7 +94,8 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 						clear: WTF.clearTrigger()
 					},
 					fieldLabel: WT.res(me.sid, 'timetableRequestSearch.operator.lbl'),
-					width: '420px'
+					width: '420px',
+					tabIndex: 101
 				}),
 				{
 					xtype: 'datefield',
@@ -105,7 +106,8 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 						clear: WTF.clearTrigger()
 					},
 					fieldLabel: WT.res(me.sid, 'timetableRequestSearch.fromDate.lbl'),
-					width: '420px'
+					width: '420px',
+					tabIndex: 103
 				},
 				WTF.localCombo('id', 'desc', {
 					reference: 'fldtype',
@@ -119,7 +121,8 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 						clear: WTF.clearTrigger()
 					},
 					fieldLabel: WT.res(me.sid, 'timetableRequestSearch.type.lbl'),
-					width: '420px'
+					width: '420px',
+					tabIndex: 105
 				}),
 				WTF.lookupCombo('id', 'desc', {
 					reference: 'fldapproved',
@@ -131,7 +134,8 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 						clear: WTF.clearTrigger()
 					},
 					fieldLabel: WT.res(me.sid, 'timetableRequestSearch.approved.lbl'),
-					width: '420px'
+					width: '420px',
+					tabIndex: 107
 				}),
 				{
 					xtype: 'button',
@@ -172,7 +176,8 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 						clear: WTF.clearTrigger()
 					},
 					fieldLabel: WT.res(me.sid, 'timetableRequestSearch.company.lbl'),
-					width: '420px'
+					width: '420px',
+					tabIndex: 102
 				}),
 				{
 					xtype: 'datefield',
@@ -183,7 +188,8 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 						clear: WTF.clearTrigger()
 					},
 					fieldLabel: WT.res(me.sid, 'timetableRequestSearch.toDate.lbl'),
-					width: '420px'
+					width: '420px',
+					tabIndex: 104
 				},
 				WTF.localCombo('id', 'desc', {
 					reference: 'fldstatus',
@@ -195,7 +201,8 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 						clear: WTF.clearTrigger()
 					},
 					fieldLabel: WT.res(me.sid, 'timetableRequestSearch.status.lbl'),
-					width: '420px'
+					width: '420px',
+					tabIndex: 106
 				})
 			]
 		});

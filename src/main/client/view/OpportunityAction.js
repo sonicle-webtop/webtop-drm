@@ -126,7 +126,7 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 														model: 'WTA.model.Simple',
 														proxy: WTF.proxy(me.mys.ID, 'LookupDocStatuses')
 													},
-													tabIndex: 101
+													tabIndex: 401
 												}), 
 												{
 													xtype: 'datefield',
@@ -134,7 +134,7 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 													reference: 'date',
 													bind: '{record.date}',
 													format: WT.getShortDateFmt(),
-													tabIndex: 102,
+													tabIndex: 402,
 													selectOnFocus: true,
 													fieldLabel: me.mys.res('opportunityAction.fld-date.lbl')
 												}
@@ -157,7 +157,7 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 													triggerAction: 'all',
 													regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
 													regexText: me.mys.res('gpLineHours.column.format.lbl'),
-													tabIndex: 103,
+													tabIndex: 403,
 													store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 														autoLoad: true
 													})
@@ -173,7 +173,7 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 													triggerAction: 'all',
 													regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
 													regexText: me.mys.res('gpLineHours.column.format.lbl'),
-													tabIndex: 104,
+													tabIndex: 404,
 													store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 														autoLoad: true
 													})
@@ -184,7 +184,7 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 											fieldLabel: me.mys.res('opportunityAction.fld-place.lbl'),
 											bind: '{record.place}',
 											width: '510px',
-											tabIndex: 105,
+											tabIndex: 405,
 											selectOnFocus: true
 										}, WTF.remoteCombo('id', 'desc', {
 											reference: 'activity',
@@ -214,13 +214,13 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 											},
 											fieldLabel: me.mys.res('opportunityAction.fld-activity.lbl'),
 											width: '510px',
-											tabIndex: 106
+											tabIndex: 406
 										}), {
 											xtype: 'textfield',
 											bind: '{record.description}',
 											fieldLabel: me.mys.res('opportunityAction.fld-description.lbl'),
 											width: '510px',
-											tabIndex: 107,
+											tabIndex: 407,
 											selectOnFocus: true
 										}, {
 											xtype: 'textareafield',
@@ -228,7 +228,7 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 											fieldLabel: me.mys.res('opportunityAction.fld-subsequentActions.lbl'),
 											labelAlign: 'top',
 											anchor: '100%',
-											tabIndex: 108
+											tabIndex: 408
 										}
 									]
 								})

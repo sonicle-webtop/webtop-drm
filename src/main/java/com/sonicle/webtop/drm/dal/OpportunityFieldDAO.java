@@ -80,26 +80,6 @@ public class OpportunityFieldDAO extends BaseDAO {
 				)
 				.fetchInto(OOpportunityField.class);
 	}
-	
-	public List<OOpportunityField> selectActiveByDomainIdTabId(Connection con, String domainId, String tabId) throws DAOException {
-		DSLContext dsl = getDSL(con);
-		return dsl
-				.select()
-				.from(OPPORTUNITY_FIELDS)
-				.where(
-						OPPORTUNITY_FIELDS.DOMAIN_ID.equal(domainId)
-				)
-				.and(
-						OPPORTUNITY_FIELDS.TAB_ID.equal(tabId)
-				)
-				.and(
-						OPPORTUNITY_FIELDS.VISIBLE.equal(Boolean.TRUE)
-				)
-				.orderBy(
-						OPPORTUNITY_FIELDS.ORDER
-				)
-				.fetchInto(OOpportunityField.class);
-	}
 
 	public int insertByDomainIdDefault(Connection con, String domainId) throws DAOException {
 		DSLContext dsl = getDSL(con);

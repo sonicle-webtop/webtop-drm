@@ -92,7 +92,8 @@ Ext.define('Sonicle.webtop.drm.ux.ExpenseNoteSearch', {
 						clear: WTF.clearTrigger()
 					},
 					fieldLabel: WT.res(me.sid, 'expenseNote.operator.lbl'),
-					width: '420px'
+					width: '420px',
+					tabIndex: 101
 				}),
 				{
 					xtype: 'datefield',
@@ -103,7 +104,8 @@ Ext.define('Sonicle.webtop.drm.ux.ExpenseNoteSearch', {
 						clear: WTF.clearTrigger()
 					},
 					fieldLabel: WT.res(me.sid, 'expenseNote.fromDate.lbl'),
-					width: '420px'
+					width: '420px',
+					tabIndex: 103
 				},
 				WTF.localCombo('id', 'desc', {
 					reference: 'fldtatus',
@@ -117,7 +119,8 @@ Ext.define('Sonicle.webtop.drm.ux.ExpenseNoteSearch', {
 						clear: WTF.clearTrigger()
 					},
 					fieldLabel: WT.res(me.sid, 'expenseNote.status.lbl'),
-					width: '420px'
+					width: '420px',
+					tabIndex: 105
 				}),
 				{
 					xtype: 'button',
@@ -158,7 +161,8 @@ Ext.define('Sonicle.webtop.drm.ux.ExpenseNoteSearch', {
 						clear: WTF.clearTrigger()
 					},
 					fieldLabel: WT.res(me.sid, 'expenseNote.company.lbl'),
-					width: '420px'
+					width: '420px',
+					tabIndex: 102
 				}),
 				{
 					xtype: 'datefield',
@@ -169,7 +173,8 @@ Ext.define('Sonicle.webtop.drm.ux.ExpenseNoteSearch', {
 						clear: WTF.clearTrigger()
 					},
 					fieldLabel: WT.res(me.sid, 'expenseNote.toDate.lbl'),
-					width: '420px'
+					width: '420px',
+					tabIndex: 104
 				}
 			]
 		});

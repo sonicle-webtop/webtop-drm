@@ -135,7 +135,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											reference: 'fldcompany',
 											bind: '{record.companyId}',
 											autoLoadOnValue: true,
-											tabIndex: 101,
+											tabIndex: 201,
 											selectOnFocus: true,
 											store: {
 												model: 'WTA.model.Simple',
@@ -165,7 +165,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											xtype: 'sosourcecombo',
 											bind: '{record.contactId}',
 											anyMatch: true,
-											tabIndex: 102,
+											tabIndex: 202,
 											selectOnFocus: true,
 											store: {
 												autoLoad: true,
@@ -180,7 +180,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											reference: 'fldmasterdata',
 											bind: '{record.customerId}',
 											autoLoadOnValue: true,
-											tabIndex: 103,
+											tabIndex: 203,
 											selectOnFocus: true,
 											store: {
 												model: 'WTA.model.Simple',
@@ -230,7 +230,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											reference: 'fldfromdate',
 											bind: '{record.fromDate}',
 											format: WT.getShortDateFmt(),
-											tabIndex: 105,
+											tabIndex: 205,
 											selectOnFocus: true,
 											listeners: {
 												select: function (s, v) {
@@ -249,14 +249,14 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											bind: '{record.referenceNo}',
 											fieldLabel: me.mys.res('workReport.fld-reference.lbl'),
 											width: '420px',
-											tabIndex: 107,
+											tabIndex: 207,
 											selectOnFocus: true
 										}, {
 											xtype: 'textfield',
 											bind: '{record.ddtNo}',
 											fieldLabel: me.mys.res('workReport.fld-ddt.lbl'),
 											width: '420px',
-											tabIndex: 109,
+											tabIndex: 209,
 											selectOnFocus: true
 										}
 									]
@@ -276,7 +276,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											reference: 'fldstatmasterdata',
 											bind: '{record.customerStatId}',
 											autoLoadOnValue: true,
-											tabIndex: 104,
+											tabIndex: 204,
 											selectOnFocus: true,
 											store: {
 												model: 'WTA.model.Simple',
@@ -313,7 +313,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											startDay: WT.getStartDay(),
 											reference: 'fldtodate',
 											bind: '{record.toDate}',
-											tabIndex: 106,
+											tabIndex: 206,
 											selectOnFocus: true,
 											listeners: {
 												select: function (s, rec) {
@@ -330,7 +330,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											reference: 'fldcausal',
 											bind: '{record.causalId}',
 											autoLoadOnValue: true,
-											tabIndex: 108,
+											tabIndex: 208,
 											selectOnFocus: true,
 											store: {
 												model: 'WTA.model.CausalLkp',
@@ -372,7 +372,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											format: WT.getShortDateFmt(),
 											fieldLabel: me.mys.res('workReport.fld-ddtToDate.lbl'),
 											width: '420px',
-											tabIndex: 110,
+											tabIndex: 210,
 											selectOnFocus: true
 										}
 									]

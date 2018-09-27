@@ -64,7 +64,7 @@ Ext.define('Sonicle.webtop.drm.ux.OpportunitySearch', {
 					reference: 'flduser',
 					bind: '{operatorId}',
 					anyMatch: true,
-					tabIndex: 1,
+					tabIndex: 101,
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -101,7 +101,7 @@ Ext.define('Sonicle.webtop.drm.ux.OpportunitySearch', {
 					startDay: WT.getStartDay(),
 					reference: 'flddate',
 					bind: '{date}',
-					tabIndex: 3,
+					tabIndex: 103,
 					triggers: {
 						clear: WTF.clearTrigger()
 					},
@@ -119,7 +119,7 @@ Ext.define('Sonicle.webtop.drm.ux.OpportunitySearch', {
 					triggerAction: 'all',
 					regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
 					regexText: WT.res(me.sid, 'gpLineHours.column.format.lbl'),
-					tabIndex: 4,
+					tabIndex: 104,
 					store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 						autoLoad: true
 					})
@@ -142,7 +142,7 @@ Ext.define('Sonicle.webtop.drm.ux.OpportunitySearch', {
 				WTF.localCombo('id', 'desc', {
 					reference: 'fldcompany',
 					bind: '{companyId}',
-					tabIndex: 2,
+					tabIndex: 102,
 					store: {
 						autoLoad: false,
 						model: 'WTA.model.Simple',
@@ -180,7 +180,7 @@ Ext.define('Sonicle.webtop.drm.ux.OpportunitySearch', {
 					triggerAction: 'all',
 					regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
 					regexText: WT.res(me.sid, 'gpLineHours.column.format.lbl'),
-					tabIndex: 5,
+					tabIndex: 105,
 					store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 						autoLoad: true
 					})

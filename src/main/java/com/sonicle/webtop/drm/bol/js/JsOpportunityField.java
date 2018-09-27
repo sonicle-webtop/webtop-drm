@@ -33,11 +33,6 @@
 package com.sonicle.webtop.drm.bol.js;
 
 import com.sonicle.webtop.drm.bol.OOpportunityField;
-import com.sonicle.webtop.drm.model.DrmGroup;
-import com.sonicle.webtop.drm.model.DrmGroupUserAssociation;
-import com.sonicle.webtop.drm.model.OpportunityField;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -48,10 +43,12 @@ public class JsOpportunityField {
 	public String field;
 	public String label;
 	public Boolean required;
+	public Boolean visible;
 
 	public JsOpportunityField(OOpportunityField oOF) {
 		this.field = oOF.getFieldId();
 		this.label = oOF.getLabel();
 		this.required = oOF.getRequired();
+		this.visible = oOF.getVisible();
 	}
 }

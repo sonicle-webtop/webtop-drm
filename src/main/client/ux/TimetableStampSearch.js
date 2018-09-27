@@ -65,7 +65,7 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableStampSearch', {
 					typeAhead: false,
 					selectOnFocus: false,
 					anyMatch: true,
-					tabIndex: 1,
+					tabIndex: 101,
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -91,7 +91,8 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableStampSearch', {
 						autoLoad: true
 					}),
 					fieldLabel: WT.res(me.sid, 'timetablestamp.fld-month.lbl'),
-					width: '420px'
+					width: '420px',
+					tabIndex: 102
 
 				}),
 				{
@@ -119,7 +120,8 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableStampSearch', {
 						autoLoad: true
 					}),
 					fieldLabel: WT.res(me.sid, 'timetablestamp.fld-year.lbl'),
-					width: '420px'
+					width: '420px',
+					tabIndex: 103
 				})
 			]
 		});
