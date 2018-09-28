@@ -926,3 +926,10 @@ CREATE TABLE "drm"."opportunity_action_documents" (
 "media_tpye" varchar(100) NOT NULL,
 PRIMARY KEY ("id")
 );
+
+--------------
+--28/09/2018--
+--------------
+
+ALTER TABLE "drm"."opportunity_fields"
+ADD COLUMN "show_on_grid" bool DEFAULT false;

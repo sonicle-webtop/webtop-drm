@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OpportunityFields implements java.io.Serializable {
 
-	private static final long serialVersionUID = 1260924379;
+	private static final long serialVersionUID = -2073334739;
 
 	private java.lang.String  domainId;
 	private java.lang.String  tabId;
@@ -25,6 +25,7 @@ public class OpportunityFields implements java.io.Serializable {
 	private java.lang.Boolean required;
 	private java.lang.Integer order;
 	private java.lang.String  label;
+	private java.lang.Boolean showOnGrid;
 
 	public OpportunityFields() {}
 
@@ -35,7 +36,8 @@ public class OpportunityFields implements java.io.Serializable {
 		java.lang.Boolean visible,
 		java.lang.Boolean required,
 		java.lang.Integer order,
-		java.lang.String  label
+		java.lang.String  label,
+		java.lang.Boolean showOnGrid
 	) {
 		this.domainId = domainId;
 		this.tabId = tabId;
@@ -44,6 +46,7 @@ public class OpportunityFields implements java.io.Serializable {
 		this.required = required;
 		this.order = order;
 		this.label = label;
+		this.showOnGrid = showOnGrid;
 	}
 
 	public java.lang.String getDomainId() {
@@ -100,5 +103,13 @@ public class OpportunityFields implements java.io.Serializable {
 
 	public void setLabel(java.lang.String label) {
 		this.label = label;
+	}
+
+	public java.lang.Boolean getShowOnGrid() {
+		return this.showOnGrid;
+	}
+
+	public void setShowOnGrid(java.lang.Boolean showOnGrid) {
+		this.showOnGrid = showOnGrid;
 	}
 }

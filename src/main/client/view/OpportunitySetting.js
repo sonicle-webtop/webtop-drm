@@ -110,6 +110,16 @@ Ext.define('Sonicle.webtop.drm.view.OpportunitySetting', {
 										matchFieldWidth: true
 									},
 									header: me.mys.res('gpOpportunityFields.required.lbl')
+								},
+								{
+									dataIndex: 'showOnGrid',
+									xtype: 'checkcolumn',
+									width: '25',
+									editor: {
+										xtype: 'checkbox',
+										matchFieldWidth: true
+									},
+									header: me.mys.res('gpOpportunityFields.showOnGrid.lbl')
 								}
 							]
 						},
@@ -168,6 +178,16 @@ Ext.define('Sonicle.webtop.drm.view.OpportunitySetting', {
 										matchFieldWidth: true
 									},
 									header: me.mys.res('gpOpportunityFields.required.lbl')
+								},
+								{
+									dataIndex: 'showOnGrid',
+									xtype: 'checkcolumn',
+									width: '25',
+									editor: {
+										xtype: 'checkbox',
+										matchFieldWidth: true
+									},
+									header: me.mys.res('gpOpportunityFields.showOnGrid.lbl')
 								}
 							]
 						},
@@ -225,6 +245,16 @@ Ext.define('Sonicle.webtop.drm.view.OpportunitySetting', {
 										matchFieldWidth: true
 									},
 									header: me.mys.res('gpOpportunityFields.required.lbl')
+								},
+								{
+									dataIndex: 'showOnGrid',
+									xtype: 'checkcolumn',
+									width: '25',
+									editor: {
+										xtype: 'checkbox',
+										matchFieldWidth: true
+									},
+									header: me.mys.res('gpOpportunityFields.showOnGrid.lbl')
 								}
 							]
 						}

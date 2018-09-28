@@ -32,6 +32,7 @@
  */
 package com.sonicle.webtop.drm.dal;
 
+import com.sonicle.webtop.core.bol.js.JsSimple;
 import com.sonicle.webtop.core.dal.BaseDAO;
 import com.sonicle.webtop.core.dal.DAOException;
 import com.sonicle.webtop.drm.bol.OOpportunityField;
@@ -80,6 +81,27 @@ public class OpportunityFieldDAO extends BaseDAO {
 				)
 				.fetchInto(OOpportunityField.class);
 	}
+	
+	public List<OOpportunityField> selectFieldIdByDomainIdVisibleShowOnGrid(Connection con, String domainId) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.select()
+				.from(OPPORTUNITY_FIELDS)
+				.where(
+						OPPORTUNITY_FIELDS.DOMAIN_ID.equal(domainId)
+				)
+				.and(
+						OPPORTUNITY_FIELDS.VISIBLE.equal(true)
+				)
+				.and(
+						OPPORTUNITY_FIELDS.SHOW_ON_GRID.equal(true)
+				)
+				.orderBy(
+						OPPORTUNITY_FIELDS.TAB_ID,
+						OPPORTUNITY_FIELDS.ORDER
+				)
+				.fetchInto(OOpportunityField.class);
+	}
 
 	public int insertByDomainIdDefault(Connection con, String domainId) throws DAOException {
 		DSLContext dsl = getDSL(con);
@@ -95,7 +117,8 @@ public class OpportunityFieldDAO extends BaseDAO {
 							OPPORTUNITY_FIELDS.VISIBLE,
 							OPPORTUNITY_FIELDS.REQUIRED,
 							OPPORTUNITY_FIELDS.ORDER,
-							OPPORTUNITY_FIELDS.LABEL
+							OPPORTUNITY_FIELDS.LABEL,
+							OPPORTUNITY_FIELDS.SHOW_ON_GRID
 						)
 						.from(OPPORTUNITY_FIELDS)
 						.where(OPPORTUNITY_FIELDS.DOMAIN_ID.equal("*"))
@@ -122,6 +145,7 @@ public class OpportunityFieldDAO extends BaseDAO {
 				.set(OPPORTUNITY_FIELDS.REQUIRED, item.getRequired())
 				.set(OPPORTUNITY_FIELDS.ORDER, item.getOrder())
 				.set(OPPORTUNITY_FIELDS.LABEL, item.getLabel())
+				.set(OPPORTUNITY_FIELDS.SHOW_ON_GRID, item.getShowOnGrid())
 				.where(
 						OPPORTUNITY_FIELDS.DOMAIN_ID.equal(item.getDomainId())
 				)

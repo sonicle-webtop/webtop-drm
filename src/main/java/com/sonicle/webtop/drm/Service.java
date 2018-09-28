@@ -1201,13 +1201,19 @@ public class Service extends BaseService {
 			String crud = ServletUtils.getStringParameter(request, "crud", true);
 			
 			if (crud.equals(Crud.READ)) {
-
+				
 				String query = ServletUtils.getStringParameter(request, "query", null);
 				OpportunityQuery oQuery = OpportunityQuery.fromJson(query);
+				JsGridOpportunity item;
 				List<JsGridOpportunity> jsGridOpportunity = new ArrayList();
-
+				
+				List<OOpportunityField> fields = manager.getOpportunitySettingFieldsInGrid();
+				
 				for (OOpportunity o : manager.listOpportunities(oQuery)) {
-					jsGridOpportunity.add(new JsGridOpportunity(o));
+					item = new JsGridOpportunity(o);
+					item.additionalInfo = getGridOpportunityAdditionalInfo(fields, o);					
+					
+					jsGridOpportunity.add(item);
 				}
 
 				new JsonResult(jsGridOpportunity).printTo(out);
@@ -2236,6 +2242,94 @@ public class Service extends BaseService {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action ManageGridTimetable", ex);
 		}
+	}
+	
+	public String getGridOpportunityAdditionalInfo(List<OOpportunityField> fields, OOpportunity o) throws WTException{
+		String additionalInfo = "";
+		
+		if(fields != null){
+			for(OOpportunityField field : fields){
+				switch(field.getFieldId()){
+					case "activity":		
+						if(o.getActivityId() != null)
+							additionalInfo += field.getLabel() + ": " + WT.getCoreManager().getActivity(o.getActivityId()).getDescription() + " / ";		
+						break;
+					case "causal":	
+						if(o.getCausalId() != null)
+							additionalInfo += field.getLabel() + ": " + WT.getCoreManager().getCausal(o.getCausalId()).getDescription() + " / ";			
+						break;
+					case "customer":
+						if(o.getCustomerId() != null)
+							additionalInfo += field.getLabel() + ": " + WT.getCoreManager().getMasterData(o.getCustomerId()).getDescription() + " / ";		
+						break;
+					case "description":
+						if(o.getDescription() != null)
+							additionalInfo += field.getLabel() + ": " + o.getDescription() + " / ";		
+						break;
+					case "executed_with":
+						if(o.getExecutedWith() != null)
+							additionalInfo += field.getLabel() + ": " + WT.getUserData(new UserProfileId(o.getDomainId(), o.getExecutedWith())).getDisplayName() + " / ";		
+						break;
+					case "place":
+						if(o.getPlace() != null)
+							additionalInfo += field.getLabel() + ": " + o.getPlace() + " / ";				
+						break;
+					case "sector":
+						if(o.getSector() != null)
+							additionalInfo += field.getLabel() + ": " + o.getSector() + " / ";			
+						break;
+					case "statistic_customer":
+						if(o.getCustomerStatId() != null)
+							additionalInfo += field.getLabel() + ": " + WT.getCoreManager().getMasterData(o.getCustomerStatId()).getDescription() + " / ";	
+						break;
+					case "status":	
+						if(o.getStatusId() != null)
+							additionalInfo += field.getLabel() + ": " + manager.getDocStatus(o.getStatusId()).getDescription() + " / ";			
+						break;
+					case "signature":
+						if(o.getSignature() != null)
+							additionalInfo += field.getLabel() + ": " +  ((o.getSignature()) ? lookupResource("grpOpportunity.fld.yes") : lookupResource("grpOpportunity.fld.no")) + " / ";		
+						break;
+					case "notes":
+						if(o.getNotes() != null)
+							additionalInfo += field.getLabel() + ": " + o.getNotes() + " / ";		
+						break;
+					case "signed_by":
+						if(o.getSignedBy() != null)
+							additionalInfo +=  field.getLabel() + ": " + WT.getUserData(new UserProfileId(o.getDomainId(), o.getSignedBy())).getDisplayName() + " / ";	
+						break;
+					case "won":
+						if(o.getWon() != null)
+							additionalInfo += field.getLabel() + ": " +  ((o.getWon()) ? lookupResource("grpOpportunity.fld.yes") : lookupResource("grpOpportunity.fld.no")) + " / ";
+						break;
+					case "discoveries":
+						if(o.getDiscoveries() != null)
+							additionalInfo += field.getLabel() + ": " + o.getDiscoveries() + " / ";		
+						break;
+					case "customer_potential":
+						if(o.getCustomerPotential() != null)
+							additionalInfo += field.getLabel() + ": " + o.getCustomerPotential() + " / ";	
+						break;
+					case "result":
+						if(o.getResult() != null)
+							additionalInfo += field.getLabel() + ": " + o.getResult() + " / ";			
+						break;
+					case "objective":
+						if(EnumUtils.toSerializedName(OpportunityField.Tab.MAIN).equals(field.getTabId())){
+							if(o.getObjective() != null)
+								additionalInfo += field.getLabel() + ": " + o.getObjective() + " / ";
+						}else{
+							if(o.getObjective_2() != null)
+								additionalInfo += field.getLabel() + ": " + o.getObjective_2() + " / ";
+						}
+						break;
+					default:
+						break;
+				}
+			}
+		}
+		
+		return additionalInfo;
 	}
 	
 	private ReportConfig.Builder reportConfigBuilder() {

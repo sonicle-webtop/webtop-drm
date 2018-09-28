@@ -41,7 +41,8 @@ Ext.define('Sonicle.webtop.drm.model.OpportunityField', {
 		WTF.field('visible', 'bool', false),
 		WTF.field('requires', 'bool', false),
 		WTF.field('order', 'int', false),
-		WTF.field('label', 'string', false)
+		WTF.field('label', 'string', false),
+		WTF.field('showOnGrid', 'bool', false)
 	]
 });
 

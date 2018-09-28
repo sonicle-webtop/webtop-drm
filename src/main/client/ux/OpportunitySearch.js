@@ -108,22 +108,6 @@ Ext.define('Sonicle.webtop.drm.ux.OpportunitySearch', {
 					fieldLabel: WT.res(me.sid, 'opportunity.fld-date.lbl'),
 					width: '420px'
 				},
-				WTF.lookupCombo('id', 'desc', {
-					reference: 'fldfromhour',
-					bind: '{fromHour}',
-					fieldLabel: WT.res(me.sid, 'opportunity.fld-fromhour.lbl'),
-					allowBlank: true,
-					editable: true,
-					forceSelection: false,
-					queryMode: 'local',
-					triggerAction: 'all',
-					regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
-					regexText: WT.res(me.sid, 'gpLineHours.column.format.lbl'),
-					tabIndex: 104,
-					store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-						autoLoad: true
-					})
-				}),
 				{
 					xtype: 'button',
 					text: WT.res(me.sid, 'btn-search.lbl'),
@@ -168,23 +152,7 @@ Ext.define('Sonicle.webtop.drm.ux.OpportunitySearch', {
 				}),
 				{
 					xtype: 'soplaceholderfield'
-				},
-				WTF.lookupCombo('id', 'desc', {
-					reference: 'fldtohour',
-					bind: '{toHour}',
-					fieldLabel: WT.res(me.sid, 'opportunity.fld-tohour.lbl'),
-					allowBlank: true,
-					editable: true,
-					forceSelection: false,
-					queryMode: 'local',
-					triggerAction: 'all',
-					regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
-					regexText: WT.res(me.sid, 'gpLineHours.column.format.lbl'),
-					tabIndex: 105,
-					store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-						autoLoad: true
-					})
-				})
+				}
 			]
 		});
 	},
@@ -196,9 +164,7 @@ Ext.define('Sonicle.webtop.drm.ux.OpportunitySearch', {
 		var query = {
 			companyId: me.lookupReference('fldcompany').getValue(),
 			operatorId: me.lookupReference('flduser').getValue(),
-			date: SoDate.format(me.lookupReference('flddate').getValue(), 'Y-m-d'),
-			fromHour: me.lookupReference('fldfromhour').getValue(),
-			toHour: me.lookupReference('fldtohour').getValue()			
+			date: SoDate.format(me.lookupReference('flddate').getValue(), 'Y-m-d')	
 		};
 		
 		me.fireEvent('search', me, query);
@@ -211,9 +177,7 @@ Ext.define('Sonicle.webtop.drm.ux.OpportunitySearch', {
 		var query = {
 			companyId: me.lookupReference('fldcompany').getValue(),
 			operatorId: me.lookupReference('flduser').getValue(),
-			date: SoDate.format(me.lookupReference('flddate').getValue(), 'Y-m-d'),
-			fromHour: me.lookupReference('fldfromhour').getValue(),
-			toHour: me.lookupReference('fldtohour').getValue()			
+			date: SoDate.format(me.lookupReference('flddate').getValue(), 'Y-m-d')		
 		};
 		
 		return query;

@@ -41,6 +41,7 @@ import com.sonicle.commons.db.DbUtils;
 import com.sonicle.webtop.core.CoreManager;
 import com.sonicle.webtop.core.app.WT;
 import com.sonicle.webtop.core.bol.OUser;
+import com.sonicle.webtop.core.bol.js.JsSimple;
 import com.sonicle.webtop.core.dal.DAOException;
 import com.sonicle.webtop.core.dal.UserDAO;
 import com.sonicle.webtop.core.sdk.BaseManager;
@@ -3243,6 +3244,7 @@ public class DrmManager extends BaseManager {
 		oField.setRequired(oOField.getRequired());
 		oField.setOrder(oOField.getOrder());
 		oField.setLabel(oOField.getLabel());
+		oField.setShowOnGrid(oOField.getShowOnGrid());
 
 		return oField;
 	}
@@ -3260,9 +3262,25 @@ public class DrmManager extends BaseManager {
 		oOField.setVisible(oField.getVisible());
 		oOField.setRequired(oField.getRequired());
 		oOField.setOrder(oField.getOrder());		
-		oOField.setLabel(oField.getLabel());		
+		oOField.setLabel(oField.getLabel());
+		oOField.setShowOnGrid(oField.getShowOnGrid());
 
 		return oOField;
+	}
+	
+	public List<OOpportunityField> getOpportunitySettingFieldsInGrid()throws WTException, SQLException {
+		Connection con = null;
+		OpportunityFieldDAO ofDao = OpportunityFieldDAO.getInstance();
+		
+		try {		
+			con = WT.getConnection(SERVICE_ID);
+			
+			return ofDao.selectFieldIdByDomainIdVisibleShowOnGrid(con, getTargetProfileId().getDomainId());
+		} catch (DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
 	}
 	
 	public OpportunitySetting getOpportunitySetting() throws WTException {

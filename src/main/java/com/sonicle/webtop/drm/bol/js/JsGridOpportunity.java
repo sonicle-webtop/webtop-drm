@@ -49,6 +49,7 @@ public class JsGridOpportunity {
 	public String date;
 	public String fromHour;
 	public String toHour;
+	public String additionalInfo;
 
 	public JsGridOpportunity(OOpportunity o) {
 		this.id = o.getId();

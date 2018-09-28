@@ -114,6 +114,11 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							},
 							columns: [
 								{
+									dataIndex: 'id',
+									header: me.res('gpOpportunity.id.lbl'),
+									flex: 1
+								},
+								{
 									xtype: 'solookupcolumn',
 									dataIndex: 'companyId',
 									store: {
@@ -123,7 +128,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									},
 									header: me.res('gpOpportunity.company.lbl'),
 									displayField: 'desc',
-									flex: 1,
+									flex: 3,
 									hidden: true
 								},
 								{
@@ -132,28 +137,33 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									store: {
 										autoLoad: true,
 										model: 'WTA.model.Simple',
-										proxy: WTF.proxy(WT.ID, 'LookupDomainUsers')
+										proxy: WTF.proxy(me.ID, 'LookupOperators')
 									},
 									header: me.res('gpOpportunity.user.lbl'),
 									displayField: 'desc',
-									flex: 1
+									flex: 3
 								},
 								{
 									dataIndex: 'date',
 									header: me.res('gpOpportunity.date.lbl'),
 									xtype: 'datecolumn',
 									format: WT.getShortDateFmt(),
-									flex: 1
+									flex: 2
 								},
 								{
 									dataIndex: 'fromHour',
 									header: me.res('gpOpportunity.fromhour.lbl'),
-									flex: 1
+									flex: 2
 								},
 								{
 									dataIndex: 'toHour',
 									header: me.res('gpOpportunity.tohour.lbl'),
-									flex: 1
+									flex: 2
+								},
+								{
+									dataIndex: 'additionalInfo',
+									header: me.res('gpOpportunity.additionalinfo.lbl'),
+									flex: 20
 								}
 							],
 							tbar: [
@@ -232,7 +242,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									store: {
 										autoLoad: true,
 										model: 'WTA.model.Simple',
-										proxy: WTF.proxy(WT.ID, 'LookupDomainUsers')
+										proxy: WTF.proxy(me.ID, 'LookupOperators')
 									},
 									header: me.res('gpWorkReport.user.lbl'),
 									displayField: 'desc',

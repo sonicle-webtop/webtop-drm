@@ -41,6 +41,7 @@ Ext.define('Sonicle.webtop.drm.model.GridOpportunities', {
 		WTF.roField('operatorId', 'string'),
 		WTF.roField('date', 'date', {dateFormat: 'Y-m-d'}),
 		WTF.roField('fromHour', 'string'),
-		WTF.roField('toHour', 'string')
+		WTF.roField('toHour', 'string'),
+		WTF.roField('additionalInfo', 'string')
 	]
 });
