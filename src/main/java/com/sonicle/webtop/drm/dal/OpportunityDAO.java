@@ -36,8 +36,10 @@ import com.sonicle.webtop.core.dal.BaseDAO;
 import com.sonicle.webtop.core.dal.DAOException;
 import com.sonicle.webtop.drm.OpportunityQuery;
 import com.sonicle.webtop.drm.bol.OOpportunity;
+import com.sonicle.webtop.drm.bol.VOpportunityEntry;
 import com.sonicle.webtop.drm.jooq.Sequences;
 import static com.sonicle.webtop.drm.jooq.Tables.OPPORTUNITIES;
+import static com.sonicle.webtop.drm.jooq.Tables.OPPORTUNITY_ACTIONS;
 import com.sonicle.webtop.drm.jooq.tables.records.OpportunitiesRecord;
 import java.sql.Connection;
 import java.util.List;
@@ -46,6 +48,8 @@ import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.DatePart;
+import org.jooq.Field;
+import org.jooq.impl.DSL;
 
 /**
  *
@@ -81,6 +85,96 @@ public class OpportunityDAO extends BaseDAO {
 						searchCndt
 				)
 				.fetchInto(OOpportunity.class);
+	}
+	
+	public List<VOpportunityEntry> viewOpportunitiesAndActions(Connection con, OpportunityQuery query) throws DAOException {
+		DSLContext dsl = getDSL(con);
+
+		Condition searchCndt = ensureCondition(query);
+		
+		Field<Integer> fldOpp = DSL.val(0).as("action_id");
+		Field<Integer> fldAct = OPPORTUNITY_ACTIONS.ID.as("action_id");
+
+		return dsl
+				.select(
+						OPPORTUNITIES.DOMAIN_ID,
+						OPPORTUNITIES.ID,
+						fldOpp,
+						OPPORTUNITIES.COMPANY_ID,
+						OPPORTUNITIES.OPERATOR_ID,
+						OPPORTUNITIES.DATE,
+						OPPORTUNITIES.FROM_HOUR,
+						OPPORTUNITIES.TO_HOUR,
+						OPPORTUNITIES.EXECUTED_WITH,
+						OPPORTUNITIES.CUSTOMER_ID,
+						OPPORTUNITIES.CUSTOMER_STAT_ID,
+						OPPORTUNITIES.SECTOR,
+						OPPORTUNITIES.DESCRIPTION,
+						OPPORTUNITIES.PLACE,
+						OPPORTUNITIES.OBJECTIVE,
+						OPPORTUNITIES.CAUSAL_ID,
+						OPPORTUNITIES.ACTIVITY_ID,
+						OPPORTUNITIES.OBJECTIVE_2,
+						OPPORTUNITIES.RESULT,
+						OPPORTUNITIES.DISCOVERIES,
+						OPPORTUNITIES.CUSTOMER_POTENTIAL,
+						OPPORTUNITIES.NOTES,
+						OPPORTUNITIES.STATUS_ID,
+						OPPORTUNITIES.SIGNED_BY,
+						OPPORTUNITIES.SIGNATURE,
+						OPPORTUNITIES.WON
+				)
+				.from(OPPORTUNITIES)
+				.where(
+						searchCndt
+				)
+				.unionAll(
+						dsl.select(
+								OPPORTUNITIES.DOMAIN_ID,
+								OPPORTUNITIES.ID,
+								fldAct,
+								OPPORTUNITIES.COMPANY_ID,
+								OPPORTUNITY_ACTIONS.OPERATOR_ID,
+								OPPORTUNITY_ACTIONS.DATE,
+								OPPORTUNITY_ACTIONS.FROM_HOUR,
+								OPPORTUNITY_ACTIONS.TO_HOUR,
+								OPPORTUNITIES.EXECUTED_WITH,
+								OPPORTUNITIES.CUSTOMER_ID,
+								OPPORTUNITIES.CUSTOMER_STAT_ID,
+								OPPORTUNITIES.SECTOR,
+								OPPORTUNITY_ACTIONS.DESCRIPTION,
+								OPPORTUNITY_ACTIONS.PLACE,
+								OPPORTUNITIES.OBJECTIVE,
+								OPPORTUNITIES.CAUSAL_ID,
+								OPPORTUNITY_ACTIONS.ACTIVITY_ID,
+								OPPORTUNITIES.OBJECTIVE_2,
+								OPPORTUNITIES.RESULT,
+								OPPORTUNITIES.DISCOVERIES,
+								OPPORTUNITIES.CUSTOMER_POTENTIAL,
+								OPPORTUNITIES.NOTES,
+								OPPORTUNITY_ACTIONS.STATUS_ID,
+								OPPORTUNITIES.SIGNED_BY,
+								OPPORTUNITIES.SIGNATURE,
+								OPPORTUNITIES.WON
+						)
+						.from(OPPORTUNITIES)
+						.join(
+								OPPORTUNITY_ACTIONS
+						)
+						.on(
+								OPPORTUNITY_ACTIONS.OPPORTUNITY_ID.equal(OPPORTUNITIES.ID)
+						)
+						.where(
+								searchCndt
+						)
+				)
+				.orderBy(
+						OPPORTUNITIES.DOMAIN_ID,
+						OPPORTUNITIES.ID,
+						fldAct,
+						OPPORTUNITIES.DATE
+				)
+				.fetchInto(VOpportunityEntry.class);
 	}
 
 	public OOpportunity selectById(Connection con, int id) throws DAOException {

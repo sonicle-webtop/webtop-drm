@@ -83,6 +83,7 @@ import com.sonicle.webtop.drm.bol.OTimetableReport;
 import com.sonicle.webtop.drm.bol.OTimetableStamp;
 import com.sonicle.webtop.drm.bol.OWorkReport;
 import com.sonicle.webtop.drm.bol.OWorkType;
+import com.sonicle.webtop.drm.bol.VOpportunityEntry;
 import com.sonicle.webtop.drm.bol.js.JsCompany;
 import com.sonicle.webtop.drm.bol.js.JsGridCompanies;
 import com.sonicle.webtop.drm.bol.js.JsGridDocStatuses;
@@ -1209,7 +1210,7 @@ public class Service extends BaseService {
 				
 				List<OOpportunityField> fields = manager.getOpportunitySettingFieldsInGrid();
 				
-				for (OOpportunity o : manager.listOpportunities(oQuery)) {
+				for (VOpportunityEntry o : manager.listOpportunitiesAndActions(oQuery)) {
 					item = new JsGridOpportunity(o);
 					item.additionalInfo = getGridOpportunityAdditionalInfo(fields, o);					
 					
@@ -2244,7 +2245,7 @@ public class Service extends BaseService {
 		}
 	}
 	
-	public String getGridOpportunityAdditionalInfo(List<OOpportunityField> fields, OOpportunity o) throws WTException{
+	public String getGridOpportunityAdditionalInfo(List<OOpportunityField> fields, VOpportunityEntry o) throws WTException{
 		String additionalInfo = "";
 		
 		if(fields != null){

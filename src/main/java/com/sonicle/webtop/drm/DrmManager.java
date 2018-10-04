@@ -89,6 +89,7 @@ import com.sonicle.webtop.drm.bol.OWorkReportAttachment;
 import com.sonicle.webtop.drm.bol.OWorkReportRow;
 import com.sonicle.webtop.drm.bol.OWorkReportSetting;
 import com.sonicle.webtop.drm.bol.OWorkType;
+import com.sonicle.webtop.drm.bol.VOpportunityEntry;
 import com.sonicle.webtop.drm.dal.BusinessTripDao;
 import com.sonicle.webtop.drm.dal.CompanyDAO;
 import com.sonicle.webtop.drm.dal.CompanyPictureDAO;
@@ -2060,6 +2061,24 @@ public class DrmManager extends BaseManager {
 		try {
 			con = WT.getConnection(SERVICE_ID);
 			opportunities = oDao.selectOpportunities(con, query);
+
+			return opportunities;
+			
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public List<VOpportunityEntry> listOpportunitiesAndActions(OpportunityQuery query) throws WTException {
+		Connection con = null;
+		OpportunityDAO oDao = OpportunityDAO.getInstance();
+		List<VOpportunityEntry> opportunities = null
+				;
+		try {
+			con = WT.getConnection(SERVICE_ID);
+			opportunities = oDao.viewOpportunitiesAndActions(con, query);
 
 			return opportunities;
 			

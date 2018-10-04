@@ -33,10 +33,12 @@
 
 Ext.define('Sonicle.webtop.drm.model.GridOpportunities', {
 	extend: 'WTA.ux.data.BaseModel',
-	idProperty: 'id',
+	idProperty: 'compositeId',
 	fields: [
 		WTF.roField('domainId', 'string'),
 		WTF.roField('id', 'int'),
+		WTF.roField('actionId', 'int'),
+		WTF.roField('compositeId', 'string'),
 		WTF.roField('companyId', 'int'),
 		WTF.roField('operatorId', 'string'),
 		WTF.roField('date', 'date', {dateFormat: 'Y-m-d'}),

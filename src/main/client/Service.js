@@ -116,7 +116,17 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								{
 									dataIndex: 'id',
 									header: me.res('gpOpportunity.id.lbl'),
-									flex: 1
+									flex: 1,
+									renderer: function (value, meta, record, rowIndex, colIndex, store) {
+										switch(record.get('actionId')) {
+											case 0:
+												return value;
+												break;
+											default:
+												return '';
+												break;
+										}
+									}
 								},
 								{
 									xtype: 'solookupcolumn',
@@ -700,7 +710,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									header: me.res('gpTimetableRequest.type.lbl'),
 									dataIndex: 'type',
 									flex: 1,
-									renderer: function (value, record) {
+									renderer: function (value, meta, record, rowIndex, colIndex, store) {
 										switch(value) {
 											case 'H':
 												return me.res('gpTimetableRequest.type.H.lbl');
@@ -757,7 +767,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									header: me.res('gpTimetableRequest.status.lbl'),
 									dataIndex: 'status',
 									flex: 1,
-									renderer: function (value, record) {
+									renderer: function (value, meta, record, rowIndex, colIndex, store) {
 										switch(value) {
 											case 'O':
 												return me.res('gpTimetableRequest.status.O.lbl');

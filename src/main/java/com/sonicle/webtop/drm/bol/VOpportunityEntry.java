@@ -30,37 +30,21 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm.bol.js;
-
-import com.sonicle.webtop.drm.bol.VOpportunityEntry;
+package com.sonicle.webtop.drm.bol;
 
 /**
  *
  * @author lssndrvs
  */
-public class JsGridOpportunity {
-
-	public Integer id;
-	public String domainId;
+public class VOpportunityEntry extends OOpportunity {
 	public Integer actionId;
-	public String compositeId;
-	public Integer companyId;
-	public String operatorId;
-	public String date;
-	public String fromHour;
-	public String toHour;
-	public String additionalInfo;
 
-	public JsGridOpportunity(VOpportunityEntry o) {
-		this.id = o.getId();
-		this.domainId = o.getDomainId();
-		this.actionId = o.getActionId();
-		this.compositeId = o.getId() + "." + o.getActionId();
-		this.companyId = o.getCompanyId();
-		this.operatorId = o.getOperatorId();
-		this.date = o.getDate().toString();
-		this.fromHour = o.getFromHour();
-		this.toHour = o.getToHour();
+	public Integer getActionId() {
+		return actionId;
+	}
+
+	public void setActionId(Integer actionId) {
+		this.actionId = actionId;
 	}
 
 }
