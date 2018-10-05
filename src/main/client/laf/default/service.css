@@ -61,3 +61,6 @@
 .wtdrm-icon-opportunity-initializefields-xs { background-image: url('opportunity_initializefields_16.png') !important; }
 
 .wtdrm-icon-opportunityaction-xs { background-image: url('opportunityaction_16.png') !important; }
+
+.opportunity-grid-row-expired { background-color: rgba(255, 109, 109, 0.6); }
+.opportunity-grid-row-notexpired { background-color: rgba(185, 255, 165, 0.6); }

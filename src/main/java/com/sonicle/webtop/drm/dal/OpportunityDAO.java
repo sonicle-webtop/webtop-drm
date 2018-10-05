@@ -76,7 +76,7 @@ public class OpportunityDAO extends BaseDAO {
 	public List<OOpportunity> selectOpportunities(Connection con, OpportunityQuery query) throws DAOException {
 		DSLContext dsl = getDSL(con);
 
-		Condition searchCndt = ensureCondition(query);
+		Condition searchCndt = ensureCondition(query, dsl);
 
 		return dsl
 				.select()
@@ -90,7 +90,7 @@ public class OpportunityDAO extends BaseDAO {
 	public List<VOpportunityEntry> viewOpportunitiesAndActions(Connection con, OpportunityQuery query) throws DAOException {
 		DSLContext dsl = getDSL(con);
 
-		Condition searchCndt = ensureCondition(query);
+		Condition searchCndt = ensureCondition(query, dsl);
 		
 		Field<Integer> fldOpp = DSL.val(0).as("action_id");
 		Field<Integer> fldAct = OPPORTUNITY_ACTIONS.ID.as("action_id");
@@ -238,7 +238,7 @@ public class OpportunityDAO extends BaseDAO {
 		return nextID;
 	}
 
-	private Condition ensureCondition(OpportunityQuery query) {
+	private Condition ensureCondition(OpportunityQuery query, DSLContext dsl) {
 								
 		Condition searchCndt = OPPORTUNITIES.OPERATOR_ID.equal(query.operatorId);
 		
@@ -248,6 +248,11 @@ public class OpportunityDAO extends BaseDAO {
 		
 		if (query.date != null) {
 			searchCndt = searchCndt.and(OPPORTUNITIES.DATE.greaterOrEqual(query.date));
+			searchCndt = searchCndt.or(OPPORTUNITIES.ID.in(
+					dsl.select(OPPORTUNITY_ACTIONS.OPPORTUNITY_ID)
+							.from(OPPORTUNITY_ACTIONS)
+							.where(OPPORTUNITY_ACTIONS.DATE.greaterOrEqual(query.date))
+			));
 		}
 		
 		if (!StringUtils.isEmpty(query.fromHour)) {

@@ -2308,24 +2308,6 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
-	public List<OOpportunityAction> listOpportunityActions(Integer opportunityId) throws WTException {
-		Connection con = null;
-		OpportunityActionDAO oActDao = OpportunityActionDAO.getInstance();
-		List<OOpportunityAction> oActs = null
-				;
-		try {
-			con = WT.getConnection(SERVICE_ID);
-			oActs = oActDao.selectByOpportunity(con, opportunityId);
-
-			return oActs;
-			
-		} catch (SQLException | DAOException ex) {
-			throw new WTException(ex, "DB error");
-		} finally {
-			DbUtils.closeQuietly(con);
-		}
-	}
-	
 	public OpportunityAction getOpportunityAction(Integer id) throws WTException {
 		Connection con = null;
 		OpportunityActionDAO oADao = OpportunityActionDAO.getInstance();

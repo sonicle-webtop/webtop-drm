@@ -247,9 +247,9 @@ public class Service extends BaseService {
 	private HashMap<String,ArrayList<JsOpportunityField>> getOpportunityRequiredFields() throws WTException {
 		try{
 			HashMap<String,ArrayList<JsOpportunityField>> opportunityRequiredFields = new HashMap<>();
-			ArrayList<JsOpportunityField> mainFields=new ArrayList<>();
-			ArrayList<JsOpportunityField> visitReportFields=new ArrayList<>();
-			ArrayList<JsOpportunityField> notesSignatureFields=new ArrayList<>();
+			ArrayList<JsOpportunityField> mainFields = new ArrayList<>();
+			ArrayList<JsOpportunityField> visitReportFields = new ArrayList<>();
+			ArrayList<JsOpportunityField> notesSignatureFields = new ArrayList<>();
 
 			for(OOpportunityField OOf : manager.getOpportunityFieldsByDomainIdTabId(getEnv().getProfileId().getDomainId(), EnumUtils.toSerializedName(OpportunityField.Tab.MAIN))){
 				mainFields.add(new JsOpportunityField(OOf));
@@ -1212,7 +1212,7 @@ public class Service extends BaseService {
 				
 				for (VOpportunityEntry o : manager.listOpportunitiesAndActions(oQuery)) {
 					item = new JsGridOpportunity(o);
-					item.additionalInfo = getGridOpportunityAdditionalInfo(fields, o);					
+					item.additionalInfo = (o.getActionId() == 0) ? getGridOpportunityAdditionalInfo(fields, o) : o.getDescription();					
 					
 					jsGridOpportunity.add(item);
 				}
@@ -1222,30 +1222,6 @@ public class Service extends BaseService {
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action ManageGridOpportunity", ex);
-		}
-	}
-	
-	public void processManageGridOpportunityAction(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
-		try {
-			String crud = ServletUtils.getStringParameter(request, "crud", true);
-			
-			if (crud.equals(Crud.READ)) {
-
-				Integer opportunityId = ServletUtils.getIntParameter(request, "opportunityId", null);
-				
-				List<JsGridOpportunityAction> jsGridOpportunityAction = new ArrayList();
-
-				if(opportunityId != null){
-					for (OOpportunityAction oAct : manager.listOpportunityActions(opportunityId)) {
-						jsGridOpportunityAction.add(new JsGridOpportunityAction(oAct));
-					}
-				}
-				
-				new JsonResult(jsGridOpportunityAction).printTo(out);
-			}
-		} catch (Exception ex) {
-			new JsonResult(ex).printTo(out);
-			logger.error("Error in action ManageGridOpportunityAction", ex);
 		}
 	}
 	

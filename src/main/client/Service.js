@@ -107,6 +107,16 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							region: 'center',
 							xtype: 'grid',
 							reference: 'gpOpportunity',
+							viewConfig: {
+								getRowClass: function(r, rowIndex, rp, ds) {
+									if(r.get('actionId') !== 0){
+										if(r.get('date') >= new Date().setHours(0,0,0,0)) 
+											return 'opportunity-grid-row-notexpired';
+										else 
+											return 'opportunity-grid-row-expired';
+									}
+								} 
+							},
 							store: {
 								autoLoad: false,
 								model: 'Sonicle.webtop.drm.model.GridOpportunities',
@@ -180,15 +190,23 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								me.getAct('opportunity', 'add'),
 								'-',
 								me.getAct('opportunity', 'edit'),
-								me.getAct('opportunity', 'remove')
+								me.getAct('opportunity', 'remove'),
+								'-',
+								me.getAct('opportunity', 'addAction')
 							],
 							listeners: {
 								rowclick: function (s, rec) {
 									me.getAct('opportunity', 'edit').setDisabled(false);
 									me.getAct('opportunity', 'remove').setDisabled(false);
+									
+									if(rec.get('actionId') === 0){
+										me.getAct('opportunity', 'addAction').setDisabled(false);
+									}else{
+										me.getAct('opportunity', 'addAction').setDisabled(true);
+									}
 								},
 								rowdblclick: function (s, rec) {
-									me.editOpportunityUI(rec);
+									me.editUI(rec);
 								}
 							}
 						}
@@ -1191,7 +1209,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			disabled: true,
 			handler: function () {
 				var sel = me.gpOpportunitySelected();
-				me.editOpportunityUI(sel);
+				me.editUI(sel);
 			}
 		});
 		me.addAct('opportunity', 'remove', {
@@ -1201,7 +1219,22 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			disabled: true,
 			handler: function () {
 				var sel = me.gpOpportunitySelected();
-				me.deleteOpportunityUI(sel);
+				me.deleteUI(sel);
+			}
+		});
+		me.addAct('opportunity', 'addAction', {
+			text: me.res('act-addOpportunityAction.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-add-xs',
+			disabled: true,
+			handler: function () {
+				me.addOpportunityActionUI({
+					callback: function (success) {
+						if (success) {
+							me.filtersOpportunity().extractData();
+						}
+					}
+				});
 			}
 		});
 		me.addAct('workReport', 'add', {
@@ -1422,6 +1455,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				});
 			});
 	},
+	editUI: function (rec) {
+		var me = this;
+		if(rec.get('actionId') === 0) me.editOpportunityUI(rec);
+		else me.editOpportunityActionUI(rec);
+		
+	},
 	editOpportunityUI: function (rec) {
 		var me = this;
 		me.editOpportunity(rec.get('id'), {
@@ -1450,6 +1489,39 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					});
 				});
 	},
+	editOpportunityActionUI: function(rec) {
+		var me = this;
+		me.editOpportunityAction(rec.get('actionId'), {
+			callback: function (success, model) {
+				if (success) {
+					this.gpOpportunity().getStore().load();
+				} else {
+					alert('error');
+				}
+			}
+		});
+	},
+	editOpportunityAction: function(id, opts) {
+		opts = opts || {};
+		var me = this,
+				vct = WT.createView(me.ID, 'view.OpportunityAction');
+		
+		vct.getView().on('viewsave', function (s, success, model) {
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vct.show(false, function() {
+			vct.getView().begin('edit', {
+				data: {
+					id: id
+				}
+			});
+		});
+	},
+	deleteUI: function (rec) {
+		var me = this;
+		if(rec.get('actionId') === 0) me.deleteOpportunityUI(rec);
+		else me.deleteOpportunityActionUI(rec);
+	},
 	deleteOpportunityUI: function (rec) {
 		var me = this,
 				sto = me.gpOpportunity().getStore(),
@@ -1463,8 +1535,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			if (bid === 'yes') {
 				me.deleteOpportunity(rec.get('id'), {
 					callback: function (success) {
-						if (success)
-							sto.remove(rec);
+						if (success) {
+							me.filtersOpportunity().extractData();
+						}
 					}
 				});
 			}
@@ -1481,6 +1554,68 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			callback: function (success, json) {
 				Ext.callback(opts.callback, opts.scope || me, [success, json]);
 			}
+		});
+	},
+	deleteOpportunityActionUI: function (rec) {
+		var me = this,
+				sto = me.gpOpportunity().getStore(),
+				msg;
+		if (rec) {
+			msg = me.res('act.confirm.delete', Ext.String.ellipsis(rec.get('actionId'), 40));
+		} else {
+			msg = me.res('gpOpportunityActions.confirm.delete.selection');
+		}
+		WT.confirm(msg, function (bid) {
+			if (bid === 'yes') {
+				me.deleteOpportunityAction(rec.get('actionId'), {
+					callback: function (success) {
+						if (success) {
+							me.filtersOpportunity().extractData();
+						}
+					}
+				});
+			}
+		});
+	},
+	deleteOpportunityAction: function (id, opts) {
+		opts = opts || {};
+		var me = this;
+		WT.ajaxReq(me.ID, 'ManageOpportunityAction', {
+			params: {
+				crud: 'delete',
+				ids: WTU.arrayAsParam(id)
+			},
+			callback: function (success, json) {
+				Ext.callback(opts.callback, opts.scope || me, [success, json]);
+			}
+		});
+	},
+	addOpportunityActionUI: function() {
+		var me = this;
+		me.addOpportunityAction({}, {
+			callback: function(success, model) {
+				if (success) {
+					me.filtersOpportunity().extractData();
+				}
+			}
+		});
+	},
+	addOpportunityAction: function (data, opts) {
+		var me = this,
+				vct = WT.createView(me.ID, 'view.OpportunityAction');
+		
+		var sel = me.gpOpportunitySelected();
+		
+		vct.getView().on('viewsave', function(s, success, model) {
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vct.show(false, function() {
+			vct.getView().begin('new', {
+				data: {
+					opportunityId: sel.get('id'),
+					operatorId: sel.get('operatorId')
+				}
+			});
 		});
 	},
 	opportunitySetting: function (opts) {
