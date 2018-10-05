@@ -310,10 +310,10 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 					bind: '{record.signature}',
 					boxLabelAlign: 'before',
 					hidden: true
-				}, won: {
+				}, success: {
 					xtype: 'checkbox',
-					reference: 'won',
-					bind: '{record.won}',
+					reference: 'success',
+					bind: '{record.success}',
 					boxLabelAlign: 'before',
 					hidden: true
 				}

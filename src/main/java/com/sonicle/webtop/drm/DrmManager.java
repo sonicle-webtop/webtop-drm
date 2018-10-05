@@ -2547,7 +2547,7 @@ public class DrmManager extends BaseManager {
 		o.setStatusId(oOpt.getStatusId());
 		o.setSignedBy(oOpt.getSignedBy());
 		o.setSignature(oOpt.getSignature());
-		o.setWon(oOpt.getWon());
+		o.setSuccess(oOpt.getSuccess());
 
 		return o;
 	}
@@ -2581,7 +2581,7 @@ public class DrmManager extends BaseManager {
 		oOpt.setStatusId(o.getStatusId());
 		oOpt.setSignedBy(o.getSignedBy());
 		oOpt.setSignature(o.getSignature());
-		oOpt.setWon(o.getWon());
+		oOpt.setSuccess(o.getSuccess());
 
 		return oOpt;
 	}

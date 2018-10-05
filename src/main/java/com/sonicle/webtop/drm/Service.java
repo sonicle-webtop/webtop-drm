@@ -2275,9 +2275,9 @@ public class Service extends BaseService {
 						if(o.getSignedBy() != null)
 							additionalInfo +=  field.getLabel() + ": " + WT.getUserData(new UserProfileId(o.getDomainId(), o.getSignedBy())).getDisplayName() + " / ";	
 						break;
-					case "won":
-						if(o.getWon() != null)
-							additionalInfo += field.getLabel() + ": " +  ((o.getWon()) ? lookupResource("grpOpportunity.fld.yes") : lookupResource("grpOpportunity.fld.no")) + " / ";
+					case "success":
+						if(o.getSuccess()!= null)
+							additionalInfo += field.getLabel() + ": " +  ((o.getSuccess()) ? lookupResource("grpOpportunity.fld.yes") : lookupResource("grpOpportunity.fld.no")) + " / ";
 						break;
 					case "discoveries":
 						if(o.getDiscoveries() != null)

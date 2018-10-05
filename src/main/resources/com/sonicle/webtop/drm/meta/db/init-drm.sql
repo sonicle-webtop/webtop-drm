@@ -833,7 +833,7 @@ INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'notes_signature', 'signatur
 INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'notes_signature', 'signed_by', 't', 't', '3', 'Firmato da');
 INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'main', 'statistic_customer', 't', 't', '3', 'Destinazione');
 INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'notes_signature', 'status', 't', 't', '2', 'Status');
-INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'notes_signature', 'won', 't', 't', '5', 'Vinto');
+INSERT INTO "drm"."opportunity_fields" VALUES ('*', 'notes_signature', 'success', 't', 't', '5', 'Successo');
 
 --------------
 --26/07/2018--
@@ -864,7 +864,7 @@ CREATE TABLE "drm"."opportunities" (
 "status_id" int4,
 "signed_by" varchar(36),
 "signature" bool,
-"won" bool,
+"success" bool,
 PRIMARY KEY ("id")
 );
 
@@ -933,3 +933,9 @@ PRIMARY KEY ("id")
 
 ALTER TABLE "drm"."opportunity_fields"
 ADD COLUMN "show_on_grid" bool DEFAULT false;
+
+--------------
+--05/10/2018--
+--------------
+--INSERITO NELLA CREATE TABLE, DA IGNORARE QUESTA ALTER TABLE SE IL CAMPO è GIà STATO RINOMINATO--
+ALTER TABLE "drm"."opportunities" RENAME "won" TO "success";

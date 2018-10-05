@@ -63,7 +63,7 @@ public class OpportunityQuery {
 	public Integer statusId;
 	public String signedBy;
 	public Boolean signature;
-	public Boolean won;
+	public Boolean success;
 
 	public OpportunityQuery() {
 	}

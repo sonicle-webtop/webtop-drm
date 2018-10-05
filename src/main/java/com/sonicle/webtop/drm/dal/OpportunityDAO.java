@@ -122,7 +122,7 @@ public class OpportunityDAO extends BaseDAO {
 						OPPORTUNITIES.STATUS_ID,
 						OPPORTUNITIES.SIGNED_BY,
 						OPPORTUNITIES.SIGNATURE,
-						OPPORTUNITIES.WON
+						OPPORTUNITIES.SUCCESS
 				)
 				.from(OPPORTUNITIES)
 				.where(
@@ -155,7 +155,7 @@ public class OpportunityDAO extends BaseDAO {
 								OPPORTUNITY_ACTIONS.STATUS_ID,
 								OPPORTUNITIES.SIGNED_BY,
 								OPPORTUNITIES.SIGNATURE,
-								OPPORTUNITIES.WON
+								OPPORTUNITIES.SUCCESS
 						)
 						.from(OPPORTUNITIES)
 						.join(
@@ -171,8 +171,10 @@ public class OpportunityDAO extends BaseDAO {
 				.orderBy(
 						OPPORTUNITIES.DOMAIN_ID,
 						OPPORTUNITIES.ID,
-						fldAct,
-						OPPORTUNITIES.DATE
+						OPPORTUNITIES.DATE,
+						OPPORTUNITIES.FROM_HOUR,
+						OPPORTUNITY_ACTIONS.DATE,
+						OPPORTUNITY_ACTIONS.FROM_HOUR			
 				)
 				.fetchInto(VOpportunityEntry.class);
 	}
@@ -213,7 +215,7 @@ public class OpportunityDAO extends BaseDAO {
 				.set(OPPORTUNITIES.STATUS_ID, item.getStatusId())
 				.set(OPPORTUNITIES.SIGNED_BY, item.getSignedBy())
 				.set(OPPORTUNITIES.SIGNATURE, item.getSignature())
-				.set(OPPORTUNITIES.WON, item.getWon())
+				.set(OPPORTUNITIES.SUCCESS, item.getSuccess())
 				.where(
 						OPPORTUNITIES.ID.equal(item.getId())
 				)
@@ -331,8 +333,8 @@ public class OpportunityDAO extends BaseDAO {
 			searchCndt = searchCndt.and(OPPORTUNITIES.SIGNATURE.equal(query.signature));
 		}
 		
-		if (query.won != null) {
-			searchCndt = searchCndt.and(OPPORTUNITIES.WON.equal(query.won));
+		if (query.success != null) {
+			searchCndt = searchCndt.and(OPPORTUNITIES.SUCCESS.equal(query.success));
 		}
 		
 		return searchCndt;

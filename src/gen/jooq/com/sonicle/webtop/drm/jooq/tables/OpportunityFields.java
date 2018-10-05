@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OpportunityFields extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.OpportunityFieldsRecord> {
 
-	private static final long serialVersionUID = 405841933;
+	private static final long serialVersionUID = -805242898;
 
 	/**
 	 * The reference instance of <code>drm.opportunity_fields</code>
@@ -69,7 +69,7 @@ public class OpportunityFields extends org.jooq.impl.TableImpl<com.sonicle.webto
 	/**
 	 * The column <code>drm.opportunity_fields.show_on_grid</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.OpportunityFieldsRecord, java.lang.Boolean> SHOW_ON_GRID = createField("show_on_grid", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.OpportunityFieldsRecord, java.lang.Boolean> SHOW_ON_GRID = createField("show_on_grid", org.jooq.impl.SQLDataType.BOOLEAN.defaulted(true), this, "");
 
 	/**
 	 * Create a <code>drm.opportunity_fields</code> table reference

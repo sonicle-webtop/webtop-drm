@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Opportunities implements java.io.Serializable {
 
-	private static final long serialVersionUID = 225899496;
+	private static final long serialVersionUID = -793822718;
 
 	private java.lang.Integer       id;
 	private java.lang.String        domainId;
@@ -42,7 +42,7 @@ public class Opportunities implements java.io.Serializable {
 	private java.lang.Integer       statusId;
 	private java.lang.String        signedBy;
 	private java.lang.Boolean       signature;
-	private java.lang.Boolean       won;
+	private java.lang.Boolean       success;
 
 	public Opportunities() {}
 
@@ -71,7 +71,7 @@ public class Opportunities implements java.io.Serializable {
 		java.lang.Integer       statusId,
 		java.lang.String        signedBy,
 		java.lang.Boolean       signature,
-		java.lang.Boolean       won
+		java.lang.Boolean       success
 	) {
 		this.id = id;
 		this.domainId = domainId;
@@ -97,7 +97,7 @@ public class Opportunities implements java.io.Serializable {
 		this.statusId = statusId;
 		this.signedBy = signedBy;
 		this.signature = signature;
-		this.won = won;
+		this.success = success;
 	}
 
 	public java.lang.Integer getId() {
@@ -292,11 +292,11 @@ public class Opportunities implements java.io.Serializable {
 		this.signature = signature;
 	}
 
-	public java.lang.Boolean getWon() {
-		return this.won;
+	public java.lang.Boolean getSuccess() {
+		return this.success;
 	}
 
-	public void setWon(java.lang.Boolean won) {
-		this.won = won;
+	public void setSuccess(java.lang.Boolean success) {
+		this.success = success;
 	}
 }
