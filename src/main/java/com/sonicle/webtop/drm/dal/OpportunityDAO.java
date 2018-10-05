@@ -170,8 +170,7 @@ public class OpportunityDAO extends BaseDAO {
 				)
 				.orderBy(
 						OPPORTUNITIES.DOMAIN_ID,
-						OPPORTUNITIES.DATE,
-						OPPORTUNITIES.FROM_HOUR,
+						OPPORTUNITIES.ID,
 						OPPORTUNITY_ACTIONS.DATE,
 						OPPORTUNITY_ACTIONS.FROM_HOUR			
 				)
