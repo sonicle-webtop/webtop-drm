@@ -50,6 +50,8 @@ public class JsGridOpportunity {
 	public String fromHour;
 	public String toHour;
 	public String additionalInfo;
+	
+	public Boolean isTotallyClosed;
 
 	public JsGridOpportunity(VOpportunityEntry o) {
 		this.id = o.getId();
@@ -61,6 +63,8 @@ public class JsGridOpportunity {
 		this.date = o.getDate().toString();
 		this.fromHour = o.getFromHour();
 		this.toHour = o.getToHour();
+		
+		this.isTotallyClosed = false;
 	}
 
 }

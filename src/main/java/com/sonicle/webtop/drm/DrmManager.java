@@ -2337,6 +2337,24 @@ public class DrmManager extends BaseManager {
 			DbUtils.closeQuietly(con);
 		}
 	}
+	
+	public int countOpportunityActionsStatusOpenByOpportunityId(Integer opportunityId) throws WTException {
+		Connection con = null;
+		OpportunityActionDAO oADao = OpportunityActionDAO.getInstance();
+		int count;
+		
+		try {
+			con = WT.getConnection(SERVICE_ID);
+
+			count = oADao.countByStatusOpenOpportunityId(con, opportunityId);
+
+			return count;
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
 
 	public OOpportunityAction addOpportunityAction(OpportunityAction oAct, HashMap<String, File> files) throws WTException {
 		Connection con = null;

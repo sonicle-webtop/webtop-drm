@@ -1213,6 +1213,17 @@ public class Service extends BaseService {
 					item = new JsGridOpportunity(o);
 					item.additionalInfo = (o.getActionId() == 0) ? getGridOpportunityAdditionalInfo(fields, o) : (((o.getActivityId() != null) ? "[" + WT.getCoreManager().getActivity(o.getActivityId()).getDescription() + "] " : "") + ((o.getDescription() != null) ? o.getDescription() : ""));					
 					
+					if(o.getStatusId() != null){
+						if("C".equals(manager.getDocStatus(o.getStatusId()).getType())){
+							if(o.getActionId() == 0){
+								if(manager.countOpportunityActionsStatusOpenByOpportunityId(o.getId()) == 0) item.isTotallyClosed = true;
+							}else{
+								item.isTotallyClosed = true;
+							}
+						}
+					}
+					
+					
 					jsGridOpportunity.add(item);
 				}
 

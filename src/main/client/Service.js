@@ -109,11 +109,15 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							reference: 'gpOpportunity',
 							viewConfig: {
 								getRowClass: function(r, rowIndex, rp, ds) {
-									if(r.get('actionId') !== 0){
-										if(r.get('date') >= new Date().setHours(0,0,0,0)) 
-											return 'opportunity-grid-row-notexpired';
-										else 
-											return 'opportunity-grid-row-expired';
+									if(r.get('isTotallyClosed') === true){
+										return 'opportunity-grid-row-closed';
+									} else{
+										if(r.get('actionId') !== 0){
+											if(r.get('date') >= new Date().setHours(0,0,0,0)) 
+												return 'opportunity-grid-row-notexpired';
+											else 
+												return 'opportunity-grid-row-expired';
+										}
 									}
 								} 
 							},
