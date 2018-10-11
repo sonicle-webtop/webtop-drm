@@ -76,8 +76,6 @@ import com.sonicle.webtop.drm.bol.OEmployeeProfile;
 import com.sonicle.webtop.drm.bol.OHourProfile;
 import com.sonicle.webtop.drm.bol.OLeaveRequest;
 import com.sonicle.webtop.drm.bol.OLeaveRequestType;
-import com.sonicle.webtop.drm.bol.OOpportunity;
-import com.sonicle.webtop.drm.bol.OOpportunityAction;
 import com.sonicle.webtop.drm.bol.OOpportunityField;
 import com.sonicle.webtop.drm.bol.OTimetableReport;
 import com.sonicle.webtop.drm.bol.OTimetableStamp;
@@ -99,7 +97,6 @@ import com.sonicle.webtop.drm.bol.js.JsGridHourProfile;
 import com.sonicle.webtop.drm.bol.js.JsGridLeaveRequest;
 import com.sonicle.webtop.drm.bol.js.JsGridLineManager;
 import com.sonicle.webtop.drm.bol.js.JsGridOpportunity;
-import com.sonicle.webtop.drm.bol.js.JsGridOpportunityAction;
 import com.sonicle.webtop.drm.bol.js.JsGridProfiles;
 import com.sonicle.webtop.drm.bol.js.JsGridTimetableReport;
 import com.sonicle.webtop.drm.bol.js.JsGridTimetableStamp;
@@ -111,6 +108,7 @@ import com.sonicle.webtop.drm.bol.js.JsOpportunity;
 import com.sonicle.webtop.drm.bol.js.JsOpportunityAction;
 import com.sonicle.webtop.drm.bol.js.JsOpportunityField;
 import com.sonicle.webtop.drm.bol.js.JsOpportunitySetting;
+import com.sonicle.webtop.drm.bol.js.JsPrepareOpportunityAction;
 import com.sonicle.webtop.drm.bol.js.JsTimetableSetting;
 import com.sonicle.webtop.drm.bol.js.JsTimetableStamp;
 import com.sonicle.webtop.drm.bol.js.JsWorkReport;
@@ -233,7 +231,8 @@ public class Service extends BaseService {
 		vs.put("defaultApplySignature", ss.getDefaultApplySignature());
 		vs.put("defaultChargeTo", ss.getDefaultChargeTo());
 		vs.put("defaultFreeSupport", ss.getDefaultFreeSupport());
-		vs.put("defaultStatus", ss.getDefaultDocStatusId());
+		vs.put("workReportDefaultStatus", ss.getWorkReportDefaultDocStatusId());
+		vs.put("opportunityDefaultStatus", ss.getOpportunityDefaultDocStatusId());
 		
 		try {
 			vs.put("opportunityRequiredFields", getOpportunityRequiredFields());
@@ -1212,7 +1211,7 @@ public class Service extends BaseService {
 				
 				for (VOpportunityEntry o : manager.listOpportunitiesAndActions(oQuery)) {
 					item = new JsGridOpportunity(o);
-					item.additionalInfo = (o.getActionId() == 0) ? getGridOpportunityAdditionalInfo(fields, o) : o.getDescription();					
+					item.additionalInfo = (o.getActionId() == 0) ? getGridOpportunityAdditionalInfo(fields, o) : (((o.getActivityId() != null) ? "[" + WT.getCoreManager().getActivity(o.getActivityId()).getDescription() + "] " : "") + ((o.getDescription() != null) ? o.getDescription() : ""));					
 					
 					jsGridOpportunity.add(item);
 				}
@@ -1356,6 +1355,26 @@ public class Service extends BaseService {
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action ManageOpportunityAction", ex);
+		}
+	}
+	
+	public void processManagePrepareOpportunityActions(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try{
+			Payload<MapItem, JsPrepareOpportunityAction> pl = ServletUtils.getPayload(request, JsPrepareOpportunityAction.class);
+
+			List<OpportunityAction> oActs = JsPrepareOpportunityAction.createOpportunityActions(pl.data);
+			String statusId = ss.getOpportunityDefaultDocStatusId();
+			
+			for (OpportunityAction act : oActs) {
+				if(statusId != null && !"null".equals(statusId)) act.setStatusId(Integer.parseInt(statusId));
+
+				manager.addOpportunityAction(act, null);
+			}
+
+			new JsonResult().printTo(out);
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManagePrepareOpportunityActions", ex);
 		}
 	}
 
@@ -1747,6 +1766,8 @@ public class Service extends BaseService {
 
 				if (setting != null) {
 					item = new JsOpportunitySetting(setting);
+					
+					item.defaultStatus = ss.getOpportunityDefaultDocStatusId();
 				} else {
 					item = new JsOpportunitySetting(new OpportunitySetting());
 				}
@@ -1758,6 +1779,10 @@ public class Service extends BaseService {
 				Payload<MapItem, JsOpportunitySetting> pl = ServletUtils.getPayload(request, JsOpportunitySetting.class);
 
 				OpportunitySetting setting = JsOpportunitySetting.createOpportunitySetting(pl.data);
+				
+				if (pl.map.has("defaultStatus")) {
+					ss.setOpportunityDefaultDocStatusId(pl.data.defaultStatus);
+				}
 				
 				manager.updateOpportunitySetting(setting);
 
@@ -1792,7 +1817,7 @@ public class Service extends BaseService {
 					item.defaultApplySignature = ss.getDefaultApplySignature();
 					item.defaultChargeTo = ss.getDefaultChargeTo();
 					item.defaultFreeSupport = ss.getDefaultFreeSupport();
-					item.defaultStatus = ss.getDefaultDocStatusId();
+					item.defaultStatus = ss.getWorkReportDefaultDocStatusId();
 				} else {
 					item = new JsWorkReportSetting(new WorkReportSetting());
 				}
@@ -1846,7 +1871,7 @@ public class Service extends BaseService {
 				}
 				
 				if (pl.map.has("defaultStatus")) {
-					ss.setDefaultDocStatusId(pl.data.defaultStatus);
+					ss.setWorkReportDefaultDocStatusId(pl.data.defaultStatus);
 				}
 
 				manager.updateWorkReportSetting(wrkSetting);

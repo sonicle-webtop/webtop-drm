@@ -30,12 +30,12 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.OpportunitySetting', {
+Ext.define('Sonicle.webtop.drm.model.PrepareOpportunityActions', {
 	extend: 'WTA.ux.data.BaseModel',
 	requires: [
-		'Sonicle.data.writer.Json'
+		'Sonicle.webtop.drm.model.Activity'
 	],
-	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageOpportunitySetting', 'data', {
+	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManagePrepareOpportunityActions', 'data', {
 		writer: {
 			type: 'sojson',
 			writeAssociations: true
@@ -44,12 +44,13 @@ Ext.define('Sonicle.webtop.drm.model.OpportunitySetting', {
 	identifier: 'negative',
 	idProperty: 'id',
 	fields: [
-		WTF.field('id', 'string', false),
-		WTF.field('defaultStatus', 'string', true)
+		WTF.field('id', 'int', false),
+		WTF.field('opportunityId', 'int', true),
+		WTF.field('operatorId', 'string', true),
+		WTF.field('date', 'date', true, {dateFormat: 'Y-m-d', defaultValue: new Date()})
 	],
 	hasMany: [
-		WTF.hasMany('generalFields', 'Sonicle.webtop.drm.model.OpportunityField'),
-		WTF.hasMany('visitReportFields', 'Sonicle.webtop.drm.model.OpportunityField'),
-		WTF.hasMany('notesSignatureFields', 'Sonicle.webtop.drm.model.OpportunityField')
+		WTF.hasMany('actionActivities', 'Sonicle.webtop.drm.model.Activity')
 	]
 });
+

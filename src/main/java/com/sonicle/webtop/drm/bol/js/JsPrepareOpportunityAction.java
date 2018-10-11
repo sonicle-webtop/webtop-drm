@@ -30,37 +30,50 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm;
+package com.sonicle.webtop.drm.bol.js;
+
+import com.sonicle.webtop.drm.model.OpportunityAction;
+import java.util.ArrayList;
+import java.util.List;
+import org.joda.time.LocalDate;
 
 /**
  *
  * @author lssndrvs
  */
-public class DrmSettings {
+public class JsPrepareOpportunityAction {
 
-	public static final String USE_STATISTIC_CUSTOMER = "customer.usestatistic";
+	public Integer id;
+	public Integer opportunityId;
+	public String operatorId;
+	public Integer statusId;
+	public LocalDate date;
+	public Integer activityId;
 
-	public static final String PRINT_DAYS_TRANSFERT = "workreport.daystrasfert.print";
+	private List<JsActivity> actionActivities = new ArrayList();
 
-	public static final String PRINT_TRANSFERT_DESCRIPTION = "workreport.transfert.print.description";
+	public JsPrepareOpportunityAction() {
+	}
 
-	public static final String PRINT_SIGNATURE = "workreport.print.signature";
+	public static List<OpportunityAction> createOpportunityActions(JsPrepareOpportunityAction js) {
 
-	public static final String ROUNDING_HOUR = "workreport.roundinghour";
-	
-	public static final String TRACKING = "workreport.tracking";
-	
-	public static final String MAIL_TRACKING = "workreport.tracking.mail";
-	
-	public static final String CLOUD_TRACKING = "workreport.tracking.cloud";
-	
-	public static final String DEFAULT_APPLY_SIGNATURE = "workreport.default.applysignature";
-	
-	public static final String DEFAULT_CHARGE_TO = "workreport.default.chargeto";
-	
-	public static final String DEFAULT_FREE_SUPPORT = "workreport.default.freesupport";
-	
-	public static final String WORK_REPORT_DEFAULT_DOC_STATUS_ID = "workreport.default.docstatusid";
-	
-	public static final String OPPORTUNITY_DEFAULT_DOC_STATUS_ID = "opportunity.default.docstatusid";
+		List<OpportunityAction> oActs = new ArrayList();
+		OpportunityAction oAct;
+		
+		for (JsActivity jsAct : js.actionActivities) {
+			oAct = new OpportunityAction();
+			
+			oAct.setId(js.id);
+			oAct.setOpportunityId(js.opportunityId);
+			oAct.setOperatorId(js.operatorId);
+			oAct.setStatusId(js.statusId);
+			oAct.setDate(js.date);
+			
+			oAct.setActivityId(jsAct.id);
+			
+			oActs.add(oAct);
+		}
+
+		return oActs;
+	}
 }

@@ -133,11 +133,19 @@ public class DrmServiceSettings extends BaseServiceSettings {
 		setBoolean(DEFAULT_FREE_SUPPORT, enabled); 
 	}
 	
-	public String getDefaultDocStatusId() {
-		return getString(DEFAULT_DOC_STATUS_ID, ""); 
+	public String getWorkReportDefaultDocStatusId() {
+		return getString(WORK_REPORT_DEFAULT_DOC_STATUS_ID, ""); 
 	}
 
-	public void setDefaultDocStatusId(String value) {
-		setString(DEFAULT_DOC_STATUS_ID, value); 
+	public void setWorkReportDefaultDocStatusId(String value) {
+		setString(WORK_REPORT_DEFAULT_DOC_STATUS_ID, value); 
+	}
+	
+	public String getOpportunityDefaultDocStatusId() {
+		return getString(OPPORTUNITY_DEFAULT_DOC_STATUS_ID, ""); 
+	}
+
+	public void setOpportunityDefaultDocStatusId(String value) {
+		setString(OPPORTUNITY_DEFAULT_DOC_STATUS_ID, value); 
 	}
 }

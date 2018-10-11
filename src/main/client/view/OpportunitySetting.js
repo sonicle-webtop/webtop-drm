@@ -262,6 +262,24 @@ Ext.define('Sonicle.webtop.drm.view.OpportunitySetting', {
 					tbar: [
 						me.getAct('initializeFields')
 					]
+				},
+				{
+					xtype: 'wtform',
+					title: me.mys.res('opportunity.config.default.tit'),
+					defaults: {
+						labelWidth: 80
+					},
+					items: [
+						WTF.localCombo('id', 'desc', {
+							bind: '{record.defaultStatus}',
+							store: {
+								autoLoad: true,
+								model: 'WTA.model.Simple',
+								proxy: WTF.proxy(me.mys.ID, 'LookupDocStatuses')
+							},
+							fieldLabel: me.mys.res('opportunity.config.fld-defaultStatus.lbl')
+						})
+					]
 				}
 			]
 		});

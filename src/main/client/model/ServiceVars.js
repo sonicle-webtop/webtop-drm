@@ -17,6 +17,7 @@ Ext.define('Sonicle.webtop.drm.model.ServiceVars', {
 		WTF.field('defaultApplySignature', 'boolean', true),
 		WTF.field('defaultChargeTo', 'boolean', true),
 		WTF.field('defaultFreeSupport', 'boolean', true),
-		WTF.field('defaultStatus', 'string', true)
+		WTF.field('workReportDefaultStatus', 'string', true),
+		WTF.field('opportunityDefaultStatus', 'string', true)
 	]
 });

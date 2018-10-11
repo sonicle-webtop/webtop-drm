@@ -192,7 +192,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								me.getAct('opportunity', 'edit'),
 								me.getAct('opportunity', 'remove'),
 								'-',
-								me.getAct('opportunity', 'addAction')
+								me.getAct('opportunity', 'addAction'),
+								me.getAct('opportunity', 'prepareActions')
 							],
 							listeners: {
 								rowclick: function (s, rec) {
@@ -201,8 +202,10 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									
 									if(rec.get('actionId') === 0){
 										me.getAct('opportunity', 'addAction').setDisabled(false);
+										me.getAct('opportunity', 'prepareActions').setDisabled(false);
 									}else{
 										me.getAct('opportunity', 'addAction').setDisabled(true);
+										me.getAct('opportunity', 'prepareActions').setDisabled(true);
 									}
 								},
 								rowdblclick: function (s, rec) {
@@ -1189,7 +1192,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			});
 		}
 		me.addAct('opportunity', 'add', {
-			text: WT.res('act-add.lbl'),
+			text: me.res('act-addOpportunity.lbl'),
 			tooltip: null,
 			iconCls: 'wt-icon-add-xs',
 			handler: function () {
@@ -1229,6 +1232,21 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			disabled: true,
 			handler: function () {
 				me.addOpportunityActionUI({
+					callback: function (success) {
+						if (success) {
+							me.filtersOpportunity().extractData();
+						}
+					}
+				});
+			}
+		});
+		me.addAct('opportunity', 'prepareActions', {
+			text: me.res('act-prepareOpportunityAction.lbl'),
+			tooltip: null,
+			iconCls: 'wtdrm-icon-prepareopportunityaction-xs',
+			disabled: true,
+			handler: function () {
+				me.prepareOpportunityActions({
 					callback: function (success) {
 						if (success) {
 							me.filtersOpportunity().extractData();
@@ -1603,6 +1621,26 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	addOpportunityAction: function (data, opts) {
 		var me = this,
 				vct = WT.createView(me.ID, 'view.OpportunityAction');
+		
+		var sel = me.gpOpportunitySelected();
+		
+		vct.getView().on('viewsave', function(s, success, model) {
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vct.show(false, function() {
+			vct.getView().begin('new', {
+				data: {
+					opportunityId: sel.get('id'),
+					operatorId: sel.get('operatorId')
+				}
+			});
+		});
+	},
+	prepareOpportunityActions: function (opts) {
+		opts = opts || {};
+
+		var me = this,
+				vct = WT.createView(me.ID, 'view.PrepareOpportunityActions');
 		
 		var sel = me.gpOpportunitySelected();
 		

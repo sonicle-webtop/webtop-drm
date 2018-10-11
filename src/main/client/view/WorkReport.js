@@ -752,7 +752,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 			mo.set('applySignature', me.mys.getVar('defaultApplySignature'));
 			mo.set('chargeTo', me.mys.getVar('defaultChargeTo'));
 			mo.set('freeSupport', me.mys.getVar('defaultFreeSupport'));
-			mo.set('docStatusId', me.mys.getVar('defaultStatus'));
+			mo.set('docStatusId', me.mys.getVar('workReportDefaultStatus'));
 		}
 		
 		if(mo.get('operatorId') === null) me.lref('flduser').setReadOnly(false);

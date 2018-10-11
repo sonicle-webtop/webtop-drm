@@ -169,12 +169,14 @@ public class OpportunityDAO extends BaseDAO {
 						)
 						.orderBy(
 								OPPORTUNITY_ACTIONS.DATE,
-								OPPORTUNITY_ACTIONS.FROM_HOUR	
+								OPPORTUNITY_ACTIONS.FROM_HOUR
 						)
 				)
 				.orderBy(
 						OPPORTUNITIES.DOMAIN_ID,
-						OPPORTUNITIES.ID								
+						OPPORTUNITIES.ID,
+						OPPORTUNITIES.DATE,
+						fldAct
 				)
 				.fetchInto(VOpportunityEntry.class);
 	}

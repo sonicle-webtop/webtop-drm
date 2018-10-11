@@ -383,6 +383,10 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 				mo = me.getModel();
 		
 		if(mo.get('operatorId') === null) me.lref('flduser').setReadOnly(false);
+		
+		if(me.isMode(me.MODE_NEW)) {
+			mo.set('statusId', me.mys.getVar('opportunityDefaultStatus'));
+		}
 	},
 	
 	initActions: function () {

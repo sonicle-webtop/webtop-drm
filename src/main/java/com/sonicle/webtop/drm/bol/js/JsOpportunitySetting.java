@@ -45,12 +45,16 @@ import org.apache.commons.lang3.StringUtils;
  * @author lssndrvs
  */
 public class JsOpportunitySetting {
+	
+	public String defaultStatus;
 
 	public List<OpportunityField> generalFields = new ArrayList();
 	public List<OpportunityField> visitReportFields = new ArrayList();
 	public List<OpportunityField> notesSignatureFields = new ArrayList();
 
 	public JsOpportunitySetting(OpportunitySetting oSetting) {
+		
+		this.defaultStatus = null;
 		
 		this.generalFields = oSetting.getGeneralFields();
 		this.visitReportFields = oSetting.getVisitReportFields();

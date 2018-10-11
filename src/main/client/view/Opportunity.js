@@ -711,6 +711,10 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 				mo = me.getModel();
 		
 		if(mo.get('operatorId') === null) me.lref('user').setReadOnly(false);
+		
+		if(me.isMode(me.MODE_NEW)) {
+			mo.set('statusId', me.mys.getVar('opportunityDefaultStatus'));
+		}
 	},
 	gpOpportunityAction: function () {
 		var me = this;
