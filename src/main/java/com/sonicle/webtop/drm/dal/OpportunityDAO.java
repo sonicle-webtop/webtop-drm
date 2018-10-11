@@ -45,6 +45,7 @@ import java.sql.Connection;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.DatePart;
@@ -94,6 +95,7 @@ public class OpportunityDAO extends BaseDAO {
 		
 		Field<Integer> fldOpp = DSL.val(0).as("action_id");
 		Field<Integer> fldAct = OPPORTUNITY_ACTIONS.ID.as("action_id");
+		Field<LocalDate> fldXDate = DSL.val(new LocalDate(1970, 1, 1)).as("x_date");
 
 		return dsl
 				.select(
@@ -103,6 +105,7 @@ public class OpportunityDAO extends BaseDAO {
 						OPPORTUNITIES.COMPANY_ID,
 						OPPORTUNITIES.OPERATOR_ID,
 						OPPORTUNITIES.DATE,
+						fldXDate,
 						OPPORTUNITIES.FROM_HOUR,
 						OPPORTUNITIES.TO_HOUR,
 						OPPORTUNITIES.EXECUTED_WITH,
@@ -136,6 +139,7 @@ public class OpportunityDAO extends BaseDAO {
 								OPPORTUNITIES.COMPANY_ID,
 								OPPORTUNITY_ACTIONS.OPERATOR_ID,
 								OPPORTUNITY_ACTIONS.DATE,
+								OPPORTUNITY_ACTIONS.DATE.as("x_date"),
 								OPPORTUNITY_ACTIONS.FROM_HOUR,
 								OPPORTUNITY_ACTIONS.TO_HOUR,
 								OPPORTUNITIES.EXECUTED_WITH,
@@ -175,7 +179,7 @@ public class OpportunityDAO extends BaseDAO {
 				.orderBy(
 						OPPORTUNITIES.DOMAIN_ID,
 						OPPORTUNITIES.ID,
-						OPPORTUNITIES.DATE,
+						fldXDate,
 						fldAct
 				)
 				.fetchInto(VOpportunityEntry.class);
