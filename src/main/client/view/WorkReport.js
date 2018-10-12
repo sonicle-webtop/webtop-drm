@@ -280,7 +280,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											selectOnFocus: true,
 											store: {
 												model: 'WTA.model.Simple',
-												proxy: WTF.proxy(me.mys.ID, 'LookupStatisticCustomers', null, {
+												proxy: WTF.proxy(me.mys.ID, (me.mys.getVar('useStatisticCustomer') === true) ? 'LookupStatisticCustomers' : 'LookupRealCustomers', null, {
 													extraParams: {
 														operator: null,
 														realCustomer: null
@@ -294,6 +294,8 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 																if (meta.selected) {
 																	me.lookupReference('fldstatmasterdata').setValue(meta.selected);
 																}
+															}else {
+																me.lookupReference('fldstatmasterdata').setValue(me.lookupReference('fldmasterdata').getValue());
 															}
 														}
 													},

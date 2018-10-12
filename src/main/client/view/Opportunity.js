@@ -109,7 +109,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 					hidden: true,
 					store: {
 						model: 'WTA.model.Simple',
-						proxy: WTF.proxy(me.mys.ID, 'LookupStatisticCustomers', null, {
+						proxy: WTF.proxy(me.mys.ID, (me.mys.getVar('useStatisticCustomer') === true) ? 'LookupStatisticCustomers' : 'LookupRealCustomers', null, {
 							extraParams: {
 								operator: null,
 								realCustomer: null
@@ -123,6 +123,8 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 										if (meta.selected) {
 											me.lookupReference('statisticCustomer').setValue(meta.selected);
 										}
+									}else {
+										me.lookupReference('statisticCustomer').setValue(me.lookupReference('customer').getValue());
 									}
 								}
 							},

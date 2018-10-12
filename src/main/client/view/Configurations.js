@@ -698,8 +698,15 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		WT.ajaxReq(me.mys.ID, 'UpdateConfiguration', {
 			params: pars,
 			callback: function (success, json) {
-				if (!success)
+				if (!success){
 					WT.error(json.message);
+				}else{
+					WT.confirm(me.mys.res('configuration.confirm.logout'), function (bid) {
+						if (bid === 'yes') {
+							WT.logout();
+						}
+					});
+				} 
 			}
 		});
 	},

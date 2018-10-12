@@ -39,6 +39,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 	layout: 'column',
 	referenceHolder: true,
 	sid: null,
+	useStatisticCustomer: null,
 	
 	viewModel: {
 		data: {
@@ -286,7 +287,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 					tabIndex: 104,
 					store: {
 						model: 'WTA.model.Simple',
-						proxy: WTF.proxy(me.sid, 'LookupStatisticCustomers', null, {
+						proxy: WTF.proxy(me.sid, (me.useStatisticCustomer === true) ? 'LookupStatisticCustomers' : 'LookupRealCustomers', null, {
 							extraParams: {
 								realCustomer: null,
 								operator: null
@@ -299,6 +300,8 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 									if (meta.selected) {
 										me.getViewModel().set('statisticCustomerId', meta.selected);
 									}
+								}else {
+									me.lookupReference('fldstatmasterdata').setValue(me.lookupReference('fldmasterdata').getValue());
 								}
 							}
 						}

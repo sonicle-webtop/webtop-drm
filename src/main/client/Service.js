@@ -232,6 +232,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							titleCollapse: true,
 							collapsible: true,
 							sid: me.ID,
+							useStatisticCustomer: me.getVar('useStatisticCustomer'),
 							listeners: {
 								search: function(s, query){
 									me.reloadWorkReport(query);
