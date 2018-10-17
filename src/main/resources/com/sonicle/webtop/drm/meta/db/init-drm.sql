@@ -939,3 +939,10 @@ ADD COLUMN "show_on_grid" bool DEFAULT false;
 --------------
 --INSERITO NELLA CREATE TABLE, DA IGNORARE QUESTA ALTER TABLE SE IL CAMPO è GIà STATO RINOMINATO--
 ALTER TABLE "drm"."opportunities" RENAME "won" TO "success";
+
+--------------
+--17/10/2018--
+--------------
+
+ALTER TABLE "drm"."work_reports"
+ALTER COLUMN "reference_no" TYPE varchar(255);

@@ -39,6 +39,8 @@ Ext.define('Sonicle.webtop.drm.view.WorkReportSetting', {
 		height: 500
 	},
 	modelName: 'Sonicle.webtop.drm.model.WorkReportSetting',
+	reloadOnClose: false,
+	
 	initComponent: function () {
 		var me = this;
 		me.callParent(arguments);
@@ -250,6 +252,8 @@ Ext.define('Sonicle.webtop.drm.view.WorkReportSetting', {
 				}
 			]
 		});
+		me.on("beforeviewsave", me.onBeforeViewSave);
+		me.on("viewsave", me.onViewSave);
 	},
 	addType: function () {
 		var me = this;
@@ -308,5 +312,27 @@ Ext.define('Sonicle.webtop.drm.view.WorkReportSetting', {
 				sto.remove(rec);
 			}
 		}, me);
+	},
+	onBeforeViewSave: function (s, mo) {		
+		s.reloadOnClose = s.needsReload(mo);
+	},
+	onViewSave: function (s, success, mo) {
+		var me = this;
+		
+		if(me.reloadOnClose)
+			WT.confirm(me.mys.res('configuration.confirm.logout'), function (bid) {
+				if (bid === 'yes') {
+					WT.logout();
+				}
+			});
+	},
+	needsReload: function (mo){
+		if(mo.isModified('defaultApplySignature') 
+				|| mo.isModified('defaultChargeTo') 
+				|| mo.isModified('defaultFreeSupport') 
+				|| mo.isModified('defaultStatus')) 
+			return true;
+		else 
+			return false;
 	}
 });
