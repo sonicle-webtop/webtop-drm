@@ -420,13 +420,13 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 	addEmployeeProfile: function (opts) {
 		opts = opts || {};
 		var me = this,
-			vct = WT.createView(me.mys.ID, 'view.EmployeeProfile');
+			vw = WT.createView(me.mys.ID, 'view.EmployeeProfile', {swapReturn: true});
 	
-		vct.getView().on('viewsave', function (s, success, model) {
+		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});	
-		vct.show(false, function () {
-			vct.getView().begin('new', {
+		vw.showView(function () {
+			vw.begin('new', {
 				data: {
 				}
 			});
@@ -449,13 +449,12 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 	editEmployeeProfile: function (id, opts) {
 		opts = opts || {};
 		var me = this,
-				vct = WT.createView(me.mys.ID, 'view.EmployeeProfile');
-		vct.getView().on('viewsave', function (s, success, model) {
+				vw = WT.createView(me.mys.ID, 'view.EmployeeProfile', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false,
-				function () {
-					vct.getView().begin('edit', {
+		vw.showView(function () {
+					vw.begin('edit', {
 						data: {
 							id: id
 						}
@@ -498,13 +497,13 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 	addHourProfile: function (opts) {
 		opts = opts || {};
 		var me = this,
-			vct = WT.createView(me.mys.ID, 'view.HourProfile');
+			vw = WT.createView(me.mys.ID, 'view.HourProfile', {swapReturn: true});
 	
-		vct.getView().on('viewsave', function (s, success, model) {
+		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});	
-		vct.show(false, function () {
-			vct.getView().begin('new', {
+		vw.showView(function () {
+			vw.begin('new', {
 				data: {
 				}
 			});
@@ -527,13 +526,12 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 	editHourProfile: function (id, opts) {
 		opts = opts || {};
 		var me = this,
-				vct = WT.createView(me.mys.ID, 'view.HourProfile');
-		vct.getView().on('viewsave', function (s, success, model) {
+				vw = WT.createView(me.mys.ID, 'view.HourProfile');
+		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false,
-				function () {
-					vct.getView().begin('edit', {
+		vw.showView(function () {
+					vw.begin('edit', {
 						data: {
 							id: id
 						}

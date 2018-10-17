@@ -716,13 +716,12 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		opts = opts || {};
 
 		var me = this,
-				vct = WT.createView(me.mys.ID, 'view.Company');
-		vct.getView().on('viewsave', function (s, success, model) {
+				vw = WT.createView(me.mys.ID, 'view.Company', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false,
-				function () {
-					vct.getView().begin('new');
+		vw.showView(function () {
+					vw.begin('new');
 				});
 	},
 	editCompanyUI: function (rec) {
@@ -742,13 +741,12 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		opts = opts || {};
 
 		var me = this,
-				vct = WT.createView(me.mys.ID, 'view.Company');
-		vct.getView().on('viewsave', function (s, success, model) {
+				vw = WT.createView(me.mys.ID, 'view.Company', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false,
-				function () {
-					vct.getView().begin('edit', {
+		vw.showView(function () {
+					vw.begin('edit', {
 						data: {
 							companyId: companyId
 						}
@@ -808,13 +806,12 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		opts = opts || {};
 
 		var me = this,
-				vct = WT.createView(me.mys.ID, 'view.Group');
-		vct.getView().on('viewsave', function (s, success, model) {
+				vw = WT.createView(me.mys.ID, 'view.Group', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false,
-				function () {
-					vct.getView().begin('new', {
+		vw.showView(function () {
+					vw.begin('new', {
 						data: {
 							groupCategory: groupCategory
 						}
@@ -841,13 +838,12 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		opts = opts || {};
 
 		var me = this,
-				vct = WT.createView(me.mys.ID, 'view.Group');
-		vct.getView().on('viewsave', function (s, success, model) { 
+				vw = WT.createView(me.mys.ID, 'view.Group', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) { 
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false,
-				function () {
-					vct.getView().begin('edit', {
+		vw.showView(function () {
+					vw.begin('edit', {
 						data: {
 							groupId: groupId
 						}
@@ -880,13 +876,12 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		opts = opts || {};
 
 		var me = this,
-				vct = WT.createView(me.mys.ID, 'view.DocStatus');
-		vct.getView().on('viewsave', function (s, success, model) { 
+				vw = WT.createView(me.mys.ID, 'view.DocStatus', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) { 
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false, 
-				function () {
-					vct.getView().begin('new');
+		vw.showView(function () {
+					vw.begin('new');
 				});
 	},
 	editDocStatusUI: function (rec) {
@@ -906,13 +901,12 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		opts = opts || {};
 
 		var me = this,
-				vct = WT.createView(me.mys.ID, 'view.DocStatus');
-		vct.getView().on('viewsave', function (s, success, model) { 
+				vw = WT.createView(me.mys.ID, 'view.DocStatus', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) { 
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false, 
-				function () {
-					vct.getView().begin('edit', {
+		vw.showView(function () {
+					vw.begin('edit', {
 						data: {
 							docStatusId: docStatusId
 						}
@@ -958,13 +952,13 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		opts = opts || {}; 
 
 		var me = this,
-				vct = WT.createView(me.mys.ID, 'view.Folder');
-		vct.getView().on('viewsave', function (s, success, model) { 
+				vw = WT.createView(me.mys.ID, 'view.Folder', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) { 
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false,
+		vw.showView(false,
 				function () {
-					vct.getView().begin('new');
+					vw.begin('new');
 				});
 	},
 	editFolderUI: function (rec) {
@@ -984,13 +978,12 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		opts = opts || {};
 
 		var me = this,
-				vct = WT.createView(me.mys.ID, 'view.Folder');
-		vct.getView().on('viewsave', function (s, success, model) { 
+				vw = WT.createView(me.mys.ID, 'view.Folder', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) { 
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false, 
-				function () {
-					vct.getView().begin('edit', {
+		vw.showView(function () {
+					vw.begin('edit', {
 						data: {
 							folderId: folderId
 						}
@@ -1034,13 +1027,13 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 	addProfile: function (type, opts) {
 		opts = opts || {};
 		var me = this,
-			vct = WT.createView(me.mys.ID, 'view.Profile');
+			vw = WT.createView(me.mys.ID, 'view.Profile', {swapReturn: true});
 	
-		vct.getView().on('viewsave', function (s, success, model) {
+		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});	
-		vct.show(false, function () {
-			vct.getView().begin('new', {
+		vw.showView(false, function () {
+			vw.begin('new', {
 				data: {
 					type: type
 				}
@@ -1064,13 +1057,12 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		opts = opts || {};
 
 		var me = this,
-				vct = WT.createView(me.mys.ID, 'view.Profile');
-		vct.getView().on('viewsave', function (s, success, model) { 
+				vw = WT.createView(me.mys.ID, 'view.Profile', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) { 
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false,
-				function () {
-					vct.getView().begin('edit', {
+		vw.showView(function () {
+					vw.begin('edit', {
 						data: {
 							profileId: profileId
 						}
@@ -1108,13 +1100,13 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 	addManager: function (opts) {
 		opts = opts || {};
 		var me = this,
-			vct = WT.createView(me.mys.ID, 'view.LineManager');
+			vw = WT.createView(me.mys.ID, 'view.LineManager', {swapReturn: true});
 	
-		vct.getView().on('viewsave', function (s, success, model) {
+		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});	
-		vct.show(false, function () {
-			vct.getView().begin('new', {
+		vw.showView(function () {
+			vw.begin('new', {
 			});
 		});
 	},
@@ -1134,13 +1126,12 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		opts = opts || {};
 
 		var me = this,
-				vct = WT.createView(me.mys.ID, 'view.LineManager');
-		vct.getView().on('viewsave', function (s, success, model) {
+				vw = WT.createView(me.mys.ID, 'view.LineManager', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false, 
-				function () {
-					vct.getView().begin('edit', {
+		vw.showView(function () {
+					vw.begin('edit', {
 						data: {
 							userId: userId
 						}

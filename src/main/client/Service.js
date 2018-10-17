@@ -1465,13 +1465,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 
 		var me = this,
 			fop = me.filtersOpportunity(),
-			vct = WT.createView(me.ID, 'view.Opportunity');
-		vct.getView().on('viewsave', function (s, success, model) {
+			vw = WT.createView(me.ID, 'view.Opportunity', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false,
-			function () {
-				vct.getView().begin('new', {
+		vw.showView(function () {
+				vw.begin('new', {
 					data: {
 						operatorId: fop.getOperatorId()
 					}
@@ -1499,13 +1498,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	editOpportunity: function (id, opts) {
 		opts = opts || {};
 		var me = this,
-				vct = WT.createView(me.ID, 'view.Opportunity');
-		vct.getView().on('viewsave', function (s, success, model) {
+				vw = WT.createView(me.ID, 'view.Opportunity', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false,
-				function () {
-					vct.getView().begin('edit', {
+		vw.showView(function () {
+					vw.begin('edit', {
 						data: {
 							id: id
 						}
@@ -1527,13 +1525,13 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	editOpportunityAction: function(id, opts) {
 		opts = opts || {};
 		var me = this,
-				vct = WT.createView(me.ID, 'view.OpportunityAction');
+				vw = WT.createView(me.ID, 'view.OpportunityAction', {swapReturn: true});
 		
-		vct.getView().on('viewsave', function (s, success, model) {
+		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false, function() {
-			vct.getView().begin('edit', {
+		vw.showView(function() {
+			vw.begin('edit', {
 				data: {
 					id: id
 				}
@@ -1625,15 +1623,15 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	},
 	addOpportunityAction: function (data, opts) {
 		var me = this,
-				vct = WT.createView(me.ID, 'view.OpportunityAction');
+				vw = WT.createView(me.ID, 'view.OpportunityAction', {swapReturn: true});
 		
 		var sel = me.gpOpportunitySelected();
 		
-		vct.getView().on('viewsave', function(s, success, model) {
+		vw.on('viewsave', function(s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false, function() {
-			vct.getView().begin('new', {
+		vw.showView(function() {
+			vw.begin('new', {
 				data: {
 					opportunityId: sel.get('id'),
 					operatorId: sel.get('operatorId')
@@ -1645,15 +1643,15 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		opts = opts || {};
 
 		var me = this,
-				vct = WT.createView(me.ID, 'view.PrepareOpportunityActions');
+				vw = WT.createView(me.ID, 'view.PrepareOpportunityActions', {swapReturn: true});
 		
 		var sel = me.gpOpportunitySelected();
 		
-		vct.getView().on('viewsave', function(s, success, model) {
+		vw.on('viewsave', function(s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false, function() {
-			vct.getView().begin('new', {
+		vw.showView(function() {
+			vw.begin('new', {
 				data: {
 					opportunityId: sel.get('id'),
 					operatorId: sel.get('operatorId')
@@ -1665,13 +1663,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		opts = opts || {};
 
 		var me = this,
-				vct = WT.createView(me.ID, 'view.OpportunitySetting');
-		vct.getView().on('viewsave', function (s, success, model) { 
+				vw = WT.createView(me.ID, 'view.OpportunitySetting', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) { 
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false,
-				function () {
-					vct.getView().begin('edit', {
+		vw.showView(function () {
+					vw.begin('edit', {
 						data: {
 							id: 'op'
 						}
@@ -1684,13 +1681,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 
 		var me = this,
 			fwr = me.filtersWorkReport(),
-			vct = WT.createView(me.ID, 'view.WorkReport');
-		vct.getView().on('viewsave', function (s, success, model) {
+			vw = WT.createView(me.ID, 'view.WorkReport', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false,
-			function () {
-				vct.getView().begin('new', {
+		vw.showView(function () {
+				vw.begin('new', {
 					data: {
 						operatorId: fwr.getOperatorId()
 					}
@@ -1712,13 +1708,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	editWorkReport: function (workReportId, opts) {
 		opts = opts || {};
 		var me = this,
-				vct = WT.createView(me.ID, 'view.WorkReport');
-		vct.getView().on('viewsave', function (s, success, model) {
+				vw = WT.createView(me.ID, 'view.WorkReport', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false,
-				function () {
-					vct.getView().begin('edit', {
+		vw.showView(function () {
+					vw.begin('edit', {
 						data: {
 							workReportId: workReportId
 						}
@@ -1762,13 +1757,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		opts = opts || {};
 
 		var me = this,
-				vct = WT.createView(me.ID, 'view.WorkReportSetting');
-		vct.getView().on('viewsave', function (s, success, model) { 
+				vw = WT.createView(me.ID, 'view.WorkReportSetting', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) { 
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false,
-				function () {
-					vct.getView().begin('edit', {
+		vw.showView(function () {
+					vw.begin('edit', {
 						data: {
 							id: 'wr'
 						}
@@ -1810,13 +1804,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		opts = opts || {};
 
 		var me = this,
-				vct = WT.createView(me.ID, 'view.ExpenseNote');
-		vct.getView().on('viewsave', function (s, success, model) {
+				vw = WT.createView(me.ID, 'view.ExpenseNote', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false, 
-				function () {
-					vct.getView().begin('new');
+		vw.showView(function () {
+					vw.begin('new');
 				});
 	},
 	editExpenseNoteUI: function (rec) {
@@ -1834,13 +1827,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	editExpenseNote: function (expenseNoteId, opts) {
 		opts = opts || {};
 		var me = this,
-				vct = WT.createView(me.ID, 'view.ExpenseNote');
-		vct.getView().on('viewsave', function (s, success, model) {
+				vw = WT.createView(me.ID, 'view.ExpenseNote', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false,
-				function () {
-					vct.getView().begin('edit', {
+		vw.showView(function () {
+					vw.begin('edit', {
 						data: {
 							expenseNoteId: expenseNoteId
 						}
@@ -1882,8 +1874,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	},
 	expenseNoteSetting: function (opts) {
 		var me = this,
-				vw = WT.createView(me.ID, 'view.ExpenseNoteSetting');
-		vw.show(false);
+				vw = WT.createView(me.ID, 'view.ExpenseNoteSetting', {swapReturn: true});
+		vw.showView();
 	},
 	reloadExpenseNote: function (query) {
 		var me = this,
@@ -1965,13 +1957,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 
 		var me = this,
 				ftr = me.filtersTimetableRequest(),
-				vct = WT.createView(me.ID, 'view.TimetableRequest');
-		vct.getView().on('viewsave', function (s, success, model) {
+				vw = WT.createView(me.ID, 'view.TimetableRequest', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false, 
-				function () {
-					vct.getView().begin('new', {
+		vw.showView(function () {
+					vw.begin('new', {
 						data: {
 							userId: ftr.getOperatorId()
 						}
@@ -1994,13 +1985,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		opts = opts || {};
 		var mode = (status === 'C' || status === 'D') ? 'view' : (userId !== WT.getVar('userId')) ? 'view' : 'edit';
 		var me = this,
-				vct = WT.createView(me.ID, 'view.TimetableRequest');
-		vct.getView().on('viewsave', function (s, success, model) {
+				vw = WT.createView(me.ID, 'view.TimetableRequest', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false,
-				function () {
-					vct.getView().begin(mode, {
+		vw.showView(function () {
+					vw.begin(mode, {
 						data: {
 							leaveRequestId: leaveRequestId
 						}
@@ -2162,13 +2152,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		opts = opts || {};
 
 		var me = this,
-				vct = WT.createView(me.ID, 'view.TimetableSetting');
-		vct.getView().on('viewsave', function (s, success, model) {
+				vw = WT.createView(me.ID, 'view.TimetableSetting', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false,
-				function () {
-					vct.getView().begin('edit', {
+		vw.showView(function () {
+					vw.begin('edit', {
 						data: {
 							id: 'tt'
 						}
@@ -2272,13 +2261,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 
 		var me = this,
 				fts = me.filtersTimetableStamp(),
-				vct = WT.createView(me.ID, 'view.TimetableStamp');
-		vct.getView().on('viewsave', function (s, success, model) {
+				vw = WT.createView(me.ID, 'view.TimetableStamp', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false, 
-				function () {
-					vct.getView().begin('new', {
+		vw.showView(function () {
+					vw.begin('new', {
 						data: {
 							userId: fts.getOperatorId(),
 							date: fts.getRefDate()
@@ -2322,8 +2310,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	
 	configurationView: function () {
 		var me = this,
-				vw = WT.createView(me.ID, 'view.Configurations');
-		vw.show(false);
+				vw = WT.createView(me.ID, 'view.Configurations', {swapReturn: true});
+		vw.showView();
 	},
 	
 	onActivate: function (tabIndex) {

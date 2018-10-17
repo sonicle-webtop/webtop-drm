@@ -394,13 +394,12 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 	addExpenseNoteDetail: function (opts) {
 		opts = opts || {};
 		var me = this,
-				vct = WT.createView(me.mys.ID, 'view.ExpenseNoteDetail');
-		vct.getView().on('viewsave', function (s, success, model) {
+				vw = WT.createView(me.mys.ID, 'view.ExpenseNoteDetail', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
-		vct.show(false,
-				function () {
-					vct.getView().begin('new');
+		vw.showView(function () {
+					vw.begin('new');
 				});
 	},
 	
