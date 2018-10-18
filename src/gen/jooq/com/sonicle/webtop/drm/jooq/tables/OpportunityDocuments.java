@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OpportunityDocuments extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.OpportunityDocumentsRecord> {
 
-	private static final long serialVersionUID = 2112170984;
+	private static final long serialVersionUID = 1954181198;
 
 	/**
 	 * The reference instance of <code>drm.opportunity_documents</code>
@@ -59,12 +59,12 @@ public class OpportunityDocuments extends org.jooq.impl.TableImpl<com.sonicle.we
 	/**
 	 * The column <code>drm.opportunity_documents.size</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.OpportunityDocumentsRecord, java.lang.Integer> SIZE = createField("size", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.OpportunityDocumentsRecord, java.lang.Long> SIZE = createField("size", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
-	 * The column <code>drm.opportunity_documents.media_tpye</code>.
+	 * The column <code>drm.opportunity_documents.media_type</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.OpportunityDocumentsRecord, java.lang.String> MEDIA_TPYE = createField("media_tpye", org.jooq.impl.SQLDataType.VARCHAR.length(100).nullable(false), this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.OpportunityDocumentsRecord, java.lang.String> MEDIA_TYPE = createField("media_type", org.jooq.impl.SQLDataType.VARCHAR.length(255).nullable(false), this, "");
 
 	/**
 	 * Create a <code>drm.opportunity_documents</code> table reference

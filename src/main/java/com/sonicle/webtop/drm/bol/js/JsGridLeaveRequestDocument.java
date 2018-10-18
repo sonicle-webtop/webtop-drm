@@ -42,7 +42,7 @@ public class JsGridLeaveRequestDocument {
 	public String id;
 	public Integer leaveRequestId;
 	public String fileName;
-	public Integer size;
+	public Long size;
 	public String mediaType;
 
 	public JsGridLeaveRequestDocument(LeaveRequestDocument lrDoc) {

@@ -42,7 +42,7 @@ public class JsGridWorkReportAttachment {
 	public String id;
 	public String workReportId;
 	public String fileName;
-	public Integer size;
+	public Long size;
 	public String mediaType;
 
 	public JsGridWorkReportAttachment(WorkReportAttachment wrkAttachment) {

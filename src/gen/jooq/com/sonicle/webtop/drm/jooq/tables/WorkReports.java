@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WorkReports extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord> {
 
-	private static final long serialVersionUID = -1451421987;
+	private static final long serialVersionUID = -1259655762;
 
 	/**
 	 * The reference instance of <code>drm.work_reports</code>
@@ -99,7 +99,7 @@ public class WorkReports extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.
 	/**
 	 * The column <code>drm.work_reports.reference_no</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.String> REFERENCE_NO = createField("reference_no", org.jooq.impl.SQLDataType.VARCHAR.length(30), this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.String> REFERENCE_NO = createField("reference_no", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
 
 	/**
 	 * The column <code>drm.work_reports.causal_id</code>.

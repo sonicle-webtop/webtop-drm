@@ -92,6 +92,11 @@ public class Tables {
 	public static final com.sonicle.webtop.drm.jooq.tables.LeaveRequestDocuments LEAVE_REQUEST_DOCUMENTS = com.sonicle.webtop.drm.jooq.tables.LeaveRequestDocuments.LEAVE_REQUEST_DOCUMENTS;
 
 	/**
+	 * The table drm.leave_request_documents_data
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.LeaveRequestDocumentsData LEAVE_REQUEST_DOCUMENTS_DATA = com.sonicle.webtop.drm.jooq.tables.LeaveRequestDocumentsData.LEAVE_REQUEST_DOCUMENTS_DATA;
+
+	/**
 	 * The table drm.leave_requests
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.LeaveRequests LEAVE_REQUESTS = com.sonicle.webtop.drm.jooq.tables.LeaveRequests.LEAVE_REQUESTS;
@@ -122,6 +127,11 @@ public class Tables {
 	public static final com.sonicle.webtop.drm.jooq.tables.OpportunityActionDocuments OPPORTUNITY_ACTION_DOCUMENTS = com.sonicle.webtop.drm.jooq.tables.OpportunityActionDocuments.OPPORTUNITY_ACTION_DOCUMENTS;
 
 	/**
+	 * The table drm.opportunity_action_documents_data
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.OpportunityActionDocumentsData OPPORTUNITY_ACTION_DOCUMENTS_DATA = com.sonicle.webtop.drm.jooq.tables.OpportunityActionDocumentsData.OPPORTUNITY_ACTION_DOCUMENTS_DATA;
+
+	/**
 	 * The table drm.opportunity_action_interlocutors
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.OpportunityActionInterlocutors OPPORTUNITY_ACTION_INTERLOCUTORS = com.sonicle.webtop.drm.jooq.tables.OpportunityActionInterlocutors.OPPORTUNITY_ACTION_INTERLOCUTORS;
@@ -135,6 +145,11 @@ public class Tables {
 	 * The table drm.opportunity_documents
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.OpportunityDocuments OPPORTUNITY_DOCUMENTS = com.sonicle.webtop.drm.jooq.tables.OpportunityDocuments.OPPORTUNITY_DOCUMENTS;
+
+	/**
+	 * The table drm.opportunity_documents_data
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.OpportunityDocumentsData OPPORTUNITY_DOCUMENTS_DATA = com.sonicle.webtop.drm.jooq.tables.OpportunityDocumentsData.OPPORTUNITY_DOCUMENTS_DATA;
 
 	/**
 	 * The table drm.opportunity_fields
@@ -195,6 +210,11 @@ public class Tables {
 	 * The table drm.work_reports_attachments
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.WorkReportsAttachments WORK_REPORTS_ATTACHMENTS = com.sonicle.webtop.drm.jooq.tables.WorkReportsAttachments.WORK_REPORTS_ATTACHMENTS;
+
+	/**
+	 * The table drm.work_reports_attachments_data
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.WorkReportsAttachmentsData WORK_REPORTS_ATTACHMENTS_DATA = com.sonicle.webtop.drm.jooq.tables.WorkReportsAttachmentsData.WORK_REPORTS_ATTACHMENTS_DATA;
 
 	/**
 	 * The table drm.work_reports_rows

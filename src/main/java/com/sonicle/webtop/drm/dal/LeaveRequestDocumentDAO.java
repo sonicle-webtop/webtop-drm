@@ -35,8 +35,10 @@ package com.sonicle.webtop.drm.dal;
 import com.sonicle.webtop.core.dal.BaseDAO;
 import com.sonicle.webtop.core.dal.DAOException;
 import com.sonicle.webtop.drm.bol.OLeaveRequestDocument;
+import com.sonicle.webtop.drm.bol.OLeaveRequestDocumentData;
 import static com.sonicle.webtop.drm.jooq.Sequences.SEQ_LEAVE_REQUEST_DOCUMENTS;
 import static com.sonicle.webtop.drm.jooq.Tables.LEAVE_REQUEST_DOCUMENTS;
+import static com.sonicle.webtop.drm.jooq.Tables.LEAVE_REQUEST_DOCUMENTS_DATA;
 import com.sonicle.webtop.drm.jooq.tables.records.LeaveRequestDocumentsRecord;
 import java.sql.Connection;
 import java.util.List;
@@ -80,6 +82,17 @@ public class LeaveRequestDocumentDAO extends BaseDAO {
 						LEAVE_REQUEST_DOCUMENTS.LEAVE_REQUEST_DOCUMENT_ID.equal(leaveRequestDocumentId)
 				)
 				.fetchOneInto(OLeaveRequestDocument.class);
+	}
+	
+	public OLeaveRequestDocumentData selectBytes(Connection con, String attachmentId) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+			.select(
+				LEAVE_REQUEST_DOCUMENTS_DATA.BYTES
+			)
+			.from(LEAVE_REQUEST_DOCUMENTS_DATA)
+			.where(LEAVE_REQUEST_DOCUMENTS_DATA.LEAVE_REQUEST_DOCUMENT_ID.equal(attachmentId))
+			.fetchOneInto(OLeaveRequestDocumentData.class);
 	}
 
 	public int insert(Connection con, OLeaveRequestDocument item) throws DAOException {

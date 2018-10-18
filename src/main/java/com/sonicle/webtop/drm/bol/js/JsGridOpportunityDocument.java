@@ -42,7 +42,7 @@ public class JsGridOpportunityDocument {
 	public String id;
 	public Integer opportunityId;
 	public String fileName;
-	public Integer size;
+	public Long size;
 	public String mediaType;
 
 	public JsGridOpportunityDocument(OpportunityDocument oD) {

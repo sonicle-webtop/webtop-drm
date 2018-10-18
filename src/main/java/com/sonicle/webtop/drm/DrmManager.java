@@ -2686,7 +2686,7 @@ public class DrmManager extends BaseManager {
 		oActDoc.setOpportunityActionId(actDoc.getOpportunityActionId());
 		oActDoc.setFilename(actDoc.getFileName());
 		oActDoc.setSize(actDoc.getSize());
-		oActDoc.setMediaTpye(actDoc.getMediaType());
+		oActDoc.setMediaType(actDoc.getMediaType());
 
 		return oActDoc;
 	}
@@ -2702,7 +2702,7 @@ public class DrmManager extends BaseManager {
 		actDoc.setOpportunityActionId(oActDoc.getOpportunityActionId());
 		actDoc.setFileName(oActDoc.getFilename());
 		actDoc.setSize(oActDoc.getSize());
-		actDoc.setMediaType(oActDoc.getMediaTpye());
+		actDoc.setMediaType(oActDoc.getMediaType());
 
 		return actDoc;
 	}
@@ -2746,7 +2746,7 @@ public class DrmManager extends BaseManager {
 		oDoc.setOpportunityId(doc.getOpportunityId());
 		oDoc.setFilename(doc.getFileName());
 		oDoc.setSize(doc.getSize());
-		oDoc.setMediaTpye(doc.getMediaType());
+		oDoc.setMediaType(doc.getMediaType());
 
 		return oDoc;
 	}
@@ -2762,7 +2762,7 @@ public class DrmManager extends BaseManager {
 		doc.setOpportunityId(oDoc.getOpportunityId());
 		doc.setFileName(oDoc.getFilename());
 		doc.setSize(oDoc.getSize());
-		doc.setMediaType(oDoc.getMediaTpye());
+		doc.setMediaType(oDoc.getMediaType());
 
 		return doc;
 	}
@@ -3178,7 +3178,7 @@ public class DrmManager extends BaseManager {
 		oAtt.setWorkReportId(attachment.getWorkReportId());
 		oAtt.setFilename(attachment.getFileName());
 		oAtt.setSize(attachment.getSize());
-		oAtt.setMediaTpye(attachment.getMediaType());
+		oAtt.setMediaType(attachment.getMediaType());
 
 		return oAtt;
 	}
@@ -3194,7 +3194,7 @@ public class DrmManager extends BaseManager {
 		att.setWorkReportId(oAttachment.getWorkReportId());
 		att.setFileName(oAttachment.getFilename());
 		att.setSize(oAttachment.getSize());
-		att.setMediaType(oAttachment.getMediaTpye());
+		att.setMediaType(oAttachment.getMediaType());
 
 		return att;
 	}
@@ -3809,7 +3809,7 @@ public class DrmManager extends BaseManager {
 		oDoc.setLeaveRequestId(doc.getLeaveRequestId());
 		oDoc.setFilename(doc.getFileName());
 		oDoc.setSize(doc.getSize());
-		oDoc.setMediaTpye(doc.getMediaType());
+		oDoc.setMediaType(doc.getMediaType());
 
 		return oDoc;
 	}
@@ -3825,7 +3825,7 @@ public class DrmManager extends BaseManager {
 		doc.setLeaveRequestId(oDoc.getLeaveRequestId());
 		doc.setFileName(oDoc.getFilename());
 		doc.setSize(oDoc.getSize());
-		doc.setMediaType(oDoc.getMediaTpye());
+		doc.setMediaType(oDoc.getMediaType());
 
 		return doc;
 	}

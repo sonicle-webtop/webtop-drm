@@ -36,7 +36,9 @@ package com.sonicle.webtop.drm.dal;
 import com.sonicle.webtop.core.dal.BaseDAO;
 import com.sonicle.webtop.core.dal.DAOException;
 import com.sonicle.webtop.drm.bol.OOpportunityActionDocument;
+import com.sonicle.webtop.drm.bol.OOpportunityActionDocumentsData;
 import static com.sonicle.webtop.drm.jooq.Tables.OPPORTUNITY_ACTION_DOCUMENTS;
+import static com.sonicle.webtop.drm.jooq.Tables.OPPORTUNITY_ACTION_DOCUMENTS_DATA;
 import com.sonicle.webtop.drm.jooq.tables.records.OpportunityActionDocumentsRecord;
 import java.sql.Connection;
 import java.util.List;
@@ -74,6 +76,17 @@ public class OpportunityActionDocumentDAO extends BaseDAO {
 						OPPORTUNITY_ACTION_DOCUMENTS.ID.equal(id)
 				)
 				.fetchOneInto(OOpportunityActionDocument.class);
+	}
+	
+	public OOpportunityActionDocumentsData selectBytes(Connection con, String attachmentId) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+			.select(
+				OPPORTUNITY_ACTION_DOCUMENTS_DATA.BYTES
+			)
+			.from(OPPORTUNITY_ACTION_DOCUMENTS_DATA)
+			.where(OPPORTUNITY_ACTION_DOCUMENTS_DATA.OPPORTUNITY_ACTION_DOCUMENT_ID.equal(attachmentId))
+			.fetchOneInto(OOpportunityActionDocumentsData.class);
 	}
 
 	public int insert(Connection con, OOpportunityActionDocument item) throws DAOException {

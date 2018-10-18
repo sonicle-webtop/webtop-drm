@@ -30,38 +30,14 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm.bol.js;
+package com.sonicle.webtop.drm.bol;
 
-import com.sonicle.webtop.drm.model.OpportunityActionDocument;
+import com.sonicle.webtop.drm.jooq.tables.pojos.LeaveRequestDocumentsData;
+
 /**
  *
  * @author lssndrvs
  */
-public class JsGridOpportunityActionDocument {
-
-	public String id;
-	public Integer opportunityActionId;
-	public String fileName;
-	public Long size;
-	public String mediaType;
-
-	public JsGridOpportunityActionDocument(OpportunityActionDocument oAD) {
-		this.id = oAD.getId();
-		this.opportunityActionId = oAD.getOpportunityActionId();
-		this.fileName = oAD.getFileName();
-		this.size = oAD.getSize();
-		this.mediaType = oAD.getMediaType();
-	}
-
-	public static OpportunityActionDocument createOpportunityActionDocument(JsGridOpportunityActionDocument js) {
-
-		OpportunityActionDocument oAD = new OpportunityActionDocument();
-		oAD.setId(js.id);
-		oAD.setOpportunityActionId(js.opportunityActionId);
-		oAD.setFileName(js.fileName);
-		oAD.setSize(js.size);
-		oAD.setMediaType(js.mediaType);
-
-		return oAD;
-	}
+public class OLeaveRequestDocumentData extends LeaveRequestDocumentsData {
+	
 }

@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Drm extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = 89911386;
+	private static final long serialVersionUID = 1195885497;
 
 	/**
 	 * The reference instance of <code>drm</code>
@@ -94,15 +94,18 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.tables.HolidayDate.HOLIDAY_DATE,
 			com.sonicle.webtop.drm.jooq.tables.HourProfiles.HOUR_PROFILES,
 			com.sonicle.webtop.drm.jooq.tables.LeaveRequestDocuments.LEAVE_REQUEST_DOCUMENTS,
+			com.sonicle.webtop.drm.jooq.tables.LeaveRequestDocumentsData.LEAVE_REQUEST_DOCUMENTS_DATA,
 			com.sonicle.webtop.drm.jooq.tables.LeaveRequests.LEAVE_REQUESTS,
 			com.sonicle.webtop.drm.jooq.tables.LineHours.LINE_HOURS,
 			com.sonicle.webtop.drm.jooq.tables.LineManagerUsers.LINE_MANAGER_USERS,
 			com.sonicle.webtop.drm.jooq.tables.LineManagers.LINE_MANAGERS,
 			com.sonicle.webtop.drm.jooq.tables.Opportunities.OPPORTUNITIES,
 			com.sonicle.webtop.drm.jooq.tables.OpportunityActionDocuments.OPPORTUNITY_ACTION_DOCUMENTS,
+			com.sonicle.webtop.drm.jooq.tables.OpportunityActionDocumentsData.OPPORTUNITY_ACTION_DOCUMENTS_DATA,
 			com.sonicle.webtop.drm.jooq.tables.OpportunityActionInterlocutors.OPPORTUNITY_ACTION_INTERLOCUTORS,
 			com.sonicle.webtop.drm.jooq.tables.OpportunityActions.OPPORTUNITY_ACTIONS,
 			com.sonicle.webtop.drm.jooq.tables.OpportunityDocuments.OPPORTUNITY_DOCUMENTS,
+			com.sonicle.webtop.drm.jooq.tables.OpportunityDocumentsData.OPPORTUNITY_DOCUMENTS_DATA,
 			com.sonicle.webtop.drm.jooq.tables.OpportunityFields.OPPORTUNITY_FIELDS,
 			com.sonicle.webtop.drm.jooq.tables.OpportunityInterlocutors.OPPORTUNITY_INTERLOCUTORS,
 			com.sonicle.webtop.drm.jooq.tables.Profiles.PROFILES,
@@ -115,6 +118,7 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.tables.TimetableStamp.TIMETABLE_STAMP,
 			com.sonicle.webtop.drm.jooq.tables.WorkReports.WORK_REPORTS,
 			com.sonicle.webtop.drm.jooq.tables.WorkReportsAttachments.WORK_REPORTS_ATTACHMENTS,
+			com.sonicle.webtop.drm.jooq.tables.WorkReportsAttachmentsData.WORK_REPORTS_ATTACHMENTS_DATA,
 			com.sonicle.webtop.drm.jooq.tables.WorkReportsRows.WORK_REPORTS_ROWS,
 			com.sonicle.webtop.drm.jooq.tables.WorkReportsSettings.WORK_REPORTS_SETTINGS,
 			com.sonicle.webtop.drm.jooq.tables.WorkTypes.WORK_TYPES);

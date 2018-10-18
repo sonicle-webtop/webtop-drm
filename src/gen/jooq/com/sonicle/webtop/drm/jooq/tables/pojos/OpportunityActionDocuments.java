@@ -16,15 +16,15 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OpportunityActionDocuments implements java.io.Serializable {
 
-	private static final long serialVersionUID = -242361412;
+	private static final long serialVersionUID = -1035029492;
 
 	private java.lang.String       id;
 	private java.lang.Integer      opportunityActionId;
 	private org.joda.time.DateTime revisionTimestamp;
 	private java.lang.Short        revisionSequence;
 	private java.lang.String       filename;
-	private java.lang.Integer      size;
-	private java.lang.String       mediaTpye;
+	private java.lang.Long         size;
+	private java.lang.String       mediaType;
 
 	public OpportunityActionDocuments() {}
 
@@ -34,8 +34,8 @@ public class OpportunityActionDocuments implements java.io.Serializable {
 		org.joda.time.DateTime revisionTimestamp,
 		java.lang.Short        revisionSequence,
 		java.lang.String       filename,
-		java.lang.Integer      size,
-		java.lang.String       mediaTpye
+		java.lang.Long         size,
+		java.lang.String       mediaType
 	) {
 		this.id = id;
 		this.opportunityActionId = opportunityActionId;
@@ -43,7 +43,7 @@ public class OpportunityActionDocuments implements java.io.Serializable {
 		this.revisionSequence = revisionSequence;
 		this.filename = filename;
 		this.size = size;
-		this.mediaTpye = mediaTpye;
+		this.mediaType = mediaType;
 	}
 
 	public java.lang.String getId() {
@@ -86,19 +86,19 @@ public class OpportunityActionDocuments implements java.io.Serializable {
 		this.filename = filename;
 	}
 
-	public java.lang.Integer getSize() {
+	public java.lang.Long getSize() {
 		return this.size;
 	}
 
-	public void setSize(java.lang.Integer size) {
+	public void setSize(java.lang.Long size) {
 		this.size = size;
 	}
 
-	public java.lang.String getMediaTpye() {
-		return this.mediaTpye;
+	public java.lang.String getMediaType() {
+		return this.mediaType;
 	}
 
-	public void setMediaTpye(java.lang.String mediaTpye) {
-		this.mediaTpye = mediaTpye;
+	public void setMediaType(java.lang.String mediaType) {
+		this.mediaType = mediaType;
 	}
 }

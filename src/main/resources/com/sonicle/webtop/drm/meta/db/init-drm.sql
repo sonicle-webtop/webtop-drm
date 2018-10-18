@@ -946,3 +946,75 @@ ALTER TABLE "drm"."opportunities" RENAME "won" TO "success";
 
 ALTER TABLE "drm"."work_reports"
 ALTER COLUMN "reference_no" TYPE varchar(255);
+
+ALTER TABLE "drm"."leave_request_documents" RENAME "media_tpye" TO "media_type";
+
+ALTER TABLE "drm"."opportunity_action_documents" RENAME "media_tpye" TO "media_type";
+
+ALTER TABLE "drm"."opportunity_documents" RENAME "media_tpye" TO "media_type";
+
+ALTER TABLE "drm"."work_reports_attachments" RENAME "media_tpye" TO "media_type";
+
+ALTER TABLE "drm"."leave_request_documents"
+ALTER COLUMN "size" TYPE int4,
+ALTER COLUMN "media_type" TYPE varchar(255);
+
+ALTER TABLE "drm"."opportunity_action_documents"
+ALTER COLUMN "size" TYPE int4,
+ALTER COLUMN "media_type" TYPE varchar(255);
+
+ALTER TABLE "drm"."opportunity_documents"
+ALTER COLUMN "size" TYPE int4,
+ALTER COLUMN "media_type" TYPE varchar(255);
+
+ALTER TABLE "drm"."work_reports_attachments"
+ALTER COLUMN "size" TYPE int4,
+ALTER COLUMN "media_type" TYPE varchar(255);
+
+ALTER TABLE "drm"."leave_request_documents"
+ALTER COLUMN "size" TYPE int8;
+
+ALTER TABLE "drm"."opportunity_action_documents"
+ALTER COLUMN "size" TYPE int8;
+
+ALTER TABLE "drm"."opportunity_documents"
+ALTER COLUMN "size" TYPE int8;
+
+ALTER TABLE "drm"."work_reports_attachments"
+ALTER COLUMN "size" TYPE int8;
+
+CREATE TABLE "drm"."leave_request_documents_data" (
+"leave_request_document_id" varchar(36) NOT NULL,
+"bytes" bytea NOT NULL
+);
+
+ALTER TABLE "drm"."leave_request_documents_data" ADD PRIMARY KEY ("leave_request_document_id");
+
+ALTER TABLE "drm"."leave_request_documents_data" ADD FOREIGN KEY ("leave_request_document_id") REFERENCES "drm"."leave_request_documents" ("leave_request_document_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+CREATE TABLE "drm"."opportunity_action_documents_data" (
+"opportunity_action_document_id" varchar(36) NOT NULL,
+"bytes" bytea NOT NULL
+);
+
+ALTER TABLE "drm"."opportunity_action_documents_data" ADD PRIMARY KEY ("opportunity_action_document_id");
+
+ALTER TABLE "drm"."opportunity_action_documents_data" ADD FOREIGN KEY ("opportunity_action_document_id") REFERENCES "drm"."opportunity_action_documents" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+CREATE TABLE "drm"."opportunity_documents_data" (
+"opportunity_document_id" varchar(36) NOT NULL,
+"bytes" bytea NOT NULL
+);
+
+ALTER TABLE "drm"."opportunity_documents_data" ADD PRIMARY KEY ("opportunity_document_id");
+
+ALTER TABLE "drm"."opportunity_documents_data" ADD FOREIGN KEY ("opportunity_document_id") REFERENCES "drm"."opportunity_documents" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+CREATE TABLE "drm"."work_reports_attachments_data" (
+"work_report_attachment_id" varchar(36) NOT NULL,
+"bytes" bytea NOT NULL
+);
+
+ALTER TABLE "drm"."work_reports_attachments_data" ADD PRIMARY KEY ("work_report_attachment_id");
+
+ALTER TABLE "drm"."work_reports_attachments_data" ADD FOREIGN KEY ("work_report_attachment_id") REFERENCES "drm"."work_reports_attachments" ("work_report_attachment_id") ON DELETE CASCADE ON UPDATE CASCADE;

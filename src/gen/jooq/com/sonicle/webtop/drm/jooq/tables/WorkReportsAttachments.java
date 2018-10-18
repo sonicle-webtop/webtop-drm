@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WorkReportsAttachments extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsAttachmentsRecord> {
 
-	private static final long serialVersionUID = 1360547663;
+	private static final long serialVersionUID = -1651243285;
 
 	/**
 	 * The reference instance of <code>drm.work_reports_attachments</code>
@@ -59,12 +59,12 @@ public class WorkReportsAttachments extends org.jooq.impl.TableImpl<com.sonicle.
 	/**
 	 * The column <code>drm.work_reports_attachments.size</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsAttachmentsRecord, java.lang.Integer> SIZE = createField("size", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsAttachmentsRecord, java.lang.Long> SIZE = createField("size", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
-	 * The column <code>drm.work_reports_attachments.media_tpye</code>.
+	 * The column <code>drm.work_reports_attachments.media_type</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsAttachmentsRecord, java.lang.String> MEDIA_TPYE = createField("media_tpye", org.jooq.impl.SQLDataType.VARCHAR.length(100).nullable(false), this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsAttachmentsRecord, java.lang.String> MEDIA_TYPE = createField("media_type", org.jooq.impl.SQLDataType.VARCHAR.length(255).nullable(false), this, "");
 
 	/**
 	 * Create a <code>drm.work_reports_attachments</code> table reference

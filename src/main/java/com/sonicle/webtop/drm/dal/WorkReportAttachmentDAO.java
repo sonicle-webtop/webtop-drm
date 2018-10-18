@@ -35,12 +35,10 @@ package com.sonicle.webtop.drm.dal;
 import com.sonicle.webtop.core.dal.BaseDAO;
 import com.sonicle.webtop.core.dal.DAOException;
 import com.sonicle.webtop.drm.bol.OWorkReportAttachment;
-import com.sonicle.webtop.drm.bol.OWorkReportRow;
-import com.sonicle.webtop.drm.bol.OWorkType;
+import com.sonicle.webtop.drm.bol.OWorkReportsAttachmentsData;
 import static com.sonicle.webtop.drm.jooq.Tables.WORK_REPORTS_ATTACHMENTS;
+import static com.sonicle.webtop.drm.jooq.Tables.WORK_REPORTS_ATTACHMENTS_DATA;
 import com.sonicle.webtop.drm.jooq.tables.records.WorkReportsAttachmentsRecord;
-import com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRowsRecord;
-import com.sonicle.webtop.drm.jooq.tables.records.WorkTypesRecord;
 import java.sql.Connection;
 import java.util.List;
 import org.jooq.DSLContext;
@@ -77,6 +75,17 @@ public class WorkReportAttachmentDAO extends BaseDAO {
 						WORK_REPORTS_ATTACHMENTS.WORK_REPORT_ATTACHMENT_ID.equal(workReportAttachmentId)
 				)
 				.fetchOneInto(OWorkReportAttachment.class);
+	}
+	
+	public OWorkReportsAttachmentsData selectBytes(Connection con, String attachmentId) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+			.select(
+				WORK_REPORTS_ATTACHMENTS_DATA.BYTES
+			)
+			.from(WORK_REPORTS_ATTACHMENTS_DATA)
+			.where(WORK_REPORTS_ATTACHMENTS_DATA.WORK_REPORT_ATTACHMENT_ID.equal(attachmentId))
+			.fetchOneInto(OWorkReportsAttachmentsData.class);
 	}
 
 	public int insert(Connection con, OWorkReportAttachment item) throws DAOException {
