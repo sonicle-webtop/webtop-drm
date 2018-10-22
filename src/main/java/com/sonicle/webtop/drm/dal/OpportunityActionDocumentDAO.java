@@ -42,6 +42,7 @@ import static com.sonicle.webtop.drm.jooq.Tables.OPPORTUNITY_ACTION_DOCUMENTS_DA
 import com.sonicle.webtop.drm.jooq.tables.records.OpportunityActionDocumentsRecord;
 import java.sql.Connection;
 import java.util.List;
+import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 
 /**
@@ -89,9 +90,12 @@ public class OpportunityActionDocumentDAO extends BaseDAO {
 			.fetchOneInto(OOpportunityActionDocumentsData.class);
 	}
 
-	public int insert(Connection con, OOpportunityActionDocument item) throws DAOException {
+	public int insert(Connection con, OOpportunityActionDocument item, DateTime revisionTimestamp) throws DAOException {
 		DSLContext dsl = getDSL(con);
 
+		item.setRevisionTimestamp(revisionTimestamp);
+		item.setRevisionSequence((short)0);
+		
 		OpportunityActionDocumentsRecord record = dsl.newRecord(OPPORTUNITY_ACTION_DOCUMENTS, item);
 
 		return dsl
@@ -121,5 +125,44 @@ public class OpportunityActionDocumentDAO extends BaseDAO {
 				)
 				.execute();
 	}
+	
+	public int insertBytes(Connection con, String documentId, byte[] bytes) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+			.insertInto(OPPORTUNITY_ACTION_DOCUMENTS_DATA)
+			.set(OPPORTUNITY_ACTION_DOCUMENTS_DATA.OPPORTUNITY_ACTION_DOCUMENT_ID, documentId)
+			.set(OPPORTUNITY_ACTION_DOCUMENTS_DATA.BYTES, bytes)
+			.execute();
+	}
+	
+	public OOpportunityActionDocumentsData selectBytesById(Connection con, String documentId) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+			.select(OPPORTUNITY_ACTION_DOCUMENTS_DATA.BYTES)
+			.from(OPPORTUNITY_ACTION_DOCUMENTS_DATA)
+			.where(OPPORTUNITY_ACTION_DOCUMENTS_DATA.OPPORTUNITY_ACTION_DOCUMENT_ID.equal(documentId))
+			.fetchOneInto(OOpportunityActionDocumentsData.class);
+	}
 
+	public int update(Connection con, OOpportunityActionDocument item, DateTime revisionTimestamp) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		item.setRevisionTimestamp(revisionTimestamp);
+		return dsl
+			.update(OPPORTUNITY_ACTION_DOCUMENTS)
+			.set(OPPORTUNITY_ACTION_DOCUMENTS.FILENAME, item.getFilename())
+			.set(OPPORTUNITY_ACTION_DOCUMENTS.SIZE, item.getSize())
+			.set(OPPORTUNITY_ACTION_DOCUMENTS.MEDIA_TYPE, item.getMediaType())
+			.where(
+				OPPORTUNITY_ACTION_DOCUMENTS.ID.equal(item.getId())
+			)
+			.execute();
+	}
+	
+	public int deleteBytesById(Connection con, String documentId) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+			.delete(OPPORTUNITY_ACTION_DOCUMENTS_DATA)
+			.where(OPPORTUNITY_ACTION_DOCUMENTS_DATA.OPPORTUNITY_ACTION_DOCUMENT_ID.equal(documentId))
+			.execute();
+	}
 }

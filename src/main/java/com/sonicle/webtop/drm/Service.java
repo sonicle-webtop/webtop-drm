@@ -128,10 +128,16 @@ import com.sonicle.webtop.drm.model.GroupCategory;
 import com.sonicle.webtop.drm.model.HourProfile;
 import com.sonicle.webtop.drm.model.LeaveRequest;
 import com.sonicle.webtop.drm.model.LeaveRequestDocument;
+import com.sonicle.webtop.drm.model.LeaveRequestDocumentWithBytes;
+import com.sonicle.webtop.drm.model.LeaveRequestDocumentWithStream;
 import com.sonicle.webtop.drm.model.Opportunity;
 import com.sonicle.webtop.drm.model.OpportunityAction;
 import com.sonicle.webtop.drm.model.OpportunityActionDocument;
+import com.sonicle.webtop.drm.model.OpportunityActionDocumentWithBytes;
+import com.sonicle.webtop.drm.model.OpportunityActionDocumentWithStream;
 import com.sonicle.webtop.drm.model.OpportunityDocument;
+import com.sonicle.webtop.drm.model.OpportunityDocumentWithBytes;
+import com.sonicle.webtop.drm.model.OpportunityDocumentWithStream;
 import com.sonicle.webtop.drm.model.OpportunityField;
 import com.sonicle.webtop.drm.model.OpportunitySetting;
 import com.sonicle.webtop.drm.model.TimetableReport;
@@ -139,6 +145,8 @@ import com.sonicle.webtop.drm.model.TimetableSetting;
 import com.sonicle.webtop.drm.model.TimetableStamp;
 import com.sonicle.webtop.drm.model.WorkReport;
 import com.sonicle.webtop.drm.model.WorkReportAttachment;
+import com.sonicle.webtop.drm.model.WorkReportAttachmentWithBytes;
+import com.sonicle.webtop.drm.model.WorkReportAttachmentWithStream;
 import com.sonicle.webtop.drm.model.WorkReportSetting;
 import com.sonicle.webtop.drm.rpt.RptTimetableReport;
 import com.sonicle.webtop.drm.rpt.RptWorkReport;
@@ -1239,7 +1247,6 @@ public class Service extends BaseService {
 		JsOpportunity item = null;
 		try {
 			String crud = ServletUtils.getStringParameter(request, "crud", true);
-			HashMap<String, File> files = new HashMap<>();
 			if (crud.equals(Crud.READ)) {
 
 				Integer id = ServletUtils.getIntParameter(request, "id", true);
@@ -1256,16 +1263,17 @@ public class Service extends BaseService {
 
 				Opportunity o = JsOpportunity.createOpportunity(pl.data);
 				
-				for (OpportunityDocument doc : o.getDocuments()) {
-
-					WebTopSession.UploadedFile uf = getUploadedFile(doc.getId().toString());
-
-					if (uf != null) {
-						files.put(uf.getUploadId(), uf.getFile());
-					}
+				for (JsOpportunity.Document jsdoc : pl.data.documents) {
+					UploadedFile upFile = getUploadedFileOrThrow(jsdoc._uplId);
+					OpportunityDocumentWithStream doc = new OpportunityDocumentWithStream(upFile.getFile());
+					doc.setId(jsdoc.id);
+					doc.setFileName(upFile.getFilename());
+					doc.setSize(upFile.getSize());
+					doc.setMediaType(upFile.getMediaType());
+					o.getDocuments().add(doc);
 				}
 
-				manager.addOpportunity(o, files);
+				manager.addOpportunity(o);
 
 				new JsonResult().printTo(out);
 
@@ -1275,16 +1283,25 @@ public class Service extends BaseService {
 
 				Opportunity o = JsOpportunity.createOpportunity(pl.data);
 				
-				for (OpportunityDocument doc : o.getDocuments()) {
-
-					WebTopSession.UploadedFile uf = getUploadedFile(doc.getId().toString());
-
-					if (uf != null) {
-						files.put(uf.getUploadId(), uf.getFile());
+				for (JsOpportunity.Document jsdoc : pl.data.documents) {
+					if(!StringUtils.isBlank(jsdoc._uplId)){
+						UploadedFile upFile = getUploadedFileOrThrow(jsdoc._uplId);
+						OpportunityDocumentWithStream doc = new OpportunityDocumentWithStream(upFile.getFile());
+						doc.setId(jsdoc.id);
+						doc.setFileName(upFile.getFilename());
+						doc.setSize(upFile.getSize());
+						doc.setMediaType(upFile.getMediaType());
+						o.getDocuments().add(doc);
+					}else{
+						OpportunityDocument doc = new OpportunityDocument();
+						doc.setId(jsdoc.id);
+						doc.setFileName(jsdoc.name);
+						doc.setSize(jsdoc.size);
+						o.getDocuments().add(doc);
 					}
 				}
 
-				manager.updateOpportunity(o, files);
+				manager.updateOpportunity(o);
 
 				new JsonResult().printTo(out);
 
@@ -1306,7 +1323,6 @@ public class Service extends BaseService {
 		JsOpportunityAction item = null;
 		try {
 			String crud = ServletUtils.getStringParameter(request, "crud", true);
-			HashMap<String, File> files = new HashMap<>();
 			if (crud.equals(Crud.READ)) {
 
 				Integer id = ServletUtils.getIntParameter(request, "id", true);
@@ -1323,16 +1339,17 @@ public class Service extends BaseService {
 
 				OpportunityAction oAct = JsOpportunityAction.createOpportunityAction(pl.data);
 				
-				for (OpportunityActionDocument doc : oAct.getActionDocuments()) {
-
-					WebTopSession.UploadedFile uf = getUploadedFile(doc.getId().toString());
-
-					if (uf != null) {
-						files.put(uf.getUploadId(), uf.getFile());
-					}
+				for (JsOpportunityAction.Document jsdoc : pl.data.actionDocuments) {
+					UploadedFile upFile = getUploadedFileOrThrow(jsdoc._uplId);
+					OpportunityActionDocumentWithStream doc = new OpportunityActionDocumentWithStream(upFile.getFile());
+					doc.setId(jsdoc.id);
+					doc.setFileName(upFile.getFilename());
+					doc.setSize(upFile.getSize());
+					doc.setMediaType(upFile.getMediaType());
+					oAct.getActionDocuments().add(doc);
 				}
 
-				manager.addOpportunityAction(oAct, files);
+				manager.addOpportunityAction(oAct);
 
 				new JsonResult().printTo(out);
 
@@ -1342,16 +1359,25 @@ public class Service extends BaseService {
 
 				OpportunityAction oAct = JsOpportunityAction.createOpportunityAction(pl.data);
 				
-				for (OpportunityActionDocument doc : oAct.getActionDocuments()) {
-
-					WebTopSession.UploadedFile uf = getUploadedFile(doc.getId().toString());
-
-					if (uf != null) {
-						files.put(uf.getUploadId(), uf.getFile());
+				for (JsOpportunityAction.Document jsdoc : pl.data.actionDocuments) {
+					if(!StringUtils.isBlank(jsdoc._uplId)){
+						UploadedFile upFile = getUploadedFileOrThrow(jsdoc._uplId);
+						OpportunityActionDocumentWithStream doc = new OpportunityActionDocumentWithStream(upFile.getFile());
+						doc.setId(jsdoc.id);
+						doc.setFileName(upFile.getFilename());
+						doc.setSize(upFile.getSize());
+						doc.setMediaType(upFile.getMediaType());
+						oAct.getActionDocuments().add(doc);
+					}else{
+						OpportunityActionDocument doc = new OpportunityActionDocument();
+						doc.setId(jsdoc.id);
+						doc.setFileName(jsdoc.name);
+						doc.setSize(jsdoc.size);
+						oAct.getActionDocuments().add(doc);
 					}
 				}
 
-				manager.updateOpportunityAction(oAct, files);
+				manager.updateOpportunityAction(oAct);
 
 				new JsonResult().printTo(out);
 
@@ -1379,7 +1405,7 @@ public class Service extends BaseService {
 			for (OpportunityAction act : oActs) {
 				if(statusId != null && !"null".equals(statusId)) act.setStatusId(Integer.parseInt(statusId));
 
-				manager.addOpportunityAction(act, null);
+				manager.addOpportunityAction(act);
 			}
 
 			new JsonResult().printTo(out);
@@ -1416,7 +1442,6 @@ public class Service extends BaseService {
 		try {
 			String crud = ServletUtils.getStringParameter(request, "crud", true);
 			DateTimeZone ptz = getEnv().getProfile().getTimeZone();
-			HashMap<String, File> files = new HashMap<>();
 			if (crud.equals(Crud.READ)) {
 
 				String id = ServletUtils.getStringParameter(request, "id", true);
@@ -1435,16 +1460,17 @@ public class Service extends BaseService {
 
 				WorkReport wrkRpt = JsWorkReport.createWorkReport(pl.data, ptz);
 
-				for (WorkReportAttachment att : wrkRpt.getAttachments()) {
-
-					WebTopSession.UploadedFile uf = getUploadedFile(att.getWorkReportAttachmentId());
-
-					if (uf != null) {
-						files.put(uf.getUploadId(), uf.getFile());
-					}
+				for (JsWorkReport.Attachment jsatt : pl.data.attachments) {
+					UploadedFile upFile = getUploadedFileOrThrow(jsatt._uplId);
+					WorkReportAttachmentWithStream att = new WorkReportAttachmentWithStream(upFile.getFile());
+					att.setWorkReportAttachmentId(jsatt.id);
+					att.setFileName(upFile.getFilename());
+					att.setSize(upFile.getSize());
+					att.setMediaType(upFile.getMediaType());
+					wrkRpt.getAttachments().add(att);
 				}
 
-				manager.addWorkReport(wrkRpt, files);
+				manager.addWorkReport(wrkRpt);
 
 				new JsonResult().printTo(out);
 
@@ -1454,16 +1480,25 @@ public class Service extends BaseService {
 
 				WorkReport wrkRpt = JsWorkReport.createWorkReport(pl.data, ptz);
 
-				for (WorkReportAttachment att : wrkRpt.getAttachments()) {
-
-					WebTopSession.UploadedFile uf = getUploadedFile(att.getWorkReportAttachmentId());
-
-					if (uf != null) {
-						files.put(uf.getUploadId(), uf.getFile());
+				for (JsWorkReport.Attachment jsatt : pl.data.attachments) {
+					if(!StringUtils.isBlank(jsatt._uplId)){
+						UploadedFile upFile = getUploadedFileOrThrow(jsatt._uplId);
+						WorkReportAttachmentWithStream att = new WorkReportAttachmentWithStream(upFile.getFile());
+						att.setWorkReportAttachmentId(jsatt.id);
+						att.setFileName(upFile.getFilename());
+						att.setSize(upFile.getSize());
+						att.setMediaType(upFile.getMediaType());
+						wrkRpt.getAttachments().add(att);
+					}else{
+						WorkReportAttachment att = new WorkReportAttachment();
+						att.setWorkReportAttachmentId(jsatt.id);
+						att.setFileName(jsatt.name);
+						att.setSize(jsatt.size);
+						wrkRpt.getAttachments().add(att);
 					}
 				}
 
-				manager.updateWorkReport(wrkRpt, files);
+				manager.updateWorkReport(wrkRpt);
 
 				new JsonResult().printTo(out);
 
@@ -1485,7 +1520,6 @@ public class Service extends BaseService {
 		JsLeaveRequest item = null;
 		try {
 			String crud = ServletUtils.getStringParameter(request, "crud", true);
-			HashMap<String, File> files = new HashMap<>();
 			if (crud.equals(Crud.READ)) {
 
 				Integer id = ServletUtils.getIntParameter(request, "id", true);
@@ -1502,16 +1536,17 @@ public class Service extends BaseService {
 
 				LeaveRequest lr = JsLeaveRequest.createLeaveRequest(pl.data);
 
-				for (LeaveRequestDocument doc : lr.getDocuments()) {
-
-					WebTopSession.UploadedFile uf = getUploadedFile(doc.getLeaveRequestDocumentId().toString());
-
-					if (uf != null) {
-						files.put(uf.getUploadId(), uf.getFile());
-					}
+				for (JsLeaveRequest.Document jsdoc : pl.data.documents) {
+					UploadedFile upFile = getUploadedFileOrThrow(jsdoc._uplId);
+					LeaveRequestDocumentWithStream doc = new LeaveRequestDocumentWithStream(upFile.getFile());
+					doc.setLeaveRequestDocumentId(jsdoc.id);
+					doc.setFileName(upFile.getFilename());
+					doc.setSize(upFile.getSize());
+					doc.setMediaType(upFile.getMediaType());
+					lr.getDocuments().add(doc);
 				}
 
-				manager.addLeaveRequest(lr, files);
+				manager.addLeaveRequest(lr);
 
 				new JsonResult().printTo(out);
 
@@ -1521,16 +1556,25 @@ public class Service extends BaseService {
 
 				LeaveRequest lr = JsLeaveRequest.createLeaveRequest(pl.data);
 
-				for (LeaveRequestDocument doc : lr.getDocuments()) {
-
-					WebTopSession.UploadedFile uf = getUploadedFile(doc.getLeaveRequestDocumentId().toString());
-
-					if (uf != null) {
-						files.put(uf.getUploadId(), uf.getFile());
+				for (JsLeaveRequest.Document jsdoc : pl.data.documents) {
+					if(!StringUtils.isBlank(jsdoc._uplId)){
+						UploadedFile upFile = getUploadedFileOrThrow(jsdoc._uplId);
+						LeaveRequestDocumentWithStream doc = new LeaveRequestDocumentWithStream(upFile.getFile());
+						doc.setLeaveRequestDocumentId(jsdoc.id);
+						doc.setFileName(upFile.getFilename());
+						doc.setSize(upFile.getSize());
+						doc.setMediaType(upFile.getMediaType());
+						lr.getDocuments().add(doc);
+					}else{
+						LeaveRequestDocument doc = new LeaveRequestDocument();
+						doc.setLeaveRequestDocumentId(jsdoc.id);
+						doc.setFileName(jsdoc.name);
+						doc.setSize(jsdoc.size);
+						lr.getDocuments().add(doc);
 					}
 				}
 
-				manager.updateLeaveRequest(lr, files, false);
+				manager.updateLeaveRequest(lr, false);
 
 				new JsonResult().printTo(out);
 
@@ -1556,7 +1600,7 @@ public class Service extends BaseService {
 			LeaveRequest lr = manager.getLeaveRequest(ids.get(0));
 			lr.setResult(choice);
 			
-			manager.updateLeaveRequest(lr, null, true);
+			manager.updateLeaveRequest(lr, true);
 
 			new JsonResult().printTo(out);
 
@@ -1584,173 +1628,144 @@ public class Service extends BaseService {
 	public void processDownloadOpportunityDocument(HttpServletRequest request, HttpServletResponse response) {
 
 		try {
-			StringArray documentIds = ServletUtils.getObjectParameter(request, "documentIds", StringArray.class, true);
-
-			Integer raw = ServletUtils.getIntParameter(request, "raw", 0);
-
-			String fileId = documentIds.get(0);
-
-			InputStream is = null;
-			FileContent fc = null;
-			try {
-
-				if (hasUploadedFile(fileId)) {
-					fc = toFileContent(getUploadedFile(fileId));
-				} else {
-					fc = manager.getOpportunityDocumentContent(fileId);
+			boolean inline = ServletUtils.getBooleanParameter(request, "inline", false);
+			String attachmentId = ServletUtils.getStringParameter(request, "attachmentId", null);
+			
+			if (!StringUtils.isBlank(attachmentId)) {
+				Integer oId = ServletUtils.getIntParameter(request, "oId", true);
+				
+				OpportunityDocumentWithBytes docData = manager.getOpportunityDocument(oId, attachmentId);
+				InputStream is = null;
+				try {
+					is = new ByteArrayInputStream(docData.getBytes());
+					ServletUtils.writeFileResponse(response, inline, docData.getFileName(), null, docData.getSize(), is);
+				} finally {
+					IOUtils.closeQuietly(is);
 				}
-
-				is = fc.getStream();
-
-				OutputStream os = response.getOutputStream();
-				ServletUtils.setContentLengthHeader(response, fc.getSize());
-				if (raw == 1) {
-					ServletUtils.setFileStreamHeadersForceDownload(response, fc.getFilename());
-				} else {
-					ServletUtils.setFileStreamHeaders(response, fc.getMediaType(), fc.getFilename());
+			} else {
+				String uploadId = ServletUtils.getStringParameter(request, "uploadId", true);
+				
+				UploadedFile uplFile = getUploadedFileOrThrow(uploadId);
+				InputStream is = null;
+				try {
+					is = new FileInputStream(uplFile.getFile());
+					ServletUtils.writeFileResponse(response, inline, uplFile.getFilename(), null, uplFile.getSize(), is);
+				} finally {
+					IOUtils.closeQuietly(is);
 				}
-				IOUtils.copy(is, os);
-
-			} finally {
-				IOUtils.closeQuietly(is);
 			}
-
-		} catch (Exception ex) {
-			logger.error("Error in action DownloadFiles", ex);
-			ServletUtils.writeErrorHandlingJs(response, ex.getMessage());
+			
+		} catch(Throwable t) {
+			logger.error("Error in DownloadOpportunityDocument", t);
+			ServletUtils.writeErrorHandlingJs(response, t.getMessage());
 		}
 	}
 	
 	public void processDownloadOpportunityActionDocument(HttpServletRequest request, HttpServletResponse response) {
 
 		try {
-			StringArray documentIds = ServletUtils.getObjectParameter(request, "documentIds", StringArray.class, true);
-
-			Integer raw = ServletUtils.getIntParameter(request, "raw", 0);
-
-			String fileId = documentIds.get(0);
-
-			InputStream is = null;
-			FileContent fc = null;
-			try {
-
-				if (hasUploadedFile(fileId)) {
-					fc = toFileContent(getUploadedFile(fileId));
-				} else {
-					fc = manager.getOpportunityActionDocumentContent(fileId);
+			boolean inline = ServletUtils.getBooleanParameter(request, "inline", false);
+			String attachmentId = ServletUtils.getStringParameter(request, "attachmentId", null);
+			
+			if (!StringUtils.isBlank(attachmentId)) {
+				Integer oAId = ServletUtils.getIntParameter(request, "oAId", true);
+				
+				OpportunityActionDocumentWithBytes docData = manager.getOpportunityActionDocument(oAId, attachmentId);
+				InputStream is = null;
+				try {
+					is = new ByteArrayInputStream(docData.getBytes());
+					ServletUtils.writeFileResponse(response, inline, docData.getFileName(), null, docData.getSize(), is);
+				} finally {
+					IOUtils.closeQuietly(is);
 				}
-
-				is = fc.getStream();
-
-				OutputStream os = response.getOutputStream();
-				ServletUtils.setContentLengthHeader(response, fc.getSize());
-				if (raw == 1) {
-					ServletUtils.setFileStreamHeadersForceDownload(response, fc.getFilename());
-				} else {
-					ServletUtils.setFileStreamHeaders(response, fc.getMediaType(), fc.getFilename());
+			} else {
+				String uploadId = ServletUtils.getStringParameter(request, "uploadId", true);
+				
+				UploadedFile uplFile = getUploadedFileOrThrow(uploadId);
+				InputStream is = null;
+				try {
+					is = new FileInputStream(uplFile.getFile());
+					ServletUtils.writeFileResponse(response, inline, uplFile.getFilename(), null, uplFile.getSize(), is);
+				} finally {
+					IOUtils.closeQuietly(is);
 				}
-				IOUtils.copy(is, os);
-
-			} finally {
-				IOUtils.closeQuietly(is);
 			}
-
-		} catch (Exception ex) {
-			logger.error("Error in action DownloadFiles", ex);
-			ServletUtils.writeErrorHandlingJs(response, ex.getMessage());
+			
+		} catch(Throwable t) {
+			logger.error("Error in DownloadOpportunityActionDocument", t);
+			ServletUtils.writeErrorHandlingJs(response, t.getMessage());
 		}
 	}
 
 	public void processDownloadWorkReportAttachment(HttpServletRequest request, HttpServletResponse response) {
 
 		try {
-			StringArray attachmentIds = ServletUtils.getObjectParameter(request, "attachmentIds", StringArray.class, true);
-
-			Integer raw = ServletUtils.getIntParameter(request, "raw", 0);
-
-			String fileId = attachmentIds.get(0);
-
-			InputStream is = null;
-			FileContent fc = null;
-			try {
-
-				if (hasUploadedFile(fileId)) {
-					fc = toFileContent(getUploadedFile(fileId));
-				} else {
-					fc = manager.getWorkReportAttachmentContent(fileId);
+			boolean inline = ServletUtils.getBooleanParameter(request, "inline", false);
+			String attachmentId = ServletUtils.getStringParameter(request, "attachmentId", null);
+			
+			if (!StringUtils.isBlank(attachmentId)) {
+				String wrId = ServletUtils.getStringParameter(request, "wrId", true);
+				
+				WorkReportAttachmentWithBytes attData = manager.getWorkReportAttachment(wrId, attachmentId);
+				InputStream is = null;
+				try {
+					is = new ByteArrayInputStream(attData.getBytes());
+					ServletUtils.writeFileResponse(response, inline, attData.getFileName(), null, attData.getSize(), is);
+				} finally {
+					IOUtils.closeQuietly(is);
 				}
-
-				is = fc.getStream();
-
-				OutputStream os = response.getOutputStream();
-				ServletUtils.setContentLengthHeader(response, fc.getSize());
-				if (raw == 1) {
-					ServletUtils.setFileStreamHeadersForceDownload(response, fc.getFilename());
-				} else {
-					ServletUtils.setFileStreamHeaders(response, fc.getMediaType(), fc.getFilename());
+			} else {
+				String uploadId = ServletUtils.getStringParameter(request, "uploadId", true);
+				
+				UploadedFile uplFile = getUploadedFileOrThrow(uploadId);
+				InputStream is = null;
+				try {
+					is = new FileInputStream(uplFile.getFile());
+					ServletUtils.writeFileResponse(response, inline, uplFile.getFilename(), null, uplFile.getSize(), is);
+				} finally {
+					IOUtils.closeQuietly(is);
 				}
-				IOUtils.copy(is, os);
-
-			} finally {
-				IOUtils.closeQuietly(is);
 			}
-
-		} catch (Exception ex) {
-			logger.error("Error in action DownloadFiles", ex);
-			ServletUtils.writeErrorHandlingJs(response, ex.getMessage());
+			
+		} catch(Throwable t) {
+			logger.error("Error in DownloadWorkReportAttachment", t);
+			ServletUtils.writeErrorHandlingJs(response, t.getMessage());
 		}
 	}
 	
 	public void processDownloadTimetableRequestDocument(HttpServletRequest request, HttpServletResponse response) {
 
 		try {
-			StringArray documentIds = ServletUtils.getObjectParameter(request, "documentIds", StringArray.class, true);
-
-			Integer raw = ServletUtils.getIntParameter(request, "raw", 0);
-
-			String fileId = documentIds.get(0);
-
-			InputStream is = null;
-			FileContent fc = null;
-			try {
-
-				if (hasUploadedFile(fileId)) {
-					fc = toFileContent(getUploadedFile(fileId));
-				} else {
-					fc = manager.getLeaveRequestDocumentContent(fileId);
+			boolean inline = ServletUtils.getBooleanParameter(request, "inline", false);
+			String attachmentId = ServletUtils.getStringParameter(request, "attachmentId", null);
+			
+			if (!StringUtils.isBlank(attachmentId)) {
+				Integer trId = ServletUtils.getIntParameter(request, "trId", true);
+				
+				LeaveRequestDocumentWithBytes docData = manager.getLeaveRequestDocument(trId, attachmentId);
+				InputStream is = null;
+				try {
+					is = new ByteArrayInputStream(docData.getBytes());
+					ServletUtils.writeFileResponse(response, inline, docData.getFileName(), null, docData.getSize(), is);
+				} finally {
+					IOUtils.closeQuietly(is);
 				}
-
-				is = fc.getStream();
-
-				OutputStream os = response.getOutputStream();
-				ServletUtils.setContentLengthHeader(response, fc.getSize());
-				if (raw == 1) {
-					ServletUtils.setFileStreamHeadersForceDownload(response, fc.getFilename());
-				} else {
-					ServletUtils.setFileStreamHeaders(response, fc.getMediaType(), fc.getFilename());
+			} else {
+				String uploadId = ServletUtils.getStringParameter(request, "uploadId", true);
+				
+				UploadedFile uplFile = getUploadedFileOrThrow(uploadId);
+				InputStream is = null;
+				try {
+					is = new FileInputStream(uplFile.getFile());
+					ServletUtils.writeFileResponse(response, inline, uplFile.getFilename(), null, uplFile.getSize(), is);
+				} finally {
+					IOUtils.closeQuietly(is);
 				}
-				IOUtils.copy(is, os);
-
-			} finally {
-				IOUtils.closeQuietly(is);
 			}
-
-		} catch (Exception ex) {
-			logger.error("Error in action DownloadFiles", ex);
-			ServletUtils.writeErrorHandlingJs(response, ex.getMessage());
-		}
-	}
-
-	private FileContent toFileContent(UploadedFile uploaded) throws WTException {
-
-		try {
-			if (uploaded == null) {
-				throw new WTException("Uploaded file is null");
-			}
-
-			return new FileContent(uploaded.getFilename(), uploaded.getSize(), uploaded.getMediaType(), new FileInputStream(uploaded.getFile()));
-		} catch (FileNotFoundException ex) {
-			throw new WTException("File non found", ex);
+			
+		} catch(Throwable t) {
+			logger.error("Error in DownloadTimetableRequestDocument", t);
+			ServletUtils.writeErrorHandlingJs(response, t.getMessage());
 		}
 	}
 	

@@ -70,7 +70,7 @@ public class JsWorkReport {
 	public Integer dayTrasfert;
 
 	public List<JsGridWorkReportRow> details = new ArrayList();
-	public List<JsGridWorkReportAttachment> attachments = new ArrayList();
+	public List<Attachment> attachments = new ArrayList();
 
 	public String _profileId;
 
@@ -101,8 +101,13 @@ public class JsWorkReport {
 			this.details.add(new JsGridWorkReportRow(wrkDetail));
 		}
 		
-		for (WorkReportAttachment wrkAttachment : report.getAttachments()) {
-			this.attachments.add(new JsGridWorkReportAttachment(wrkAttachment));
+		attachments = new ArrayList<>(report.getAttachments().size());
+		for (WorkReportAttachment att : report.getAttachments()) {
+			Attachment jsatt = new Attachment();
+			jsatt.id = att.getWorkReportAttachmentId();
+			jsatt.name = att.getFileName();
+			jsatt.size = att.getSize();
+			attachments.add(jsatt);
 		}
 
 		this._profileId = ownerPid;
@@ -141,12 +146,15 @@ public class JsWorkReport {
 
 		}
 		
-		for (JsGridWorkReportAttachment jsWrkAttachment : js.attachments) {
-
-			rw.getAttachments().add(JsGridWorkReportAttachment.createWorkReportAttachment(jsWrkAttachment));
-
-		}
-
+		// Attachment needs to be treated outside this class in order to have complete access to their streams
+		
 		return rw;
+	}
+	
+	public static class Attachment {
+		public String id;
+		public String name;
+		public Long size;
+		public String _uplId;
 	}
 }

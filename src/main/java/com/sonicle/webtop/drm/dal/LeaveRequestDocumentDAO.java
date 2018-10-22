@@ -42,6 +42,7 @@ import static com.sonicle.webtop.drm.jooq.Tables.LEAVE_REQUEST_DOCUMENTS_DATA;
 import com.sonicle.webtop.drm.jooq.tables.records.LeaveRequestDocumentsRecord;
 import java.sql.Connection;
 import java.util.List;
+import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 
 /**
@@ -95,9 +96,12 @@ public class LeaveRequestDocumentDAO extends BaseDAO {
 			.fetchOneInto(OLeaveRequestDocumentData.class);
 	}
 
-	public int insert(Connection con, OLeaveRequestDocument item) throws DAOException {
+	public int insert(Connection con, OLeaveRequestDocument item, DateTime revisionTimestamp) throws DAOException {
 		DSLContext dsl = getDSL(con);
 
+		item.setRevisionTimestamp(revisionTimestamp);
+		item.setRevisionSequence((short)0);
+		
 		LeaveRequestDocumentsRecord record = dsl.newRecord(LEAVE_REQUEST_DOCUMENTS, item);
 
 		return dsl
@@ -126,6 +130,46 @@ public class LeaveRequestDocumentDAO extends BaseDAO {
 						LEAVE_REQUEST_DOCUMENTS.LEAVE_REQUEST_ID.equal(leaveRequestId)
 				)
 				.execute();
+	}
+	
+	public int insertBytes(Connection con, String documentId, byte[] bytes) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+			.insertInto(LEAVE_REQUEST_DOCUMENTS_DATA)
+			.set(LEAVE_REQUEST_DOCUMENTS_DATA.LEAVE_REQUEST_DOCUMENT_ID, documentId)
+			.set(LEAVE_REQUEST_DOCUMENTS_DATA.BYTES, bytes)
+			.execute();
+	}
+	
+	public OLeaveRequestDocumentData selectBytesById(Connection con, String documentId) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+			.select(LEAVE_REQUEST_DOCUMENTS_DATA.BYTES)
+			.from(LEAVE_REQUEST_DOCUMENTS_DATA)
+			.where(LEAVE_REQUEST_DOCUMENTS_DATA.LEAVE_REQUEST_DOCUMENT_ID.equal(documentId))
+			.fetchOneInto(OLeaveRequestDocumentData.class);
+	}
+
+	public int update(Connection con, OLeaveRequestDocument item, DateTime revisionTimestamp) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		item.setRevisionTimestamp(revisionTimestamp);
+		return dsl
+			.update(LEAVE_REQUEST_DOCUMENTS)
+			.set(LEAVE_REQUEST_DOCUMENTS.FILENAME, item.getFilename())
+			.set(LEAVE_REQUEST_DOCUMENTS.SIZE, item.getSize())
+			.set(LEAVE_REQUEST_DOCUMENTS.MEDIA_TYPE, item.getMediaType())
+			.where(
+				LEAVE_REQUEST_DOCUMENTS.LEAVE_REQUEST_DOCUMENT_ID.equal(item.getLeaveRequestDocumentId())
+			)
+			.execute();
+	}
+	
+	public int deleteBytesById(Connection con, String documentId) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+			.delete(LEAVE_REQUEST_DOCUMENTS_DATA)
+			.where(LEAVE_REQUEST_DOCUMENTS_DATA.LEAVE_REQUEST_DOCUMENT_ID.equal(documentId))
+			.execute();
 	}
 
 }

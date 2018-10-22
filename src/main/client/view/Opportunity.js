@@ -35,6 +35,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 	requires: [
 		'Sonicle.webtop.drm.ux.ContactGrid',
 		'Sonicle.webtop.drm.model.Opportunity',
+		'WTA.ux.grid.Attachments',
 		'WTA.ux.data.SimpleSourceModel',
 		'Sonicle.Bytes',
 		'WTA.ux.UploadBar'
@@ -536,69 +537,36 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 						})
 					]
 				},{
+					xtype: 'wtattachmentsgrid',
 					title: me.mys.res('opportunity.documents.tit'),
-					xtype: 'grid',
-					id: gpId,
-					reference: 'gpDocument',
 					bind: {
 						store: '{record.documents}'
 					},
-					selModel: {
-						type: 'checkboxmodel',
-						mode: 'MULTI'
-					},
-					columns: [
-						{
-							xtype: 'solinkcolumn',
-							dataIndex: 'fileName',
-							header: me.mys.res('gpOpportunityDocument.filename.lbl'),
-							flex: 3,
-							listeners: {
-								linkclick: function (s, idx, rec) {
-									me.downloadDocument([rec.getId()]);
-								}
-							}
-						}, {
-							xtype: 'sobytescolumn',
-							dataIndex: 'size',
-							header: me.mys.res('gpOpportunityDocument.size.lbl'),
-							flex: 1
-						}
-					],
-					tbar: [
-						me.getAct('downloadDocument'),
-						me.getAct('openDocument'),
-						me.getAct('deleteDocument')
-					],
-					bbar: {
-						xtype: 'wtuploadbar',
-						sid: me.mys.ID,
-						uploadContext: 'UploadOpportunityDocument',
-						dropElement: gpId,
-						listeners: {
-							fileuploaded: function (s, file, json) {
-								me.addDocument(json.data.uploadId, file);
-							}
-						}
-					},
+					sid: me.mys.ID,
+					uploadContext: 'OpportunityDocument',
+					uploadTag: WT.uiid(me.getId()),
+					dropElementId: me.getId(),
+					typeField: 'ext',
 					listeners: {
-						rowcontextmenu: function (s, rec, itm, i, e) {
-							var sm = s.getSelectionModel();
-							sm.select(rec);
-							WT.showContextMenu(e, me.getRef('cxmGridDocument'), {
-								file: rec
-							});
+						attachmentlinkclick: function(s, rec) {
+							me.openAttachmentUI(rec, false);
 						},
-						select: function (s, rec, i, e) {
-							me.updateDisabled('downloadDocument');
-							me.updateDisabled('openDocument');
-							me.updateDisabled('deleteDocument');
+						attachmentdownloadclick: function(s, rec) {
+							me.openAttachmentUI(rec, true);
+						},
+						attachmentdeleteclick: function(s, rec) {
+							s.getStore().remove(rec);
+						},
+						attachmentuploaded: function(s, uploadId, file) {
+							var sto = s.getStore();
+							sto.add(sto.createModel({
+								name: file.name,
+								size: file.size,
+								_uplId: uploadId
+							}));
+							me.getComponent(0).getLayout().setActiveItem(s);
 						}
-					},
-					plugins: [{
-						ptype: 'sofiledrop',
-						text: WT.res('sofiledrop.text')
-					}]
+					}
 				}
 			]
 		});
@@ -659,53 +627,31 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 		
 		me.on('viewinvalid', me.onViewInvalid);
 		me.on('viewload', me.onViewLoad);
+		me.on('viewclose', me.onViewClose);
 	},
-	gpDocument: function () {
-		this.lref('gpDocument');
-	},
-	getSelectedFiles: function () {
-		return this.lref('gpDocument').getSelection();
-	},
-	selectionIds: function (sel) {
-		var ids = [];
-		Ext.iterate(sel, function (rec) {
-			ids.push(rec.getId());
-		});
-		return ids;
-	},
-	addDocument: function (uploadId, file) {
-		var me = this;
-		var gp = me.lref('gpDocument'),
-				sto = gp.getStore();
-
-		sto.add(sto.createModel({
-			id: uploadId,
-			fileName: file.name,
-			size: file.size,
-			mediaType: file.type
-		}));
-	},
-	deleteDocument: function (rec) {
+	openAttachmentUI: function(rec, download) {
 		var me = this,
-				grid = me.lref('gpDocument'),
-				sto = grid.getStore();
-
-		WT.confirm(WT.res('confirm.delete'), function (bid) {
-			if (bid === 'yes') {
-				sto.remove(rec);
-			}
-		}, me);
-	},
-	openDocuments: function (documentIds) {
-		Sonicle.URLMgr.openFile(WTF.processBinUrl(this.mys.ID, 'DownloadOpportunityDocument', {
-			documentIds: WTU.arrayAsParam(documentIds)
-		}));
-	},
-	downloadDocument: function (documentIds) {
-		Sonicle.URLMgr.openFile(WTF.processBinUrl(this.mys.ID, 'DownloadOpportunityDocument', {
-			raw: 1,
-			documentIds: WTU.arrayAsParam(documentIds)
-		}));
+				name = rec.get('name'),
+				uploadId = rec.get('_uplId'),
+				url;
+		
+		if (!Ext.isEmpty(uploadId)) {
+			url = WTF.processBinUrl(me.mys.ID, 'DownloadOpportunityDocument', {
+				inline: !download,
+				uploadId: uploadId
+			});
+		} else {
+			url = WTF.processBinUrl(me.mys.ID, 'DownloadOpportunityDocument', {
+				inline: !download,
+				oId: me.getModel().getId(),
+				attachmentId: rec.get('id')
+			});
+		}
+		if (download) {
+			Sonicle.URLMgr.downloadFile(url, {filename: name});
+		} else {
+			Sonicle.URLMgr.openFile(url, {filename: name});
+		}
 	},
 	onViewLoad: function(s, success) {
 		if(!success) return;
@@ -717,6 +663,9 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 		if(me.isMode(me.MODE_NEW)) {
 			mo.set('statusId', me.mys.getVar('opportunityDefaultStatus'));
 		}
+	},
+	onViewClose: function(s) {
+		s.mys.cleanupUploadedFiles(WT.uiid(s.getId()));
 	},
 	gpOpportunityAction: function () {
 		var me = this;
@@ -730,87 +679,9 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 	},
 	initActions: function () {
 		var me = this;
-		me.addAct('openDocument', {
-			tooltip: null,
-			iconCls: 'wtdrm-icon-openDocument-xs',
-			disabled: true,
-			handler: function () {
-				var sel = me.getSelectedFiles();
-				if (sel.length > 0) {
-					ids = me.selectionIds(sel);
-					me.openDocuments(ids);
-				}
-			}
-		});
-		me.addAct('downloadDocument', {
-			tooltip: null,
-			iconCls: 'wtdrm-icon-downloadDocument-xs',
-			disabled: true,
-			handler: function () {
-				var sel = me.getSelectedFiles();
-
-				if (sel.length > 0) {
-					ids = me.selectionIds(sel);
-					me.downloadDocument(ids);
-				}
-			}
-		});
-		me.addAct('deleteDocument', {
-			tooltip: null,
-			iconCls: 'wtdrm-icon-deleteDocument-xs',
-			disabled: true,
-			handler: function () {
-				var sel = me.getSelectedFiles();
-				
-				if (sel.length > 0) {
-					me.deleteDocument(sel);
-				}
-			}
-		});
 	},
 	initCxm: function () {
 		var me = this;
-		me.addRef('cxmGridDocument', Ext.create({
-			xtype: 'menu',
-			items: [
-				me.getAct('openDocument'),
-				me.getAct('downloadDocument'),
-				'-',
-				me.getAct('deleteDocument')
-			],
-			listeners: {
-				beforeshow: function (s) {
-					me.updateDisabled('openDocument');
-					me.updateDisabled('downloadDocument');
-					me.updateDisabled('deleteDocument');
-				}
-			}
-		}));
-	},
-	/**
-	 * @private
-	 */
-	updateDisabled: function (action) {
-		var me = this,
-				dis = me.isDisabled(action);
-		me.setActDisabled(action, dis);
-	},
-	/**
-	 * @private
-	 */
-	isDisabled: function (action) {
-		var me = this, sel;
-		switch (action) {
-			case 'openDocument':
-				sel = me.getSelectedFiles();
-				return false;
-			case 'downloadDocument':
-				sel = me.getSelectedFiles();
-				return false;
-			case 'deleteDocument':
-				sel = me.getSelectedFiles();
-				return false;
-		}
 	},
 	onViewInvalid: function (s, mo, errs) {
 		var me = this;

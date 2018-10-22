@@ -58,7 +58,7 @@ public class JsOpportunityAction {
 	public Integer activityId;
 
 	private List<JsGridOpportunityActionInterlocutor> actionInterlocutors = new ArrayList();
-	private List<JsGridOpportunityActionDocument> actionDocuments = new ArrayList();
+	public List<Document> actionDocuments = new ArrayList();
 
 	public JsOpportunityAction(OpportunityAction oAct) {
 		this.id = oAct.getId();
@@ -77,8 +77,13 @@ public class JsOpportunityAction {
 			this.actionInterlocutors.add(new JsGridOpportunityActionInterlocutor(oActInt));
 		}
 		
-		for (OpportunityActionDocument oActDoc : oAct.getActionDocuments()) {
-			this.actionDocuments.add(new JsGridOpportunityActionDocument(oActDoc));
+		actionDocuments = new ArrayList<>(oAct.getActionDocuments().size());
+		for (OpportunityActionDocument doc : oAct.getActionDocuments()) {
+			Document jsdoc = new Document();
+			jsdoc.id = doc.getId();
+			jsdoc.name = doc.getFileName();
+			jsdoc.size = doc.getSize();
+			actionDocuments.add(jsdoc);
 		}
 	}
 
@@ -103,12 +108,15 @@ public class JsOpportunityAction {
 
 		}
 		
-		for (JsGridOpportunityActionDocument jsGridOppActDoc : js.actionDocuments) {
-
-			oAct.getActionDocuments().add(JsGridOpportunityActionDocument.createOpportunityActionDocument(jsGridOppActDoc));
-
-		}
+		// Attachment needs to be treated outside this class in order to have complete access to their streams
 
 		return oAct;
+	}
+	
+	public static class Document {
+		public String id;
+		public String name;
+		public Long size;
+		public String _uplId;
 	}
 }

@@ -33,6 +33,7 @@
 package com.sonicle.webtop.drm;
 
 import com.sonicle.commons.EnumUtils;
+import com.sonicle.commons.IdentifierUtils;
 import com.sonicle.commons.LangUtils;
 import com.sonicle.commons.LangUtils.CollectionChangeSet;
 import static com.sonicle.commons.LangUtils.getCollectionChanges;
@@ -47,7 +48,6 @@ import com.sonicle.webtop.core.sdk.BaseManager;
 import com.sonicle.webtop.core.sdk.UserProfile;
 import com.sonicle.webtop.core.sdk.UserProfileId;
 import com.sonicle.webtop.core.sdk.WTException;
-import com.sonicle.webtop.core.util.IdentifierUtils;
 import static com.sonicle.webtop.drm.Service.logger;
 import com.sonicle.webtop.drm.bol.OBusinessTrip;
 import com.sonicle.webtop.drm.bol.OCompany;
@@ -68,12 +68,14 @@ import com.sonicle.webtop.drm.bol.OHolidayDate;
 import com.sonicle.webtop.drm.bol.OHourProfile;
 import com.sonicle.webtop.drm.bol.OLeaveRequest;
 import com.sonicle.webtop.drm.bol.OLeaveRequestDocument;
-import com.sonicle.webtop.drm.bol.OLeaveRequestType;
+import com.sonicle.webtop.drm.bol.OLeaveRequestDocumentData;
 import com.sonicle.webtop.drm.bol.OOpportunity;
 import com.sonicle.webtop.drm.bol.OOpportunityAction;
 import com.sonicle.webtop.drm.bol.OOpportunityActionDocument;
+import com.sonicle.webtop.drm.bol.OOpportunityActionDocumentsData;
 import com.sonicle.webtop.drm.bol.OOpportunityActionInterlocutor;
 import com.sonicle.webtop.drm.bol.OOpportunityDocument;
+import com.sonicle.webtop.drm.bol.OOpportunityDocumentsData;
 import com.sonicle.webtop.drm.bol.OOpportunityField;
 import com.sonicle.webtop.drm.bol.OOpportunityInterlocutor;
 import com.sonicle.webtop.drm.bol.OProfileMasterdata;
@@ -87,6 +89,7 @@ import com.sonicle.webtop.drm.bol.OWorkReport;
 import com.sonicle.webtop.drm.bol.OWorkReportAttachment;
 import com.sonicle.webtop.drm.bol.OWorkReportRow;
 import com.sonicle.webtop.drm.bol.OWorkReportSetting;
+import com.sonicle.webtop.drm.bol.OWorkReportsAttachmentsData;
 import com.sonicle.webtop.drm.bol.OWorkType;
 import com.sonicle.webtop.drm.bol.VOpportunityEntry;
 import com.sonicle.webtop.drm.dal.BusinessTripDao;
@@ -146,11 +149,17 @@ import com.sonicle.webtop.drm.model.HolidayDate;
 import com.sonicle.webtop.drm.model.HourProfile;
 import com.sonicle.webtop.drm.model.LeaveRequest;
 import com.sonicle.webtop.drm.model.LeaveRequestDocument;
+import com.sonicle.webtop.drm.model.LeaveRequestDocumentWithBytes;
+import com.sonicle.webtop.drm.model.LeaveRequestDocumentWithStream;
 import com.sonicle.webtop.drm.model.Opportunity;
 import com.sonicle.webtop.drm.model.OpportunityAction;
 import com.sonicle.webtop.drm.model.OpportunityActionDocument;
+import com.sonicle.webtop.drm.model.OpportunityActionDocumentWithBytes;
+import com.sonicle.webtop.drm.model.OpportunityActionDocumentWithStream;
 import com.sonicle.webtop.drm.model.OpportunityActionInterlocutor;
 import com.sonicle.webtop.drm.model.OpportunityDocument;
+import com.sonicle.webtop.drm.model.OpportunityDocumentWithBytes;
+import com.sonicle.webtop.drm.model.OpportunityDocumentWithStream;
 import com.sonicle.webtop.drm.model.OpportunityField;
 import com.sonicle.webtop.drm.model.OpportunityInterlocutor;
 import com.sonicle.webtop.drm.model.OpportunitySetting;
@@ -163,6 +172,8 @@ import com.sonicle.webtop.drm.model.TimetableStamp;
 import com.sonicle.webtop.drm.model.UserForManager;
 import com.sonicle.webtop.drm.model.WorkReport;
 import com.sonicle.webtop.drm.model.WorkReportAttachment;
+import com.sonicle.webtop.drm.model.WorkReportAttachmentWithBytes;
+import com.sonicle.webtop.drm.model.WorkReportAttachmentWithStream;
 import com.sonicle.webtop.drm.model.WorkReportRow;
 import com.sonicle.webtop.drm.model.WorkReportSetting;
 import com.sonicle.webtop.drm.model.WorkType;
@@ -194,9 +205,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.imgscalr.Scalr;
-import org.joda.time.Interval;
 import org.joda.time.LocalDate;
-import org.joda.time.Period;
 
 /**
  *
@@ -328,10 +337,10 @@ public class DrmManager extends BaseManager {
 			con = WT.getConnection(SERVICE_ID);
 
 			boolean hasPicture = cmpPicDao.hasPicture(con, companyId);
-			company = createCompany(compDao.selectById(con, companyId), hasPicture);
+			company = ManagerUtils.createCompany(compDao.selectById(con, companyId), hasPicture);
 
 			for (OCompanyUser oComUsr : comUsrDao.selectByCompany(con, companyId)) {
-				company.getAssociatedUsers().add(createCompanyUser(oComUsr));
+				company.getAssociatedUsers().add(ManagerUtils.createCompanyUser(oComUsr));
 			}
 
 			return company;
@@ -357,13 +366,13 @@ public class DrmManager extends BaseManager {
 			CompanyDAO compDao = CompanyDAO.getInstance();
 			CompanyUserDAO compUsrDao = CompanyUserDAO.getInstance();
 
-			OCompany newCompany = createOCompany(company);
+			OCompany newCompany = ManagerUtils.createOCompany(company);
 			newCompany.setDomainId(getTargetProfileId().getDomainId());
 			newCompany.setCompanyId(compDao.getSequence(con).intValue());
 
 			OCompanyUser newCompUsr = null;
 			for (CompanyUserAssociation compUsr : company.getAssociatedUsers()) {
-				newCompUsr = createOCompanyUser(compUsr);
+				newCompUsr = ManagerUtils.createOCompanyUser(compUsr);
 				newCompUsr.setAssociationId(compUsrDao.getSequence(con).intValue());
 				newCompUsr.setCompanyId(newCompany.getCompanyId());
 				compUsrDao.insert(con, newCompUsr);
@@ -412,7 +421,7 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID, false);
 
-			OCompany company = createOCompany(item);
+			OCompany company = ManagerUtils.createOCompany(item);
 
 			compDao.update(con, company);
 
@@ -420,7 +429,7 @@ public class DrmManager extends BaseManager {
 
 			for (CompanyUserAssociation compUsrs : changesSet1.inserted) {
 
-				OCompanyUser comU = createOCompanyUser(compUsrs);
+				OCompanyUser comU = ManagerUtils.createOCompanyUser(compUsrs);
 
 				comU.setAssociationId(compUsrDao.getSequence(con).intValue());
 				comU.setCompanyId(item.getCompanyId());
@@ -476,86 +485,6 @@ public class DrmManager extends BaseManager {
 		} finally {
 			DbUtils.closeQuietly(con);
 		}
-	}
-
-	private OCompany createOCompany(Company com) {
-		if (com == null) {
-			return null;
-		}
-		OCompany ocom = new OCompany();
-		ocom.setCompanyId(com.getCompanyId());
-		ocom.setDomainId(com.getDomainId());
-		ocom.setName(com.getName());
-		ocom.setAddress(com.getAddress());
-		ocom.setPostalCode(com.getPostalCode());
-		ocom.setCity(com.getCity());
-		ocom.setState(com.getState());
-		ocom.setPhone(com.getPhone());
-		ocom.setFax(com.getFax());
-		ocom.setVat(com.getVat());
-		ocom.setTaxCode(com.getTaxCode());
-		ocom.setBusinessRegister(com.getBusinessRegister());
-		ocom.setRea(com.getRea());
-		ocom.setFooterColumns(com.getFooterColumns());
-		ocom.setFooterColumnLeft(com.getFooterColumnLeft());
-		ocom.setFooterColumnRight(com.getFooterColumnRight());
-
-		return ocom;
-	}
-
-	private Company createCompany(OCompany oCom, boolean hasPicture) {
-		if (oCom == null) {
-			return null;
-		}
-		
-		Company com = new Company();
-		com.setCompanyId(oCom.getCompanyId());
-		com.setDomainId(oCom.getDomainId());
-		com.setName(oCom.getName());
-		com.setAddress(oCom.getAddress());
-		com.setPostalCode(oCom.getPostalCode());
-		com.setCity(oCom.getCity());
-		com.setState(oCom.getState());
-		com.setPhone(oCom.getPhone());
-		com.setFax(oCom.getFax());
-		com.setVat(oCom.getVat());
-		com.setTaxCode(oCom.getTaxCode());
-		com.setBusinessRegister(oCom.getBusinessRegister());
-		com.setRea(oCom.getRea());
-		com.setFooterColumns(oCom.getFooterColumns());
-		com.setFooterColumnLeft(oCom.getFooterColumnLeft());
-		com.setFooterColumnRight(oCom.getFooterColumnRight());
-		com.setHasPicture(hasPicture);
-		
-		return com;
-	}
-
-	private CompanyUserAssociation createCompanyUser(OCompanyUser oComUsr) {
-
-		if (oComUsr == null) {
-			return null;
-		}
-
-		CompanyUserAssociation comUsr = new CompanyUserAssociation();
-		comUsr.setAssociationId(oComUsr.getAssociationId());
-		comUsr.setCompanyId(oComUsr.getCompanyId());
-		comUsr.setUserId(oComUsr.getUserId());
-
-		return comUsr;
-	}
-
-	private OCompanyUser createOCompanyUser(CompanyUserAssociation comUsr) {
-
-		if (comUsr == null) {
-			return null;
-		}
-
-		OCompanyUser oComUsr = new OCompanyUser();
-		oComUsr.setAssociationId(comUsr.getAssociationId());
-		oComUsr.setCompanyId(comUsr.getCompanyId());
-		oComUsr.setUserId(comUsr.getUserId());
-
-		return oComUsr;
 	}
 
 	public List<OEmployeeProfile> listEmployeeProfiles() throws WTException {
@@ -624,10 +553,10 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID);
 
-			docStatus = createDocStatus(docDao.selectById(con, docStatusId));
+			docStatus = ManagerUtils.createDocStatus(docDao.selectById(con, docStatusId));
 
 			for (ODocStatusGroup odocS : docGroupDao.selectByDocStatus(con, docStatusId)) {
-				docStatus.getAssociatedProfiles().add(createDocStatusProfile(odocS));
+				docStatus.getAssociatedProfiles().add(ManagerUtils.createDocStatusProfile(odocS));
 			}
 
 			return docStatus;
@@ -649,14 +578,14 @@ public class DrmManager extends BaseManager {
 			DocStatusDAO docDao = DocStatusDAO.getInstance();
 			DocStausGroupDAO docGDao = DocStausGroupDAO.getInstance();
 
-			ODocStatus newDocStatus = createODocStatus(docStatus);
+			ODocStatus newDocStatus = ManagerUtils.createODocStatus(docStatus);
 			newDocStatus.setDocStatusId(docDao.getSequence(con).intValue());
 			newDocStatus.setBuiltIn(false);
 
 			ODocStatusGroup newDocS = null;
 			for (DocStatusGroupAssociation docS : docStatus.getAssociatedProfiles()) {
 
-				newDocS = createODocStatusProfile(docS);
+				newDocS = ManagerUtils.createODocStatusProfile(docS);
 				newDocS.setDocStatusId(newDocStatus.getDocStatusId());
 				newDocS.setAssociationId(docGDao.getSequence(con).intValue());
 
@@ -695,7 +624,7 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID, false);
 
-			ODocStatus docStatus = createODocStatus(item);
+			ODocStatus docStatus = ManagerUtils.createODocStatus(item);
 
 			docDao.update(con, docStatus);
 
@@ -703,7 +632,7 @@ public class DrmManager extends BaseManager {
 
 			for (DocStatusGroupAssociation docsGroup : changesSet1.inserted) {
 
-				ODocStatusGroup docG = createODocStatusProfile(docsGroup);
+				ODocStatusGroup docG = ManagerUtils.createODocStatusProfile(docsGroup);
 
 				docG.setAssociationId(docGDao.getSequence(con).intValue());
 				docG.setDocStatusId(item.getDocStatusId());
@@ -753,62 +682,6 @@ public class DrmManager extends BaseManager {
 		} finally {
 			DbUtils.closeQuietly(con);
 		}
-	}
-
-	private ODocStatus createODocStatus(DocStatus dStat) {
-		if (dStat == null) {
-			return null;
-		}
-		ODocStatus oDstat = new ODocStatus();
-		oDstat.setDocStatusId(dStat.getDocStatusId());
-		oDstat.setName(dStat.getName());
-		oDstat.setDescription(dStat.getDescription());
-		oDstat.setType(dStat.getType());
-		oDstat.setBuiltIn(dStat.getBuiltIn());
-
-		return oDstat;
-	}
-
-	private DocStatus createDocStatus(ODocStatus oDstat) {
-		if (oDstat == null) {
-			return null;
-		}
-		DocStatus dStat = new DocStatus();
-		dStat.setDocStatusId(oDstat.getDocStatusId());
-		dStat.setName(oDstat.getName());
-		dStat.setDescription(oDstat.getDescription());
-		dStat.setType(oDstat.getType());
-		dStat.setBuiltIn(oDstat.getBuiltIn());
-
-		return dStat;
-	}
-
-	private DocStatusGroupAssociation createDocStatusProfile(ODocStatusGroup odocS) {
-
-		if (odocS == null) {
-			return null;
-		}
-
-		DocStatusGroupAssociation docStatusGroup = new DocStatusGroupAssociation();
-		docStatusGroup.setAssociationId(odocS.getAssociationId());
-		docStatusGroup.setDocStatusId(odocS.getDocStatusId());
-		docStatusGroup.setGroupId(odocS.getGroupId());
-
-		return docStatusGroup;
-	}
-
-	private ODocStatusGroup createODocStatusProfile(DocStatusGroupAssociation docS) {
-
-		if (docS == null) {
-			return null;
-		}
-
-		ODocStatusGroup odocS = new ODocStatusGroup();
-		odocS.setAssociationId(docS.getAssociationId());
-		odocS.setDocStatusId(docS.getDocStatusId());
-		odocS.setGroupId(docS.getGroupId());
-
-		return odocS;
 	}
 	
 	public OWorkType getWorkType(int workTypeId) throws WTException {
@@ -862,10 +735,10 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID);
 
-			group = createDrmGroup(grpDao.selectById(con, groupId));
+			group = ManagerUtils.createDrmGroup(grpDao.selectById(con, groupId));
 
 			for (ODrmGroupUser oGrpUsr : grpUsrDao.selectByGroup(con, groupId)) {
-				group.getAssociatedUsers().add(createDrmGroupUser(oGrpUsr));
+				group.getAssociatedUsers().add(ManagerUtils.createDrmGroupUser(oGrpUsr));
 			}
 
 			return group;
@@ -887,14 +760,14 @@ public class DrmManager extends BaseManager {
 			DrmGroupDAO grpDao = DrmGroupDAO.getInstance();
 			DrmGroupUserDAO grpUsrDao = DrmGroupUserDAO.getInstance();
 
-			ODrmGroup newDrmGroup = createODrmGroup(group);
+			ODrmGroup newDrmGroup = ManagerUtils.createODrmGroup(group);
 			newDrmGroup.setGroupId(IdentifierUtils.getUUID());
 			newDrmGroup.setDomainId(getTargetProfileId().getDomainId());
 
 			ODrmGroupUser newGrpUsr = null;
 			for (DrmGroupUserAssociation grpUsr : group.getAssociatedUsers()) {
 
-				newGrpUsr = createODrmGroupUser(grpUsr);
+				newGrpUsr = ManagerUtils.createODrmGroupUser(grpUsr);
 				newGrpUsr.setGroupId(newDrmGroup.getGroupId());
 				newGrpUsr.setAssociationId(grpUsrDao.getSequence(con).intValue());
 
@@ -932,7 +805,7 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID, false);
 
-			ODrmGroup group = createODrmGroup(item);
+			ODrmGroup group = ManagerUtils.createODrmGroup(item);
 
 			groDao.update(con, group);
 
@@ -940,7 +813,7 @@ public class DrmManager extends BaseManager {
 
 			for (DrmGroupUserAssociation grpUsr : changesSet1.inserted) {
 
-				ODrmGroupUser oGrpUsr = createODrmGroupUser(grpUsr);
+				ODrmGroupUser oGrpUsr = ManagerUtils.createODrmGroupUser(grpUsr);
 
 				oGrpUsr.setAssociationId(grpUsrDao.getSequence(con).intValue());
 				oGrpUsr.setGroupId(item.getGroupId());
@@ -993,68 +866,6 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	private DrmGroup createDrmGroup(ODrmGroup oGroup) {
-
-		if (oGroup == null) {
-			return null;
-		}
-
-		DrmGroup group = new DrmGroup();
-		group.setGroupId(oGroup.getGroupId());
-		group.setDomainId(oGroup.getDomainId());
-		group.setName(oGroup.getName());
-		group.setDescription(oGroup.getDescription());
-		group.setGroupCategory(oGroup.getGroupCategory());
-		group.setGroupType(oGroup.getGroupType());
-
-		return group;
-	}
-
-	private ODrmGroup createODrmGroup(DrmGroup group) {
-
-		if (group == null) {
-			return null;
-		}
-
-		ODrmGroup oGroup = new ODrmGroup();
-		oGroup.setGroupId(group.getGroupId());
-		oGroup.setDomainId(group.getDomainId());
-		oGroup.setName(group.getName());
-		oGroup.setDescription(group.getDescription());
-		oGroup.setGroupCategory(group.getGroupCategory());
-		oGroup.setGroupType(group.getGroupType());
-
-		return oGroup;
-	}
-
-	private DrmGroupUserAssociation createDrmGroupUser(ODrmGroupUser oGrpUsr) {
-
-		if (oGrpUsr == null) {
-			return null;
-		}
-
-		DrmGroupUserAssociation grpUsr = new DrmGroupUserAssociation();
-		grpUsr.setAssociationId(oGrpUsr.getAssociationId());
-		grpUsr.setGroupId(oGrpUsr.getGroupId());
-		grpUsr.setUserId(oGrpUsr.getUserId());
-
-		return grpUsr;
-	}
-
-	private ODrmGroupUser createODrmGroupUser(DrmGroupUserAssociation grpUsr) {
-
-		if (grpUsr == null) {
-			return null;
-		}
-
-		ODrmGroupUser oGrpUsr = new ODrmGroupUser();
-		oGrpUsr.setAssociationId(grpUsr.getAssociationId());
-		oGrpUsr.setGroupId(grpUsr.getGroupId());
-		oGrpUsr.setUserId(grpUsr.getUserId());
-
-		return oGrpUsr;
-	}
-
 	public List<ODrmProfile> listProfiles() throws WTException {
 		Connection con = null;
 		DrmProfileDAO pflDao = DrmProfileDAO.getInstance();
@@ -1101,20 +912,20 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID);
 
-			profile = createProfile(pflDao.selectById(con, profileId));
+			profile = ManagerUtils.createProfile(pflDao.selectById(con, profileId));
 
 			if (profile.type.equals(EnumUtils.toSerializedName(DrmProfile.Type.EXTERNAL))) {
 				for (OProfileMasterdata oPrfMaster : prfMasterDao.selectByProfile(con, profileId)) {
-					profile.getAssociatedCustomers().add(createProfileMasterdata(oPrfMaster));
+					profile.getAssociatedCustomers().add(ManagerUtils.createProfileMasterdata(oPrfMaster));
 				}
 			} else if (profile.type.equals(EnumUtils.toSerializedName(DrmProfile.Type.SUPERVISOR))) {
 				for (OProfileSupervisedUser oPrfSupervised : prfSupervisedDao.selectByProfile(con, profileId)) {
-					profile.getSupervisedUsers().add(createProfileSupervisedUser(oPrfSupervised));
+					profile.getSupervisedUsers().add(ManagerUtils.createProfileSupervisedUser(oPrfSupervised));
 				}
 			}
 
 			for (OProfileMember oPrfUser : prfUserDao.selectByProfile(con, profileId)) {
-				profile.getAssociatedUsers().add(createProfileMember(oPrfUser));
+				profile.getAssociatedUsers().add(ManagerUtils.createProfileMember(oPrfUser));
 			}
 
 			return profile;
@@ -1135,7 +946,7 @@ public class DrmManager extends BaseManager {
 
 			EmployeeProfileDAO epDao = EmployeeProfileDAO.getInstance();
 
-			OEmployeeProfile oEP = createOEmployeeProfile(eProfile);
+			OEmployeeProfile oEP = ManagerUtils.createOEmployeeProfile(eProfile);
 			oEP.setId(epDao.getSequence(con).intValue());
 			oEP.setDomainId(getTargetProfileId().getDomainId());
 
@@ -1164,7 +975,7 @@ public class DrmManager extends BaseManager {
 			con = WT.getConnection(SERVICE_ID, false);
 			
 			EmployeeProfileDAO epDao = EmployeeProfileDAO.getInstance();
-			OEmployeeProfile eProfile = createOEmployeeProfile(item);
+			OEmployeeProfile eProfile = ManagerUtils.createOEmployeeProfile(item);
 
 			epDao.update(con, eProfile);
 
@@ -1217,13 +1028,13 @@ public class DrmManager extends BaseManager {
 			HourProfileDAO hpDao = HourProfileDAO.getInstance();
 			LineHourDAO lhDao = LineHourDAO.getInstance();
 
-			OHourProfile oHP = createOHourProfile(hProfile);
+			OHourProfile oHP = ManagerUtils.createOHourProfile(hProfile);
 			oHP.setId(hpDao.getSequence(con).intValue());
 			oHP.setDomainId(getTargetProfileId().getDomainId());
 
 			OLineHour oLH = null;
 			for (LineHour eh : hProfile.getLineHours()) {
-				oLH = fillOLineHour(new OLineHour(), eh);
+				oLH = ManagerUtils.fillOLineHour(new OLineHour(), eh);
 				oLH.setId(lhDao.getSequence(con).intValue());
 				oLH.setDomainId(oHP.getDomainId());
 				oLH.setHourProfileId(oHP.getId());
@@ -1258,13 +1069,13 @@ public class DrmManager extends BaseManager {
 			LineHourDAO lhDao = LineHourDAO.getInstance();
 		
 			HourProfile oldHP = getHourProfile(item.getId());
-			OHourProfile hProfile = createOHourProfile(item);
+			OHourProfile hProfile = ManagerUtils.createOHourProfile(item);
 
 			hpDao.update(con, hProfile);
 
 			LangUtils.CollectionChangeSet<LineHour> changesSet1 = LangUtils.getCollectionChanges(oldHP.getLineHours(), item.getLineHours());
 			for (LineHour eh : changesSet1.inserted) {
-				final OLineHour oLH = fillOLineHour(new OLineHour(), eh);
+				final OLineHour oLH = ManagerUtils.fillOLineHour(new OLineHour(), eh);
 				oLH.setId(lhDao.getSequence(con).intValue());
 				oLH.setDomainId(item.getDomainId());
 				oLH.setHourProfileId(item.getId());
@@ -1276,7 +1087,7 @@ public class DrmManager extends BaseManager {
 			}
 			
 			for (LineHour eh : changesSet1.updated) {
-				OLineHour oLH = createOLineHour(eh);
+				OLineHour oLH = ManagerUtils.createOLineHour(eh);
 				lhDao.update(con, oLH);
 			}
 
@@ -1334,7 +1145,7 @@ public class DrmManager extends BaseManager {
 			ProfileSupervisedUserDAO prfSupervisedDao = ProfileSupervisedUserDAO.getInstance();
 			ProfileMemberDAO prfUserDao = ProfileMemberDAO.getInstance();
 
-			ODrmProfile newDrmProfile = createODrmProfile(profile);
+			ODrmProfile newDrmProfile = ManagerUtils.createODrmProfile(profile);
 			newDrmProfile.setProfileId(IdentifierUtils.getUUID());
 			newDrmProfile.setDomainId(getTargetProfileId().getDomainId());
 
@@ -1343,7 +1154,7 @@ public class DrmManager extends BaseManager {
 			if (newDrmProfile.getType().equals(EnumUtils.toSerializedName(DrmProfile.Type.EXTERNAL))) {
 				for (ProfileMasterdata prfMasterD : profile.getAssociatedCustomers()) {
 
-					newPrfMast = createOProfileMasterdata(prfMasterD);
+					newPrfMast = ManagerUtils.createOProfileMasterdata(prfMasterD);
 					newPrfMast.setId(prfMastDao.getSequence(con).intValue());
 					newPrfMast.setProfileId(newDrmProfile.getProfileId());
 
@@ -1352,7 +1163,7 @@ public class DrmManager extends BaseManager {
 			} else if (newDrmProfile.getType().equals(EnumUtils.toSerializedName(DrmProfile.Type.SUPERVISOR))) {
 				for (ProfileSupervisedUser prfSupervised : profile.getSupervisedUsers()) {
 
-					newPrfSupervised = createOProfileSupervisedUser(prfSupervised);
+					newPrfSupervised = ManagerUtils.createOProfileSupervisedUser(prfSupervised);
 					newPrfSupervised.setId(prfMastDao.getSequence(con).intValue());
 					newPrfSupervised.setProfileId(newDrmProfile.getProfileId());
 
@@ -1362,7 +1173,7 @@ public class DrmManager extends BaseManager {
 
 			OProfileMember opmem = null;
 			for (ProfileMember pmem : profile.getAssociatedUsers()) {
-				opmem = fillOProfileMember(new OProfileMember(), pmem);
+				opmem = ManagerUtils.fillOProfileMember(new OProfileMember(), pmem);
 				opmem.setId(prfMastDao.getSequence(con).intValue());
 				opmem.setProfileId(newDrmProfile.getProfileId());
 				prfUserDao.insert(con, opmem);
@@ -1403,7 +1214,7 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID, false);
 
-			ODrmProfile profile = createODrmProfile(item);
+			ODrmProfile profile = ManagerUtils.createODrmProfile(item);
 
 			pflDao.update(con, profile);
 
@@ -1411,7 +1222,7 @@ public class DrmManager extends BaseManager {
 				LangUtils.CollectionChangeSet<ProfileMasterdata> changesSet1 = LangUtils.getCollectionChanges(oldDrmProfile.getAssociatedCustomers(), item.getAssociatedCustomers());
 
 				for (ProfileMasterdata prfMaster : changesSet1.inserted) {
-					OProfileMasterdata oGrpUsr = createOProfileMasterdata(prfMaster);
+					OProfileMasterdata oGrpUsr = ManagerUtils.createOProfileMasterdata(prfMaster);
 					oGrpUsr.setId(pmasDao.getSequence(con).intValue());
 					oGrpUsr.setProfileId(item.getProfileId());
 					pmasDao.insert(con, oGrpUsr);
@@ -1426,7 +1237,7 @@ public class DrmManager extends BaseManager {
 				LangUtils.CollectionChangeSet<ProfileSupervisedUser> changesSet1 = LangUtils.getCollectionChanges(oldDrmProfile.getSupervisedUsers(), item.getSupervisedUsers());
 
 				for (ProfileSupervisedUser prfSupervised : changesSet1.inserted) {
-					OProfileSupervisedUser oPrfSupervised = createOProfileSupervisedUser(prfSupervised);
+					OProfileSupervisedUser oPrfSupervised = ManagerUtils.createOProfileSupervisedUser(prfSupervised);
 					oPrfSupervised.setId(pmasDao.getSequence(con).intValue());
 					oPrfSupervised.setProfileId(item.getProfileId());
 					psupDao.insert(con, oPrfSupervised);
@@ -1439,7 +1250,7 @@ public class DrmManager extends BaseManager {
 
 			LangUtils.CollectionChangeSet<ProfileMember> changesSet1 = LangUtils.getCollectionChanges(oldDrmProfile.getAssociatedUsers(), item.getAssociatedUsers());
 			for (ProfileMember pmem : changesSet1.inserted) {
-				final OProfileMember opmem = fillOProfileMember(new OProfileMember(), pmem);
+				final OProfileMember opmem = ManagerUtils.fillOProfileMember(new OProfileMember(), pmem);
 				opmem.setId(pmasDao.getSequence(con).intValue());
 				opmem.setProfileId(item.getProfileId());
 				pmemDao.insert(con, opmem);
@@ -1494,341 +1305,6 @@ public class DrmManager extends BaseManager {
 			DbUtils.closeQuietly(con);
 		}
 	}
-	
-	private EmployeeProfile createEmployeeProfile(OEmployeeProfile oEP) {
-
-		if (oEP == null) {
-			return null;
-		}
-
-		EmployeeProfile eProfile = new EmployeeProfile();
-		eProfile.setId(oEP.getId());
-		eProfile.setDomainId(oEP.getDomainId());
-		eProfile.setUserId(oEP.getUserId());
-		eProfile.setNumber(oEP.getNumber());
-		eProfile.setTolerance(oEP.getTolerance());
-		eProfile.setExtraordinary(oEP.getExtraordinary());
-		eProfile.setOnlyPresence(oEP.getOnlyPresence());
-		eProfile.setHourProfileId(oEP.getHourProfileId());
-
-		return eProfile;
-	}
-
-	private OEmployeeProfile createOEmployeeProfile(EmployeeProfile eProfile) {
-
-		if (eProfile == null) {
-			return null;
-		}
-
-		OEmployeeProfile oEp = new OEmployeeProfile();
-		oEp.setId(eProfile.getId());
-		oEp.setDomainId(eProfile.getDomainId());
-		oEp.setUserId(eProfile.getUserId());
-		oEp.setNumber(eProfile.getNumber());
-		oEp.setTolerance(eProfile.getTolerance());
-		oEp.setExtraordinary(eProfile.getExtraordinary());
-		oEp.setOnlyPresence(eProfile.getOnlyPresence());
-		oEp.setHourProfileId(eProfile.getHourProfileId());
-
-		return oEp;
-	}
-	
-	private HourProfile createHourProfile(OHourProfile oHP) {
-
-		if (oHP == null) {
-			return null;
-		}
-
-		HourProfile hpProfile = new HourProfile();
-		hpProfile.setId(oHP.getId());
-		hpProfile.setDomainId(oHP.getDomainId());
-		hpProfile.setDescription(oHP.getDescription());
-		
-		return hpProfile;
-	}
-
-	private OHourProfile createOHourProfile(HourProfile hProfile) {
-
-		if (hProfile == null) {
-			return null;
-		}
-
-		OHourProfile oHp = new OHourProfile();
-		oHp.setId(hProfile.getId());
-		oHp.setDomainId(hProfile.getDomainId());
-		oHp.setDescription(hProfile.getDescription());
-
-		return oHp;
-	}
-	
-	private LineHour createLineHour(OLineHour oEH) {
-
-		if (oEH == null) {
-			return null;
-		}
-
-		LineHour eh = new LineHour();
-		eh.setId(oEH.getId());
-		eh.setDomainId(oEH.getDomainId());
-		eh.setHourProfileId(oEH.getHourProfileId());
-		eh.setLineId(oEH.getLineId());
-		eh.setE_1(oEH.get_1E());
-		eh.setU_1(oEH.get_1U());
-		eh.setH_1(oEH.get_1H());
-		eh.setE_2(oEH.get_2E());
-		eh.setU_2(oEH.get_2U());
-		eh.setH_2(oEH.get_2H());
-		eh.setE_3(oEH.get_3E());
-		eh.setU_3(oEH.get_3U());
-		eh.setH_3(oEH.get_3H());
-		eh.setE_4(oEH.get_4E());
-		eh.setU_4(oEH.get_4U());
-		eh.setH_4(oEH.get_4H());
-		eh.setE_5(oEH.get_5E());
-		eh.setU_5(oEH.get_5U());
-		eh.setH_5(oEH.get_5H());
-		eh.setE_6(oEH.get_6E());
-		eh.setU_6(oEH.get_6U());
-		eh.setH_6(oEH.get_6H());
-		eh.setE_7(oEH.get_7E());
-		eh.setU_7(oEH.get_7U());
-		eh.setH_7(oEH.get_7H());
-
-		return eh;
-	}
-
-	private OLineHour createOLineHour(LineHour eh) {
-
-		if (eh == null) {
-			return null;
-		}
-
-		OLineHour oEH = new OLineHour();
-		oEH.setId(eh.getId());
-		oEH.setDomainId(eh.getDomainId());
-		oEH.setHourProfileId(eh.getHourProfileId());
-		oEH.setLineId(eh.getLineId());
-		oEH.set_1E(eh.getE_1());
-		oEH.set_1U(eh.getU_1());
-		oEH.set_1H(getDiffHours(eh.getE_1(), eh.getU_1()));
-		oEH.set_2E(eh.getE_2());
-		oEH.set_2U(eh.getU_2());
-		oEH.set_2H(getDiffHours(eh.getE_2(), eh.getU_2()));
-		oEH.set_3E(eh.getE_3());
-		oEH.set_3U(eh.getU_3());
-		oEH.set_3H(getDiffHours(eh.getE_3(), eh.getU_3()));
-		oEH.set_4E(eh.getE_4());
-		oEH.set_4U(eh.getU_4());
-		oEH.set_4H(getDiffHours(eh.getE_4(), eh.getU_4()));
-		oEH.set_5E(eh.getE_5());
-		oEH.set_5U(eh.getU_5());
-		oEH.set_5H(getDiffHours(eh.getE_5(), eh.getU_5()));
-		oEH.set_6E(eh.getE_6());
-		oEH.set_6U(eh.getU_6());
-		oEH.set_6H(getDiffHours(eh.getE_6(), eh.getU_6()));
-		oEH.set_7E(eh.getE_7());
-		oEH.set_7U(eh.getU_7());
-		oEH.set_7H(getDiffHours(eh.getE_7(), eh.getU_7()));
-
-		return oEH;
-	}
-	
-	private TimetableStamp createTimetableStamp(OTimetableStamp oTS) {
-
-		if (oTS == null) {
-			return null;
-		}
-
-		TimetableStamp stamp = new TimetableStamp();
-		stamp.setId(oTS.getId());
-		stamp.setDomainId(oTS.getDomainId());
-		stamp.setUserId(oTS.getUserId());
-		stamp.setType(oTS.getType());
-		stamp.setEntrance(oTS.getEntrance());
-		stamp.setExit(oTS.getExit());
-
-		return stamp;
-	}
-
-	private OTimetableStamp createOTimetableStamp(TimetableStamp stamp) {
-
-		if (stamp == null) {
-			return null;
-		}
-
-		OTimetableStamp oTS = new OTimetableStamp();
-		oTS.setId(stamp.getId());
-		oTS.setDomainId(stamp.getDomainId());
-		oTS.setUserId(stamp.getUserId());
-		oTS.setType(stamp.getType());
-		oTS.setEntrance(stamp.getEntrance());
-		oTS.setExit(stamp.getExit());
-
-		return oTS;
-	}
-
-	private DrmProfile createProfile(ODrmProfile oProfile) {
-
-		if (oProfile == null) {
-			return null;
-		}
-
-		DrmProfile profile = new DrmProfile();
-		profile.setProfileId(oProfile.getProfileId());
-		profile.setDomainId(oProfile.getDomainId());
-		profile.setDescription(oProfile.getDescription());
-		profile.setType(oProfile.getType());
-
-		return profile;
-	}
-
-	private ODrmProfile createODrmProfile(DrmProfile profile) {
-
-		if (profile == null) {
-			return null;
-		}
-
-		ODrmProfile oProfile = new ODrmProfile();
-		oProfile.setProfileId(profile.getProfileId());
-		oProfile.setDomainId(profile.getDomainId());
-		oProfile.setDescription(profile.getDescription());
-		oProfile.setType(profile.getType());
-
-		return oProfile;
-	}
-
-	private ProfileMasterdata createProfileMasterdata(OProfileMasterdata oPrfMasterD) {
-
-		if (oPrfMasterD == null) {
-			return null;
-		}
-
-		ProfileMasterdata prfMasterD = new ProfileMasterdata();
-		prfMasterD.setId(oPrfMasterD.getId());
-		prfMasterD.setProfileId(oPrfMasterD.getProfileId());
-		prfMasterD.setMasterDataId(oPrfMasterD.getMasterDataId());
-
-		return prfMasterD;
-	}
-
-	private OProfileMasterdata createOProfileMasterdata(ProfileMasterdata prfMasterD) {
-
-		if (prfMasterD == null) {
-			return null;
-		}
-
-		OProfileMasterdata oPrfMasterD = new OProfileMasterdata();
-		oPrfMasterD.setId(prfMasterD.getId());
-		oPrfMasterD.setProfileId(prfMasterD.getProfileId());
-		oPrfMasterD.setMasterDataId(prfMasterD.getMasterDataId());
-
-		return oPrfMasterD;
-	}
-
-	private ProfileSupervisedUser createProfileSupervisedUser(OProfileSupervisedUser oPrfSupervised) {
-
-		if (oPrfSupervised == null) {
-			return null;
-		}
-
-		ProfileSupervisedUser prfSupervised = new ProfileSupervisedUser();
-		prfSupervised.setId(oPrfSupervised.getId());
-		prfSupervised.setProfileId(oPrfSupervised.getProfileId());
-		prfSupervised.setUserId(oPrfSupervised.getUserId());
-
-		return prfSupervised;
-	}
-
-	private OProfileSupervisedUser createOProfileSupervisedUser(ProfileSupervisedUser prfSupervised) {
-
-		if (prfSupervised == null) {
-			return null;
-		}
-
-		OProfileSupervisedUser oPrfSupervised = new OProfileSupervisedUser();
-		oPrfSupervised.setId(prfSupervised.getId());
-		oPrfSupervised.setProfileId(prfSupervised.getProfileId());
-		oPrfSupervised.setUserId(prfSupervised.getUserId());
-
-		return oPrfSupervised;
-	}
-	
-	private ProfileMember createProfileMember(OProfileMember with) {
-		return fillProfileMember(new ProfileMember(), with);
-	}
-
-	private ProfileMember fillProfileMember(ProfileMember fill, OProfileMember with) {
-		if ((fill != null) && (with != null)) {
-			fill.setId(with.getId());
-			fill.setProfileId(with.getProfileId());
-			fill.setUserId(with.getUserId());
-		}
-		return fill;
-	}
-
-	private OProfileMember fillOProfileMember(OProfileMember fill, ProfileMember with) {
-		if ((fill != null) && (with != null)) {
-			fill.setId(with.getId());
-			fill.setProfileId(with.getProfileId());
-			fill.setUserId(with.getUserId());
-		}
-		return fill;
-	}
-	
-	private OLineHour fillOLineHour(OLineHour fill, LineHour with) {
-		if ((fill != null) && (with != null)) {
-			fill.setLineId(with.getLineId());
-			fill.set_1E(with.getE_1());
-			fill.set_1U(with.getU_1());
-			fill.set_1H(getDiffHours(with.getE_1(), with.getU_1()));
-			fill.set_2E(with.getE_2());
-			fill.set_2U(with.getU_2());
-			fill.set_2H(getDiffHours(with.getE_2(), with.getU_2()));
-			fill.set_3E(with.getE_3());
-			fill.set_3U(with.getU_3());
-			fill.set_3H(getDiffHours(with.getE_3(), with.getU_3()));
-			fill.set_4E(with.getE_4());
-			fill.set_4U(with.getU_4());
-			fill.set_4H(getDiffHours(with.getE_4(), with.getU_4()));
-			fill.set_5E(with.getE_5());
-			fill.set_5U(with.getU_5());
-			fill.set_5H(getDiffHours(with.getE_5(), with.getU_5()));
-			fill.set_6E(with.getE_6());
-			fill.set_6U(with.getU_6());
-			fill.set_6H(getDiffHours(with.getE_6(), with.getU_6()));
-			fill.set_7E(with.getE_7());
-			fill.set_7U(with.getU_7());
-			fill.set_7H(getDiffHours(with.getE_7(), with.getU_7()));
-		}
-		return fill;
-	}
-	
-	public String getDiffHours(String e, String u){
-		if(null != e && null != u){
-			java.util.Date startDate = new java.util.Date();
-			java.util.Date endDate = new java.util.Date();
-			startDate.setHours(Integer.parseInt(e.split(":")[0]));
-			startDate.setMinutes(Integer.parseInt(e.split(":")[1]));
-			startDate.setSeconds(0);
-			endDate.setHours(Integer.parseInt(u.split(":")[0]));
-			endDate.setMinutes(Integer.parseInt(u.split(":")[1]));
-			endDate.setSeconds(0);
-
-			Interval interval = new Interval(startDate.getTime(), endDate.getTime());
-			Period period = interval.toPeriod();
-			
-			return period.getHours()+ "." + period.getMinutes();
-		}else{
-			return null;
-		}
-	  }
-	
-	private ODrmLineManagerUsers fillODrmLineManagerUsers(ODrmLineManagerUsers fill, UserForManager with) {
-		if ((fill != null) && (with != null)) {
-			fill.setUserId(with.getUserId());
-		}
-		return fill;
-	}
 
 	public List<ODrmFolder> listFolders() throws WTException {
 		Connection con = null;
@@ -1859,10 +1335,10 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID);
 
-			folder = createFolder(fldDao.selectById(con, folderId));
+			folder = ManagerUtils.createFolder(fldDao.selectById(con, folderId));
 
 			for (ODrmFolderGroup oFldG : fldGDao.selectByDocStatus(con, folderId)) {
-				folder.getAssociatedGroups().add(createDrmFolderGroup(oFldG));
+				folder.getAssociatedGroups().add(ManagerUtils.createDrmFolderGroup(oFldG));
 			}
 
 			return folder;
@@ -1884,12 +1360,12 @@ public class DrmManager extends BaseManager {
 			DrmFolderDAO fldDao = DrmFolderDAO.getInstance();
 			DrmFolderGroupDAO fldGDao = DrmFolderGroupDAO.getInstance();
 
-			ODrmFolder newFolder = createODrmFolder(folder);
+			ODrmFolder newFolder = ManagerUtils.createODrmFolder(folder);
 			newFolder.setFolderId(IdentifierUtils.getUUID());
 
 			ODrmFolderGroup newFldGrp = null;
 			for (DrmFolderGroupAssociation fldG : folder.getAssociatedGroups()) {
-				newFldGrp = createODrmFolderGroup(fldG);
+				newFldGrp = ManagerUtils.createODrmFolderGroup(fldG);
 				newFldGrp.setAssociationId(fldGDao.getSequence(con).intValue());
 				newFldGrp.setFolderId(newFolder.getFolderId());
 
@@ -1924,7 +1400,7 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID, false);
 
-			ODrmFolder folder = createODrmFolder(item);
+			ODrmFolder folder = ManagerUtils.createODrmFolder(item);
 
 			fldDao.update(con, folder);
 
@@ -1932,7 +1408,7 @@ public class DrmManager extends BaseManager {
 
 			for (DrmFolderGroupAssociation fldGroup : changesSet1.inserted) {
 
-				ODrmFolderGroup fldG = createODrmFolderGroup(fldGroup);
+				ODrmFolderGroup fldG = ManagerUtils.createODrmFolderGroup(fldGroup);
 
 				fldG.setAssociationId(fldGDao.getSequence(con).intValue());
 				fldG.setFolderId(item.getFolderId());
@@ -1979,60 +1455,6 @@ public class DrmManager extends BaseManager {
 		} finally {
 			DbUtils.closeQuietly(con);
 		}
-	}
-
-	private ODrmFolder createODrmFolder(DrmFolder fld) {
-		if (fld == null) {
-			return null;
-		}
-		ODrmFolder oFld = new ODrmFolder();
-		oFld.setFolderId(fld.getFolderId());
-		oFld.setName(fld.getName());
-		oFld.setDescription(fld.getDescription());
-		oFld.setExpired(fld.isExpired());
-
-		return oFld;
-	}
-
-	private DrmFolder createFolder(ODrmFolder oFld) {
-		if (oFld == null) {
-			return null;
-		}
-		DrmFolder fld = new DrmFolder();
-		fld.setFolderId(oFld.getFolderId());
-		fld.setName(oFld.getName());
-		fld.setDescription(oFld.getDescription());
-		fld.setExpired(oFld.getExpired());
-
-		return fld;
-	}
-
-	private DrmFolderGroupAssociation createDrmFolderGroup(ODrmFolderGroup oFldGrp) {
-
-		if (oFldGrp == null) {
-			return null;
-		}
-
-		DrmFolderGroupAssociation fldGrp = new DrmFolderGroupAssociation();
-		fldGrp.setAssociationId(oFldGrp.getAssociationId());
-		fldGrp.setFolderId(oFldGrp.getFolderId());
-		fldGrp.setGroupId(oFldGrp.getGroupId());
-
-		return fldGrp;
-	}
-
-	private ODrmFolderGroup createODrmFolderGroup(DrmFolderGroupAssociation fldGrp) {
-
-		if (fldGrp == null) {
-			return null;
-		}
-
-		ODrmFolderGroup oFldGrp = new ODrmFolderGroup();
-		oFldGrp.setAssociationId(fldGrp.getAssociationId());
-		oFldGrp.setFolderId(fldGrp.getFolderId());
-		oFldGrp.setGroupId(fldGrp.getGroupId());
-
-		return oFldGrp;
 	}
 
 	public List<OWorkReport> listWorkReports(WorkReportQuery query) throws WTException {
@@ -2100,14 +1522,14 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID);
 
-			o = createOpportunity(oDao.selectById(con, id));
+			o = ManagerUtils.createOpportunity(oDao.selectById(con, id));
 			
 			for (OOpportunityInterlocutor oInt : oIDao.selectByOpportunity(con, id)) {
-				o.getInterlocutors().add(createOpportunityInterlocutor(oInt));
+				o.getInterlocutors().add(ManagerUtils.createOpportunityInterlocutor(oInt));
 			}
 
 			for (OOpportunityDocument oDoc : oDDao.selectByOpportunity(con, id)) {
-				o.getDocuments().add(createOpportunityDocument(oDoc));
+				o.getDocuments().add(ManagerUtils.createOpportunityDocument(oDoc));
 			}
 
 			return o;
@@ -2119,7 +1541,7 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	public OOpportunity addOpportunity(Opportunity o, HashMap<String, File> files) throws WTException {
+	public OOpportunity addOpportunity(Opportunity o) throws WTException {
 		Connection con = null;
 		OpportunityDAO oDao = OpportunityDAO.getInstance();
 		OpportunityInterlocutorDAO oIDao = OpportunityInterlocutorDAO.getInstance();
@@ -2130,43 +1552,27 @@ public class DrmManager extends BaseManager {
 			
 			DateTime revisionTimestamp = createRevisionTimestamp();
 
-			OOpportunity newO = createOOpportunity(o);
+			OOpportunity newO = ManagerUtils.createOOpportunity(o);
 			newO.setId(oDao.getOpportunitySequence(con).intValue());
 			newO.setDomainId(getTargetProfileId().getDomainId());
 			
 			OOpportunityInterlocutor newOInt = null;
 			for (OpportunityInterlocutor oInt : o.getInterlocutors()) {
-				newOInt = createOOpportunityInterlocutor(oInt);
+				newOInt = ManagerUtils.createOOpportunityInterlocutor(oInt);
 				newOInt.setId(oIDao.getSequence(con).intValue());
 				newOInt.setOpportunityId(newO.getId());
 
 				oIDao.insert(con, newOInt);
 			}
 
+			ArrayList<OOpportunityDocument> oDocs = new ArrayList<>();
+			
 			for (OpportunityDocument doc : o.getDocuments()) {
-				OOpportunityDocument oDoc = createOOpportunityDocument(doc);
-				oDoc.setOpportunityId(newO.getId());
-				oDoc.setRevisionTimestamp(revisionTimestamp);
-				oDoc.setRevisionSequence((short) 1);
-
-				oDDao.insert(con, oDoc);
+				if (!(doc instanceof OpportunityDocumentWithStream)) throw new IOException("Attachment stream not available [" + doc.getId() + "]");
+				oDocs.add(ManagerUtils.doOpportunityDocumentInsert(con, newO.getId(), (OpportunityDocumentWithStream)doc));
 			}
 
 			oDao.insert(con, newO);
-
-			File destDir = new File(getOpportunityPath(newO.getId()));
-			if (!destDir.exists()) {
-				destDir.mkdir();
-			}
-			
-			for (OpportunityDocument doc : o.getDocuments()) {
-
-				File file = files.get(doc.getId());
-				String fileName = PathUtils.addFileExension(file.getName(), FilenameUtils.getExtension(doc.getFileName()));
-				File destFile = new File(destDir, fileName);
-
-				FileUtils.copyFile(file, destFile);
-			}
 
 			DbUtils.commitQuietly(con);
 
@@ -2183,11 +1589,11 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	public OOpportunity updateOpportunity(Opportunity item, HashMap<String, File> files) throws WTException {
+	public OOpportunity updateOpportunity(Opportunity item) throws WTException {
 		Connection con = null;
 		OpportunityDAO oDao = OpportunityDAO.getInstance();
 		OpportunityInterlocutorDAO oIDao = OpportunityInterlocutorDAO.getInstance();
-		OpportunityDocumentDAO oDDao = OpportunityDocumentDAO.getInstance();
+		OpportunityDocumentDAO docDao = OpportunityDocumentDAO.getInstance();
 		
 		try {
 			con = WT.getConnection(SERVICE_ID, false);
@@ -2196,7 +1602,7 @@ public class DrmManager extends BaseManager {
 			
 			Opportunity oldO = getOpportunity(item.getId());
 
-			OOpportunity o = createOOpportunity(item);
+			OOpportunity o = ManagerUtils.createOOpportunity(item);
 			
 			//Opportunity
 			oDao.update(con, o);
@@ -2206,7 +1612,7 @@ public class DrmManager extends BaseManager {
 			
 			for (OpportunityInterlocutor oInt : changesSet2.inserted) {
 
-				OOpportunityInterlocutor oOInt = createOOpportunityInterlocutor(oInt);
+				OOpportunityInterlocutor oOInt = ManagerUtils.createOOpportunityInterlocutor(oInt);
 
 				oOInt.setId(oIDao.getSequence(con).intValue());
 				oOInt.setOpportunityId(item.getId());
@@ -2219,44 +1625,26 @@ public class DrmManager extends BaseManager {
 			}
 
 			for (OpportunityInterlocutor oInt : changesSet2.updated) {
-				OOpportunityInterlocutor oOInt = createOOpportunityInterlocutor(oInt);
+				OOpportunityInterlocutor oOInt = ManagerUtils.createOOpportunityInterlocutor(oInt);
 				oOInt.setOpportunityId(item.getId());
 
 				oIDao.update(con, oOInt);
 			}
 
 			//Opportunity Documents
-			LangUtils.CollectionChangeSet<OpportunityDocument> changesSet3 = LangUtils.getCollectionChanges(oldO.getDocuments(), item.getDocuments());
+			List<OpportunityDocument> oldDocs = ManagerUtils.createOpportunityDocumentList(docDao.selectByOpportunity(con, item.getId()));
+			CollectionChangeSet<OpportunityDocument> changeSet = LangUtils.getCollectionChanges(oldDocs, item.getDocuments());
 
-			File destDir = new File(getOpportunityPath(item.getId()));
-			if (!destDir.exists()) {
-				destDir.mkdirs();
+			for (OpportunityDocument doc : changeSet.inserted) {
+				if (!(doc instanceof OpportunityDocumentWithStream)) throw new IOException("Attachment stream not available [" + doc.getId()+ "]");
+				ManagerUtils.doOpportunityDocumentInsert(con, o.getId(), (OpportunityDocumentWithStream)doc);
 			}
-
-			for (OpportunityDocument oDoc : changesSet3.inserted) {
-
-				OOpportunityDocument oODoc = createOOpportunityDocument(oDoc);
-
-				oODoc.setOpportunityId(item.getId());
-				oODoc.setRevisionTimestamp(revisionTimestamp);
-				oODoc.setRevisionSequence((short) 1);
-
-				oDDao.insert(con, oODoc);
-
-				File file = files.get(oDoc.getId());
-				String fileName = PathUtils.addFileExension(file.getName(), FilenameUtils.getExtension(oDoc.getFileName()));
-				File destFile = new File(destDir, fileName);
-
-				FileUtils.copyFile(file, destFile);
+			for (OpportunityDocument doc : changeSet.updated) {
+				if (!(doc instanceof OpportunityDocumentWithStream)) continue;
+				ManagerUtils.doOpportunityDocumentUpdate(con, (OpportunityDocumentWithStream)doc);
 			}
-
-			for (OpportunityDocument oDoc : changesSet3.deleted) {
-
-				String fileName = PathUtils.addFileExension(oDoc.getId().toString(), FilenameUtils.getExtension(oDoc.getFileName()));
-				File file = new File(destDir, fileName);
-
-				FileUtils.deleteQuietly(file);
-				oDDao.deleteById(con, oDoc.getId());
+			for (OpportunityDocument doc : changeSet.deleted) {
+				docDao.deleteById(con, doc.getId());
 			}
 
 			DbUtils.commitQuietly(con);
@@ -2319,14 +1707,14 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID);
 
-			oAct = createOpportunityAction(oADao.select(con, id));
+			oAct = ManagerUtils.createOpportunityAction(oADao.select(con, id));
 
 			for (OOpportunityActionInterlocutor oActInt : oAIDao.selectByOpportunityAction(con, oAct.getId())) {
-				oAct.getActionInterlocutors().add(createOpportunityActionInterlocutor(oActInt));
+				oAct.getActionInterlocutors().add(ManagerUtils.createOpportunityActionInterlocutor(oActInt));
 			}
 
 			for (OOpportunityActionDocument oActDoc : oADDao.selectByOpportunityAction(con, oAct.getId())) {
-				oAct.getActionDocuments().add(createOpportunityActionDocument(oActDoc));
+				oAct.getActionDocuments().add(ManagerUtils.createOpportunityActionDocument(oActDoc));
 			}
 
 			return oAct;
@@ -2356,7 +1744,7 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	public OOpportunityAction addOpportunityAction(OpportunityAction oAct, HashMap<String, File> files) throws WTException {
+	public OOpportunityAction addOpportunityAction(OpportunityAction oAct) throws WTException {
 		Connection con = null;
 		OpportunityActionDAO oActDao = OpportunityActionDAO.getInstance();
 		OpportunityActionInterlocutorDAO oActIntDao = OpportunityActionInterlocutorDAO.getInstance();
@@ -2367,42 +1755,26 @@ public class DrmManager extends BaseManager {
 			
 			DateTime revisionTimestamp = createRevisionTimestamp();
 
-			OOpportunityAction newOOAct = createOOpportunityAction(oAct);
+			OOpportunityAction newOOAct = ManagerUtils.createOOpportunityAction(oAct);
 			newOOAct.setId(oActDao.getSequence(con).intValue());
 			
 			OOpportunityActionInterlocutor newOActInt = null;
 			for (OpportunityActionInterlocutor oActInt : oAct.getActionInterlocutors()) {
-				newOActInt = createOOpportunityActionInterlocutor(oActInt);
+				newOActInt = ManagerUtils.createOOpportunityActionInterlocutor(oActInt);
 				newOActInt.setId(oActIntDao.getSequence(con).intValue());
 				newOActInt.setOpportunityActionId(newOOAct.getId());
 
 				oActIntDao.insert(con, newOActInt);
 			}
 
+			ArrayList<OOpportunityActionDocument> oDocs = new ArrayList<>();
+			
 			for (OpportunityActionDocument doc : oAct.getActionDocuments()) {
-				OOpportunityActionDocument oActDoc = createOOpportunityActionDocument(doc);
-				oActDoc.setOpportunityActionId(newOOAct.getId());
-				oActDoc.setRevisionTimestamp(revisionTimestamp);
-				oActDoc.setRevisionSequence((short) 1);
-
-				oActDocDao.insert(con, oActDoc);
+				if (!(doc instanceof OpportunityActionDocumentWithStream)) throw new IOException("Attachment stream not available [" + doc.getId() + "]");
+				oDocs.add(ManagerUtils.doOpportunityActionDocumentInsert(con, newOOAct.getId(), (OpportunityActionDocumentWithStream)doc));
 			}
 
 			oActDao.insert(con, newOOAct);
-
-			File destDir = new File(getOpportunityPath(newOOAct.getId()));
-			if (!destDir.exists()) {
-				destDir.mkdir();
-			}
-			
-			for (OpportunityActionDocument doc : oAct.getActionDocuments()) {
-
-				File file = files.get(doc.getId());
-				String fileName = PathUtils.addFileExension(file.getName(), FilenameUtils.getExtension(doc.getFileName()));
-				File destFile = new File(destDir, fileName);
-
-				FileUtils.copyFile(file, destFile);
-			}
 
 			DbUtils.commitQuietly(con);
 
@@ -2419,11 +1791,11 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	public OOpportunityAction updateOpportunityAction(OpportunityAction item, HashMap<String, File> files) throws WTException {
+	public OOpportunityAction updateOpportunityAction(OpportunityAction item) throws WTException {
 		Connection con = null;
 		OpportunityActionDAO oActDao = OpportunityActionDAO.getInstance();
 		OpportunityActionInterlocutorDAO oActIntDao = OpportunityActionInterlocutorDAO.getInstance();
-		OpportunityActionDocumentDAO oActDocDao = OpportunityActionDocumentDAO.getInstance();
+		OpportunityActionDocumentDAO docDao = OpportunityActionDocumentDAO.getInstance();
 		
 		try {
 			con = WT.getConnection(SERVICE_ID, false);
@@ -2432,7 +1804,7 @@ public class DrmManager extends BaseManager {
 			
 			OpportunityAction oldOAct = getOpportunityAction(item.getId());
 
-			OOpportunityAction oOAct = createOOpportunityAction(item);
+			OOpportunityAction oOAct = ManagerUtils.createOOpportunityAction(item);
 			
 			//Opportunity Action
 			oActDao.update(con, oOAct);
@@ -2443,7 +1815,7 @@ public class DrmManager extends BaseManager {
 			
 			for (OpportunityActionInterlocutor oActInt : changesSet2.inserted) {
 
-				OOpportunityActionInterlocutor oOActInt = createOOpportunityActionInterlocutor(oActInt);
+				OOpportunityActionInterlocutor oOActInt = ManagerUtils.createOOpportunityActionInterlocutor(oActInt);
 
 				oOActInt.setId(oActIntDao.getSequence(con).intValue());
 				oOActInt.setOpportunityActionId(item.getId());
@@ -2456,44 +1828,26 @@ public class DrmManager extends BaseManager {
 			}
 
 			for (OpportunityActionInterlocutor oActInt : changesSet2.updated) {
-				OOpportunityActionInterlocutor oOActInt = createOOpportunityActionInterlocutor(oActInt);
+				OOpportunityActionInterlocutor oOActInt = ManagerUtils.createOOpportunityActionInterlocutor(oActInt);
 				oOActInt.setOpportunityActionId(item.getId());
 
 				oActIntDao.update(con, oOActInt);
 			}
 
 			//Opportunity Action Documents
-			LangUtils.CollectionChangeSet<OpportunityActionDocument> changesSet3 = LangUtils.getCollectionChanges(oldOAct.getActionDocuments(), item.getActionDocuments());
+			List<OpportunityActionDocument> oldDocs = ManagerUtils.createOpportunityActionDocumentList(docDao.selectByOpportunityAction(con, item.getId()));
+			CollectionChangeSet<OpportunityActionDocument> changeSet = LangUtils.getCollectionChanges(oldDocs, item.getActionDocuments());
 
-			File destDir = new File(getOpportunityPath(item.getId()));
-			if (!destDir.exists()) {
-				destDir.mkdirs();
+			for (OpportunityActionDocument doc : changeSet.inserted) {
+				if (!(doc instanceof OpportunityActionDocumentWithStream)) throw new IOException("Attachment stream not available [" + doc.getId()+ "]");
+				ManagerUtils.doOpportunityActionDocumentInsert(con, oOAct.getId(), (OpportunityActionDocumentWithStream)doc);
 			}
-
-			for (OpportunityActionDocument oActDoc : changesSet3.inserted) {
-
-				OOpportunityActionDocument oOActDoc = createOOpportunityActionDocument(oActDoc);
-
-				oOActDoc.setOpportunityActionId(item.getId());
-				oOActDoc.setRevisionTimestamp(revisionTimestamp);
-				oOActDoc.setRevisionSequence((short) 1);
-
-				oActDocDao.insert(con, oOActDoc);
-
-				File file = files.get(oActDoc.getId());
-				String fileName = PathUtils.addFileExension(file.getName(), FilenameUtils.getExtension(oActDoc.getFileName()));
-				File destFile = new File(destDir, fileName);
-
-				FileUtils.copyFile(file, destFile);
+			for (OpportunityActionDocument doc : changeSet.updated) {
+				if (!(doc instanceof OpportunityActionDocumentWithStream)) continue;
+				ManagerUtils.doOpportunityActionDocumentUpdate(con, (OpportunityActionDocumentWithStream)doc);
 			}
-
-			for (OpportunityActionDocument oActDoc : changesSet3.deleted) {
-
-				String fileName = PathUtils.addFileExension(oActDoc.getId().toString(), FilenameUtils.getExtension(oActDoc.getFileName()));
-				File file = new File(destDir, fileName);
-
-				FileUtils.deleteQuietly(file);
-				oActDocDao.deleteById(con, oActDoc.getId());
+			for (OpportunityActionDocument doc : changeSet.deleted) {
+				docDao.deleteById(con, doc.getId());
 			}
 
 			DbUtils.commitQuietly(con);
@@ -2535,256 +1889,21 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	private Opportunity createOpportunity(OOpportunity oOpt) {
-		if (oOpt == null) {
-			return null;
-		}
-		Opportunity o = new Opportunity();
-		o.setId(oOpt.getId());
-		o.setDomainId(oOpt.getDomainId());
-		o.setCompanyId(oOpt.getCompanyId());
-		o.setOperatorId(oOpt.getOperatorId());
-		o.setDate(oOpt.getDate());
-		o.setFromHour(oOpt.getFromHour());
-		o.setToHour(oOpt.getToHour());
-		o.setExecutedWith(oOpt.getExecutedWith());
-		o.setCustomerId(oOpt.getCustomerId());
-		o.setCustomerStatId(oOpt.getCustomerStatId());
-		o.setSector(oOpt.getSector());
-		o.setDescription(oOpt.getDescription());
-		o.setPlace(oOpt.getPlace());
-		o.setObjective(oOpt.getObjective());
-		o.setCausalId(oOpt.getCausalId());
-		o.setActivityId(oOpt.getActivityId());
-		o.setObjective2(oOpt.getObjective_2());
-		o.setResult(oOpt.getResult());
-		o.setDiscoveries(oOpt.getDiscoveries());
-		o.setCustomerPotential(oOpt.getCustomerPotential());
-		o.setNotes(oOpt.getNotes());
-		o.setStatusId(oOpt.getStatusId());
-		o.setSignedBy(oOpt.getSignedBy());
-		o.setSignature(oOpt.getSignature());
-		o.setSuccess(oOpt.getSuccess());
-
-		return o;
-	}
-
-	private OOpportunity createOOpportunity(Opportunity o) {
-		if (o == null) {
-			return null;
-		}
-		OOpportunity oOpt = new OOpportunity();
-		oOpt.setId(o.getId());
-		oOpt.setDomainId(o.getDomainId());
-		oOpt.setCompanyId(o.getCompanyId());
-		oOpt.setOperatorId(o.getOperatorId());
-		oOpt.setDate(o.getDate());
-		oOpt.setFromHour(o.getFromHour());
-		oOpt.setToHour(o.getToHour());
-		oOpt.setExecutedWith(o.getExecutedWith());
-		oOpt.setCustomerId(o.getCustomerId());
-		oOpt.setCustomerStatId(o.getCustomerStatId());
-		oOpt.setSector(o.getSector());
-		oOpt.setDescription(o.getDescription());
-		oOpt.setPlace(o.getPlace());
-		oOpt.setObjective(o.getObjective());
-		oOpt.setCausalId(o.getCausalId());
-		oOpt.setActivityId(o.getActivityId());
-		oOpt.setObjective_2(o.getObjective2());
-		oOpt.setResult(o.getResult());
-		oOpt.setDiscoveries(o.getDiscoveries());
-		oOpt.setCustomerPotential(o.getCustomerPotential());
-		oOpt.setNotes(o.getNotes());
-		oOpt.setStatusId(o.getStatusId());
-		oOpt.setSignedBy(o.getSignedBy());
-		oOpt.setSignature(o.getSignature());
-		oOpt.setSuccess(o.getSuccess());
-
-		return oOpt;
-	}
-	
-	private OOpportunityAction createOOpportunityAction(OpportunityAction act) {
-
-		if (act == null) {
-			return null;
-		}
-
-		OOpportunityAction oAct = new OOpportunityAction();
-		oAct.setId(act.getId());
-		oAct.setOpportunityId(act.getOpportunityId());
-		oAct.setOperatorId(act.getOperatorId());
-		oAct.setStatusId(act.getStatusId());
-		oAct.setDate(act.getDate());
-		oAct.setFromHour(act.getFromHour());
-		oAct.setToHour(act.getToHour());
-		oAct.setDescription(act.getDescription());
-		oAct.setPlace(act.getPlace());
-		oAct.setSubsequentActions(act.getSubsequentActions());
-		oAct.setActivityId(act.getActivityId());
-
-		return oAct;
-	}
-
-	private OpportunityAction createOpportunityAction(OOpportunityAction oAct) {
-
-		if (oAct == null) {
-			return null;
-		}
-
-		OpportunityAction act = new OpportunityAction();
-		act.setId(oAct.getId());
-		act.setOpportunityId(oAct.getOpportunityId());
-		act.setOperatorId(oAct.getOperatorId());
-		act.setStatusId(oAct.getStatusId());
-		act.setDate(oAct.getDate());
-		act.setFromHour(oAct.getFromHour());
-		act.setToHour(oAct.getToHour());
-		act.setDescription(oAct.getDescription());
-		act.setPlace(oAct.getPlace());
-		act.setSubsequentActions(oAct.getSubsequentActions());
-		act.setActivityId(oAct.getActivityId());
-
-		return act;
-	}
-	
-	private OOpportunityActionInterlocutor createOOpportunityActionInterlocutor(OpportunityActionInterlocutor actInterl) {
-
-		if (actInterl == null) {
-			return null;
-		}
-
-		OOpportunityActionInterlocutor oActInterl = new OOpportunityActionInterlocutor();
-		oActInterl.setId(actInterl.getId());
-		oActInterl.setOpportunityActionId(actInterl.getOpportunityActionId());
-		oActInterl.setContactId(actInterl.getContactId());
-
-		return oActInterl;
-	}
-
-	private OpportunityActionInterlocutor createOpportunityActionInterlocutor(OOpportunityActionInterlocutor oActInterl) {
-
-		if (oActInterl == null) {
-			return null;
-		}
-
-		OpportunityActionInterlocutor actInterl = new OpportunityActionInterlocutor();
-		actInterl.setId(oActInterl.getId());
-		actInterl.setOpportunityActionId(oActInterl.getOpportunityActionId());
-		actInterl.setContactId(oActInterl.getContactId());
-
-		return actInterl;
-	}
-	
-	private OOpportunityActionDocument createOOpportunityActionDocument(OpportunityActionDocument actDoc) {
-
-		if (actDoc == null) {
-			return null;
-		}
-
-		OOpportunityActionDocument oActDoc = new OOpportunityActionDocument();
-		oActDoc.setId(actDoc.getId());
-		oActDoc.setOpportunityActionId(actDoc.getOpportunityActionId());
-		oActDoc.setFilename(actDoc.getFileName());
-		oActDoc.setSize(actDoc.getSize());
-		oActDoc.setMediaType(actDoc.getMediaType());
-
-		return oActDoc;
-	}
-
-	private OpportunityActionDocument createOpportunityActionDocument(OOpportunityActionDocument oActDoc) {
-
-		if (oActDoc == null) {
-			return null;
-		}
-
-		OpportunityActionDocument actDoc = new OpportunityActionDocument();
-		actDoc.setId(oActDoc.getId());
-		actDoc.setOpportunityActionId(oActDoc.getOpportunityActionId());
-		actDoc.setFileName(oActDoc.getFilename());
-		actDoc.setSize(oActDoc.getSize());
-		actDoc.setMediaType(oActDoc.getMediaType());
-
-		return actDoc;
-	}
-	
-	private OOpportunityInterlocutor createOOpportunityInterlocutor(OpportunityInterlocutor interl) {
-
-		if (interl == null) {
-			return null;
-		}
-
-		OOpportunityInterlocutor oInterl = new OOpportunityInterlocutor();
-		oInterl.setId(interl.getId());
-		oInterl.setOpportunityId(interl.getOpportunityId());
-		oInterl.setContactId(interl.getContactId());
-
-		return oInterl;
-	}
-
-	private OpportunityInterlocutor createOpportunityInterlocutor(OOpportunityInterlocutor oInterl) {
-
-		if (oInterl == null) {
-			return null;
-		}
-
-		OpportunityInterlocutor interl = new OpportunityInterlocutor();
-		interl.setId(oInterl.getId());
-		interl.setOpportunityId(oInterl.getOpportunityId());
-		interl.setContactId(oInterl.getContactId());
-
-		return interl;
-	}
-	
-	private OOpportunityDocument createOOpportunityDocument(OpportunityDocument doc) {
-
-		if (doc == null) {
-			return null;
-		}
-
-		OOpportunityDocument oDoc = new OOpportunityDocument();
-		oDoc.setId(doc.getId());
-		oDoc.setOpportunityId(doc.getOpportunityId());
-		oDoc.setFilename(doc.getFileName());
-		oDoc.setSize(doc.getSize());
-		oDoc.setMediaType(doc.getMediaType());
-
-		return oDoc;
-	}
-
-	private OpportunityDocument createOpportunityDocument(OOpportunityDocument oDoc) {
-
-		if (oDoc == null) {
-			return null;
-		}
-
-		OpportunityDocument doc = new OpportunityDocument();
-		doc.setId(oDoc.getId());
-		doc.setOpportunityId(oDoc.getOpportunityId());
-		doc.setFileName(oDoc.getFilename());
-		doc.setSize(oDoc.getSize());
-		doc.setMediaType(oDoc.getMediaType());
-
-		return doc;
-	}
-	
-	public String getOpportunityPath(Integer id) {
-
-		return PathUtils.concatPathParts(WT.getServiceHomePath(getTargetProfileId().getDomainId(), SERVICE_ID),
-				"Opportunity", id.toString());
-
-	}
-
-	public OpportunityDocument getOpportunityDocument(String opportunityDocumentId) throws WTException {
+	public OpportunityDocumentWithBytes getOpportunityDocument(Integer oId, String opportunityDocumentId) throws WTException {
 		Connection con = null;
-		OpportunityDocumentDAO oDDao = OpportunityDocumentDAO.getInstance();
-		OpportunityDocument doc = null;
+		OpportunityDocumentDAO docDao = OpportunityDocumentDAO.getInstance();
+		OOpportunityDocument oDoc = null;
 		try {
 
 			con = WT.getConnection(SERVICE_ID);
 
-			doc = createOpportunityDocument(oDDao.select(con, opportunityDocumentId));
-
-			return doc;
+			oDoc = docDao.select(con, opportunityDocumentId);
+			if(oDoc == null) return null;
+			
+			OOpportunityDocumentsData oDocData = docDao.selectBytesById(con, opportunityDocumentId);
+			if(oDocData == null) return null;
+			
+			return ManagerUtils.fillOpportunityDocument(new OpportunityDocumentWithBytes(oDocData.getBytes()), oDoc);
 
 		} catch (SQLException | DAOException ex) {
 			throw new WTException(ex, "DB error");
@@ -2793,73 +1912,26 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	public FileContent getOpportunityDocumentContent(String opportunityDocumentId) throws WTException {
-
-		OpportunityDocument doc = getOpportunityDocument(opportunityDocumentId);
-
-		if (doc == null) {
-			return null;
-		}
-
-		File file = new File(getOpportunityPath(doc.getOpportunityId()),
-				PathUtils.addFileExension(doc.getId().toString(),
-						PathUtils.getFileExtension(doc.getFileName())));
-
-		if (!file.canRead() || !file.exists()) {
-			throw new WTException("File not exists or not readable [{0}]", file.getAbsolutePath());
-		}
-		try {
-			return new FileContent(doc.getFileName(), file.length(), doc.getMediaType(), new FileInputStream(file));
-		} catch (FileNotFoundException ex) {
-			throw new WTException("File not found", ex);
-		}
-	}
-	
-	public String getOpportunityActionPath(Integer id) {
-
-		return PathUtils.concatPathParts(WT.getServiceHomePath(getTargetProfileId().getDomainId(), SERVICE_ID),
-				"OpportunityAction", id.toString());
-
-	}
-
-	public OpportunityActionDocument getOpportunityActionDocument(String opportunityActionDocumentId) throws WTException {
+	public OpportunityActionDocumentWithBytes getOpportunityActionDocument(Integer oAId, String opportunityActionDocumentId) throws WTException {
 		Connection con = null;
-		OpportunityActionDocumentDAO oADDao = OpportunityActionDocumentDAO.getInstance();
-		OpportunityActionDocument actDoc = null;
+		OpportunityActionDocumentDAO docDao = OpportunityActionDocumentDAO.getInstance();
+		OOpportunityActionDocument oDoc = null;
 		try {
 
 			con = WT.getConnection(SERVICE_ID);
 
-			actDoc = createOpportunityActionDocument(oADDao.select(con, opportunityActionDocumentId));
-
-			return actDoc;
+			oDoc = docDao.select(con, opportunityActionDocumentId);
+			if(oDoc == null) return null;
+			
+			OOpportunityActionDocumentsData oDocData = docDao.selectBytesById(con, opportunityActionDocumentId);
+			if(oDocData == null) return null;
+			
+			return ManagerUtils.fillOpportunityActionDocument(new OpportunityActionDocumentWithBytes(oDocData.getBytes()), oDoc);
 
 		} catch (SQLException | DAOException ex) {
 			throw new WTException(ex, "DB error");
 		} finally {
 			DbUtils.closeQuietly(con);
-		}
-	}
-
-	public FileContent getOpportunityActionDocumentContent(String opportunityActionDocumentId) throws WTException {
-
-		OpportunityActionDocument actDoc = getOpportunityActionDocument(opportunityActionDocumentId);
-
-		if (actDoc == null) {
-			return null;
-		}
-
-		File file = new File(getOpportunityActionPath(actDoc.getOpportunityActionId()),
-				PathUtils.addFileExension(actDoc.getId().toString(),
-						PathUtils.getFileExtension(actDoc.getFileName())));
-
-		if (!file.canRead() || !file.exists()) {
-			throw new WTException("File not exists or not readable [{0}]", file.getAbsolutePath());
-		}
-		try {
-			return new FileContent(actDoc.getFileName(), file.length(), actDoc.getMediaType(), new FileInputStream(file));
-		} catch (FileNotFoundException ex) {
-			throw new WTException("File not found", ex);
 		}
 	}
 
@@ -2873,14 +1945,14 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID);
 
-			report = createWorkReport(wrkDao.selectById(con, workReportId));
+			report = ManagerUtils.createWorkReport(wrkDao.selectById(con, workReportId));
 
 			for (OWorkReportRow oWrkDetail : wrkDDao.selectByWorkReport(con, workReportId)) {
-				report.getDetails().add(createWorkReportRow(oWrkDetail));
+				report.getDetails().add(ManagerUtils.createWorkReportRow(oWrkDetail));
 			}
 
 			for (OWorkReportAttachment oAtt : attDao.selectByWorkReport(con, workReportId)) {
-				report.getAttachments().add(createWorkReportAttachment(oAtt));
+				report.getAttachments().add(ManagerUtils.createWorkReportAttachment(oAtt));
 			}
 
 			return report;
@@ -2892,7 +1964,7 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	public OWorkReport addWorkReport(WorkReport wrkRpt, HashMap<String, File> files) throws WTException {
+	public void addWorkReport(WorkReport wrkRpt) throws WTException {
 
 		Connection con = null;
 
@@ -2900,54 +1972,33 @@ public class DrmManager extends BaseManager {
 			con = WT.getConnection(SERVICE_ID, false);
 
 			DateTime revisionTimestamp = createRevisionTimestamp();
-			String workReportPath = "";
 
 			WorkReportDAO wrkDao = WorkReportDAO.getInstance();
 			WorkReportRowDAO wrkDDao = WorkReportRowDAO.getInstance();
-			WorkReportAttachmentDAO attDao = WorkReportAttachmentDAO.getInstance();
 
-			OWorkReport newWorkReport = createOWorkReport(wrkRpt);
+			OWorkReport newWorkReport = ManagerUtils.createOWorkReport(wrkRpt);
 			newWorkReport.setWorkReportId(IdentifierUtils.getUUID());
 			newWorkReport.setWorkReportNo(wrkDao.getWorkReportSequence(con) + "-" + newWorkReport.getFromDate().year().getAsText());
 
 			OWorkReportRow newWrkDetail = null;
 			for (WorkReportRow wrkDetail : wrkRpt.getDetails()) {
-				newWrkDetail = createOWorkReportRow(wrkDetail);
+				newWrkDetail = ManagerUtils.createOWorkReportRow(wrkDetail);
 				newWrkDetail.setId(wrkDDao.getSequence(con).intValue());
 				newWrkDetail.setWorkReportId(newWorkReport.getWorkReportId());
 
 				wrkDDao.insert(con, newWrkDetail);
 			}
-
-			for (WorkReportAttachment attachment : wrkRpt.getAttachments()) {
-				OWorkReportAttachment oAtt = createOWorkReportAttachment(attachment);
-				oAtt.setWorkReportId(newWorkReport.getWorkReportId());
-				oAtt.setRevisionTimestamp(revisionTimestamp);
-				oAtt.setRevisionSequence((short) 1);
-
-				attDao.insert(con, oAtt);
+			
+			ArrayList<OWorkReportAttachment> oAtts = new ArrayList<>();
+			
+			for (WorkReportAttachment att : wrkRpt.getAttachments()) {
+				if (!(att instanceof WorkReportAttachmentWithStream)) throw new IOException("Attachment stream not available [" + att.getWorkReportAttachmentId()+ "]");
+				oAtts.add(ManagerUtils.doWorkReportAttachmentInsert(con, newWorkReport.getWorkReportId(), (WorkReportAttachmentWithStream)att));
 			}
 
 			wrkDao.insert(con, newWorkReport, revisionTimestamp);
 
-			File destDir = new File(getWorkReportPath(newWorkReport.getWorkReportId()));
-			if (!destDir.exists()) {
-				destDir.mkdir();
-			}
-			
-			for (WorkReportAttachment attachment : wrkRpt.getAttachments()) {
-
-				File file = files.get(attachment.getWorkReportAttachmentId());
-				String fileName = PathUtils.addFileExension(file.getName(), FilenameUtils.getExtension(attachment.getFileName()));
-				File destFile = new File(destDir, fileName);
-
-				FileUtils.copyFile(file, destFile);
-			}
-
-			DbUtils.commitQuietly(con);
-
-			return newWorkReport;
-
+			DbUtils.commitQuietly(con);			
 		} catch (SQLException | DAOException ex) {
 			DbUtils.rollbackQuietly(con);
 			throw new WTException(ex, "DB error");
@@ -2959,7 +2010,7 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	public OWorkReport updateWorkReport(WorkReport item, HashMap<String, File> files) throws WTException {
+	public void updateWorkReport(WorkReport item) throws WTException {
 
 		Connection con = null;
 		WorkReportDAO wrkDao = WorkReportDAO.getInstance();
@@ -2972,14 +2023,14 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID, false);
 
-			OWorkReport report = createOWorkReport(item);
+			OWorkReport report = ManagerUtils.createOWorkReport(item);
 
 			wrkDao.update(con, report, revisionTimestamp);
 
 			LangUtils.CollectionChangeSet<WorkReportRow> changesSet1 = LangUtils.getCollectionChanges(oldWorkReport.getDetails(), item.getDetails());
 			for (WorkReportRow wrkDetail : changesSet1.inserted) {
 
-				OWorkReportRow oWrkDetail = createOWorkReportRow(wrkDetail);
+				OWorkReportRow oWrkDetail = ManagerUtils.createOWorkReportRow(wrkDetail);
 
 				oWrkDetail.setId(detailDao.getSequence(con).intValue());
 				oWrkDetail.setWorkReportId(item.getWorkReportId());
@@ -2992,49 +2043,28 @@ public class DrmManager extends BaseManager {
 			}
 
 			for (WorkReportRow wrkDetail : changesSet1.updated) {
-				OWorkReportRow oWrkDetail = createOWorkReportRow(wrkDetail);
+				OWorkReportRow oWrkDetail = ManagerUtils.createOWorkReportRow(wrkDetail);
 				oWrkDetail.setWorkReportId(item.getWorkReportId());
 
 				detailDao.update(con, oWrkDetail);
 			}
 
-			LangUtils.CollectionChangeSet<WorkReportAttachment> changesSet2 = LangUtils.getCollectionChanges(oldWorkReport.getAttachments(), item.getAttachments());
+			List<WorkReportAttachment> oldAtts = ManagerUtils.createWorkReportAttachmentList(attDao.selectByWorkReport(con, item.getWorkReportId()));
+			CollectionChangeSet<WorkReportAttachment> changeSet = LangUtils.getCollectionChanges(oldAtts, item.getAttachments());
 
-			File destDir = new File(getWorkReportPath(item.getWorkReportId()));
-			if (!destDir.exists()) {
-				destDir.mkdirs();
+			for (WorkReportAttachment att : changeSet.inserted) {
+				if (!(att instanceof WorkReportAttachmentWithStream)) throw new IOException("Attachment stream not available [" + att.getWorkReportAttachmentId()+ "]");
+				ManagerUtils.doWorkReportAttachmentInsert(con, report.getWorkReportId(), (WorkReportAttachmentWithStream)att);
 			}
-
-			for (WorkReportAttachment wrkAttachment : changesSet2.inserted) {
-
-				OWorkReportAttachment oWrkAttachment = createOWorkReportAttachment(wrkAttachment);
-
-				oWrkAttachment.setWorkReportId(item.getWorkReportId());
-				oWrkAttachment.setRevisionTimestamp(revisionTimestamp);
-				oWrkAttachment.setRevisionSequence((short) 1);
-
-				attDao.insert(con, oWrkAttachment);
-
-				File file = files.get(wrkAttachment.getWorkReportAttachmentId());
-				String fileName = PathUtils.addFileExension(file.getName(), FilenameUtils.getExtension(wrkAttachment.getFileName()));
-				File destFile = new File(destDir, fileName);
-
-				FileUtils.copyFile(file, destFile);
+			for (WorkReportAttachment att : changeSet.updated) {
+				if (!(att instanceof WorkReportAttachmentWithStream)) continue;
+				ManagerUtils.doWorkReportAttachmentUpdate(con, (WorkReportAttachmentWithStream)att);
 			}
-
-			for (WorkReportAttachment wrkAttachment : changesSet2.deleted) {
-
-				String fileName = PathUtils.addFileExension(wrkAttachment.getWorkReportAttachmentId(), FilenameUtils.getExtension(wrkAttachment.getFileName()));
-				File file = new File(destDir, fileName);
-
-				FileUtils.deleteQuietly(file);
-				attDao.deleteById(con, wrkAttachment.getWorkReportAttachmentId());
+			for (WorkReportAttachment att : changeSet.deleted) {
+				attDao.deleteById(con, att.getWorkReportAttachmentId());
 			}
 
 			DbUtils.commitQuietly(con);
-
-			return report;
-
 		} catch (SQLException | DAOException ex) {
 			throw new WTException(ex, "DB error");
 		} catch (IOException ex) {
@@ -3043,7 +2073,7 @@ public class DrmManager extends BaseManager {
 			DbUtils.closeQuietly(con);
 		}
 	}
-
+	
 	public void deleteWorkReport(String workReportId) throws WTException {
 
 		Connection con = null;
@@ -3066,224 +2096,28 @@ public class DrmManager extends BaseManager {
 			DbUtils.closeQuietly(con);
 		}
 	}
-
-	private WorkReport createWorkReport(OWorkReport oWrkRpt) {
-		if (oWrkRpt == null) {
-			return null;
-		}
-		WorkReport wrkRpt = new WorkReport();
-		wrkRpt.setWorkReportId(oWrkRpt.getWorkReportId());
-		wrkRpt.setWorkReportNo(oWrkRpt.getWorkReportNo());
-		wrkRpt.setCompanyId(oWrkRpt.getCompanyId());
-		wrkRpt.setOperatorId(oWrkRpt.getOperatorId());
-		wrkRpt.setRevisionStatus(EnumUtils.forSerializedName(oWrkRpt.getRevisionStatus(), WorkReport.RevisionStatus.class));
-		wrkRpt.setRevisionTimestamp(oWrkRpt.getRevisionTimestamp());
-		wrkRpt.setRevisionSequence(oWrkRpt.getRevisionSequence());
-		wrkRpt.setDocStatusId(oWrkRpt.getDocStatusId());
-		wrkRpt.setContactId(oWrkRpt.getContactId());
-		wrkRpt.setCustomerId(oWrkRpt.getCustomerId());
-		wrkRpt.setCustomerStatId(oWrkRpt.getCustomerStatId());
-		wrkRpt.setFromDate(oWrkRpt.getFromDate());
-		wrkRpt.setToDate(oWrkRpt.getToDate());
-		wrkRpt.setReferenceNo(oWrkRpt.getReferenceNo());
-		wrkRpt.setCausalId(oWrkRpt.getCausalId());
-		wrkRpt.setDdtNo(oWrkRpt.getDdtNo());
-		wrkRpt.setDdtDate(oWrkRpt.getDdtDate());
-		wrkRpt.setNotes(oWrkRpt.getNotes());
-		wrkRpt.setDescription(oWrkRpt.getDescription());
-		wrkRpt.setApplySignature(oWrkRpt.getApplySignature());
-		wrkRpt.setChargeTo(oWrkRpt.getChargeTo());
-		wrkRpt.setFreeSupport(oWrkRpt.getFreeSupport());
-		wrkRpt.setBusinessTripId(oWrkRpt.getBusinessTripId());
-		wrkRpt.setDayTrasfert(oWrkRpt.getDayTrasfert().intValue());
-
-		return wrkRpt;
-	}
-
-	private OWorkReport createOWorkReport(WorkReport wrkRpt) {
-		if (wrkRpt == null) {
-			return null;
-		}
-		OWorkReport oWrkRpt = new OWorkReport();
-		oWrkRpt.setWorkReportId(wrkRpt.getWorkReportId());
-		oWrkRpt.setWorkReportNo(wrkRpt.getWorkReportNo());
-		oWrkRpt.setCompanyId(wrkRpt.getCompanyId());
-		oWrkRpt.setOperatorId(wrkRpt.getOperatorId());
-		oWrkRpt.setRevisionStatus(EnumUtils.toSerializedName(wrkRpt.getRevisionStatus()));
-		oWrkRpt.setRevisionTimestamp(wrkRpt.getRevisionTimestamp());
-		oWrkRpt.setRevisionSequence(wrkRpt.getRevisionSequence());
-		oWrkRpt.setDocStatusId(wrkRpt.getDocStatusId());
-		oWrkRpt.setContactId(wrkRpt.getContactId());
-		oWrkRpt.setCustomerId(wrkRpt.getCustomerId());
-		oWrkRpt.setCustomerStatId(wrkRpt.getCustomerStatId());
-		oWrkRpt.setFromDate(wrkRpt.getFromDate());
-		oWrkRpt.setToDate(wrkRpt.getToDate());
-		oWrkRpt.setReferenceNo(wrkRpt.getReferenceNo());
-		oWrkRpt.setCausalId(wrkRpt.getCausalId());
-		oWrkRpt.setDdtNo(wrkRpt.getDdtNo());
-		oWrkRpt.setDdtDate(wrkRpt.getDdtDate());
-		oWrkRpt.setNotes(wrkRpt.getNotes());
-		oWrkRpt.setDescription(wrkRpt.getDescription());
-		oWrkRpt.setApplySignature(wrkRpt.getApplySignature());
-		oWrkRpt.setChargeTo(wrkRpt.getChargeTo());
-		oWrkRpt.setFreeSupport(wrkRpt.getFreeSupport());
-		oWrkRpt.setBusinessTripId(wrkRpt.getBusinessTripId());
-		oWrkRpt.setDayTrasfert(wrkRpt.getDayTrasfert().shortValue());
-
-		return oWrkRpt;
-	}
-
-	private WorkReportRow createWorkReportRow(OWorkReportRow oWrkDetail) {
-
-		if (oWrkDetail == null) {
-			return null;
-		}
-
-		WorkReportRow wrkDetail = new WorkReportRow();
-		wrkDetail.setId(oWrkDetail.getId());
-		wrkDetail.setWorkReportId(oWrkDetail.getWorkReportId());
-		wrkDetail.setRowNo(oWrkDetail.getRowNo().intValue());
-		wrkDetail.setWorkTypeId(oWrkDetail.getWorkTypeId());
-		wrkDetail.setDuration(oWrkDetail.getDuration().intValue());
-		wrkDetail.setRowFlag(oWrkDetail.getRowFlag());
-
-		return wrkDetail;
-	}
-
-	private OWorkReportRow createOWorkReportRow(WorkReportRow wrkDetail) {
-
-		if (wrkDetail == null) {
-			return null;
-		}
-
-		OWorkReportRow oWrkDetail = new OWorkReportRow();
-		oWrkDetail.setId(wrkDetail.getId());
-		oWrkDetail.setWorkReportId(wrkDetail.getWorkReportId());
-		oWrkDetail.setRowNo(wrkDetail.getRowNo().shortValue());
-		oWrkDetail.setWorkTypeId(wrkDetail.getWorkTypeId());
-		oWrkDetail.setDuration(wrkDetail.getDuration().shortValue());
-		oWrkDetail.setRowFlag(wrkDetail.getRowFlag());
-
-		return oWrkDetail;
-	}
-
-	private OWorkReportAttachment createOWorkReportAttachment(WorkReportAttachment attachment) {
-
-		if (attachment == null) {
-			return null;
-		}
-
-		OWorkReportAttachment oAtt = new OWorkReportAttachment();
-		oAtt.setWorkReportAttachmentId(attachment.getWorkReportAttachmentId());
-		oAtt.setWorkReportId(attachment.getWorkReportId());
-		oAtt.setFilename(attachment.getFileName());
-		oAtt.setSize(attachment.getSize());
-		oAtt.setMediaType(attachment.getMediaType());
-
-		return oAtt;
-	}
-
-	private WorkReportAttachment createWorkReportAttachment(OWorkReportAttachment oAttachment) {
-
-		if (oAttachment == null) {
-			return null;
-		}
-
-		WorkReportAttachment att = new WorkReportAttachment();
-		att.setWorkReportAttachmentId(oAttachment.getWorkReportAttachmentId());
-		att.setWorkReportId(oAttachment.getWorkReportId());
-		att.setFileName(oAttachment.getFilename());
-		att.setSize(oAttachment.getSize());
-		att.setMediaType(oAttachment.getMediaType());
-
-		return att;
-	}
-
-	public String getWorkReportPath(String workReportId) {
-
-		return PathUtils.concatPathParts(WT.getServiceHomePath(getTargetProfileId().getDomainId(), SERVICE_ID),
-				"WorkReports", workReportId);
-
-	}
-
-	public WorkReportAttachment getWorkReportAttachment(String workReportAttachmentId) throws WTException {
+	
+	public WorkReportAttachmentWithBytes getWorkReportAttachment(String workReportId, String workReportAttachmentId) throws WTException {
 		Connection con = null;
 		WorkReportAttachmentDAO attDao = WorkReportAttachmentDAO.getInstance();
-		WorkReportAttachment attachment = null;
+		OWorkReportAttachment oAtt = null;
 		try {
 
 			con = WT.getConnection(SERVICE_ID);
 
-			attachment = createWorkReportAttachment(attDao.select(con, workReportAttachmentId));
-
-			return attachment;
+			oAtt = attDao.select(con, workReportAttachmentId);
+			if(oAtt == null) return null;
+			
+			OWorkReportsAttachmentsData oAttData = attDao.selectBytesById(con, workReportAttachmentId);
+			if(oAttData == null) return null;
+			
+			return ManagerUtils.fillWorkReportAttachment(new WorkReportAttachmentWithBytes(oAttData.getBytes()), oAtt);
 
 		} catch (SQLException | DAOException ex) {
 			throw new WTException(ex, "DB error");
 		} finally {
 			DbUtils.closeQuietly(con);
 		}
-	}
-
-	public FileContent getWorkReportAttachmentContent(String workReportAttachmentId) throws WTException {
-
-		WorkReportAttachment attachment = getWorkReportAttachment(workReportAttachmentId);
-
-		if (attachment == null) {
-			return null;
-		}
-
-		File file = new File(getWorkReportPath(attachment.getWorkReportId()),
-				PathUtils.addFileExension(attachment.getWorkReportAttachmentId(),
-						PathUtils.getFileExtension(attachment.getFileName())));
-
-		if (!file.canRead() || !file.exists()) {
-			throw new WTException("File not exists or not readable [{0}]", file.getAbsolutePath());
-		}
-		try {
-			return new FileContent(attachment.getFileName(), file.length(), attachment.getMediaType(), new FileInputStream(file));
-		} catch (FileNotFoundException ex) {
-			throw new WTException("File not found", ex);
-		}
-	}
-	
-	private OpportunityField createOpportunityField(OOpportunityField oOField) {
-
-		if (oOField == null) {
-			return null;
-		}
-
-		OpportunityField oField = new OpportunityField();
-		
-		oField.setDomainId(oOField.getDomainId());
-		oField.setTab(EnumUtils.forSerializedName(oOField.getTabId(), OpportunityField.Tab.class));
-		oField.setFieldId(oOField.getFieldId());
-		oField.setVisible(oOField.getVisible());
-		oField.setRequired(oOField.getRequired());
-		oField.setOrder(oOField.getOrder());
-		oField.setLabel(oOField.getLabel());
-		oField.setShowOnGrid(oOField.getShowOnGrid());
-
-		return oField;
-	}
-
-	private OOpportunityField createOOpportunityField(OpportunityField oField) {
-
-		if (oField == null) {
-			return null;
-		}
-
-		OOpportunityField oOField = new OOpportunityField();
-		oOField.setDomainId(oField.getDomainId());
-		oOField.setTabId(EnumUtils.toSerializedName(oField.getTab()));
-		oOField.setFieldId(oField.getFieldId());
-		oOField.setVisible(oField.getVisible());
-		oOField.setRequired(oField.getRequired());
-		oOField.setOrder(oField.getOrder());		
-		oOField.setLabel(oField.getLabel());
-		oOField.setShowOnGrid(oField.getShowOnGrid());
-
-		return oOField;
 	}
 	
 	public List<OOpportunityField> getOpportunitySettingFieldsInGrid()throws WTException, SQLException {
@@ -3313,15 +2147,15 @@ public class DrmManager extends BaseManager {
 			
 			if (setting != null) {
 				for (OOpportunityField oOField : ofDao.selectByDomainIdTabId(con, getTargetProfileId().getDomainId(), EnumUtils.toSerializedName(OpportunityField.Tab.MAIN))) {
-					setting.getGeneralFields().add(createOpportunityField(oOField));
+					setting.getGeneralFields().add(ManagerUtils.createOpportunityField(oOField));
 				}
 
 				for (OOpportunityField oOField : ofDao.selectByDomainIdTabId(con, getTargetProfileId().getDomainId(), EnumUtils.toSerializedName(OpportunityField.Tab.VISIT_REPORT))) {
-					setting.getVisitReportFields().add(createOpportunityField(oOField));
+					setting.getVisitReportFields().add(ManagerUtils.createOpportunityField(oOField));
 				}
 				
 				for (OOpportunityField oOField : ofDao.selectByDomainIdTabId(con, getTargetProfileId().getDomainId(), EnumUtils.toSerializedName(OpportunityField.Tab.NOTES_SIGNATURE))) {
-					setting.getNotesSignatureFields().add(createOpportunityField(oOField));
+					setting.getNotesSignatureFields().add(ManagerUtils.createOpportunityField(oOField));
 				}
 			}
 			
@@ -3344,21 +2178,21 @@ public class DrmManager extends BaseManager {
 
 			for (OpportunityField field : item.getGeneralFields()) {
 
-				OOpportunityField oField = createOOpportunityField(field);
+				OOpportunityField oField = ManagerUtils.createOOpportunityField(field);
 
 				ofDao.update(con, oField);
 			}
 			
 			for (OpportunityField field : item.getVisitReportFields()) {
 
-				OOpportunityField oField = createOOpportunityField(field);
+				OOpportunityField oField = ManagerUtils.createOOpportunityField(field);
 
 				ofDao.update(con, oField);
 			}
 			
 			for (OpportunityField field : item.getNotesSignatureFields()) {
 
-				OOpportunityField oField = createOOpportunityField(field);
+				OOpportunityField oField = ManagerUtils.createOOpportunityField(field);
 
 				ofDao.update(con, oField);
 			}
@@ -3402,16 +2236,16 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID);
 
-			setting = createWorkReportSetting(wSettDao.selectByDomainId(con, getTargetProfileId().getDomainId()));
+			setting = ManagerUtils.createWorkReportSetting(wSettDao.selectByDomainId(con, getTargetProfileId().getDomainId()));
 			if (setting != null) {
 				setting.setWorkReportSequence(wSettDao.getWorkReportSequence(con).intValue());
 
 				for (OWorkType oType : wrkTDao.selectByDomain(con, getTargetProfileId().getDomainId())) {
-					setting.getTypes().add(createWorkType(oType));
+					setting.getTypes().add(ManagerUtils.createWorkType(oType));
 				}
 
 				for (OBusinessTrip oTrip : tripDao.selectByDomain(con, getTargetProfileId().getDomainId())) {
-					setting.getTrips().add(createBusinessTrip(oTrip));
+					setting.getTrips().add(ManagerUtils.createBusinessTrip(oTrip));
 				}
 			}
 			return setting;
@@ -3456,10 +2290,10 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID);
 
-			lr = createLeaveRequest(lrDao.selectById(con, leaveRequestId));
+			lr = ManagerUtils.createLeaveRequest(lrDao.selectById(con, leaveRequestId));
 
 			for (OLeaveRequestDocument oDoc : docDao.selectByLeaveRequest(con, leaveRequestId)) {
-				lr.getDocuments().add(createLeaveRequestDocument(oDoc));
+				lr.getDocuments().add(ManagerUtils.createLeaveRequestDocument(oDoc));
 			}
 
 			return lr;
@@ -3471,7 +2305,7 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	public OLeaveRequest addLeaveRequest(LeaveRequest lv, HashMap<String, File> files) throws WTException {
+	public void addLeaveRequest(LeaveRequest lv) throws WTException {
 
 		Connection con = null;
 
@@ -3483,43 +2317,25 @@ public class DrmManager extends BaseManager {
 			LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
 			LeaveRequestDocumentDAO docDao = LeaveRequestDocumentDAO.getInstance();
 
-			OLeaveRequest newLr = createOLeaveRequest(lv);
+			OLeaveRequest newLr = ManagerUtils.createOLeaveRequest(lv);
 			newLr.setLeaveRequestId(lrDao.getLeaveRequestSequence(con).intValue());
 			newLr.setDomainId(getTargetProfileId().getDomainId());
 			newLr.setEmployeeReqTimestamp(employeeReqTimestamp);
 			newLr.setStatus("O");
 			newLr.setEmployeeCancReq(false);
 
+			ArrayList<OLeaveRequestDocument> oDocs = new ArrayList<>();
+			
 			for (LeaveRequestDocument doc : lv.getDocuments()) {
-				OLeaveRequestDocument oDoc = createOLeaveRequestDocument(doc);
-				oDoc.setLeaveRequestId(newLr.getLeaveRequestId());
-				oDoc.setRevisionTimestamp(employeeReqTimestamp);
-				oDoc.setRevisionSequence((short) 1);
-
-				docDao.insert(con, oDoc);
+				if (!(doc instanceof LeaveRequestDocumentWithStream)) throw new IOException("Attachment stream not available [" + doc.getLeaveRequestDocumentId()+ "]");
+				oDocs.add(ManagerUtils.doLeaveRequestDocumentInsert(con, newLr.getLeaveRequestId(), (LeaveRequestDocumentWithStream)doc));
 			}
 
 			lrDao.insert(con, newLr, employeeReqTimestamp);
 
-			File destDir = new File(getLeaveRequestPath(newLr.getLeaveRequestId()));
-			if (!destDir.exists()) {
-				destDir.mkdir();
-			}
-			
-			for (LeaveRequestDocument doc : lv.getDocuments()) {
-
-				File file = files.get(doc.getLeaveRequestDocumentId());
-				String fileName = PathUtils.addFileExension(file.getName(), FilenameUtils.getExtension(doc.getFileName()));
-				File destFile = new File(destDir, fileName);
-
-				FileUtils.copyFile(file, destFile);
-			}
-
 			DbUtils.commitQuietly(con);
 
 			notifyLeaveRequest(newLr);
-			
-			return newLr;
 
 		} catch (SQLException | DAOException ex) {
 			DbUtils.rollbackQuietly(con);
@@ -3532,7 +2348,7 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	public OLeaveRequest updateLeaveRequest(LeaveRequest item, HashMap<String, File> files, boolean sendMail) throws WTException, MessagingException, TemplateException {
+	public OLeaveRequest updateLeaveRequest(LeaveRequest item, boolean sendMail) throws WTException, MessagingException, TemplateException {
 		Connection con = null;
 		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
 		LeaveRequestDocumentDAO docDao = LeaveRequestDocumentDAO.getInstance();
@@ -3548,7 +2364,7 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID, false);
 
-			OLeaveRequest lr = createOLeaveRequest(item);
+			OLeaveRequest lr = ManagerUtils.createOLeaveRequest(item);
 			lr.setEmployeeReqTimestamp(revisionTimestamp);
 			if(lr.getEmployeeCancReq()) lr.setEmployeeCancReqTimestamp(revisionTimestamp);
 			if(lr.getResult() != null){
@@ -3557,7 +2373,7 @@ public class DrmManager extends BaseManager {
 				
 				if(lr.getResult() == true){
 					//Insert in TimetableEvents
-					List<LocalDate> dts = getDateRange(lr.getFromDate(), lr.getToDate());
+					List<LocalDate> dts = ManagerUtils.getDateRange(lr.getFromDate(), lr.getToDate());
 
 					for(LocalDate ld : dts){
 						OTimetableEvent oTe = new OTimetableEvent();
@@ -3583,7 +2399,7 @@ public class DrmManager extends BaseManager {
 								}
 							}
 						}else{
-							hRange = getHourRange(lr.getFromHour(), lr.getToHour());
+							hRange = ManagerUtils.getHourRange(lr.getFromHour(), lr.getToHour());
 						}
 						
 						if(hRange == null) hRange = "8";
@@ -3602,40 +2418,20 @@ public class DrmManager extends BaseManager {
 			}
 
 			lrDao.update(con, lr);
+			
+			List<LeaveRequestDocument> oldDocs = ManagerUtils.createLeaveRequestDocumentList(docDao.selectByLeaveRequest(con, item.getLeaveRequestId()));
+			CollectionChangeSet<LeaveRequestDocument> changeSet = LangUtils.getCollectionChanges(oldDocs, item.getDocuments());
 
-			if(files != null){
-				LangUtils.CollectionChangeSet<LeaveRequestDocument> changesSet2 = LangUtils.getCollectionChanges(oldLr.getDocuments(), item.getDocuments());
-
-				File destDir = new File(getLeaveRequestPath(item.getLeaveRequestId()));
-				if (!destDir.exists()) {
-					destDir.mkdirs();
-				}
-
-				for (LeaveRequestDocument lrDoc : changesSet2.inserted) {
-
-					OLeaveRequestDocument oLrDoc = createOLeaveRequestDocument(lrDoc);
-
-					oLrDoc.setLeaveRequestId(item.getLeaveRequestId());
-					oLrDoc.setRevisionTimestamp(revisionTimestamp);
-					oLrDoc.setRevisionSequence((short) 1);
-
-					docDao.insert(con, oLrDoc);
-
-					File file = files.get(lrDoc.getLeaveRequestDocumentId());
-					String fileName = PathUtils.addFileExension(file.getName(), FilenameUtils.getExtension(lrDoc.getFileName()));
-					File destFile = new File(destDir, fileName);
-
-					FileUtils.copyFile(file, destFile);
-				}
-
-				for (LeaveRequestDocument lrDoc : changesSet2.deleted) {
-
-					String fileName = PathUtils.addFileExension(lrDoc.getLeaveRequestDocumentId().toString(), FilenameUtils.getExtension(lrDoc.getFileName()));
-					File file = new File(destDir, fileName);
-
-					FileUtils.deleteQuietly(file);
-					docDao.deleteById(con, lrDoc.getLeaveRequestDocumentId());
-				}
+			for (LeaveRequestDocument doc : changeSet.inserted) {
+				if (!(doc instanceof LeaveRequestDocumentWithStream)) throw new IOException("Attachment stream not available [" + doc.getLeaveRequestDocumentId()+ "]");
+				ManagerUtils.doLeaveRequestDocumentInsert(con, lr.getLeaveRequestId(), (LeaveRequestDocumentWithStream)doc);
+			}
+			for (LeaveRequestDocument doc : changeSet.updated) {
+				if (!(doc instanceof LeaveRequestDocumentWithStream)) continue;
+				ManagerUtils.doLeaveRequestDocumentUpdate(con, (LeaveRequestDocumentWithStream)doc);
+			}
+			for (LeaveRequestDocument doc : changeSet.deleted) {
+				docDao.deleteById(con, doc.getLeaveRequestDocumentId());
 			}
 			
 			DbUtils.commitQuietly(con);
@@ -3684,39 +2480,6 @@ public class DrmManager extends BaseManager {
 			DbUtils.closeQuietly(con);
 		}
 	}
-	
-	public static List<LocalDate> getDateRange(LocalDate start, LocalDate end) {
-        List<LocalDate> ret = new ArrayList<LocalDate>();
-        LocalDate tmp = start;
-        while(tmp.isBefore(end) || tmp.equals(end)) {
-            ret.add(tmp);
-            tmp = tmp.plusDays(1);
-        }
-        return ret;
-    }
-	
-	public String getHourRange(String start, String end) {
-        String[] fractions1 = start.split(":");
-		String[] fractions2 = end.split(":");
-		
-		Integer hours1 = Integer.parseInt(fractions1[0]);
-		Integer hours2 = Integer.parseInt(fractions2[0]);
-		Integer minutes1 = Integer.parseInt(fractions1[1]);
-		Integer minutes2 = Integer.parseInt(fractions2[1]); 
-		
-		int hourDiff = hours2- hours1;
-		
-		int minutesDiff = minutes2 - minutes1;
-		
-		if (minutesDiff < 0) {
-			minutesDiff = 60 + minutesDiff;
-			hourDiff--;
-		}
-		if (hourDiff < 0) {
-			hourDiff = 24 + hourDiff ;
-		}
-		return hourDiff + "." + minutesDiff;
-    }
 
 	public void deleteLeaveRequest(Integer leaveRequestId) throws WTException {
 
@@ -3748,133 +2511,26 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	private LeaveRequest createLeaveRequest(OLeaveRequest oLr) {
-		if (oLr == null) {
-			return null;
-		}
-		LeaveRequest lr = new LeaveRequest();
-		lr.setLeaveRequestId(oLr.getLeaveRequestId());
-		lr.setDomainId(oLr.getDomainId());
-		lr.setCompanyId(oLr.getCompanyId());
-		lr.setUserId(oLr.getUserId());
-		lr.setManagerId(oLr.getManagerId());
-		lr.setType(oLr.getType());
-		lr.setFromDate(oLr.getFromDate());
-		lr.setToDate(oLr.getToDate());
-		lr.setFromHour(oLr.getFromHour());
-		lr.setToHour(oLr.getToHour());
-		lr.setStatus(oLr.getStatus());
-		lr.setNotes(oLr.getNotes());
-		lr.setCancRequest(oLr.getEmployeeCancReq());
-		lr.setResult(oLr.getResult());
-		lr.setCancReason(oLr.getCancReason());
-		lr.setCancResult(oLr.getCancResult());
-
-		return lr;
-	}
-
-	private OLeaveRequest createOLeaveRequest(LeaveRequest lr) {
-		if (lr == null) {
-			return null;
-		}
-		OLeaveRequest oLr = new OLeaveRequest();
-		oLr.setLeaveRequestId(lr.getLeaveRequestId());
-		oLr.setDomainId(lr.getDomainId());
-		oLr.setCompanyId(lr.getCompanyId());
-		oLr.setUserId(lr.getUserId());
-		oLr.setManagerId(lr.getManagerId());
-		oLr.setType(lr.getType());
-		oLr.setFromDate(lr.getFromDate());
-		oLr.setToDate(lr.getToDate());
-		oLr.setFromHour(lr.getFromHour());
-		oLr.setToHour(lr.getToHour());
-		oLr.setStatus(lr.getStatus());
-		oLr.setNotes(lr.getNotes());
-		oLr.setResult(lr.getResult());
-		oLr.setEmployeeCancReq(lr.getCancRequest());
-		oLr.setCancReason(lr.getCancReason());
-		oLr.setCancResult(lr.getCancResult());
-
-		return oLr;
-	}
-
-	private OLeaveRequestDocument createOLeaveRequestDocument(LeaveRequestDocument doc) {
-
-		if (doc == null) {
-			return null;
-		}
-
-		OLeaveRequestDocument oDoc = new OLeaveRequestDocument();
-		oDoc.setLeaveRequestDocumentId(doc.getLeaveRequestDocumentId());
-		oDoc.setLeaveRequestId(doc.getLeaveRequestId());
-		oDoc.setFilename(doc.getFileName());
-		oDoc.setSize(doc.getSize());
-		oDoc.setMediaType(doc.getMediaType());
-
-		return oDoc;
-	}
-
-	private LeaveRequestDocument createLeaveRequestDocument(OLeaveRequestDocument oDoc) {
-
-		if (oDoc == null) {
-			return null;
-		}
-
-		LeaveRequestDocument doc = new LeaveRequestDocument();
-		doc.setLeaveRequestDocumentId(oDoc.getLeaveRequestDocumentId());
-		doc.setLeaveRequestId(oDoc.getLeaveRequestId());
-		doc.setFileName(oDoc.getFilename());
-		doc.setSize(oDoc.getSize());
-		doc.setMediaType(oDoc.getMediaType());
-
-		return doc;
-	}
-
-	public String getLeaveRequestPath(Integer leaveRequestId) {
-
-		return PathUtils.concatPathParts(WT.getServiceHomePath(getTargetProfileId().getDomainId(), SERVICE_ID),
-				"LeaveRequest", leaveRequestId.toString());
-
-	}
-
-	public LeaveRequestDocument getLeaveRequestDocument(String leaveRequestDocumentId) throws WTException {
+	public LeaveRequestDocumentWithBytes getLeaveRequestDocument(Integer lrId, String leaveRequestDocumentId) throws WTException {
 		Connection con = null;
 		LeaveRequestDocumentDAO docDao = LeaveRequestDocumentDAO.getInstance();
-		LeaveRequestDocument doc = null;
+		OLeaveRequestDocument oDoc = null;
 		try {
 
 			con = WT.getConnection(SERVICE_ID);
 
-			doc = createLeaveRequestDocument(docDao.select(con, leaveRequestDocumentId));
-
-			return doc;
+			oDoc = docDao.select(con, leaveRequestDocumentId);
+			if(oDoc == null) return null;
+			
+			OLeaveRequestDocumentData oDocData = docDao.selectBytesById(con, leaveRequestDocumentId);
+			if(oDocData == null) return null;
+			
+			return ManagerUtils.fillLeaveRequestDocument(new LeaveRequestDocumentWithBytes(oDocData.getBytes()), oDoc);
 
 		} catch (SQLException | DAOException ex) {
 			throw new WTException(ex, "DB error");
 		} finally {
 			DbUtils.closeQuietly(con);
-		}
-	}
-
-	public FileContent getLeaveRequestDocumentContent(String leaveRequestDocumentId) throws WTException {
-
-		LeaveRequestDocument doc = getLeaveRequestDocument(leaveRequestDocumentId);
-
-		if (doc == null) {
-			return null;
-		}
-
-		File file = new File(getLeaveRequestPath(doc.getLeaveRequestId()),
-				PathUtils.addFileExension(doc.getLeaveRequestDocumentId().toString(),
-						PathUtils.getFileExtension(doc.getFileName())));
-
-		if (!file.canRead() || !file.exists()) {
-			throw new WTException("File not exists or not readable [{0}]", file.getAbsolutePath());
-		}
-		try {
-			return new FileContent(doc.getFileName(), file.length(), doc.getMediaType(), new FileInputStream(file));
-		} catch (FileNotFoundException ex) {
-			throw new WTException("File not found", ex);
 		}
 	}
 	
@@ -3888,11 +2544,11 @@ public class DrmManager extends BaseManager {
 		try {
 			con = WT.getConnection(SERVICE_ID);
 
-			setting = createTimetableSetting(tSettDao.selectByDomainId(con, getTargetProfileId().getDomainId()));
+			setting = ManagerUtils.createTimetableSetting(tSettDao.selectByDomainId(con, getTargetProfileId().getDomainId()));
 			
 			if (setting != null) {
 				for (OHolidayDate oHd : hdDao.selectByDomain(con, getTargetProfileId().getDomainId())) {
-					setting.getHolidayDates().add(createHolidayDate(oHd));
+					setting.getHolidayDates().add(ManagerUtils.createHolidayDate(oHd));
 				}
 			}
 			return setting;
@@ -3902,56 +2558,6 @@ public class DrmManager extends BaseManager {
 		} finally {
 			DbUtils.closeQuietly(con);
 		}
-	}
-	
-	private OTimetableSetting createOTimetableSetting(TimetableSetting tSetting) {
-		if (tSetting == null) {
-			return null;
-		}
-		OTimetableSetting oSetting = new OTimetableSetting();
-		oSetting.setTimetableSettingId(tSetting.getTimetableSettingId());
-		oSetting.setDomainId(tSetting.getDomainId());
-		oSetting.setCompanyExit(tSetting.getCompanyExit());
-		oSetting.setManageStamp(tSetting.getManageStamp());
-		oSetting.setAllowedAddresses(tSetting.getAllowedAddresses());
-		oSetting.setAllowedUsers(tSetting.getAllowedUsers());
-		oSetting.setStaffOfficeEmail(tSetting.getStaffOfficeEmail());
-		oSetting.setRequestsHolidaysPermitsPreviousDates(tSetting.getRequestsHolidaysPermitsPreviousDates());
-		oSetting.setTotalToleranceInMinutes(tSetting.getTotalToleranceInMinutes());
-		oSetting.setRounding(tSetting.getRounding());
-		oSetting.setMinimumExtraordinary(tSetting.getMinimumExtraordinary());
-		oSetting.setBreakAnomaly(tSetting.getBreakAnomaly());
-		oSetting.setReadOnlyEvents(tSetting.getReadOnlyEvents());
-		oSetting.setRequestsPermitsNotRemunered(tSetting.getRequestsPermitsNotRemunered());
-		oSetting.setRequestsPermitsMedicalVisits(tSetting.getRequestsPermitsMedicalVisits());
-		oSetting.setRequestsPermitsContractuals(tSetting.getRequestsPermitsContractuals());
-
-		return oSetting;
-	}
-
-	private TimetableSetting createTimetableSetting(OTimetableSetting oTSetting) {
-		if (oTSetting == null) {
-			return null;
-		}
-		TimetableSetting tSetting = new TimetableSetting();
-		tSetting.setTimetableSettingId(oTSetting.getTimetableSettingId());
-		tSetting.setDomainId(oTSetting.getDomainId());
-		tSetting.setCompanyExit(oTSetting.getCompanyExit());
-		tSetting.setManageStamp(oTSetting.getManageStamp());
-		tSetting.setAllowedAddresses(oTSetting.getAllowedAddresses());
-		tSetting.setAllowedUsers(oTSetting.getAllowedUsers());
-		tSetting.setStaffOfficeEmail(oTSetting.getStaffOfficeEmail());
-		tSetting.setRequestsHolidaysPermitsPreviousDates(oTSetting.getRequestsHolidaysPermitsPreviousDates());
-		tSetting.setTotalToleranceInMinutes(oTSetting.getTotalToleranceInMinutes());
-		tSetting.setRounding(oTSetting.getRounding());
-		tSetting.setMinimumExtraordinary(oTSetting.getMinimumExtraordinary());
-		tSetting.setBreakAnomaly(oTSetting.getBreakAnomaly());
-		tSetting.setReadOnlyEvents(oTSetting.getReadOnlyEvents());
-		tSetting.setRequestsPermitsNotRemunered(oTSetting.getRequestsPermitsNotRemunered());
-		tSetting.setRequestsPermitsMedicalVisits(oTSetting.getRequestsPermitsMedicalVisits());
-		tSetting.setRequestsPermitsContractuals(oTSetting.getRequestsPermitsContractuals());
-
-		return tSetting;
 	}
 	
 	public void updateTimetableSetting(TimetableSetting item) throws WTException {
@@ -3965,7 +2571,7 @@ public class DrmManager extends BaseManager {
 
 			TimetableSetting oldTimetableSetting = getTimetableSetting();
 
-			OTimetableSetting setting = createOTimetableSetting(item);
+			OTimetableSetting setting = ManagerUtils.createOTimetableSetting(item);
 
 			if (oldTimetableSetting == null) {
 
@@ -3983,7 +2589,7 @@ public class DrmManager extends BaseManager {
 			CollectionChangeSet<HolidayDate> changesSet1 = getCollectionChanges(hds, item.getHolidayDates());
 			for (HolidayDate hd : changesSet1.inserted) {
 
-				OHolidayDate oHd = createOHolidayDate(hd);
+				OHolidayDate oHd = ManagerUtils.createOHolidayDate(hd);
 				oHd.setDomainId(getTargetProfileId().getDomainId());
 
 				hdDao.insert(con, oHd);
@@ -3995,7 +2601,7 @@ public class DrmManager extends BaseManager {
 
 			for (HolidayDate hd : changesSet1.updated) {
 
-				OHolidayDate oHd = createOHolidayDate(hd);
+				OHolidayDate oHd = ManagerUtils.createOHolidayDate(hd);
 				OHolidayDate newOHd = null;
 				
 				newOHd = hdDao.selectByDomainDate(con, oHd.getDomainId(), DateTime.parse(oHd.getDate().toString()));
@@ -4022,13 +2628,13 @@ public class DrmManager extends BaseManager {
 			WorkTypeDAO typeDao = WorkTypeDAO.getInstance();
 			BusinessTripDao tripDao = BusinessTripDao.getInstance();
 
-			OWorkReportSetting newWorkSetting = createOWorkReportSetting(wrkSett);
+			OWorkReportSetting newWorkSetting = ManagerUtils.createOWorkReportSetting(wrkSett);
 			newWorkSetting.setWorkReportSettingId(settingDao.getSequence(con).intValue());
 			newWorkSetting.setDomainId(getTargetProfileId().getDomainId());
 
 			OWorkType newWrkType = null;
 			for (WorkType t : wrkSett.getTypes()) {
-				newWrkType = createOWorkType(t);
+				newWrkType = ManagerUtils.createOWorkType(t);
 				newWrkType.setWorkTypeId(typeDao.getSequence(con).intValue());
 				newWrkType.setDomainId(wrkSett.getDomainId());
 
@@ -4037,7 +2643,7 @@ public class DrmManager extends BaseManager {
 
 			OBusinessTrip newBusinessTrip = null;
 			for (BusinessTrip t : wrkSett.getTrips()) {
-				newBusinessTrip = createOBusinessTrip(t);
+				newBusinessTrip = ManagerUtils.createOBusinessTrip(t);
 				newBusinessTrip.setBusinessTripId(typeDao.getSequence(con).intValue());
 				newBusinessTrip.setDomainId(wrkSett.getDomainId());
 
@@ -4075,7 +2681,7 @@ public class DrmManager extends BaseManager {
 
 			WorkReportSetting oldWorkReportSetting = getWorkReportSetting();
 
-			OWorkReportSetting setting = createOWorkReportSetting(item);
+			OWorkReportSetting setting = ManagerUtils.createOWorkReportSetting(item);
 
 			if (oldWorkReportSetting == null) {
 
@@ -4101,7 +2707,7 @@ public class DrmManager extends BaseManager {
 
 			for (WorkType type : changesSet1.inserted) {
 
-				OWorkType oType = createOWorkType(type);
+				OWorkType oType = ManagerUtils.createOWorkType(type);
 
 				oType.setWorkTypeId(typeDao.getSequence(con).intValue());
 				oType.setDomainId(getTargetProfileId().getDomainId());
@@ -4115,7 +2721,7 @@ public class DrmManager extends BaseManager {
 
 			for (WorkType type : changesSet1.updated) {
 
-				OWorkType oType = createOWorkType(type);
+				OWorkType oType = ManagerUtils.createOWorkType(type);
 
 				typeDao.update(con, oType);
 			}
@@ -4126,7 +2732,7 @@ public class DrmManager extends BaseManager {
 
 			for (BusinessTrip trip : changesSet2.inserted) {
 
-				OBusinessTrip oTrip = createOBusinessTrip(trip);
+				OBusinessTrip oTrip = ManagerUtils.createOBusinessTrip(trip);
 
 				oTrip.setBusinessTripId(typeDao.getSequence(con).intValue());
 				oTrip.setDomainId(getTargetProfileId().getDomainId());
@@ -4140,7 +2746,7 @@ public class DrmManager extends BaseManager {
 
 			for (BusinessTrip trip : changesSet2.updated) {
 
-				OBusinessTrip oTrip = createOBusinessTrip(trip);
+				OBusinessTrip oTrip = ManagerUtils.createOBusinessTrip(trip);
 
 				tripDao.update(con, oTrip);
 			}
@@ -4152,126 +2758,6 @@ public class DrmManager extends BaseManager {
 		} finally {
 			DbUtils.closeQuietly(con);
 		}
-	}
-
-	private OWorkReportSetting createOWorkReportSetting(WorkReportSetting wrkSetting) {
-		if (wrkSetting == null) {
-			return null;
-		}
-		OWorkReportSetting oSetting = new OWorkReportSetting();
-		oSetting.setWorkReportSettingId(wrkSetting.getWorkReportSettingId());
-		oSetting.setDomainId(wrkSetting.getDomainId());
-		oSetting.setWarrantyText(wrkSetting.getWarrantyText());
-
-		return oSetting;
-	}
-
-	private WorkReportSetting createWorkReportSetting(OWorkReportSetting oWrkSetting) {
-		if (oWrkSetting == null) {
-			return null;
-		}
-		WorkReportSetting wrkSetting = new WorkReportSetting();
-		wrkSetting.setWorkReportSettingId(oWrkSetting.getWorkReportSettingId());
-		wrkSetting.setDomainId(oWrkSetting.getDomainId());
-		wrkSetting.setWarrantyText(oWrkSetting.getWarrantyText());
-
-		return wrkSetting;
-	}
-
-	private WorkType createWorkType(OWorkType oType) {
-
-		if (oType == null) {
-			return null;
-		}
-
-		WorkType type = new WorkType();
-		type.setWorkTypeId(oType.getWorkTypeId());
-		type.setDomainId(oType.getDomainId());
-		type
-				.setRevisionStatus(EnumUtils.forSerializedName(oType.getRevisionStatus(), WorkType.RevisionStatus.class
-				));
-		type.setExternalId(oType.getExternalId());
-		type.setDescription(oType.getDescription());
-
-		return type;
-	}
-
-	private OWorkType createOWorkType(WorkType type) {
-
-		if (type == null) {
-			return null;
-		}
-
-		OWorkType oType = new OWorkType();
-		oType.setWorkTypeId(type.getWorkTypeId());
-		oType.setDomainId(type.getDomainId());
-		oType.setRevisionStatus(EnumUtils.toSerializedName(type.getRevisionStatus()));
-		oType.setExternalId(type.getExternalId());
-		oType.setDescription(type.getDescription());
-
-		return oType;
-	}
-	
-	private HolidayDate createHolidayDate(OHolidayDate oHd) {
-
-		if (oHd == null) {
-			return null;
-		}
-
-		HolidayDate hd = new HolidayDate();
-		hd.setDomainId(oHd.getDomainId());
-		hd.setDate(oHd.getDate());
-		hd.setDescription(oHd.getDescription());
-
-		return hd;
-	}
-
-	private OHolidayDate createOHolidayDate(HolidayDate hd) {
-
-		if (hd == null) {
-			return null;
-		}
-
-		OHolidayDate oHd = new OHolidayDate();
-		oHd.setDomainId(hd.getDomainId());
-		oHd.setDate(hd.getDate());
-		oHd.setDescription(hd.getDescription());
-
-		return oHd;
-	}
-
-	private BusinessTrip createBusinessTrip(OBusinessTrip oTrip) {
-
-		if (oTrip == null) {
-			return null;
-		}
-
-		BusinessTrip trip = new BusinessTrip();
-		trip.setBusinessTripId(oTrip.getBusinessTripId());
-		trip.setDomainId(oTrip.getDomainId());
-		trip
-				.setRevisionStatus(EnumUtils.forSerializedName(oTrip.getRevisionStatus(), BusinessTrip.RevisionStatus.class
-				));
-		trip.setExternalId(oTrip.getExternalId());
-		trip.setDescription(oTrip.getDescription());
-
-		return trip;
-	}
-
-	private OBusinessTrip createOBusinessTrip(BusinessTrip trip) {
-
-		if (trip == null) {
-			return null;
-		}
-
-		OBusinessTrip oTrip = new OBusinessTrip();
-		oTrip.setBusinessTripId(trip.getBusinessTripId());
-		oTrip.setDomainId(trip.getDomainId());
-		oTrip.setRevisionStatus(EnumUtils.toSerializedName(trip.getRevisionStatus()));
-		oTrip.setExternalId(trip.getExternalId());
-		oTrip.setDescription(trip.getDescription());
-
-		return oTrip;
 	}
 
 	public List<OWorkType> listWorkType() throws WTException {
@@ -4409,7 +2895,7 @@ public class DrmManager extends BaseManager {
 			if(cmp == null) throw new WTException("Unable to retrieve company [{0}]", companyId);
 			
 			OCompanyPicture pic = cpicDao.select(con, companyId);
-			return createCompanyPicture(pic);
+			return ManagerUtils.createCompanyPicture(pic);
 			
 		} catch(SQLException | DAOException ex) {
 			throw new WTException(ex, "DB error");
@@ -4445,20 +2931,6 @@ public class DrmManager extends BaseManager {
 		} finally {
 			DbUtils.closeQuietly(con);
 		}
-	}
-	
-	private CompanyPicture createCompanyPicture(OCompanyPicture with) {
-		return fillContactPicture(new CompanyPicture(), with);
-	}
-	
-	private CompanyPicture fillContactPicture(CompanyPicture fill, OCompanyPicture with) {
-		if ((fill != null) && (with != null)) {
-			fill.setWidth(with.getWidth());
-			fill.setHeight(with.getHeight());
-			fill.setMediaType(with.getMediaType());
-			fill.setBytes(with.getBytes());
-		}
-		return fill;
 	}
 	
 	public void doUpdateCompanyPicture(Connection con, int companyId, CompanyPicture picture) throws IOException, DAOException {
@@ -4545,60 +3017,6 @@ public class DrmManager extends BaseManager {
 			DbUtils.closeQuietly(con);
 		}
 	}
-	
-	private DrmLineManager createLineManager(ODrmLineManager oLineManager) {
-
-		if (oLineManager == null) {
-			return null;
-		}
-
-		DrmLineManager manager = new DrmLineManager();
-		manager.setDomainId(oLineManager.getDomainId());
-		manager.setUserId(oLineManager.getUserId());
-
-		return manager;
-	}
-	
-	private ODrmLineManager createODrmLineManager(DrmLineManager manager) {
-
-		if (manager == null) {
-			return null;
-		}
-
-		ODrmLineManager oManager = new ODrmLineManager();
-		oManager.setDomainId(manager.getDomainId());
-		oManager.setUserId(manager.getUserId());
-
-		return oManager;
-	}
-	
-	private UserForManager createUserForManager(ODrmLineManagerUsers oLineManagerUser) {
-
-		if (oLineManagerUser == null) {
-			return null;
-		}
-
-		UserForManager userForManager = new UserForManager();
-		userForManager.setDomainId(oLineManagerUser.getDomainId());
-		userForManager.setManagerUserId(oLineManagerUser.getLineManagerUserId());
-		userForManager.setUserId(oLineManagerUser.getUserId());
-
-		return userForManager;
-	}
-	
-	private ODrmLineManagerUsers createODrmLineManagerUser(UserForManager ufm) {
-
-		if (ufm == null) {
-			return null;
-		}
-
-		ODrmLineManagerUsers oLmu = new ODrmLineManagerUsers();
-		oLmu.setDomainId(ufm.getDomainId());
-		oLmu.setLineManagerUserId(ufm.getManagerUserId());
-		oLmu.setUserId(ufm.getUserId());
-
-		return oLmu;
-	}
 
 	public DrmLineManager getDrmLineManager(String userId) throws WTException {
 		Connection con = null;
@@ -4610,10 +3028,10 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID);
 
-			manager = createLineManager(mngDao.selectLineManagerByDomainUserId(con, getTargetProfileId().getDomainId(), userId));
+			manager = ManagerUtils.createLineManager(mngDao.selectLineManagerByDomainUserId(con, getTargetProfileId().getDomainId(), userId));
 
 			for (ODrmLineManagerUsers olmu : ufmngDao.listByDomainLineManagerUserId(con, getTargetProfileId().getDomainId(), userId)) {
-				manager.getAssociatedUsers().add(createUserForManager(olmu));
+				manager.getAssociatedUsers().add(ManagerUtils.createUserForManager(olmu));
 			}
 
 			return manager;
@@ -4634,7 +3052,7 @@ public class DrmManager extends BaseManager {
 			DrmLineManagerDAO mngDao = DrmLineManagerDAO.getInstance();
 			DrmUserForManagerDAO ufmngDao = DrmUserForManagerDAO.getInstance();
 
-			ODrmLineManager newDrmLineManager = createODrmLineManager(lineManager);
+			ODrmLineManager newDrmLineManager = ManagerUtils.createODrmLineManager(lineManager);
 			newDrmLineManager.setDomainId(getTargetProfileId().getDomainId());
 
 			ODrmLineManagerUsers newLmu = null;
@@ -4642,7 +3060,7 @@ public class DrmManager extends BaseManager {
 			for (UserForManager ufm : lineManager.getAssociatedUsers()) {
 				ufm.setManagerUserId(newDrmLineManager.getUserId());
 				ufm.setDomainId(getTargetProfileId().getDomainId());
-				newLmu = createODrmLineManagerUser(ufm);
+				newLmu = ManagerUtils.createODrmLineManagerUser(ufm);
 
 				ufmngDao.insert(con, newLmu);
 			}
@@ -4674,13 +3092,13 @@ public class DrmManager extends BaseManager {
 		try {
 			DrmLineManager oldDrmLineManage = getDrmLineManager(item.getUserId());
 			DrmUserForManagerDAO ufmngDao = DrmUserForManagerDAO.getInstance();
-			ODrmLineManager manager = createODrmLineManager(item);
+			ODrmLineManager manager = ManagerUtils.createODrmLineManager(item);
 			
 			con = WT.getConnection(SERVICE_ID, false);
 			
 			LangUtils.CollectionChangeSet<UserForManager> changesSet1 = LangUtils.getCollectionChanges(oldDrmLineManage.getAssociatedUsers(), item.getAssociatedUsers());
 			for (UserForManager ufm : changesSet1.inserted) {
-				final ODrmLineManagerUsers oufm = fillODrmLineManagerUsers(new ODrmLineManagerUsers(), ufm);
+				final ODrmLineManagerUsers oufm = ManagerUtils.fillODrmLineManagerUsers(new ODrmLineManagerUsers(), ufm);
 				oufm.setDomainId(getTargetProfileId().getDomainId());
 				oufm.setLineManagerUserId(item.getUserId());
 				ufmngDao.insert(con, oufm);
@@ -4742,7 +3160,7 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID);
 
-			employeeProfile = createEmployeeProfile(epDao.selectEmployeeProfileById(con, id));
+			employeeProfile = ManagerUtils.createEmployeeProfile(epDao.selectEmployeeProfileById(con, id));
 
 			return employeeProfile;
 
@@ -4763,10 +3181,10 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID);
 
-			hProfile = createHourProfile(hpDao.selectHourProfileById(con, id));
+			hProfile = ManagerUtils.createHourProfile(hpDao.selectHourProfileById(con, id));
 
 			for (OLineHour oEH : lhDao.selectLineHourByHourProfileId(con, id)) {
-				hProfile.getLineHours().add(createLineHour(oEH));
+				hProfile.getLineHours().add(ManagerUtils.createLineHour(oEH));
 			}
 
 			return hProfile;
@@ -4789,7 +3207,7 @@ public class DrmManager extends BaseManager {
 
 			TimetableStampDAO tsDao = TimetableStampDAO.getInstance();
 
-			OTimetableStamp oTS = createOTimetableStamp(stamp);
+			OTimetableStamp oTS = ManagerUtils.createOTimetableStamp(stamp);
 			
 			//Check stamps, if not exixt insert a new object, else check exit
 			stamps = tsDao.getDailyStampsByDomainUserIdType(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), oTS.getType());
@@ -4888,7 +3306,7 @@ public class DrmManager extends BaseManager {
 			con = WT.getConnection(SERVICE_ID, false);
 
 			TimetableStampDAO tsDao = TimetableStampDAO.getInstance();
-			OTimetableStamp oTs = createOTimetableStamp(ts);
+			OTimetableStamp oTs = ManagerUtils.createOTimetableStamp(ts);
 			
 			oTs.setId(tsDao.getSequence(con).intValue());
 			oTs.setDomainId(getTargetProfileId().getDomainId());
@@ -4997,9 +3415,9 @@ public class DrmManager extends BaseManager {
 						te = teDao.getEventsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
 
 						ttrs.addAll(mergeStampByDate(trsf, con));
-						ttrs.addAll(mergeEventByDate(createOTimetableReport(te)));
+						ttrs.addAll(ManagerUtils.mergeEventByDate(ManagerUtils.createOTimetableReport(te)));
 						
-						ttrs = mergeStampAndEventByDate(ttrs);
+						ttrs = ManagerUtils.mergeStampAndEventByDate(ttrs);
 						
 						trs.addAll(ttrs);
 					}
@@ -5009,9 +3427,9 @@ public class DrmManager extends BaseManager {
 					te = teDao.getEventsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.userId, query.fromDay, query.month, query.year);
 
 					trs.addAll(mergeStampByDate(trsf, con));
-					trs.addAll(mergeEventByDate(createOTimetableReport(te)));
+					trs.addAll(ManagerUtils.mergeEventByDate(ManagerUtils.createOTimetableReport(te)));
 					
-					trs = mergeStampAndEventByDate(trs);
+					trs = ManagerUtils.mergeStampAndEventByDate(trs);
 				}
 				
 				//Insert Data in Table
@@ -5062,7 +3480,7 @@ public class DrmManager extends BaseManager {
 		TimetableSettingDAO tsDao = TimetableSettingDAO.getInstance();
 		EmployeeProfileDAO epDao = EmployeeProfileDAO.getInstance();
 		
-		TimetableSetting setting = createTimetableSetting(tsDao.selectByDomainId(con, getTargetProfileId().getDomainId()));
+		TimetableSetting setting = ManagerUtils.createTimetableSetting(tsDao.selectByDomainId(con, getTargetProfileId().getDomainId()));
 		OEmployeeProfile oep = null;
 		Integer tolerance = 0;
 		Integer rounding = 0;
@@ -5082,7 +3500,7 @@ public class DrmManager extends BaseManager {
 				Float wh2f = (wh2 != null) ? Float.parseFloat(wh2) : 0.0f;
 				
 				Float wht = wh1f + wh2f;
-				BigDecimal bd = round(wht, 2);
+				BigDecimal bd = ManagerUtils.round(wht, 2);
 				
 				String val = bd.toString();
 				
@@ -5111,7 +3529,7 @@ public class DrmManager extends BaseManager {
 
 			Float wht = (float) (Float.parseFloat(otr.getWorkingHours()) + tolerance) / 60f;
 
-			BigDecimal bd = round(wht, 2);
+			BigDecimal bd = ManagerUtils.round(wht, 2);
 			String val = bd.toString();
 			
 			rounding = Integer.parseInt(setting.getRounding());
@@ -5140,136 +3558,13 @@ public class DrmManager extends BaseManager {
 		return trsf;
 	}
 	
-	private List<OTimetableReport> mergeEventByDate(List<OTimetableReport> trsf){
-		
-		HashMap<LocalDate, OTimetableReport> hashTr = new HashMap();
-	
-		for(OTimetableReport otr : trsf){
-			if(hashTr.get(otr.getDate().toLocalDate()) == null){
-				hashTr.put(otr.getDate().toLocalDate(), otr);
-			}else{
-				if(hashTr.get(otr.getDate().toLocalDate()).getOvertime() == null)
-					hashTr.get(otr.getDate().toLocalDate()).setOvertime(otr.getOvertime());
-				if(hashTr.get(otr.getDate().toLocalDate()).getPaidLeave() == null)
-					hashTr.get(otr.getDate().toLocalDate()).setPaidLeave(otr.getPaidLeave());
-				if(hashTr.get(otr.getDate().toLocalDate()).getUnpaidLeave() == null)
-					hashTr.get(otr.getDate().toLocalDate()).setUnpaidLeave(otr.getUnpaidLeave());
-				if(hashTr.get(otr.getDate().toLocalDate()).getHoliday() == null)
-					hashTr.get(otr.getDate().toLocalDate()).setHoliday(otr.getHoliday());
-				if(hashTr.get(otr.getDate().toLocalDate()).getMedicalVisit() == null)
-					hashTr.get(otr.getDate().toLocalDate()).setMedicalVisit(otr.getMedicalVisit());
-				if(hashTr.get(otr.getDate().toLocalDate()).getContractual() == null)
-					hashTr.get(otr.getDate().toLocalDate()).setContractual(otr.getContractual());
-			}
-		}
-		
-		return new ArrayList(hashTr.values());
-	}
-	
-	private List<OTimetableReport> mergeStampAndEventByDate(List<OTimetableReport> trsf){
-		
-		HashMap<LocalDate, OTimetableReport> hashTr = new HashMap();
-	
-		for(OTimetableReport otr : trsf){
-			if(hashTr.get(otr.getDate().toLocalDate()) == null){
-				hashTr.put(otr.getDate().toLocalDate(), otr);
-			}else{
-				if(hashTr.get(otr.getDate().toLocalDate()).getWorkingHours() == null)
-					hashTr.get(otr.getDate().toLocalDate()).setWorkingHours(otr.getWorkingHours());
-				if(hashTr.get(otr.getDate().toLocalDate()).getCausal() == null)
-					hashTr.get(otr.getDate().toLocalDate()).setCausal(otr.getCausal());
-				if(hashTr.get(otr.getDate().toLocalDate()).getHour() == null)
-					hashTr.get(otr.getDate().toLocalDate()).setHour(otr.getHour());
-				if(hashTr.get(otr.getDate().toLocalDate()).getDetail() == null)
-					hashTr.get(otr.getDate().toLocalDate()).setDetail(otr.getDetail());
-				if(hashTr.get(otr.getDate().toLocalDate()).getNote() == null)
-					hashTr.get(otr.getDate().toLocalDate()).setNote(otr.getNote());
-				if(hashTr.get(otr.getDate().toLocalDate()).getOvertime() == null)
-					hashTr.get(otr.getDate().toLocalDate()).setOvertime(otr.getOvertime());
-				if(hashTr.get(otr.getDate().toLocalDate()).getPaidLeave() == null)
-					hashTr.get(otr.getDate().toLocalDate()).setPaidLeave(otr.getPaidLeave());
-				if(hashTr.get(otr.getDate().toLocalDate()).getUnpaidLeave() == null)
-					hashTr.get(otr.getDate().toLocalDate()).setUnpaidLeave(otr.getUnpaidLeave());
-				if(hashTr.get(otr.getDate().toLocalDate()).getHoliday() == null)
-					hashTr.get(otr.getDate().toLocalDate()).setHoliday(otr.getHoliday());
-				if(hashTr.get(otr.getDate().toLocalDate()).getMedicalVisit() == null)
-					hashTr.get(otr.getDate().toLocalDate()).setMedicalVisit(otr.getMedicalVisit());
-				if(hashTr.get(otr.getDate().toLocalDate()).getContractual() == null)
-					hashTr.get(otr.getDate().toLocalDate()).setContractual(otr.getContractual());
-			}
-		}
-		
-		//Add empty days into HashMaps
-		if(!trsf.isEmpty()){
-			List<DateTime> dates = new ArrayList();
-			for(int i = trsf.get(0).getDate().dayOfMonth().getMinimumValue(); i <= trsf.get(0).getDate().dayOfMonth().getMaximumValue(); i++){
-				dates.add(trsf.get(0).getDate().withDayOfMonth(i));
-			}
-
-			for(DateTime dt : dates){
-				if(hashTr.get(dt.toLocalDate()) == null){
-					OTimetableReport temp = new OTimetableReport();
-					temp.setDomainId(trsf.get(0).getDomainId());
-					temp.setCompanyId(trsf.get(0).getCompanyId());
-					temp.setUserId(trsf.get(0).getUserId());
-					temp.setDate(dt);
-					
-					hashTr.put(dt.toLocalDate(), temp);
-				}
-			}
-		}
-		
-		return new ArrayList(hashTr.values());
-	}
-	
-	public static BigDecimal round(float d, int decimalPlace) {
-        BigDecimal bd = new BigDecimal(Float.toString(d));
-        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_DOWN);       
-		
-        return bd;
-    }
-	
-	private List<OTimetableReport> createOTimetableReport(List<OTimetableEvent> tel){
-		List<OTimetableReport> trl = new ArrayList();
-		OTimetableReport tr = null;
-		
-		for(OTimetableEvent te : tel){
-			tr = new OTimetableReport();
-			
-			tr.setDomainId(te.getDomainId());
-			tr.setCompanyId(te.getCompanyId());
-			tr.setUserId(te.getUserId());
-			tr.setDate(te.getDate().toDateTimeAtStartOfDay());
-			
-			OLeaveRequestType requestType = EnumUtils.forSerializedName(te.getType(), OLeaveRequestType.class);
-			
-			if(OLeaveRequestType.HOLIDAY.equals(requestType)){
-				tr.setHoliday(te.getHour());
-			}else if(OLeaveRequestType.PAID_LEAVE.equals(requestType)){
-				tr.setPaidLeave(te.getHour());
-			}else if(OLeaveRequestType.UNPAID_LEAVE.equals(requestType)){
-				tr.setUnpaidLeave(te.getHour());
-			}else if(OLeaveRequestType.CONTRACTUAL.equals(requestType)){
-				tr.setContractual(te.getHour());
-			}else if(OLeaveRequestType.MEDICAL_VISIT.equals(requestType)){
-				tr.setMedicalVisit(te.getHour());
-			}else if(OLeaveRequestType.OVERTIME.equals(requestType)){
-				tr.setOvertime(te.getHour());
-			}
-			
-			trl.add(tr);
-		}
-		
-		return trl;
-	}
-	
 	public void updateTimetableReport(TimetableReport item) throws WTException {
 		Connection con = null;
 		TimetableReportDAO trDao = TimetableReportDAO.getInstance();
 		try {
 			con = WT.getConnection(SERVICE_ID, false);
 
-			OTimetableReport oTr = createOTimetableReport(item);
+			OTimetableReport oTr = ManagerUtils.createOTimetableReport(item);
 
 			trDao.update(con, oTr);
 
@@ -5285,27 +3580,6 @@ public class DrmManager extends BaseManager {
 		} finally {
 			DbUtils.closeQuietly(con);
 		}
-	}
-	
-	private OTimetableReport createOTimetableReport(TimetableReport tr) {
-		if (tr == null) {
-			return null;
-		}
-		OTimetableReport oTr = new OTimetableReport();
-		oTr.setId(tr.getId());
-		oTr.setWorkingHours(tr.getWorkingHours());
-		oTr.setOvertime(tr.getOvertime());
-		oTr.setPaidLeave(tr.getPaidLeave());
-		oTr.setUnpaidLeave(tr.getUnpaidLeave());
-		oTr.setHoliday(tr.getHoliday());
-		oTr.setMedicalVisit(tr.getMedicalVisit());
-		oTr.setContractual(tr.getContractual());
-		oTr.setCausal(tr.getCausal());
-		oTr.setHour(tr.getHour());
-		oTr.setDetail(tr.getDetail());
-		oTr.setNote(tr.getNote());
-
-		return oTr;
 	}
 	
 	private void notifyLeaveRequest(OLeaveRequest lr) throws MessagingException, IOException, TemplateException {	
@@ -5396,11 +3670,6 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
-	public static String buildLeaveRequestReplyPublicUrl(String publicBaseUrl, String leaveRequestPublicId, String recipientEmail, String crud, String resp) {
-		String s = PublicService.PUBPATH_CONTEXT_LEAVE_REQUEST + "/" + leaveRequestPublicId + "/" + PublicService.LeaveRequestUrlPath.TOKEN_REPLY + "?aid=" + recipientEmail + "&crud=" + crud + "&resp=" + resp;
-		return PathUtils.concatPaths(publicBaseUrl, s);
-	}
-	
 	public List<OOpportunityField> getOpportunityFieldsByDomainIdTabId(String domainId, String tabId) throws WTException {
 		Connection con = null;
 		OpportunityFieldDAO oFDao = OpportunityFieldDAO.getInstance();
@@ -5420,5 +3689,10 @@ public class DrmManager extends BaseManager {
 		} finally {
 			DbUtils.closeQuietly(con);
 		}
+	}
+	
+	static String buildLeaveRequestReplyPublicUrl(String publicBaseUrl, String leaveRequestPublicId, String recipientEmail, String crud, String resp) {
+		String s = PublicService.PUBPATH_CONTEXT_LEAVE_REQUEST + "/" + leaveRequestPublicId + "/" + PublicService.LeaveRequestUrlPath.TOKEN_REPLY + "?aid=" + recipientEmail + "&crud=" + crud + "&resp=" + resp;
+		return PathUtils.concatPaths(publicBaseUrl, s);
 	}
 }

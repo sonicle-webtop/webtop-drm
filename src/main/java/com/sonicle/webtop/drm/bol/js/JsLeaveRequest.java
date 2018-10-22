@@ -61,7 +61,7 @@ public class JsLeaveRequest {
 	public String cancReason;
 	public Boolean canceResult;
 
-	public List<JsGridLeaveRequestDocument> documents = new ArrayList();
+	public List<Document> documents = new ArrayList();
 
 	public JsLeaveRequest(LeaveRequest lr) {		
 		this.leaveRequestId = lr.getLeaveRequestId();
@@ -81,8 +81,13 @@ public class JsLeaveRequest {
 		this.cancReason = lr.getCancReason();
 		this.canceResult = lr.getCancResult();
 		
-		for (LeaveRequestDocument lrDoc : lr.getDocuments()) {
-			this.documents.add(new JsGridLeaveRequestDocument(lrDoc));
+		documents = new ArrayList<>(lr.getDocuments().size());
+		for (LeaveRequestDocument doc : lr.getDocuments()) {
+			Document jsdoc = new Document();
+			jsdoc.id = doc.getLeaveRequestDocumentId();
+			jsdoc.name = doc.getFileName();
+			jsdoc.size = doc.getSize();
+			documents.add(jsdoc);
 		}
 	}
 
@@ -106,12 +111,15 @@ public class JsLeaveRequest {
 		lr.setCancReason(js.cancReason);
 		lr.setCancResult(js.canceResult);
 		
-		for (JsGridLeaveRequestDocument jsLrDoc : js.documents) {
-
-			lr.getDocuments().add(JsGridLeaveRequestDocument.createLeaveRequestDocument(jsLrDoc));
-
-		}
-
+		// Attachment needs to be treated outside this class in order to have complete access to their streams
+		
 		return lr;
+	}
+	
+	public static class Document {
+		public String id;
+		public String name;
+		public Long size;
+		public String _uplId;
 	}
 }

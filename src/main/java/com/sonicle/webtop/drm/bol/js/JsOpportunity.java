@@ -33,7 +33,6 @@
 package com.sonicle.webtop.drm.bol.js;
 
 import com.sonicle.webtop.drm.model.Opportunity;
-import com.sonicle.webtop.drm.model.OpportunityAction;
 import com.sonicle.webtop.drm.model.OpportunityDocument;
 import com.sonicle.webtop.drm.model.OpportunityInterlocutor;
 import java.util.ArrayList;
@@ -73,7 +72,7 @@ public class JsOpportunity {
 	public Boolean success;
 
 	public List<JsGridOpportunityInterlocutor> interlocutors = new ArrayList();
-	public List<JsGridOpportunityDocument> documents = new ArrayList();
+	public List<Document> documents = new ArrayList();
 
 	public JsOpportunity(Opportunity o) {
 		this.id = o.getId();
@@ -106,8 +105,13 @@ public class JsOpportunity {
 			this.interlocutors.add(new JsGridOpportunityInterlocutor(oInt));
 		}
 		
-		for (OpportunityDocument oDoc : o.getDocuments()) {
-			this.documents.add(new JsGridOpportunityDocument(oDoc));
+		documents = new ArrayList<>(o.getDocuments().size());
+		for (OpportunityDocument doc : o.getDocuments()) {
+			Document jsdoc = new Document();
+			jsdoc.id = doc.getId();
+			jsdoc.name = doc.getFileName();
+			jsdoc.size = doc.getSize();
+			documents.add(jsdoc);
 		}
 	}
 
@@ -146,12 +150,15 @@ public class JsOpportunity {
 
 		}
 		
-		for (JsGridOpportunityDocument jsGridOppDoc : js.documents) {
-
-			o.getDocuments().add(JsGridOpportunityDocument.createOpportunityDocument(jsGridOppDoc));
-
-		}
+		// Attachment needs to be treated outside this class in order to have complete access to their streams
 
 		return o;
+	}
+	
+	public static class Document {
+		public String id;
+		public String name;
+		public Long size;
+		public String _uplId;
 	}
 }

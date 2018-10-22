@@ -41,6 +41,7 @@ import static com.sonicle.webtop.drm.jooq.Tables.WORK_REPORTS_ATTACHMENTS_DATA;
 import com.sonicle.webtop.drm.jooq.tables.records.WorkReportsAttachmentsRecord;
 import java.sql.Connection;
 import java.util.List;
+import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 
 /**
@@ -88,9 +89,12 @@ public class WorkReportAttachmentDAO extends BaseDAO {
 			.fetchOneInto(OWorkReportsAttachmentsData.class);
 	}
 
-	public int insert(Connection con, OWorkReportAttachment item) throws DAOException {
+	public int insert(Connection con, OWorkReportAttachment item, DateTime revisionTimestamp) throws DAOException {
 		DSLContext dsl = getDSL(con);
-
+		
+		item.setRevisionTimestamp(revisionTimestamp);
+		item.setRevisionSequence((short)0);
+		
 		WorkReportsAttachmentsRecord record = dsl.newRecord(WORK_REPORTS_ATTACHMENTS, item);
 
 		return dsl
@@ -98,7 +102,39 @@ public class WorkReportAttachmentDAO extends BaseDAO {
 				.set(record)
 				.execute();
 	}
+	
+	public int insertBytes(Connection con, String attachmentId, byte[] bytes) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+			.insertInto(WORK_REPORTS_ATTACHMENTS_DATA)
+			.set(WORK_REPORTS_ATTACHMENTS_DATA.WORK_REPORT_ATTACHMENT_ID, attachmentId)
+			.set(WORK_REPORTS_ATTACHMENTS_DATA.BYTES, bytes)
+			.execute();
+	}
+	
+	public OWorkReportsAttachmentsData selectBytesById(Connection con, String attachmentId) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+			.select(WORK_REPORTS_ATTACHMENTS_DATA.BYTES)
+			.from(WORK_REPORTS_ATTACHMENTS_DATA)
+			.where(WORK_REPORTS_ATTACHMENTS_DATA.WORK_REPORT_ATTACHMENT_ID.equal(attachmentId))
+			.fetchOneInto(OWorkReportsAttachmentsData.class);
+	}
 
+	public int update(Connection con, OWorkReportAttachment item, DateTime revisionTimestamp) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		item.setRevisionTimestamp(revisionTimestamp);
+		return dsl
+			.update(WORK_REPORTS_ATTACHMENTS)
+			.set(WORK_REPORTS_ATTACHMENTS.FILENAME, item.getFilename())
+			.set(WORK_REPORTS_ATTACHMENTS.SIZE, item.getSize())
+			.set(WORK_REPORTS_ATTACHMENTS.MEDIA_TYPE, item.getMediaType())
+			.where(
+				WORK_REPORTS_ATTACHMENTS.WORK_REPORT_ATTACHMENT_ID.equal(item.getWorkReportAttachmentId())
+			)
+			.execute();
+	}
+	
 	public int deleteById(Connection con, String id) {
 		DSLContext dsl = getDSL(con);
 
@@ -108,6 +144,14 @@ public class WorkReportAttachmentDAO extends BaseDAO {
 						WORK_REPORTS_ATTACHMENTS.WORK_REPORT_ATTACHMENT_ID.equal(id)
 				)
 				.execute();
+	}
+	
+	public int deleteBytesById(Connection con, String attachmentId) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+			.delete(WORK_REPORTS_ATTACHMENTS_DATA)
+			.where(WORK_REPORTS_ATTACHMENTS_DATA.WORK_REPORT_ATTACHMENT_ID.equal(attachmentId))
+			.execute();
 	}
 
 }

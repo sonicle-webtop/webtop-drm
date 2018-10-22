@@ -103,7 +103,7 @@ public class PublicService extends BasePublicService {
 							if(lr != null){
 								if("new".equals(crud)){
 									lr.setResult(responseStatus);
-									adminDrmMgr.updateLeaveRequest(lr, null, true);
+									adminDrmMgr.updateLeaveRequest(lr, true);
 								} else if("delete".equals(crud)){
 									adminDrmMgr.updateCancellationLeaveRequest(Integer.valueOf(lrUrlPath.getPublicUid()), responseStatus);
 								} else{

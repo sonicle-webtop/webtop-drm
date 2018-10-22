@@ -35,6 +35,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 	requires: [
 		'Sonicle.webtop.drm.model.WorkReport',
 		'WTA.ux.data.SimpleSourceModel',
+		'WTA.ux.grid.Attachments',
 		'Sonicle.Bytes',
 		'WTA.ux.UploadBar'
 	],
@@ -588,89 +589,44 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 						}
 					]
 				}, {
+					xtype: 'wtattachmentsgrid',
 					title: me.mys.res('workReport.attachment.tit'),
-					xtype: 'grid',
-					id: gpId,
-					reference: 'gpAttachment',
 					bind: {
 						store: '{record.attachments}'
 					},
-					selModel: {
-						type: 'checkboxmodel',
-						mode: 'MULTI'
-					},
-					columns: [
-						{
-							xtype: 'solinkcolumn',
-							dataIndex: 'fileName',
-							header: me.mys.res('gpWorkReportAttachment.filename.lbl'),
-							flex: 3,
-							listeners: {
-								linkclick: function (s, idx, rec) {
-									me.downloadAttachment([rec.getId()]);
-								}
-							}
-						}, {
-							xtype: 'sobytescolumn',
-							dataIndex: 'size',
-							header: me.mys.res('gpWorkReportAttachment.size.lbl'),
-							flex: 1
-						}
-					],
-					tbar: [
-						me.getAct('downloadAttachment'),
-						me.getAct('openAttachment'),
-						me.getAct('deleteAttachment')
-					],
-					bbar: {
-						xtype: 'wtuploadbar',
-						sid: me.mys.ID,
-						uploadContext: 'UploadWorkReportAttachment',
-						dropElement: gpId,
-						listeners: {
-							fileuploaded: function (s, file, json) {
-								me.addDocument(json.data.uploadId, file);
-							}
-						}
-					},
+					sid: me.mys.ID,
+					uploadContext: 'WorkReportAttachment',
+					uploadTag: WT.uiid(me.getId()),
+					dropElementId: me.getId(),
+					typeField: 'ext',
 					listeners: {
-						rowcontextmenu: function (s, rec, itm, i, e) {
-							var sm = s.getSelectionModel();
-							sm.select(rec);
-							WT.showContextMenu(e, me.getRef('cxmGridDocument'), {
-								file: rec
-							});
+						attachmentlinkclick: function(s, rec) {
+							me.openAttachmentUI(rec, false);
 						},
-						select: function (s, rec, i, e) {
-							me.updateDisabled('downloadAttachment');
-							me.updateDisabled('openAttachment');
-							me.updateDisabled('deleteAttachment');
+						attachmentdownloadclick: function(s, rec) {
+							me.openAttachmentUI(rec, true);
+						},
+						attachmentdeleteclick: function(s, rec) {
+							s.getStore().remove(rec);
+						},
+						attachmentuploaded: function(s, uploadId, file) {
+							var sto = s.getStore();
+							sto.add(sto.createModel({
+								name: file.name,
+								size: file.size,
+								_uplId: uploadId
+							}));
+							me.getComponent(0).getLayout().setActiveItem(s);
 						}
-					},
-					plugins: [{
-						ptype: 'sofiledrop',
-						text: WT.res('sofiledrop.text')
-					}]
+					}
 				}
 			]
 		});
 
 		me.on('viewinvalid', me.onViewInvalid);
 		me.on('viewload', me.onViewLoad);
+		me.on('viewclose', me.onViewClose);
 
-	},
-	gpAttachment: function () {
-		this.lref('gpAttachment');
-	},
-	getSelectedFiles: function () {
-		return this.lref('gpAttachment').getSelection();
-	},
-	selectionIds: function (sel) {
-		var ids = [];
-		Ext.iterate(sel, function (rec) {
-			ids.push(rec.getId());
-		});
-		return ids;
 	},
 	addDetail: function () {
 		var me = this;
@@ -702,39 +658,29 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 			}
 		}, me);
 	},
-	addDocument: function (uploadId, file) {
-		var me = this;
-		var gp = me.lref('gpAttachment'),
-				sto = gp.getStore();
-
-		sto.add(sto.createModel({
-			id: uploadId,
-			fileName: file.name,
-			size: file.size,
-			mediaType: file.type
-		}));
-	},
-	deleteDocument: function (rec) {
+	openAttachmentUI: function(rec, download) {
 		var me = this,
-				grid = me.lref('gpAttachment'),
-				sto = grid.getStore();
-
-		WT.confirm(WT.res('confirm.delete'), function (bid) {
-			if (bid === 'yes') {
-				sto.remove(rec);
-			}
-		}, me);
-	},
-	openAttachments: function (attachmentIds) {
-		Sonicle.URLMgr.openFile(WTF.processBinUrl(this.mys.ID, 'DownloadWorkReportAttachment', {
-			attachmentIds: WTU.arrayAsParam(attachmentIds)
-		}));
-	},
-	downloadAttachment: function (attachmentIds) {
-		Sonicle.URLMgr.openFile(WTF.processBinUrl(this.mys.ID, 'DownloadWorkReportAttachment', {
-			raw: 1,
-			attachmentIds: WTU.arrayAsParam(attachmentIds)
-		}));
+				name = rec.get('name'),
+				uploadId = rec.get('_uplId'),
+				url;
+		
+		if (!Ext.isEmpty(uploadId)) {
+			url = WTF.processBinUrl(me.mys.ID, 'DownloadWorkReportAttachment', {
+				inline: !download,
+				uploadId: uploadId
+			});
+		} else {
+			url = WTF.processBinUrl(me.mys.ID, 'DownloadWorkReportAttachment', {
+				inline: !download,
+				wrId: me.getModel().getId(),
+				attachmentId: rec.get('id')
+			});
+		}
+		if (download) {
+			Sonicle.URLMgr.downloadFile(url, {filename: name});
+		} else {
+			Sonicle.URLMgr.openFile(url, {filename: name});
+		}
 	},
 	printWorkReport: function(contactId) {
 		var me = this;
@@ -744,7 +690,6 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 			me.mys.printWorkReport([contactId]);
 		}
 	},
-	
 	onViewLoad: function(s, success) {
 		if(!success) return;
 		var me = this,
@@ -760,89 +705,15 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 		if(mo.get('operatorId') === null) me.lref('flduser').setReadOnly(false);
 	},
 	
+	onViewClose: function(s) {
+		s.mys.cleanupUploadedFiles(WT.uiid(s.getId()));
+	},
+	
 	initActions: function () {
 		var me = this;
-		me.addAct('openAttachment', {
-			tooltip: null,
-			iconCls: 'wtdrm-icon-openAttachment-xs',
-			disabled: true,
-			handler: function () {
-				var sel = me.getSelectedFiles();
-				if (sel.length > 0) {
-					ids = me.selectionIds(sel);
-					me.openAttachments(ids);
-				}
-			}
-		});
-		me.addAct('downloadAttachment', {
-			tooltip: null,
-			iconCls: 'wtdrm-icon-downloadAttachment-xs',
-			disabled: true,
-			handler: function () {
-				var sel = me.getSelectedFiles();
-
-				if (sel.length > 0) {
-					ids = me.selectionIds(sel);
-					me.downloadAttachment(ids);
-				}
-			}
-		});
-		me.addAct('deleteAttachment', {
-			tooltip: null,
-			iconCls: 'wtdrm-icon-deleteAttachment-xs',
-			disabled: true,
-			handler: function () {
-				var sel = me.getSelectedFiles();
-				
-				if (sel.length > 0) {
-					me.deleteDocument(sel);
-				}
-			}
-		});
 	},
 	initCxm: function () {
 		var me = this;
-		me.addRef('cxmGridDocument', Ext.create({
-			xtype: 'menu',
-			items: [
-				me.getAct('openAttachment'),
-				me.getAct('downloadAttachment'),
-				'-',
-				me.getAct('deleteAttachment')
-			],
-			listeners: {
-				beforeshow: function (s) {
-					me.updateDisabled('openAttachment');
-					me.updateDisabled('downloadAttachment');
-					me.updateDisabled('deleteAttachment');
-				}
-			}
-		}));
-	},
-	/**
-	 * @private
-	 */
-	updateDisabled: function (action) {
-		var me = this,
-				dis = me.isDisabled(action);
-		me.setActDisabled(action, dis);
-	},
-	/**
-	 * @private
-	 */
-	isDisabled: function (action) {
-		var me = this, sel;
-		switch (action) {
-			case 'openAttachment':
-				sel = me.getSelectedFiles();
-				return false;
-			case 'downloadAttachment':
-				sel = me.getSelectedFiles();
-				return false;
-			case 'deleteAttachment':
-				sel = me.getSelectedFiles();
-				return false;
-		}
 	},
 	onViewInvalid: function (s, mo, errs) {
 		var me = this;
