@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WorkReports extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord> {
 
-	private static final long serialVersionUID = -1259655762;
+	private static final long serialVersionUID = 968841333;
 
 	/**
 	 * The reference instance of <code>drm.work_reports</code>
@@ -35,11 +35,6 @@ public class WorkReports extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.
 	 * The column <code>drm.work_reports.work_report_id</code>.
 	 */
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.String> WORK_REPORT_ID = createField("work_report_id", org.jooq.impl.SQLDataType.VARCHAR.length(36).nullable(false), this, "");
-
-	/**
-	 * The column <code>drm.work_reports.work_report_no</code>.
-	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.String> WORK_REPORT_NO = createField("work_report_no", org.jooq.impl.SQLDataType.VARCHAR.length(36), this, "");
 
 	/**
 	 * The column <code>drm.work_reports.company_id</code>.
@@ -150,6 +145,16 @@ public class WorkReports extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.
 	 * The column <code>drm.work_reports.day_trasfert</code>.
 	 */
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.Short> DAY_TRASFERT = createField("day_trasfert", org.jooq.impl.SQLDataType.SMALLINT, this, "");
+
+	/**
+	 * The column <code>drm.work_reports.number</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.Integer> NUMBER = createField("number", org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+	/**
+	 * The column <code>drm.work_reports.year</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.Integer> YEAR = createField("year", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
 	 * Create a <code>drm.work_reports</code> table reference

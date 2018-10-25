@@ -57,7 +57,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 			docStatusId: null,
 			chargeTo: null,
 			year: null,
-			workReportNo: null
+			number: null
 		}
 	},
 	
@@ -222,16 +222,10 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 					width: '420px'
 				}),
 				{
-					xtype: 'combo',
+					xtype: 'numberfield',
 					reference: 'fldyear',
 					bind: '{year}',
 					tabIndex: 114,
-					store: Ext.create('Sonicle.webtop.drm.store.YearStore', {
-						autoLoad: true
-
-					}),
-					valueField: 'year',
-					displayField: 'year',
 					triggers: {
 						clear: WTF.clearTrigger()
 					},
@@ -382,14 +376,14 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 					width: '420px'
 				}),
 				{
-					xtype: 'textfield',
-					reference: 'fldworkreportno',
-					bind: '{workReportNo}',
+					xtype: 'numberfield',
+					reference: 'fldnumber',
+					bind: '{number}',
 					tabIndex: 115,
 					triggers: {
 						clear: WTF.clearTrigger()
 					},
-					fieldLabel: WT.res(me.sid, 'workReport.fld-workreportno.lbl'),
+					fieldLabel: WT.res(me.sid, 'workReport.fld-number.lbl'),
 					width: '420px'
 				}
 			]
@@ -408,7 +402,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 			fromDate: SoDate.format(me.lookupReference('fldfrom').getValue(), 'Y-m-d'),
 			toDate: SoDate.format(me.lookupReference('fldto').getValue(), 'Y-m-d'),
 			referenceNo: me.lookupReference('fldreference').getValue(),
-			workReportNo: me.lookupReference('fldworkreportno').getValue(),
+			number: me.lookupReference('fldnumber').getValue(),
 			businessTripId: me.lookupReference('fldbusinesstrip').getValue(),
 			description: me.lookupReference('flddescription').getValue(),
 			notes: me.lookupReference('fldnotes').getValue(),
@@ -433,7 +427,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 			fromDate: SoDate.format(me.lookupReference('fldfrom').getValue(), 'Y-m-d'),
 			toDate: SoDate.format(me.lookupReference('fldto').getValue(), 'Y-m-d'),
 			referenceNo: me.lookupReference('fldreference').getValue(),
-			workReportNo: me.lookupReference('fldworkreportno').getValue(),
+			number: me.lookupReference('fldnumber').getValue(),
 			businessTripId: me.lookupReference('fldbusinesstrip').getValue(),
 			description: me.lookupReference('flddescription').getValue(),
 			notes: me.lookupReference('fldnotes').getValue(),

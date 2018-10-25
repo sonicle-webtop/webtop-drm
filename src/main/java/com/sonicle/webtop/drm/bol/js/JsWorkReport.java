@@ -48,7 +48,8 @@ import org.joda.time.LocalDate;
 public class JsWorkReport {
 
 	public String workReportId;
-	public String workReportNo;
+	public Integer number;
+	public Integer year;
 	public Integer companyId;
 	public String operatorId;
 	public Integer docStatusId;
@@ -76,7 +77,8 @@ public class JsWorkReport {
 
 	public JsWorkReport(WorkReport report, DateTimeZone profileTz, String ownerPid) {
 		this.workReportId = report.getWorkReportId();
-		this.workReportNo = report.getWorkReportNo();
+		this.number = report.getNumber();
+		this.year = report.getYear();
 		this.companyId = report.getCompanyId();
 		this.operatorId = report.getOperatorId();
 		this.docStatusId = report.getDocStatusId();
@@ -117,7 +119,8 @@ public class JsWorkReport {
 
 		WorkReport rw = new WorkReport();
 		rw.setWorkReportId(js.workReportId);
-		rw.setWorkReportNo(js.workReportNo);
+		rw.setNumber(js.number);
+		rw.setYear(js.year);
 		rw.setCompanyId(js.companyId);
 		rw.setOperatorId(js.operatorId);
 		rw.setDocStatusId(js.docStatusId);

@@ -43,7 +43,7 @@ public class WorkReportQuery {
 
 	public Integer companyId;
 	public String operatorId;
-	public String workReportNo;
+	public Integer number;
 	public Integer year;
 	public String customerId;
 	public String customerStatId;

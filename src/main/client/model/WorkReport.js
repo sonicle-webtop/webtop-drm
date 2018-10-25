@@ -47,7 +47,8 @@ Ext.define('Sonicle.webtop.drm.model.WorkReport', {
 	idProperty: 'workReportId',
 	fields: [
 		WTF.field('workReportId', 'string', true),
-		WTF.field('workReportNo', 'string', true),
+		WTF.field('number', 'int', true),
+		WTF.field('year', 'int', true),
 		WTF.field('operatorId', 'string', false),
 		WTF.field('companyId', 'int', false),
 		WTF.field('contactId', 'int', true),

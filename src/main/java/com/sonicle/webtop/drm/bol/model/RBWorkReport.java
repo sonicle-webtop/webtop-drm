@@ -55,11 +55,12 @@ import org.joda.time.DateTime;
 
 /**
  *
- * @author malbinola
+ * @author avasi
  */
 public class RBWorkReport {
 	public String workReportId;
-	public String workReportNo;
+	public Integer number;
+	public Integer year;
 	public Integer companyId;
 	public String companyDescription;
 	public String operatorId;
@@ -102,7 +103,8 @@ public class RBWorkReport {
 		
 	public RBWorkReport(CoreManager coreMgr, DrmManager drmMgr, IContactsManager contactMgr, WorkReport wr, DrmServiceSettings ss, CompanyPicture picture) throws WTException, IOException {		
 		this.workReportId = wr.getWorkReportId();
-		this.workReportNo = wr.getWorkReportNo();
+		this.number = wr.getNumber();
+		this.year = wr.getYear();
 		this.companyId = wr.getCompanyId();
 		this.companyDescription = drmMgr.getCompany(wr.getCompanyId()).getName();
 		this.operatorId = wr.getOperatorId();
@@ -181,12 +183,20 @@ public class RBWorkReport {
 		this.workReportId = workReportId;
 	}
 
-	public String getWorkReportNo() {
-		return workReportNo;
+	public Integer getNumber() {
+		return number;
 	}
 
-	public void setWorkReportNo(String workReportNo) {
-		this.workReportNo = workReportNo;
+	public void setNumber(Integer number) {
+		this.number = number;
+	}
+	
+	public Integer getYear() {
+		return year;
+	}
+
+	public void setYear(Integer year) {
+		this.year = year;
 	}
 
 	public Integer getCompanyId() {

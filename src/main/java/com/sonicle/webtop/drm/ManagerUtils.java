@@ -151,7 +151,8 @@ public class ManagerUtils {
 		}
 		WorkReport wrkRpt = new WorkReport();
 		wrkRpt.setWorkReportId(oWrkRpt.getWorkReportId());
-		wrkRpt.setWorkReportNo(oWrkRpt.getWorkReportNo());
+		wrkRpt.setNumber(oWrkRpt.getNumber());
+		wrkRpt.setYear(oWrkRpt.getYear());
 		wrkRpt.setCompanyId(oWrkRpt.getCompanyId());
 		wrkRpt.setOperatorId(oWrkRpt.getOperatorId());
 		wrkRpt.setRevisionStatus(EnumUtils.forSerializedName(oWrkRpt.getRevisionStatus(), WorkReport.RevisionStatus.class));
@@ -184,7 +185,8 @@ public class ManagerUtils {
 		}
 		OWorkReport oWrkRpt = new OWorkReport();
 		oWrkRpt.setWorkReportId(wrkRpt.getWorkReportId());
-		oWrkRpt.setWorkReportNo(wrkRpt.getWorkReportNo());
+		oWrkRpt.setNumber(wrkRpt.getNumber());
+		oWrkRpt.setYear(wrkRpt.getYear());
 		oWrkRpt.setCompanyId(wrkRpt.getCompanyId());
 		oWrkRpt.setOperatorId(wrkRpt.getOperatorId());
 		oWrkRpt.setRevisionStatus(EnumUtils.toSerializedName(wrkRpt.getRevisionStatus()));

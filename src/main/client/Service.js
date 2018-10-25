@@ -250,14 +250,19 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							},
 							columns: [
 								{
-									dataIndex: 'workReportNo',
-									header: me.res('gpWorkReport.workreportno.lbl'),
+									dataIndex: 'number',
+									header: me.res('gpWorkReport.number.lbl'),
+									flex: 2
+								},
+								{
+									dataIndex: 'year',
+									header: me.res('gpWorkReport.year.lbl'),
 									flex: 1
 								},
 								{
 									dataIndex: 'referenceNo',
 									header: me.res('gpWorkReport.reference.lbl'),
-									flex: 1
+									flex: 2
 								},
 								{
 									xtype: 'solookupcolumn',
@@ -269,7 +274,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									},
 									header: me.res('gpWorkReport.company.lbl'),
 									displayField: 'desc',
-									flex: 1,
+									flex: 3,
 									hidden: true
 								},
 								{
@@ -282,7 +287,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									},
 									header: me.res('gpWorkReport.user.lbl'),
 									displayField: 'desc',
-									flex: 1
+									flex: 3
 								},
 								{
 									xtype: 'solookupcolumn',
@@ -294,7 +299,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									},
 									header: me.res('gpWorkReport.realcustomer.lbl'),
 									displayField: 'desc',
-									flex: 1
+									flex: 3
 								},
 								{
 									xtype: 'solookupcolumn',
@@ -306,7 +311,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									},
 									header: me.res('gpWorkReport.statcustomer.lbl'),
 									displayField: 'desc',
-									flex: 1
+									flex: 3
 								},
 								{
 									xtype: 'solookupcolumn',
@@ -330,21 +335,21 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									},
 									header: me.res('gpWorkReport.causal.lbl'),
 									displayField: 'desc',
-									flex: 1
+									flex: 2
 								},
 								{
 									dataIndex: 'fromDate',
 									header: me.res('gpWorkReport.from.lbl'),
 									xtype: 'datecolumn',
 									format: WT.getShortDateFmt(),
-									flex: 1
+									flex: 2
 								},
 								{
 									dataIndex: 'toDate',
 									header: me.res('gpWorkReport.to.lbl'),
 									xtype: 'datecolumn',
 									format: WT.getShortDateFmt(),
-									flex: 1
+									flex: 2
 								},
 								{
 									xtype: 'solookupcolumn',
@@ -356,7 +361,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									},
 									displayField: 'desc',
 									header: me.res('gpWorkReport.trasfert.lbl'),
-									flex: 1
+									flex: 3
 								},
 								{
 									xtype: 'solookupcolumn',
@@ -368,7 +373,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									},
 									header: me.res('gpWorkReport.docstatus.lbl'),
 									displayField: 'desc',
-									flex: 1,
+									flex: 2,
 									hidden: true
 								},
 								{
@@ -376,7 +381,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									dataIndex: 'freeSupport',
 									header: me.res('gpWorkReport.freesupport.lbl'),
 									disabled: true,
-									flex: 1,
+									flex: 3,
 									hidden: true
 								},
 								{
@@ -384,7 +389,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									dataIndex: 'chargeTo',
 									header: me.res('gpWorkReport.chargeTo.lbl'),
 									disabled: true,
-									flex: 1,
+									flex: 3,
 									hidden: true
 								}
 							],
@@ -1725,7 +1730,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				sto = me.gpWorkReport().getStore(),
 				msg;
 		if (rec) {
-			msg = me.res('act.confirm.delete', Ext.String.ellipsis(rec.get('workReportNo'), 40));
+			msg = me.res('act.confirm.delete', Ext.String.ellipsis(rec.get('number'), 40));
 		} else {
 			msg = me.res('gpWorkReport.confirm.delete.selection');
 		}

@@ -16,10 +16,9 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WorkReports implements java.io.Serializable {
 
-	private static final long serialVersionUID = -745962805;
+	private static final long serialVersionUID = 1585972245;
 
 	private java.lang.String        workReportId;
-	private java.lang.String        workReportNo;
 	private java.lang.Integer       companyId;
 	private java.lang.String        operatorId;
 	private java.lang.String        revisionStatus;
@@ -42,12 +41,13 @@ public class WorkReports implements java.io.Serializable {
 	private java.lang.Boolean       freeSupport;
 	private java.lang.Integer       businessTripId;
 	private java.lang.Short         dayTrasfert;
+	private java.lang.Integer       number;
+	private java.lang.Integer       year;
 
 	public WorkReports() {}
 
 	public WorkReports(
 		java.lang.String        workReportId,
-		java.lang.String        workReportNo,
 		java.lang.Integer       companyId,
 		java.lang.String        operatorId,
 		java.lang.String        revisionStatus,
@@ -69,10 +69,11 @@ public class WorkReports implements java.io.Serializable {
 		java.lang.Boolean       chargeTo,
 		java.lang.Boolean       freeSupport,
 		java.lang.Integer       businessTripId,
-		java.lang.Short         dayTrasfert
+		java.lang.Short         dayTrasfert,
+		java.lang.Integer       number,
+		java.lang.Integer       year
 	) {
 		this.workReportId = workReportId;
-		this.workReportNo = workReportNo;
 		this.companyId = companyId;
 		this.operatorId = operatorId;
 		this.revisionStatus = revisionStatus;
@@ -95,6 +96,8 @@ public class WorkReports implements java.io.Serializable {
 		this.freeSupport = freeSupport;
 		this.businessTripId = businessTripId;
 		this.dayTrasfert = dayTrasfert;
+		this.number = number;
+		this.year = year;
 	}
 
 	public java.lang.String getWorkReportId() {
@@ -103,14 +106,6 @@ public class WorkReports implements java.io.Serializable {
 
 	public void setWorkReportId(java.lang.String workReportId) {
 		this.workReportId = workReportId;
-	}
-
-	public java.lang.String getWorkReportNo() {
-		return this.workReportNo;
-	}
-
-	public void setWorkReportNo(java.lang.String workReportNo) {
-		this.workReportNo = workReportNo;
 	}
 
 	public java.lang.Integer getCompanyId() {
@@ -287,5 +282,21 @@ public class WorkReports implements java.io.Serializable {
 
 	public void setDayTrasfert(java.lang.Short dayTrasfert) {
 		this.dayTrasfert = dayTrasfert;
+	}
+
+	public java.lang.Integer getNumber() {
+		return this.number;
+	}
+
+	public void setNumber(java.lang.Integer number) {
+		this.number = number;
+	}
+
+	public java.lang.Integer getYear() {
+		return this.year;
+	}
+
+	public void setYear(java.lang.Integer year) {
+		this.year = year;
 	}
 }

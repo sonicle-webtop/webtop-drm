@@ -45,7 +45,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 		width: 920,
 		height: 500
 	},
-	fieldTitle: 'workReportNo',
+	fieldTitle: 'number',
 	modelName: 'Sonicle.webtop.drm.model.WorkReport',
 	
 	initComponent: function () {

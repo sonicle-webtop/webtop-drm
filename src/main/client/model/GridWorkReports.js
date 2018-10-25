@@ -36,7 +36,7 @@ Ext.define('Sonicle.webtop.drm.model.GridWorkReports', {
 	idProperty: 'workReportId',
 	fields: [
 		WTF.roField('workReportId', 'string'),
-		WTF.roField('workReportNo', 'string'),
+		WTF.roField('number', 'int'),
 		WTF.roField('companyId', 'int'),
 		WTF.roField('operatorId', 'string'),
 		WTF.roField('customerId', 'string'),

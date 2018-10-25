@@ -1018,3 +1018,18 @@ CREATE TABLE "drm"."work_reports_attachments_data" (
 ALTER TABLE "drm"."work_reports_attachments_data" ADD PRIMARY KEY ("work_report_attachment_id");
 
 ALTER TABLE "drm"."work_reports_attachments_data" ADD FOREIGN KEY ("work_report_attachment_id") REFERENCES "drm"."work_reports_attachments" ("work_report_attachment_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+--------------
+--25/10/2018--
+--------------
+
+ALTER TABLE "drm"."work_reports"
+ADD COLUMN "number" int4,
+ADD COLUMN "year" int4;
+
+update work_reports set 
+"number" = SPLIT_PART(work_report_no, '-', 1) :: INTEGER, 
+"year" = SPLIT_PART(work_report_no, '-', 2) :: INTEGER;
+
+ALTER TABLE "drm"."work_reports"
+DROP COLUMN "work_report_no";

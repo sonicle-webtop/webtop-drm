@@ -104,7 +104,8 @@ public class WorkReportDAO extends BaseDAO {
 		item.setRevisionTimestamp(revisionTimestamp);
 		return dsl
 				.update(WORK_REPORTS)
-				.set(WORK_REPORTS.WORK_REPORT_NO, item.getWorkReportNo())
+				.set(WORK_REPORTS.NUMBER, item.getNumber())
+				.set(WORK_REPORTS.YEAR, item.getYear())
 				.set(WORK_REPORTS.COMPANY_ID, item.getCompanyId())
 				.set(WORK_REPORTS.OPERATOR_ID, item.getOperatorId())
 				.set(WORK_REPORTS.REVISION_STATUS, item.getRevisionStatus())
@@ -215,11 +216,11 @@ public class WorkReportDAO extends BaseDAO {
 		}
 		
 		if (query.year != null) {
-			searchCndt = searchCndt.and(WORK_REPORTS.FROM_DATE.extract(DatePart.YEAR).equal(query.year));
+			searchCndt = searchCndt.and(WORK_REPORTS.YEAR.equal(query.year));
 		}
 		
-		if (!StringUtils.isEmpty(query.workReportNo)) {
-			searchCndt = searchCndt.and(WORK_REPORTS.WORK_REPORT_NO.like("%" + query.workReportNo + "%"));
+		if (query.number != null) {
+			searchCndt = searchCndt.and(WORK_REPORTS.NUMBER.equal(query.number));
 		}
 
 		return searchCndt;

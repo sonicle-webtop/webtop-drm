@@ -42,7 +42,8 @@ import org.joda.time.DateTimeZone;
 public class JsGridWorkReports {
 
 	public String workReportId;
-	public String workReportNo;
+	public Integer number;
+	public Integer year;
 	public Integer companyId;
 	public String operatorId;
 	public Integer docStatusId;
@@ -62,7 +63,8 @@ public class JsGridWorkReports {
 
 	public JsGridWorkReports(OWorkReport report, DateTimeZone profileTz, String ownerPid) {
 		this.workReportId = report.getWorkReportId();
-		this.workReportNo = report.getWorkReportNo();
+		this.number = report.getNumber();
+		this.year = report.getYear();
 		this.companyId = report.getCompanyId();
 		this.operatorId = report.getOperatorId();
 		this.customerId = report.getCustomerId();

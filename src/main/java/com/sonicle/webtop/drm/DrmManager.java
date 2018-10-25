@@ -1978,7 +1978,8 @@ public class DrmManager extends BaseManager {
 
 			OWorkReport newWorkReport = ManagerUtils.createOWorkReport(wrkRpt);
 			newWorkReport.setWorkReportId(IdentifierUtils.getUUID());
-			newWorkReport.setWorkReportNo(wrkDao.getWorkReportSequence(con) + "-" + newWorkReport.getFromDate().year().getAsText());
+			newWorkReport.setNumber(wrkDao.getWorkReportSequence(con).intValue());
+			newWorkReport.setYear(DateTime.now().getYear());
 
 			OWorkReportRow newWrkDetail = null;
 			for (WorkReportRow wrkDetail : wrkRpt.getDetails()) {
