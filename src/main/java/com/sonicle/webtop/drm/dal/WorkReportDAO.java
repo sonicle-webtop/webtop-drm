@@ -86,6 +86,10 @@ public class WorkReportDAO extends BaseDAO {
 						.or(WORK_REPORTS.REVISION_STATUS.equal(OWorkReport.REV_STATUS_MODIFIED))
 						.and(searchCndt)
 				)
+				.orderBy(
+						WORK_REPORTS.YEAR,
+						WORK_REPORTS.NUMBER
+				)
 				.fetchInto(OWorkReport.class);
 	}
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.0.final using JasperReports Library version 6.3.0  -->
-<!-- 2018-10-25T14:25:03 -->
+<!-- 2018-10-25T14:45:46 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="workreport" pageWidth="595" pageHeight="842" columnWidth="557" leftMargin="19" rightMargin="19" topMargin="10" bottomMargin="10" isSummaryWithPageHeaderAndFooter="true" resourceBundle="workreport" uuid="47fa44bf-1a8e-4a18-a0df-8b26982ff32e">
 	<property name="com.jaspersoft.studio.unit." value="cm"/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
@@ -119,7 +119,7 @@
 				<textElement>
 					<font size="12" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA["RAPPORTO DI INTERVENTO Nr. "+  $F{number} + " ANNO " + $F{year}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["RAPPORTO DI INTERVENTO Nr. "+  $F{number} + " / " + $F{year}]]></textFieldExpression>
 			</textField>
 			<rectangle>
 				<reportElement x="290" y="0" width="267" height="80" uuid="98e36c3a-32d7-48d0-a9bb-f2ee7ea3faba"/>
