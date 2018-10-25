@@ -50,7 +50,6 @@ import com.sonicle.webtop.contacts.model.ContactItemEx;
 import com.sonicle.webtop.contacts.model.FolderContacts;
 import com.sonicle.webtop.core.CoreUserSettings;
 import com.sonicle.webtop.core.app.WT;
-import com.sonicle.webtop.core.app.WebTopSession;
 import com.sonicle.webtop.core.app.WebTopSession.UploadedFile;
 import com.sonicle.webtop.core.bol.OGroup;
 import com.sonicle.webtop.core.bol.OUser;
@@ -63,6 +62,7 @@ import com.sonicle.webtop.core.model.CausalExt;
 import com.sonicle.webtop.core.model.MasterData;
 import com.sonicle.webtop.core.sdk.BaseService;
 import com.sonicle.webtop.core.sdk.UserProfile;
+import com.sonicle.webtop.core.sdk.UserProfile.Data;
 import com.sonicle.webtop.core.sdk.UserProfileId;
 import com.sonicle.webtop.core.sdk.WTException;
 import com.sonicle.webtop.drm.bol.OBusinessTrip;
@@ -123,7 +123,6 @@ import com.sonicle.webtop.drm.model.DrmGroup;
 import com.sonicle.webtop.drm.model.DrmLineManager;
 import com.sonicle.webtop.drm.model.DrmProfile;
 import com.sonicle.webtop.drm.model.EmployeeProfile;
-import com.sonicle.webtop.drm.model.FileContent;
 import com.sonicle.webtop.drm.model.GroupCategory;
 import com.sonicle.webtop.drm.model.HourProfile;
 import com.sonicle.webtop.drm.model.LeaveRequest;
@@ -151,12 +150,10 @@ import com.sonicle.webtop.drm.model.WorkReportSetting;
 import com.sonicle.webtop.drm.rpt.RptTimetableReport;
 import com.sonicle.webtop.drm.rpt.RptWorkReport;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.UnknownHostException;
 import java.sql.Connection;
@@ -299,9 +296,12 @@ public class Service extends BaseService {
 	public void processLookupOperators(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			List<JsSimple> jsUser = new ArrayList();
+			Data uD;
 			
 			for (String usr : manager.listOperators()) {
-				jsUser.add(new JsSimple(usr, WT.getUserData(new UserProfileId(getEnv().getProfileId().getDomain(), usr)).getDisplayName()));
+				uD = WT.getUserData(new UserProfileId(getEnv().getProfileId().getDomain(), usr));
+				if(uD != null)
+					jsUser.add(new JsSimple(usr, uD.getDisplayName()));
 			}
 			
 			ResultMeta meta = new LookupMeta().setSelected(jsUser.get(0).id);
@@ -573,13 +573,16 @@ public class Service extends BaseService {
 		try {
 			List<JsSimpleSource> contacts = new ArrayList();
 			List<Integer> categoryIds = new ArrayList();
+			Data uD;
 					
 			IContactsManager contactManager = (IContactsManager) WT.getServiceManager("com.sonicle.webtop.contacts", getEnv().getProfileId());
 			categoryIds = contactManager.listCategoryIds();
 			for(FolderContacts fc : contactManager.listFolderContacts(categoryIds, "", null)){
-				String owner = WT.getUserData(fc.folder.getProfileId()).getDisplayName();
-				for(ContactItemEx c : fc.contacts){
-					contacts.add(new JsSimpleSource(c.getContactId(), c.getFirstName() + " " + c.getLastName(), "[" + owner + " / " + fc.folder.getName() + "]"));
+				uD = WT.getUserData(fc.folder.getProfileId());
+				if(uD != null){
+					for(ContactItemEx c : fc.contacts){
+						contacts.add(new JsSimpleSource(c.getContactId(), c.getFirstName() + " " + c.getLastName(), "[" + uD.getDisplayName() + " / " + fc.folder.getName() + "]"));
+					}
 				}
 			}
 
@@ -2295,8 +2298,11 @@ public class Service extends BaseService {
 							additionalInfo += field.getLabel() + ": " + o.getDescription() + " / ";		
 						break;
 					case "executed_with":
-						if(o.getExecutedWith() != null)
-							additionalInfo += field.getLabel() + ": " + WT.getUserData(new UserProfileId(o.getDomainId(), o.getExecutedWith())).getDisplayName() + " / ";		
+						if(o.getExecutedWith() != null){
+							Data uD =  WT.getUserData(new UserProfileId(o.getDomainId(), o.getExecutedWith()));
+							if(uD != null)
+								additionalInfo += field.getLabel() + ": " + uD.getDisplayName() + " / ";
+						}
 						break;
 					case "place":
 						if(o.getPlace() != null)
@@ -2323,8 +2329,11 @@ public class Service extends BaseService {
 							additionalInfo += field.getLabel() + ": " + o.getNotes() + " / ";		
 						break;
 					case "signed_by":
-						if(o.getSignedBy() != null)
-							additionalInfo +=  field.getLabel() + ": " + WT.getUserData(new UserProfileId(o.getDomainId(), o.getSignedBy())).getDisplayName() + " / ";	
+						if(o.getSignedBy() != null){
+							Data uD = WT.getUserData(new UserProfileId(o.getDomainId(), o.getSignedBy()));
+							if(uD != null)
+								additionalInfo +=  field.getLabel() + ": " + uD.getDisplayName() + " / ";
+						}
 						break;
 					case "success":
 						if(o.getSuccess()!= null)
