@@ -46,8 +46,10 @@ import com.sonicle.commons.web.json.extjs.ExtTreeNode;
 import com.sonicle.commons.web.json.extjs.LookupMeta;
 import com.sonicle.commons.web.json.extjs.ResultMeta;
 import com.sonicle.webtop.contacts.IContactsManager;
-import com.sonicle.webtop.contacts.model.ContactItemEx;
-import com.sonicle.webtop.contacts.model.FolderContacts;
+import com.sonicle.webtop.contacts.model.ContactItem;
+import com.sonicle.webtop.contacts.model.Grouping;
+import com.sonicle.webtop.contacts.model.ListContactsResult;
+import com.sonicle.webtop.contacts.model.ShowBy;
 import com.sonicle.webtop.core.CoreUserSettings;
 import com.sonicle.webtop.core.app.WT;
 import com.sonicle.webtop.core.app.WebTopSession.UploadedFile;
@@ -577,13 +579,10 @@ public class Service extends BaseService {
 					
 			IContactsManager contactManager = (IContactsManager) WT.getServiceManager("com.sonicle.webtop.contacts", getEnv().getProfileId());
 			categoryIds = contactManager.listCategoryIds();
-			for(FolderContacts fc : contactManager.listFolderContacts(categoryIds, "", null)){
-				uD = WT.getUserData(fc.folder.getProfileId());
-				if(uD != null){
-					for(ContactItemEx c : fc.contacts){
-						contacts.add(new JsSimpleSource(c.getContactId(), c.getFirstName() + " " + c.getLastName(), "[" + uD.getDisplayName() + " / " + fc.folder.getName() + "]"));
-					}
-				}
+			ListContactsResult lcr = contactManager.listContacts(categoryIds, false, Grouping.ALPHABETIC, ShowBy.LASTNAME, null);
+			for(ContactItem c: lcr.items){
+				uD = WT.getUserData(c.getCategoryProfileId());
+				contacts.add(new JsSimpleSource(c.getContactId(), c.getFullName(true), "[" + uD.getDisplayName() + " / " + c.getCategoryName() + "]"));
 			}
 
 			new JsonResult(contacts).printTo(out);
