@@ -133,6 +133,7 @@ public class WorkReportDAO extends BaseDAO {
 				.set(WORK_REPORTS.FREE_SUPPORT, item.getFreeSupport())
 				.set(WORK_REPORTS.BUSINESS_TRIP_ID, item.getBusinessTripId())
 				.set(WORK_REPORTS.DAY_TRASFERT, item.getDayTrasfert())
+				.set(WORK_REPORTS.EVENT_ID, item.getEventId())
 				.where(
 						WORK_REPORTS.WORK_REPORT_ID.equal(item.getWorkReportId())
 				)

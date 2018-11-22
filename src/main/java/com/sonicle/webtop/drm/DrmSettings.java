@@ -63,4 +63,10 @@ public class DrmSettings {
 	public static final String WORK_REPORT_DEFAULT_DOC_STATUS_ID = "workreport.default.docstatusid";
 	
 	public static final String OPPORTUNITY_DEFAULT_DOC_STATUS_ID = "opportunity.default.docstatusid";
+	
+	public static final String OPPORTUNITY_CALENDAR_ID = "opportunity.calendar.id";
+	
+	public static final String WORK_REPORT_CALENDAR_ID = "workreport.calendar.id";
+	
+	public static final String LEAVE_REQUEST_CALENDAR_ID = "leaverequest.calendar.id";
 }

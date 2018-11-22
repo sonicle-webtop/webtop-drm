@@ -42,7 +42,6 @@ import static com.sonicle.webtop.drm.jooq.Tables.LEAVE_REQUESTS;
 import com.sonicle.webtop.drm.jooq.tables.records.LeaveRequestsRecord;
 import java.sql.Connection;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -139,6 +138,7 @@ public class LeaveRequestDAO extends BaseDAO {
 				.set(LEAVE_REQUESTS.TO_DATE, item.getToDate())
 				.set(LEAVE_REQUESTS.CANC_REASON, item.getCancReason())
 				.set(LEAVE_REQUESTS.CANC_RESULT, item.getCancResult())
+				.set(LEAVE_REQUESTS.EVENT_ID, item.getEventId())
 				.where(
 						LEAVE_REQUESTS.LEAVE_REQUEST_ID.equal(item.getLeaveRequestId())
 				)

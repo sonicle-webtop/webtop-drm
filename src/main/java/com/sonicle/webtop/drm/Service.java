@@ -33,6 +33,7 @@
 package com.sonicle.webtop.drm;
 
 import com.sonicle.commons.EnumUtils;
+import com.sonicle.commons.LangUtils;
 import com.sonicle.commons.net.IPUtils;
 import com.sonicle.commons.web.Crud;
 import com.sonicle.commons.web.ServletUtils;
@@ -171,6 +172,12 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import com.sonicle.webtop.calendar.ICalendarManager;
+import com.sonicle.webtop.calendar.model.Calendar;
+import com.sonicle.webtop.calendar.model.Event;
+import com.sonicle.webtop.calendar.model.EventInstance;
+import com.sonicle.webtop.calendar.model.EventKey;
+import com.sonicle.webtop.calendar.model.UpdateEventTarget;
 
 /**
  *
@@ -182,6 +189,7 @@ public class Service extends BaseService {
 
 	private DrmManager manager;
 	private DrmServiceSettings ss;
+	private DrmUserSettings us;
 	private LinkedHashMap<String, RootProgramNode> programs = new LinkedHashMap();
 
 	private LinkedHashMap<String, String> groupCategories = new LinkedHashMap();
@@ -193,6 +201,7 @@ public class Service extends BaseService {
 
 		manager = (DrmManager) WT.getServiceManager(SERVICE_ID);
 		ss = new DrmServiceSettings(SERVICE_ID, pid.getDomainId());
+		us = new DrmUserSettings(SERVICE_ID, new UserProfileId(pid.getDomain(), pid.getUserId()));
 
 		RootProgramNode prog = null;
 		
@@ -1275,7 +1284,10 @@ public class Service extends BaseService {
 					doc.setMediaType(upFile.getMediaType());
 					o.getDocuments().add(doc);
 				}
-
+				
+				Integer eventId = createOrUpdateOpportunityEventIntoOpportunityCalendar(o);
+				o.setEventId(eventId);
+				
 				manager.addOpportunity(o);
 
 				new JsonResult().printTo(out);
@@ -1304,6 +1316,12 @@ public class Service extends BaseService {
 					}
 				}
 
+				Integer eventId = createOrUpdateOpportunityEventIntoOpportunityCalendar(o);
+				o.setEventId(eventId);
+				
+				for(OpportunityAction oAct : o.getActions())
+					updateOpportunityActionEventTitle(oAct, o);
+				
 				manager.updateOpportunity(o);
 
 				new JsonResult().printTo(out);
@@ -1312,6 +1330,13 @@ public class Service extends BaseService {
 
 				StringArray ids = ServletUtils.getObjectParameter(request, "ids", StringArray.class, true);
 
+				Opportunity o = manager.getOpportunity(Integer.parseInt(ids.get(0)));
+				
+				deleteOpportunityEvent(o);
+				
+				for(OpportunityAction oAct : o.getActions())
+					deleteOpportunityActionEvent(oAct);
+				
 				manager.deleteOpportunity(Integer.parseInt(ids.get(0)));
 
 				new JsonResult().printTo(out);
@@ -1352,6 +1377,9 @@ public class Service extends BaseService {
 					oAct.getActionDocuments().add(doc);
 				}
 
+				Integer eventId = createOrUpdateOpportunityActionEventIntoOpportunityCalendar(oAct);
+				oAct.setEventId(eventId);
+				
 				manager.addOpportunityAction(oAct);
 
 				new JsonResult().printTo(out);
@@ -1380,6 +1408,9 @@ public class Service extends BaseService {
 					}
 				}
 
+				Integer eventId = createOrUpdateOpportunityActionEventIntoOpportunityCalendar(oAct);
+				oAct.setEventId(eventId);
+				
 				manager.updateOpportunityAction(oAct);
 
 				new JsonResult().printTo(out);
@@ -1387,6 +1418,10 @@ public class Service extends BaseService {
 			} else if (crud.equals(Crud.DELETE)) {
 
 				StringArray ids = ServletUtils.getObjectParameter(request, "ids", StringArray.class, true);
+				
+				OpportunityAction oAct = manager.getOpportunityAction(Integer.parseInt(ids.get(0)));
+				
+				deleteOpportunityActionEvent(oAct);
 
 				manager.deleteOpportunityAction(Integer.parseInt(ids.get(0)));
 
@@ -1473,8 +1508,11 @@ public class Service extends BaseService {
 					wrkRpt.getAttachments().add(att);
 				}
 
+				Integer eventId = createOrUpdateWorkReportEventIntoWorkReportCalendar(wrkRpt);
+				wrkRpt.setEventId(eventId);
+				
 				manager.addWorkReport(wrkRpt);
-
+				
 				new JsonResult().printTo(out);
 
 			} else if (crud.equals(Crud.UPDATE)) {
@@ -1501,6 +1539,9 @@ public class Service extends BaseService {
 					}
 				}
 
+				Integer eventId = createOrUpdateWorkReportEventIntoWorkReportCalendar(wrkRpt);
+				wrkRpt.setEventId(eventId);
+				
 				manager.updateWorkReport(wrkRpt);
 
 				new JsonResult().printTo(out);
@@ -1509,6 +1550,10 @@ public class Service extends BaseService {
 
 				StringArray ids = ServletUtils.getObjectParameter(request, "reportIds", StringArray.class, true);
 
+				WorkReport wrkRpt = manager.getWorkReport(ids.get(0));
+				
+				deleteWorkReportEvent(wrkRpt);
+				
 				manager.deleteWorkReport(ids.get(0));
 
 				new JsonResult().printTo(out);
@@ -1549,6 +1594,9 @@ public class Service extends BaseService {
 					lr.getDocuments().add(doc);
 				}
 
+				Integer eventId = createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+				lr.setEventId(eventId);
+				
 				manager.addLeaveRequest(lr);
 
 				new JsonResult().printTo(out);
@@ -1576,6 +1624,9 @@ public class Service extends BaseService {
 						lr.getDocuments().add(doc);
 					}
 				}
+				
+				Integer eventId = createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+				lr.setEventId(eventId);
 
 				manager.updateLeaveRequest(lr, false);
 
@@ -1584,7 +1635,11 @@ public class Service extends BaseService {
 			} else if (crud.equals(Crud.DELETE)) {
 
 				IntegerArray ids = ServletUtils.getObjectParameter(request, "leaveRequestIds", IntegerArray.class, true);
-
+				
+				LeaveRequest lr = manager.getLeaveRequest(ids.get(0));
+				
+				deleteLeaveRequestEvent(lr);
+				
 				manager.deleteLeaveRequest(ids.get(0));
 
 				new JsonResult().printTo(out);
@@ -2381,5 +2436,539 @@ public class Service extends BaseService {
 				.timeFormatLong(cus.getLongTimeFormat())
 				.generatedBy(WT.getPlatformName() + " " + lookupResource(WorkReportLocale.SERVICE_NAME))
 				.printedBy(ud.getDisplayName());
+	}
+	
+	private Integer createOrUpdateWorkReportEventIntoWorkReportCalendar(WorkReport wrkRpt) throws WTException {
+		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
+		Integer eventId = null;
+		Event ev = null;
+		
+		if (cm != null) {
+			Integer wrCalId = us.getWorkReportCalendarId();
+			
+			if(wrCalId == null || !cm.existCalendar(wrCalId)){
+				wrCalId = createWorkReportCalendar(cm, wrkRpt);
+				us.setWorkReportCalendarId(wrCalId);
+			}
+			
+			if(wrkRpt.getEventId() != null){
+				ev = cm.getEvent(wrkRpt.getEventId());
+				
+				if(ev != null){
+					eventId = updateWorkReportEvent(cm, wrkRpt, ev);
+				}else{
+					eventId = createWorkReportEvent(cm, wrkRpt, wrCalId);
+				}
+			}else{
+				eventId = createWorkReportEvent(cm, wrkRpt, wrCalId);
+			}			
+		}
+		
+		return eventId;
+	}
+	
+	private Integer createWorkReportCalendar(ICalendarManager cm, WorkReport wrkRpt) throws WTException{
+		Calendar cal = new Calendar();
+		cal.setName(lookupResource("workreport.calendar.name"));
+		cal.setColor("#FFAD46");
+		cal.setProfileId(new UserProfileId(getEnv().getProfileId().getDomainId(), wrkRpt.getOperatorId()));
+		
+		cal = cm.addCalendar(cal);
+		
+		return cal.getCalendarId();
+	}
+	
+	private int createWorkReportEvent(ICalendarManager cm, WorkReport wrkRpt, int wrCalId) throws WTException{
+		DateTimeZone tz = getEnv().getProfile().getTimeZone();
+		Event ev = new Event();
+		String title = "";
+
+		ev.setCalendarId(wrCalId);
+		ev.setAllDay(true);
+		ev.setTimezone(tz.getID());
+		ev.setIsPrivate(true);
+		ev.setBusy(false);
+
+		if(wrkRpt.getFromDate() != null) 
+			ev.setStartDate(wrkRpt.getFromDate().toDateTimeAtStartOfDay(tz));
+		if(wrkRpt.getToDate() != null)
+			ev.setEndDate(wrkRpt.getToDate().toDateTimeAtStartOfDay(tz));
+		if(wrkRpt.getCausalId() != null)
+			ev.setCausalId(wrkRpt.getCausalId());
+		if(wrkRpt.getDescription() != null)
+			ev.setDescription(wrkRpt.getDescription());
+		if(wrkRpt.getReferenceNo()!= null)
+			ev.setTitle(wrkRpt.getReferenceNo());
+		if(wrkRpt.getCustomerId() != null)
+			ev.setMasterDataId(wrkRpt.getCustomerId());
+		if(wrkRpt.getCustomerStatId()!= null)
+			ev.setStatMasterDataId(wrkRpt.getCustomerStatId());
+		if(wrkRpt.getNumber() != null)
+			title += wrkRpt.getNumber() + " ";
+		if(wrkRpt.getYear()!= null)
+			title += wrkRpt.getYear()+ " ";
+		if(wrkRpt.getReferenceNo()!= null)
+			title += "/ " + wrkRpt.getReferenceNo()+ " ";
+		ev.setTitle(title);
+
+		ev = cm.addEvent(ev, false);
+		
+		return ev.getEventId();
+	}
+	
+	private int updateWorkReportEvent(ICalendarManager cm, WorkReport wrkRpt, Event ev) throws WTException{
+		EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
+		DateTimeZone tz = getEnv().getProfile().getTimeZone();
+		String title = "";
+		
+		if(wrkRpt.getFromDate() != null) 
+			evI.setStartDate(wrkRpt.getFromDate().toDateTimeAtStartOfDay(tz));
+		if(wrkRpt.getToDate() != null)
+			evI.setEndDate(wrkRpt.getToDate().toDateTimeAtStartOfDay(tz));
+		if(wrkRpt.getCausalId() != null)
+			evI.setCausalId(wrkRpt.getCausalId());
+		if(wrkRpt.getDescription() != null)
+			evI.setDescription(wrkRpt.getDescription());
+		if(wrkRpt.getReferenceNo()!= null)
+			evI.setTitle(wrkRpt.getReferenceNo());
+		if(wrkRpt.getCustomerId() != null)
+			evI.setMasterDataId(wrkRpt.getCustomerId());
+		if(wrkRpt.getCustomerStatId()!= null)
+			evI.setStatMasterDataId(wrkRpt.getCustomerStatId());
+		if(wrkRpt.getNumber() != null)
+			title += wrkRpt.getNumber() + " ";
+		if(wrkRpt.getYear()!= null)
+			title += wrkRpt.getYear()+ " ";
+		if(wrkRpt.getReferenceNo()!= null)
+			title += "/ " + wrkRpt.getReferenceNo()+ " ";
+		evI.setTitle(title);
+
+		cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false);
+		
+		return evI.getEventId();
+	}
+	
+	private void deleteWorkReportEvent(WorkReport wrkRpt) throws WTException{		
+		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
+		
+		if (cm != null) {
+			if(wrkRpt.getEventId() != null){
+				Event ev = cm.getEvent(wrkRpt.getEventId());
+				if(ev != null)
+					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(wrkRpt.getEventId(), null), false);
+			}
+		}
+	}
+	
+	private Integer createOrUpdateOpportunityEventIntoOpportunityCalendar(Opportunity o) throws WTException {
+		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
+		Integer eventId = null;
+		Event ev = null;
+		
+		if (cm != null) {
+			Integer oCalId = us.getOpportunityCalendarId();
+			
+			if(oCalId == null || !cm.existCalendar(oCalId)){
+				oCalId = createOpportunityCalendar(cm, o);
+				us.setOpportunityCalendarId(oCalId);
+			}
+			
+			if(o.getEventId() != null){
+				ev = cm.getEvent(o.getEventId());
+				
+				if(ev != null){
+					eventId = updateOpportunityEvent(cm, o, ev);
+				}else{
+					eventId = createOpportunityEvent(cm, o, oCalId);
+				}
+			}else{
+				eventId = createOpportunityEvent(cm, o, oCalId);
+			}
+		}
+		
+		return eventId;
+	}
+	
+	private Integer createOpportunityCalendar(ICalendarManager cm, Opportunity o) throws WTException{
+		Calendar cal = new Calendar();
+		cal.setName(lookupResource("opportunity.calendar.name"));
+		cal.setColor("#9FC6E7");
+		cal.setProfileId(new UserProfileId(getEnv().getProfileId().getDomainId(), o.getOperatorId()));
+		
+		cal = cm.addCalendar(cal);
+		
+		return cal.getCalendarId();
+	}
+	
+	private int createOpportunityEvent(ICalendarManager cm, Opportunity o, int oCalId) throws WTException{
+		DateTimeZone tz = getEnv().getProfile().getTimeZone();
+		Event ev = new Event();
+
+		ev.setCalendarId(oCalId);
+		ev.setTimezone(tz.getID());
+		ev.setIsPrivate(true);
+		ev.setBusy(false);
+		
+		if(o.getDate() != null){			
+			if(o.getFromHour() != null && o.getToHour() != null){
+				ev.setAllDay(false);
+				
+				ev.setDatesAndTimes(false, tz.getID(), o.getDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(o.getFromHour().split(":")[0]), Integer.parseInt(o.getFromHour().split(":")[1]), 0, 0), o.getDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(o.getToHour().split(":")[0]), Integer.parseInt(o.getToHour().split(":")[1]), 0, 0));
+			}else{
+				ev.setAllDay(true);
+				
+				ev.setStartDate(o.getDate().toDateTimeAtStartOfDay(tz));
+				ev.setEndDate(o.getDate().toDateTimeAtStartOfDay(tz));
+			}
+		}
+		if(o.getPlace() != null)
+			ev.setLocation(o.getPlace());
+		if(o.getCausalId() != null)
+			ev.setCausalId(o.getCausalId());
+		if(o.getObjective() != null)
+			ev.setDescription(o.getObjective());
+		if(o.getDescription() != null)
+			ev.setTitle(o.getDescription());
+		if(o.getCustomerId() != null)
+			ev.setMasterDataId(o.getCustomerId());
+		if(o.getCustomerStatId() != null)
+			ev.setStatMasterDataId(o.getCustomerStatId());
+		if(o.getActivityId() != null)
+			ev.setActivityId(o.getActivityId());
+
+		ev = cm.addEvent(ev, false);
+		
+		return ev.getEventId();
+	}
+	
+	private int updateOpportunityEvent(ICalendarManager cm, Opportunity o, Event ev) throws WTException{
+		EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
+		DateTimeZone tz = getEnv().getProfile().getTimeZone();
+
+		evI.setTimezone(tz.getID());
+		
+		if(o.getDate() != null){			
+			if(o.getFromHour() != null && o.getToHour() != null){
+				evI.setAllDay(false);
+				
+				evI.setDatesAndTimes(false, tz.getID(), o.getDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(o.getFromHour().split(":")[0]), Integer.parseInt(o.getFromHour().split(":")[1]), 0, 0), o.getDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(o.getToHour().split(":")[0]), Integer.parseInt(o.getToHour().split(":")[1]), 0, 0));
+			}else{
+				evI.setAllDay(true);
+				
+				evI.setStartDate(o.getDate().toDateTimeAtStartOfDay(tz));
+				evI.setEndDate(o.getDate().toDateTimeAtStartOfDay(tz));
+			}
+		}
+		if(o.getPlace() != null)
+			evI.setLocation(o.getPlace());
+		if(o.getCausalId() != null)
+			evI.setCausalId(o.getCausalId());
+		if(o.getObjective() != null)
+			evI.setDescription(o.getObjective());
+		if(o.getDescription() != null)
+			evI.setTitle(o.getDescription());
+		if(o.getCustomerId() != null)
+			evI.setMasterDataId(o.getCustomerId());
+		if(o.getCustomerStatId() != null)
+			evI.setStatMasterDataId(o.getCustomerStatId());
+		if(o.getActivityId() != null)
+			evI.setActivityId(o.getActivityId());
+
+		cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false);
+		
+		return evI.getEventId();
+	}
+	
+	private void deleteOpportunityEvent(Opportunity o) throws WTException{		
+		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
+		
+		if (cm != null) {
+			if(o.getEventId() != null){
+				Event ev = cm.getEvent(o.getEventId());
+				if(ev != null)
+					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(o.getEventId(), null), false);
+			}
+		}
+	}
+	
+	private Integer createOrUpdateOpportunityActionEventIntoOpportunityCalendar(OpportunityAction oAct) throws WTException {
+		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
+		Integer eventId = null;
+		Event ev = null;
+		
+		Opportunity o = manager.getOpportunity(oAct.getOpportunityId());
+		
+		if (cm != null) {
+			Integer oCalId = us.getOpportunityCalendarId();
+			
+			if(oCalId == null || !cm.existCalendar(oCalId)){
+				oCalId = createOpportunityCalendar(cm, o);
+				us.setOpportunityCalendarId(oCalId);
+			}
+			
+			if(oAct.getEventId() != null){
+				ev = cm.getEvent(oAct.getEventId());
+				
+				if(ev != null){
+					eventId = updateOpportunityActionEvent(cm, oAct, o, ev);
+				}else{
+					eventId = createOpportunityActionEvent(cm, oAct, o, oCalId);
+				}
+			}else{
+				eventId = createOpportunityActionEvent(cm, oAct, o, oCalId);
+			}
+		}
+		
+		return eventId;
+	}
+	
+	private int createOpportunityActionEvent(ICalendarManager cm, OpportunityAction oAct, Opportunity o, int oCalId) throws WTException{
+		DateTimeZone tz = getEnv().getProfile().getTimeZone();
+		Event ev = new Event();
+		String title = "";
+		
+		ev.setCalendarId(oCalId);
+		ev.setTimezone(tz.getID());
+		ev.setIsPrivate(true);
+		ev.setBusy(false);
+		
+		if(oAct.getDate() != null){			
+			if(oAct.getFromHour() != null && oAct.getToHour() != null){
+				ev.setAllDay(false);
+				
+				ev.setDatesAndTimes(false, tz.getID(), oAct.getDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(oAct.getFromHour().split(":")[0]), Integer.parseInt(oAct.getFromHour().split(":")[1]), 0, 0), oAct.getDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(oAct.getToHour().split(":")[0]), Integer.parseInt(oAct.getToHour().split(":")[1]), 0, 0));
+			}else{
+				ev.setAllDay(true);
+				
+				ev.setStartDate(oAct.getDate().toDateTimeAtStartOfDay(tz));
+				ev.setEndDate(oAct.getDate().toDateTimeAtStartOfDay(tz));
+			}
+		}
+		if(o.getDescription() != null)
+			title += o.getDescription() + " > ";
+		if(oAct.getDescription() != null)
+			title += oAct.getDescription();
+		if(oAct.getPlace() != null)
+			ev.setLocation(oAct.getPlace());
+		if(oAct.getSubsequentActions() != null)
+			ev.setDescription(oAct.getSubsequentActions());
+		if(oAct.getActivityId() != null)
+			ev.setActivityId(oAct.getActivityId());
+
+		ev.setTitle(title);
+		
+		ev = cm.addEvent(ev, false);
+		
+		return ev.getEventId();
+	}
+	
+	private int updateOpportunityActionEvent(ICalendarManager cm, OpportunityAction oAct, Opportunity o, Event ev) throws WTException{
+		EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
+		DateTimeZone tz = getEnv().getProfile().getTimeZone();
+		String title = "";
+
+		evI.setTimezone(tz.getID());
+		
+		if(oAct.getDate() != null){			
+			if(oAct.getFromHour() != null && oAct.getToHour() != null){
+				evI.setAllDay(false);
+				
+				evI.setDatesAndTimes(false, tz.getID(), oAct.getDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(oAct.getFromHour().split(":")[0]), Integer.parseInt(oAct.getFromHour().split(":")[1]), 0, 0), oAct.getDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(oAct.getToHour().split(":")[0]), Integer.parseInt(oAct.getToHour().split(":")[1]), 0, 0));
+			}else{
+				evI.setAllDay(true);
+				
+				evI.setStartDate(oAct.getDate().toDateTimeAtStartOfDay(tz));
+				evI.setEndDate(oAct.getDate().toDateTimeAtStartOfDay(tz));
+			}
+		}
+		if(o.getDescription() != null)
+			title += o.getDescription() + " > ";
+		if(oAct.getDescription() != null)
+			title += oAct.getDescription();
+		if(oAct.getPlace() != null)
+			evI.setLocation(oAct.getPlace());
+		if(oAct.getSubsequentActions() != null)
+			evI.setDescription(oAct.getSubsequentActions());
+		if(oAct.getActivityId() != null)
+			evI.setActivityId(oAct.getActivityId());
+
+		evI.setTitle(title);
+
+		cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false);
+		
+		return evI.getEventId();
+	}
+	
+	private void updateOpportunityActionEventTitle(OpportunityAction oAct, Opportunity o) throws WTException{
+		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
+		String title = "";
+		Event ev = null;
+
+		if (cm != null) {
+			if(o.getDescription() != null)
+				title += o.getDescription() + " > ";
+			if(oAct.getDescription() != null)
+				title += oAct.getDescription();
+			
+			if(oAct.getEventId() != null){
+				ev = cm.getEvent(oAct.getEventId());
+				
+				if(ev != null){
+					EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
+					evI.setTitle(title);
+					cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false);
+				}
+			}
+		}
+	}
+	
+	private void deleteOpportunityActionEvent(OpportunityAction oAct) throws WTException{		
+		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
+		
+		if (cm != null) {
+			if(oAct.getEventId() != null){
+				Event ev = cm.getEvent(oAct.getEventId());
+				if(ev != null)
+					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(oAct.getEventId(), null), false);
+			}
+		}
+	}
+	
+	private Integer createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(LeaveRequest lReq) throws WTException {
+		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
+		Integer eventId = null;
+		Event ev = null;
+		
+		if (cm != null) {
+			Integer lrCalId = us.getLeaveRequestCalendarId();
+			
+			if(lrCalId == null || !cm.existCalendar(lrCalId)){
+				lrCalId = createLeaveRequestCalendar(cm, lReq);
+				us.setLeaveRequestCalendarId(lrCalId);
+			}
+			
+			if(lReq.getEventId() != null){
+				ev = cm.getEvent(lReq.getEventId());
+				
+				if(ev != null){
+					eventId = updateLeaveRequestEvent(cm, lReq, ev);
+				}else{
+					eventId = createLeaveRequestEvent(cm, lReq, lrCalId);
+				}
+			}else{
+				eventId = createLeaveRequestEvent(cm, lReq, lrCalId);
+			}			
+		}
+		
+		return eventId;
+	}
+	
+	private Integer createLeaveRequestCalendar(ICalendarManager cm, LeaveRequest lReq) throws WTException{
+		Calendar cal = new Calendar();
+		cal.setName(lookupResource("leaverequest.calendar.name"));
+		cal.setColor("#42D692");
+		cal.setProfileId(new UserProfileId(getEnv().getProfileId().getDomainId(), lReq.getUserId()));
+		
+		cal = cm.addCalendar(cal);
+		
+		return cal.getCalendarId();
+	}
+	
+	private int createLeaveRequestEvent(ICalendarManager cm, LeaveRequest lReq, int lrCalId) throws WTException{
+		DateTimeZone tz = getEnv().getProfile().getTimeZone();
+		Event ev = new Event();
+		String title = "";
+		
+		ev.setCalendarId(lrCalId);
+		ev.setAllDay(true);
+		ev.setTimezone(tz.getID());
+		ev.setIsPrivate(true);
+		ev.setBusy(false);
+		
+		if(lReq.getFromDate() != null && lReq.getToDate() != null){			
+			if(lReq.getFromHour() != null && lReq.getToHour() != null){
+				ev.setAllDay(false);
+				
+				ev.setDatesAndTimes(false, tz.getID(), lReq.getFromDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(lReq.getFromHour().split(":")[0]), Integer.parseInt(lReq.getFromHour().split(":")[1]), 0, 0), lReq.getToDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(lReq.getToHour().split(":")[0]), Integer.parseInt(lReq.getToHour().split(":")[1]), 0, 0));
+			}else{
+				ev.setAllDay(true);
+				
+				ev.setStartDate(lReq.getFromDate().toDateTimeAtStartOfDay(tz));
+				ev.setEndDate(lReq.getToDate().toDateTimeAtStartOfDay(tz));
+			}
+		}
+		
+		if(lReq.getType() != null) 
+			title += lookupResource("leaverequest.type." + lReq.getType()) + " ";
+		if(lReq.getNotes()!= null) 
+			ev.setDescription(lReq.getNotes());
+		if(LangUtils.value(lReq.getCancResult(), Boolean.FALSE))
+			title += lookupResource("leaverequest.calendar.requesttype.D");
+		else if(LangUtils.value(lReq.getCancRequest(), Boolean.FALSE))
+			title += lookupResource("leaverequest.calendar.requesttype.RD");
+		else if(LangUtils.value(lReq.getResult(), Boolean.FALSE))
+			title += lookupResource("leaverequest.calendar.requesttype.A");
+		else if(!LangUtils.value(lReq.getResult(), Boolean.TRUE))
+			title += lookupResource("leaverequest.calendar.requesttype.NA");
+		else
+			title += lookupResource("leaverequest.calendar.requesttype.S");
+		
+		ev.setTitle(title);
+
+		ev = cm.addEvent(ev, false);
+		
+		return ev.getEventId();
+	}
+	
+	private int updateLeaveRequestEvent(ICalendarManager cm, LeaveRequest lReq, Event ev) throws WTException{
+		EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
+		DateTimeZone tz = getEnv().getProfile().getTimeZone();
+		String title = "";
+		
+		if(lReq.getFromDate() != null && lReq.getToDate() != null){			
+			if(lReq.getFromHour() != null && lReq.getToHour() != null){
+				evI.setAllDay(false);
+				
+				evI.setDatesAndTimes(false, tz.getID(), lReq.getFromDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(lReq.getFromHour().split(":")[0]), Integer.parseInt(lReq.getFromHour().split(":")[1]), 0, 0), lReq.getToDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(lReq.getToHour().split(":")[0]), Integer.parseInt(lReq.getToHour().split(":")[1]), 0, 0));
+			}else{
+				evI.setAllDay(true);
+				
+				evI.setStartDate(lReq.getFromDate().toDateTimeAtStartOfDay(tz));
+				evI.setEndDate(lReq.getToDate().toDateTimeAtStartOfDay(tz));
+			}
+		}
+		
+		if(lReq.getType() != null) 
+			title += lookupResource("leaverequest.type." + lReq.getType()) + " ";
+		if(lReq.getNotes()!= null) 
+			evI.setDescription(lReq.getNotes());
+		if(LangUtils.value(lReq.getCancResult(), Boolean.FALSE))
+			title += lookupResource("leaverequest.calendar.requesttype.D");
+		else if(LangUtils.value(lReq.getCancRequest(), Boolean.FALSE))
+			title += lookupResource("leaverequest.calendar.requesttype.RD");
+		else if(LangUtils.value(lReq.getResult(), Boolean.FALSE))
+			title += lookupResource("leaverequest.calendar.requesttype.A");
+		else if(!LangUtils.value(lReq.getResult(), Boolean.TRUE))
+			title += lookupResource("leaverequest.calendar.requesttype.NA");
+		else
+			title += lookupResource("leaverequest.calendar.requesttype.S");
+		
+		evI.setTitle(title);
+
+		cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false);
+		
+		return evI.getEventId();
+	}
+	
+	private void deleteLeaveRequestEvent(LeaveRequest lReq) throws WTException{		
+		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
+		
+		if (cm != null) {
+			if(lReq.getEventId() != null){
+				Event ev = cm.getEvent(lReq.getEventId());
+				if(ev != null)
+					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(lReq.getEventId(), null), false);
+			}
+		}
 	}
 }

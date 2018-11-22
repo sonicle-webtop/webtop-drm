@@ -222,6 +222,7 @@ public class OpportunityDAO extends BaseDAO {
 				.set(OPPORTUNITIES.SIGNED_BY, item.getSignedBy())
 				.set(OPPORTUNITIES.SIGNATURE, item.getSignature())
 				.set(OPPORTUNITIES.SUCCESS, item.getSuccess())
+				.set(OPPORTUNITIES.EVENT_ID, item.getEventId())
 				.where(
 						OPPORTUNITIES.ID.equal(item.getId())
 				)

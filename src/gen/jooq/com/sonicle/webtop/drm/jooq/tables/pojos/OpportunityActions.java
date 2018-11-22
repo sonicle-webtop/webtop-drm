@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OpportunityActions implements java.io.Serializable {
 
-	private static final long serialVersionUID = 2123106825;
+	private static final long serialVersionUID = 205653191;
 
 	private java.lang.Integer       id;
 	private java.lang.Integer       opportunityId;
@@ -29,6 +29,7 @@ public class OpportunityActions implements java.io.Serializable {
 	private java.lang.String        place;
 	private java.lang.String        subsequentActions;
 	private java.lang.Integer       activityId;
+	private java.lang.Integer       eventId;
 
 	public OpportunityActions() {}
 
@@ -43,7 +44,8 @@ public class OpportunityActions implements java.io.Serializable {
 		java.lang.String        description,
 		java.lang.String        place,
 		java.lang.String        subsequentActions,
-		java.lang.Integer       activityId
+		java.lang.Integer       activityId,
+		java.lang.Integer       eventId
 	) {
 		this.id = id;
 		this.opportunityId = opportunityId;
@@ -56,6 +58,7 @@ public class OpportunityActions implements java.io.Serializable {
 		this.place = place;
 		this.subsequentActions = subsequentActions;
 		this.activityId = activityId;
+		this.eventId = eventId;
 	}
 
 	public java.lang.Integer getId() {
@@ -144,5 +147,13 @@ public class OpportunityActions implements java.io.Serializable {
 
 	public void setActivityId(java.lang.Integer activityId) {
 		this.activityId = activityId;
+	}
+
+	public java.lang.Integer getEventId() {
+		return this.eventId;
+	}
+
+	public void setEventId(java.lang.Integer eventId) {
+		this.eventId = eventId;
 	}
 }

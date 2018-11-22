@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WorkReports implements java.io.Serializable {
 
-	private static final long serialVersionUID = 1585972245;
+	private static final long serialVersionUID = 1402310539;
 
 	private java.lang.String        workReportId;
 	private java.lang.Integer       companyId;
@@ -43,6 +43,7 @@ public class WorkReports implements java.io.Serializable {
 	private java.lang.Short         dayTrasfert;
 	private java.lang.Integer       number;
 	private java.lang.Integer       year;
+	private java.lang.Integer       eventId;
 
 	public WorkReports() {}
 
@@ -71,7 +72,8 @@ public class WorkReports implements java.io.Serializable {
 		java.lang.Integer       businessTripId,
 		java.lang.Short         dayTrasfert,
 		java.lang.Integer       number,
-		java.lang.Integer       year
+		java.lang.Integer       year,
+		java.lang.Integer       eventId
 	) {
 		this.workReportId = workReportId;
 		this.companyId = companyId;
@@ -98,6 +100,7 @@ public class WorkReports implements java.io.Serializable {
 		this.dayTrasfert = dayTrasfert;
 		this.number = number;
 		this.year = year;
+		this.eventId = eventId;
 	}
 
 	public java.lang.String getWorkReportId() {
@@ -298,5 +301,13 @@ public class WorkReports implements java.io.Serializable {
 
 	public void setYear(java.lang.Integer year) {
 		this.year = year;
+	}
+
+	public java.lang.Integer getEventId() {
+		return this.eventId;
+	}
+
+	public void setEventId(java.lang.Integer eventId) {
+		this.eventId = eventId;
 	}
 }

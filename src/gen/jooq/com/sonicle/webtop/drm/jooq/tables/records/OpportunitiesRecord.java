@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.records;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OpportunitiesRecord extends org.jooq.impl.UpdatableRecordImpl<com.sonicle.webtop.drm.jooq.tables.records.OpportunitiesRecord> {
 
-	private static final long serialVersionUID = -1779928174;
+	private static final long serialVersionUID = 2011443575;
 
 	/**
 	 * Setter for <code>drm.opportunities.id</code>.
@@ -368,6 +368,20 @@ public class OpportunitiesRecord extends org.jooq.impl.UpdatableRecordImpl<com.s
 		return (java.lang.Boolean) getValue(24);
 	}
 
+	/**
+	 * Setter for <code>drm.opportunities.event_id</code>.
+	 */
+	public void setEventId(java.lang.Integer value) {
+		setValue(25, value);
+	}
+
+	/**
+	 * Getter for <code>drm.opportunities.event_id</code>.
+	 */
+	public java.lang.Integer getEventId() {
+		return (java.lang.Integer) getValue(25);
+	}
+
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
@@ -394,7 +408,7 @@ public class OpportunitiesRecord extends org.jooq.impl.UpdatableRecordImpl<com.s
 	/**
 	 * Create a detached, initialised OpportunitiesRecord
 	 */
-	public OpportunitiesRecord(java.lang.Integer id, java.lang.String domainId, java.lang.Integer companyId, java.lang.String operatorId, org.joda.time.LocalDate date, java.lang.String fromHour, java.lang.String toHour, java.lang.String executedWith, java.lang.String customerId, java.lang.String customerStatId, java.lang.String sector, java.lang.String description, java.lang.String place, java.lang.String objective, java.lang.Integer causalId, java.lang.Integer activityId, java.lang.String objective_2, java.lang.String result, java.lang.String discoveries, java.lang.String customerPotential, java.lang.String notes, java.lang.Integer statusId, java.lang.String signedBy, java.lang.Boolean signature, java.lang.Boolean success) {
+	public OpportunitiesRecord(java.lang.Integer id, java.lang.String domainId, java.lang.Integer companyId, java.lang.String operatorId, org.joda.time.LocalDate date, java.lang.String fromHour, java.lang.String toHour, java.lang.String executedWith, java.lang.String customerId, java.lang.String customerStatId, java.lang.String sector, java.lang.String description, java.lang.String place, java.lang.String objective, java.lang.Integer causalId, java.lang.Integer activityId, java.lang.String objective_2, java.lang.String result, java.lang.String discoveries, java.lang.String customerPotential, java.lang.String notes, java.lang.Integer statusId, java.lang.String signedBy, java.lang.Boolean signature, java.lang.Boolean success, java.lang.Integer eventId) {
 		super(com.sonicle.webtop.drm.jooq.tables.Opportunities.OPPORTUNITIES);
 
 		setValue(0, id);
@@ -422,5 +436,6 @@ public class OpportunitiesRecord extends org.jooq.impl.UpdatableRecordImpl<com.s
 		setValue(22, signedBy);
 		setValue(23, signature);
 		setValue(24, success);
+		setValue(25, eventId);
 	}
 }

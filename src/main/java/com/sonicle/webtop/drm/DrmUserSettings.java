@@ -48,5 +48,28 @@ public class DrmUserSettings extends BaseUserSettings {
 		super(serviceId, profileId);
 		this.ss = new DrmServiceSettings(serviceId, profileId.getDomainId());
 	}
+	
+	public Integer getOpportunityCalendarId() {
+		return getInteger(OPPORTUNITY_CALENDAR_ID, null); 
+	}
 
+	public void setOpportunityCalendarId(int value) {
+		setInteger(OPPORTUNITY_CALENDAR_ID, value); 
+	}
+	
+	public Integer getWorkReportCalendarId() {
+		return getInteger(WORK_REPORT_CALENDAR_ID, null); 
+	}
+
+	public void setWorkReportCalendarId(int value) {
+		setInteger(WORK_REPORT_CALENDAR_ID, value); 
+	}
+
+	public Integer getLeaveRequestCalendarId() {
+		return getInteger(LEAVE_REQUEST_CALENDAR_ID, null); 
+	}
+
+	public void setLeaveRequestCalendarId(int value) {
+		setInteger(LEAVE_REQUEST_CALENDAR_ID, value); 
+	}
 }

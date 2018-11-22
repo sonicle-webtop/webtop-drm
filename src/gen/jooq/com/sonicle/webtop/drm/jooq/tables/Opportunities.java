@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Opportunities extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.OpportunitiesRecord> {
 
-	private static final long serialVersionUID = -1587864257;
+	private static final long serialVersionUID = -1372542083;
 
 	/**
 	 * The reference instance of <code>drm.opportunities</code>
@@ -155,6 +155,11 @@ public class Opportunities extends org.jooq.impl.TableImpl<com.sonicle.webtop.dr
 	 * The column <code>drm.opportunities.success</code>.
 	 */
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.OpportunitiesRecord, java.lang.Boolean> SUCCESS = createField("success", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
+
+	/**
+	 * The column <code>drm.opportunities.event_id</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.OpportunitiesRecord, java.lang.Integer> EVENT_ID = createField("event_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
 	 * Create a <code>drm.opportunities</code> table reference

@@ -127,6 +127,7 @@ public class OpportunityActionDAO extends BaseDAO {
 				.set(OPPORTUNITY_ACTIONS.PLACE, item.getPlace())
 				.set(OPPORTUNITY_ACTIONS.SUBSEQUENT_ACTIONS, item.getSubsequentActions())
 				.set(OPPORTUNITY_ACTIONS.ACTIVITY_ID, item.getActivityId())
+				.set(OPPORTUNITY_ACTIONS.EVENT_ID, item.getEventId())
 				.where(
 						OPPORTUNITY_ACTIONS.ID.equal(item.getId())
 				)

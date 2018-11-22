@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class LeaveRequests implements java.io.Serializable {
 
-	private static final long serialVersionUID = 814350058;
+	private static final long serialVersionUID = 738634252;
 
 	private java.lang.Integer       leaveRequestId;
 	private java.lang.String        domainId;
@@ -38,6 +38,7 @@ public class LeaveRequests implements java.io.Serializable {
 	private org.joda.time.DateTime  managerCancRespTimetamp;
 	private java.lang.String        cancReason;
 	private java.lang.Boolean       cancResult;
+	private java.lang.Integer       eventId;
 
 	public LeaveRequests() {}
 
@@ -61,7 +62,8 @@ public class LeaveRequests implements java.io.Serializable {
 		org.joda.time.DateTime  employeeCancReqTimestamp,
 		org.joda.time.DateTime  managerCancRespTimetamp,
 		java.lang.String        cancReason,
-		java.lang.Boolean       cancResult
+		java.lang.Boolean       cancResult,
+		java.lang.Integer       eventId
 	) {
 		this.leaveRequestId = leaveRequestId;
 		this.domainId = domainId;
@@ -83,6 +85,7 @@ public class LeaveRequests implements java.io.Serializable {
 		this.managerCancRespTimetamp = managerCancRespTimetamp;
 		this.cancReason = cancReason;
 		this.cancResult = cancResult;
+		this.eventId = eventId;
 	}
 
 	public java.lang.Integer getLeaveRequestId() {
@@ -243,5 +246,13 @@ public class LeaveRequests implements java.io.Serializable {
 
 	public void setCancResult(java.lang.Boolean cancResult) {
 		this.cancResult = cancResult;
+	}
+
+	public java.lang.Integer getEventId() {
+		return this.eventId;
+	}
+
+	public void setEventId(java.lang.Integer eventId) {
+		this.eventId = eventId;
 	}
 }

@@ -175,6 +175,7 @@ public class ManagerUtils {
 		wrkRpt.setFreeSupport(oWrkRpt.getFreeSupport());
 		wrkRpt.setBusinessTripId(oWrkRpt.getBusinessTripId());
 		wrkRpt.setDayTrasfert(oWrkRpt.getDayTrasfert().intValue());
+		wrkRpt.setEventId(oWrkRpt.getEventId());
 
 		return wrkRpt;
 	}
@@ -209,6 +210,7 @@ public class ManagerUtils {
 		oWrkRpt.setFreeSupport(wrkRpt.getFreeSupport());
 		oWrkRpt.setBusinessTripId(wrkRpt.getBusinessTripId());
 		oWrkRpt.setDayTrasfert(wrkRpt.getDayTrasfert().shortValue());
+		oWrkRpt.setEventId(wrkRpt.getEventId());
 
 		return oWrkRpt;
 	}
@@ -1164,6 +1166,7 @@ public class ManagerUtils {
 		o.setSignedBy(oOpt.getSignedBy());
 		o.setSignature(oOpt.getSignature());
 		o.setSuccess(oOpt.getSuccess());
+		o.setEventId(oOpt.getEventId());
 
 		return o;
 	}
@@ -1198,6 +1201,7 @@ public class ManagerUtils {
 		oOpt.setSignedBy(o.getSignedBy());
 		oOpt.setSignature(o.getSignature());
 		oOpt.setSuccess(o.getSuccess());
+		oOpt.setEventId(o.getEventId());
 
 		return oOpt;
 	}
@@ -1220,6 +1224,7 @@ public class ManagerUtils {
 		oAct.setPlace(act.getPlace());
 		oAct.setSubsequentActions(act.getSubsequentActions());
 		oAct.setActivityId(act.getActivityId());
+		oAct.setEventId(act.getEventId());
 
 		return oAct;
 	}
@@ -1242,6 +1247,7 @@ public class ManagerUtils {
 		act.setPlace(oAct.getPlace());
 		act.setSubsequentActions(oAct.getSubsequentActions());
 		act.setActivityId(oAct.getActivityId());
+		act.setEventId(oAct.getEventId());
 
 		return act;
 	}
@@ -1395,6 +1401,7 @@ public class ManagerUtils {
 		lr.setResult(oLr.getResult());
 		lr.setCancReason(oLr.getCancReason());
 		lr.setCancResult(oLr.getCancResult());
+		lr.setEventId(oLr.getEventId());
 
 		return lr;
 	}
@@ -1420,6 +1427,7 @@ public class ManagerUtils {
 		oLr.setEmployeeCancReq(lr.getCancRequest());
 		oLr.setCancReason(lr.getCancReason());
 		oLr.setCancResult(lr.getCancResult());
+		oLr.setEventId(lr.getEventId());
 
 		return oLr;
 	}

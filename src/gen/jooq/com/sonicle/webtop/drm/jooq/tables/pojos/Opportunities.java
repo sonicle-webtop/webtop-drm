@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Opportunities implements java.io.Serializable {
 
-	private static final long serialVersionUID = -793822718;
+	private static final long serialVersionUID = -631698376;
 
 	private java.lang.Integer       id;
 	private java.lang.String        domainId;
@@ -43,6 +43,7 @@ public class Opportunities implements java.io.Serializable {
 	private java.lang.String        signedBy;
 	private java.lang.Boolean       signature;
 	private java.lang.Boolean       success;
+	private java.lang.Integer       eventId;
 
 	public Opportunities() {}
 
@@ -71,7 +72,8 @@ public class Opportunities implements java.io.Serializable {
 		java.lang.Integer       statusId,
 		java.lang.String        signedBy,
 		java.lang.Boolean       signature,
-		java.lang.Boolean       success
+		java.lang.Boolean       success,
+		java.lang.Integer       eventId
 	) {
 		this.id = id;
 		this.domainId = domainId;
@@ -98,6 +100,7 @@ public class Opportunities implements java.io.Serializable {
 		this.signedBy = signedBy;
 		this.signature = signature;
 		this.success = success;
+		this.eventId = eventId;
 	}
 
 	public java.lang.Integer getId() {
@@ -298,5 +301,13 @@ public class Opportunities implements java.io.Serializable {
 
 	public void setSuccess(java.lang.Boolean success) {
 		this.success = success;
+	}
+
+	public java.lang.Integer getEventId() {
+		return this.eventId;
+	}
+
+	public void setEventId(java.lang.Integer eventId) {
+		this.eventId = eventId;
 	}
 }

@@ -1033,3 +1033,19 @@ update work_reports set
 
 ALTER TABLE "drm"."work_reports"
 DROP COLUMN "work_report_no";
+
+--------------
+--15/11/2018--
+--------------
+
+ALTER TABLE "drm"."work_reports"
+ADD COLUMN "event_id" int4;
+
+ALTER TABLE "drm"."opportunity_actions"
+ADD COLUMN "event_id" int4;
+
+ALTER TABLE "drm"."opportunities"
+ADD COLUMN "event_id" int4;
+
+ALTER TABLE "drm"."leave_requests"
+ADD COLUMN "event_id" int4;

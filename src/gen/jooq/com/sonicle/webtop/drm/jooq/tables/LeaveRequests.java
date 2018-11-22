@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class LeaveRequests extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.LeaveRequestsRecord> {
 
-	private static final long serialVersionUID = 1379425410;
+	private static final long serialVersionUID = 2018953687;
 
 	/**
 	 * The reference instance of <code>drm.leave_requests</code>
@@ -130,6 +130,11 @@ public class LeaveRequests extends org.jooq.impl.TableImpl<com.sonicle.webtop.dr
 	 * The column <code>drm.leave_requests.canc_result</code>.
 	 */
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.LeaveRequestsRecord, java.lang.Boolean> CANC_RESULT = createField("canc_result", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
+
+	/**
+	 * The column <code>drm.leave_requests.event_id</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.LeaveRequestsRecord, java.lang.Integer> EVENT_ID = createField("event_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
 	 * Create a <code>drm.leave_requests</code> table reference
