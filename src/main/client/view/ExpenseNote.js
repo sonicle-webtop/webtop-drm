@@ -260,6 +260,7 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 							xtype: 'solinkcolumn',
 							dataIndex: 'fileName',
 							header: me.mys.res('gpExpenseNoteDocument.filename.lbl'),
+							cls: 'wt-theme-text-lnk',
 							flex: 3,
 							listeners: {
 								linkclick: function (s, idx, rec) {
