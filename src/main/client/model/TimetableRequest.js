@@ -60,7 +60,8 @@ Ext.define('Sonicle.webtop.drm.model.TimetableRequest', {
 		WTF.field('result', 'bool', true),
 		WTF.field('cancRequest', 'bool', true),
 		WTF.field('cancReason', 'string', true),
-		WTF.field('cancResult', 'bool', true)
+		WTF.field('cancResult', 'bool', true),
+		WTF.field('eventId', 'int', true)
 	],
 	hasMany: [
 		WTF.hasMany('documents', 'Sonicle.webtop.drm.model.LeaveRequestDocument')

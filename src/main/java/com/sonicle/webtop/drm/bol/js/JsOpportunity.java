@@ -70,6 +70,7 @@ public class JsOpportunity {
 	public String signedBy;
 	public Boolean signature;
 	public Boolean success;
+	public Integer eventId;
 
 	public List<JsGridOpportunityInterlocutor> interlocutors = new ArrayList();
 	public List<Document> documents = new ArrayList();
@@ -100,6 +101,7 @@ public class JsOpportunity {
 		this.signedBy = o.getSignedBy();
 		this.signature = o.getSignature();
 		this.success = o.getSuccess();
+		this.eventId = o.getEventId();
 
 		for (OpportunityInterlocutor oInt : o.getInterlocutors()) {
 			this.interlocutors.add(new JsGridOpportunityInterlocutor(oInt));
@@ -143,6 +145,7 @@ public class JsOpportunity {
 		o.setSignedBy(js.signedBy);
 		o.setSignature(js.signature);
 		o.setSuccess(js.success);
+		o.setEventId(js.eventId);
 
 		for (JsGridOpportunityInterlocutor jsGridOppInt : js.interlocutors) {
 

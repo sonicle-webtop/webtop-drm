@@ -77,7 +77,9 @@ Ext.define('Sonicle.webtop.drm.model.WorkReport', {
 			defaultValue: 0
 		}),
 		
-		WTF.roField('_profileId', 'string')
+		WTF.roField('_profileId', 'string'),
+		
+		WTF.field('eventId', 'int', true)
 
 	],
 	hasMany: [

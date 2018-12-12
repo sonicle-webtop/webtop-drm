@@ -60,6 +60,7 @@ public class JsLeaveRequest {
 	public Boolean cancRequest;
 	public String cancReason;
 	public Boolean canceResult;
+	public Integer eventId;
 
 	public List<Document> documents = new ArrayList();
 
@@ -80,6 +81,7 @@ public class JsLeaveRequest {
 		this.cancRequest = lr.getCancRequest();
 		this.cancReason = lr.getCancReason();
 		this.canceResult = lr.getCancResult();
+		this.eventId = lr.getEventId();
 		
 		documents = new ArrayList<>(lr.getDocuments().size());
 		for (LeaveRequestDocument doc : lr.getDocuments()) {
@@ -110,6 +112,7 @@ public class JsLeaveRequest {
 		lr.setCancRequest(js.cancRequest);
 		lr.setCancReason(js.cancReason);
 		lr.setCancResult(js.canceResult);
+		lr.setEventId(js.eventId);
 		
 		// Attachment needs to be treated outside this class in order to have complete access to their streams
 		

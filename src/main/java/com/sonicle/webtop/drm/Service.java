@@ -1441,6 +1441,9 @@ public class Service extends BaseService {
 			
 			for (OpportunityAction act : oActs) {
 				if(statusId != null && !"null".equals(statusId)) act.setStatusId(Integer.parseInt(statusId));
+				
+				Integer eventId = createOrUpdateOpportunityActionEventIntoOpportunityCalendar(act);
+				act.setEventId(eventId);
 
 				manager.addOpportunityAction(act);
 			}
@@ -1506,11 +1509,14 @@ public class Service extends BaseService {
 					att.setMediaType(upFile.getMediaType());
 					wrkRpt.getAttachments().add(att);
 				}
-
+				
+				String wrId = manager.addWorkReport(wrkRpt);
+				wrkRpt = manager.getWorkReport(wrId);
+				
 				Integer eventId = createOrUpdateWorkReportEventIntoWorkReportCalendar(wrkRpt);
 				wrkRpt.setEventId(eventId);
 				
-				manager.addWorkReport(wrkRpt);
+				manager.updateWorkReport(wrkRpt);
 				
 				new JsonResult().printTo(out);
 
@@ -1657,6 +1663,9 @@ public class Service extends BaseService {
 			LeaveRequest lr = manager.getLeaveRequest(ids.get(0));
 			lr.setResult(choice);
 			
+			Integer eventId = createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+			lr.setEventId(eventId);
+			
 			manager.updateLeaveRequest(lr, true);
 
 			new JsonResult().printTo(out);
@@ -1674,6 +1683,11 @@ public class Service extends BaseService {
 			Boolean choice = ServletUtils.getBooleanParameter(request, "choice", false);
 			
 			manager.updateCancellationLeaveRequest(ids.get(0), choice);
+			
+			LeaveRequest lr = manager.getLeaveRequest(ids.get(0));
+			
+			Integer eventId = createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+			lr.setEventId(eventId);
 
 			new JsonResult().printTo(out);
 		} catch (Exception ex) {
@@ -2745,6 +2759,8 @@ public class Service extends BaseService {
 		}
 		if(o.getDescription() != null)
 			title += o.getDescription() + " > ";
+		if(oAct.getActivityId() != null)
+			title += "[" + WT.getCoreManager().getActivity(oAct.getActivityId()).getDescription() + "] ";
 		if(oAct.getDescription() != null)
 			title += oAct.getDescription();
 		if(oAct.getPlace() != null)
@@ -2782,6 +2798,8 @@ public class Service extends BaseService {
 		}
 		if(o.getDescription() != null)
 			title += o.getDescription() + " > ";
+		if(oAct.getActivityId() != null)
+			title += "[" + WT.getCoreManager().getActivity(oAct.getActivityId()).getDescription() + "] ";
 		if(oAct.getDescription() != null)
 			title += oAct.getDescription();
 		if(oAct.getPlace() != null)

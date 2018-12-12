@@ -56,7 +56,8 @@ public class JsOpportunityAction {
 	public String place;
 	public String subsequentActions;
 	public Integer activityId;
-
+	public Integer eventId;	
+	
 	private List<JsGridOpportunityActionInterlocutor> actionInterlocutors = new ArrayList();
 	public List<Document> actionDocuments = new ArrayList();
 
@@ -72,6 +73,7 @@ public class JsOpportunityAction {
 		this.place = oAct.getPlace();
 		this.subsequentActions = oAct.getSubsequentActions();
 		this.activityId = oAct.getActivityId();
+		this.eventId = oAct.getEventId();
 
 		for (OpportunityActionInterlocutor oActInt : oAct.getActionInterlocutors()) {
 			this.actionInterlocutors.add(new JsGridOpportunityActionInterlocutor(oActInt));
@@ -101,6 +103,7 @@ public class JsOpportunityAction {
 		oAct.setPlace(js.place);
 		oAct.setSubsequentActions(js.subsequentActions);
 		oAct.setActivityId(js.activityId);
+		oAct.setEventId(js.eventId);
 		
 		for (JsGridOpportunityActionInterlocutor jsGridOppActInt : js.actionInterlocutors) {
 

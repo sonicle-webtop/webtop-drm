@@ -72,7 +72,8 @@ Ext.define('Sonicle.webtop.drm.model.Opportunity', {
 		WTF.field('statusId', 'string', true, {validators: [{type: 'wtdrmdynpresence', requiredFieldGroupName: 'notesSignatureFields', requiredFieldName: 'status'}]}),
 		WTF.field('signedBy', 'string', true, {validators: [{type: 'wtdrmdynpresence', requiredFieldGroupName: 'notesSignatureFields', requiredFieldName: 'signed_by'}]}),
 		WTF.field('signature', 'bool', true, {validators: [{type: 'wtdrmdynpresence', requiredFieldGroupName: 'notesSignatureFields', requiredFieldName: 'signature'}]}),
-		WTF.field('success', 'bool', true, {validators: [{type: 'wtdrmdynpresence', requiredFieldGroupName: 'notesSignatureFields', requiredFieldName: 'success'}]})
+		WTF.field('success', 'bool', true, {validators: [{type: 'wtdrmdynpresence', requiredFieldGroupName: 'notesSignatureFields', requiredFieldName: 'success'}]}),
+		WTF.field('eventId', 'int', true)
 	],
 	hasMany: [
 		WTF.hasMany('interlocutors', 'Sonicle.webtop.drm.model.OpportunityInterlocutor'),

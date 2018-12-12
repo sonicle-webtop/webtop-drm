@@ -1512,7 +1512,8 @@ public class DrmManager extends BaseManager {
 	
 	public Opportunity getOpportunity(Integer id) throws WTException {
 		Connection con = null;
-		OpportunityDAO oDao = OpportunityDAO.getInstance();
+		OpportunityDAO oDAO = OpportunityDAO.getInstance();
+		OpportunityActionDAO oActDAO = OpportunityActionDAO.getInstance();
 		OpportunityInterlocutorDAO oIDao = OpportunityInterlocutorDAO.getInstance();
 		OpportunityDocumentDAO oDDao = OpportunityDocumentDAO.getInstance();
 		
@@ -1522,7 +1523,11 @@ public class DrmManager extends BaseManager {
 
 			con = WT.getConnection(SERVICE_ID);
 
-			o = ManagerUtils.createOpportunity(oDao.selectById(con, id));
+			o = ManagerUtils.createOpportunity(oDAO.selectById(con, id));
+			
+			for (OOpportunityAction oAct : oActDAO.selectByOpportunity(con, id)) {
+				o.getActions().add(ManagerUtils.createOpportunityAction(oAct));
+			}
 			
 			for (OOpportunityInterlocutor oInt : oIDao.selectByOpportunity(con, id)) {
 				o.getInterlocutors().add(ManagerUtils.createOpportunityInterlocutor(oInt));
@@ -1964,7 +1969,7 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	public void addWorkReport(WorkReport wrkRpt) throws WTException {
+	public String addWorkReport(WorkReport wrkRpt) throws WTException {
 
 		Connection con = null;
 
@@ -1999,7 +2004,9 @@ public class DrmManager extends BaseManager {
 
 			wrkDao.insert(con, newWorkReport, revisionTimestamp);
 
-			DbUtils.commitQuietly(con);			
+			DbUtils.commitQuietly(con);
+
+			return newWorkReport.getWorkReportId();
 		} catch (SQLException | DAOException ex) {
 			DbUtils.rollbackQuietly(con);
 			throw new WTException(ex, "DB error");
