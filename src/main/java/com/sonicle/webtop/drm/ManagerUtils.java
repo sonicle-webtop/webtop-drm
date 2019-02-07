@@ -42,6 +42,7 @@ import com.sonicle.webtop.drm.bol.OBusinessTrip;
 import com.sonicle.webtop.drm.bol.OCompany;
 import com.sonicle.webtop.drm.bol.OCompanyPicture;
 import com.sonicle.webtop.drm.bol.OCompanyUser;
+import com.sonicle.webtop.drm.bol.OCostType;
 import com.sonicle.webtop.drm.bol.ODocStatus;
 import com.sonicle.webtop.drm.bol.ODocStatusGroup;
 import com.sonicle.webtop.drm.bol.ODrmFolder;
@@ -52,6 +53,7 @@ import com.sonicle.webtop.drm.bol.ODrmLineManager;
 import com.sonicle.webtop.drm.bol.ODrmLineManagerUsers;
 import com.sonicle.webtop.drm.bol.ODrmProfile;
 import com.sonicle.webtop.drm.bol.OEmployeeProfile;
+import com.sonicle.webtop.drm.bol.OExpenseNoteSetting;
 import com.sonicle.webtop.drm.bol.OHolidayDate;
 import com.sonicle.webtop.drm.bol.OHourProfile;
 import com.sonicle.webtop.drm.bol.OLeaveRequest;
@@ -85,6 +87,7 @@ import com.sonicle.webtop.drm.model.BusinessTrip;
 import com.sonicle.webtop.drm.model.Company;
 import com.sonicle.webtop.drm.model.CompanyPicture;
 import com.sonicle.webtop.drm.model.CompanyUserAssociation;
+import com.sonicle.webtop.drm.model.CostType;
 import com.sonicle.webtop.drm.model.DocStatus;
 import com.sonicle.webtop.drm.model.DocStatusGroupAssociation;
 import com.sonicle.webtop.drm.model.DrmFolder;
@@ -94,6 +97,7 @@ import com.sonicle.webtop.drm.model.DrmGroupUserAssociation;
 import com.sonicle.webtop.drm.model.DrmLineManager;
 import com.sonicle.webtop.drm.model.DrmProfile;
 import com.sonicle.webtop.drm.model.EmployeeProfile;
+import com.sonicle.webtop.drm.model.ExpenseNoteSetting;
 import com.sonicle.webtop.drm.model.HolidayDate;
 import com.sonicle.webtop.drm.model.HourProfile;
 import com.sonicle.webtop.drm.model.LeaveRequest;
@@ -174,7 +178,7 @@ public class ManagerUtils {
 		wrkRpt.setChargeTo(oWrkRpt.getChargeTo());
 		wrkRpt.setFreeSupport(oWrkRpt.getFreeSupport());
 		wrkRpt.setBusinessTripId(oWrkRpt.getBusinessTripId());
-		wrkRpt.setDayTrasfert(oWrkRpt.getDayTrasfert().intValue());
+		wrkRpt.setBusinessTripDays(oWrkRpt.getBusinessTripDays().intValue());
 		wrkRpt.setEventId(oWrkRpt.getEventId());
 
 		return wrkRpt;
@@ -209,7 +213,7 @@ public class ManagerUtils {
 		oWrkRpt.setChargeTo(wrkRpt.getChargeTo());
 		oWrkRpt.setFreeSupport(wrkRpt.getFreeSupport());
 		oWrkRpt.setBusinessTripId(wrkRpt.getBusinessTripId());
-		oWrkRpt.setDayTrasfert(wrkRpt.getDayTrasfert().shortValue());
+		oWrkRpt.setBusinessTripDays(wrkRpt.getBusinessTripDays().shortValue());
 		oWrkRpt.setEventId(wrkRpt.getEventId());
 
 		return oWrkRpt;
@@ -227,7 +231,7 @@ public class ManagerUtils {
 		wrkDetail.setRowNo(oWrkDetail.getRowNo().intValue());
 		wrkDetail.setWorkTypeId(oWrkDetail.getWorkTypeId());
 		wrkDetail.setDuration(oWrkDetail.getDuration().intValue());
-		wrkDetail.setRowFlag(oWrkDetail.getRowFlag());
+		wrkDetail.setExtra(oWrkDetail.getExtra());
 
 		return wrkDetail;
 	}
@@ -244,7 +248,7 @@ public class ManagerUtils {
 		oWrkDetail.setRowNo(wrkDetail.getRowNo().shortValue());
 		oWrkDetail.setWorkTypeId(wrkDetail.getWorkTypeId());
 		oWrkDetail.setDuration(wrkDetail.getDuration().shortValue());
-		oWrkDetail.setRowFlag(wrkDetail.getRowFlag());
+		oWrkDetail.setExtra(wrkDetail.getExtra());
 
 		return oWrkDetail;
 	}
@@ -1432,6 +1436,34 @@ public class ManagerUtils {
 		return oLr;
 	}
 	
+	static OExpenseNoteSetting createOExpenseNoteSetting(ExpenseNoteSetting enSetting) {
+		if (enSetting == null) {
+			return null;
+		}
+		OExpenseNoteSetting oSetting = new OExpenseNoteSetting();
+		oSetting.setExpenseNoteSettingId(enSetting.getExpenseNoteSettingId());
+		oSetting.setDomainId(enSetting.getDomainId());
+		oSetting.setAverageMaximum(enSetting.getAverageMaximum());
+		oSetting.setKmCost(enSetting.getKmCost());
+		oSetting.setDefaultCurrency(enSetting.getDefaultCurrency());
+
+		return oSetting;
+	}
+
+	static ExpenseNoteSetting createExpenseNoteSetting(OExpenseNoteSetting oEnSetting) {
+		if (oEnSetting == null) {
+			return null;
+		}
+		ExpenseNoteSetting enSetting = new ExpenseNoteSetting();
+		enSetting.setExpenseNoteSettingId(oEnSetting.getExpenseNoteSettingId());
+		enSetting.setDomainId(oEnSetting.getDomainId());
+		enSetting.setAverageMaximum(oEnSetting.getAverageMaximum());
+		enSetting.setKmCost(oEnSetting.getKmCost());
+		enSetting.setDefaultCurrency(oEnSetting.getDefaultCurrency());
+
+		return enSetting;
+	}
+	
 	static OTimetableSetting createOTimetableSetting(TimetableSetting tSetting) {
 		if (tSetting == null) {
 			return null;
@@ -1538,6 +1570,48 @@ public class ManagerUtils {
 		oType.setDescription(type.getDescription());
 
 		return oType;
+	}
+	
+	static CostType createCostType(OCostType oCt) {
+
+		if (oCt == null) {
+			return null;
+		}
+
+		CostType ct = new CostType();
+		ct.setDomainId(oCt.getDomainId());
+		ct.setId(oCt.getId());
+		ct.setDescription(oCt.getDescription());
+		ct.setMaxImport(oCt.getMaxImport());
+		ct.setCostType(oCt.getCostType());
+		ct.setWithOthers(oCt.getWithOthers());
+		ct.setPerPerson(oCt.getPerPerson());
+		ct.setKm(oCt.getKm());
+		ct.setAdvancePayment(oCt.getAdvancePayment());
+		ct.setExchange(oCt.getExchange());
+
+		return ct;
+	}
+
+	static OCostType createOCostType(CostType ct) {
+
+		if (ct == null) {
+			return null;
+		}
+
+		OCostType oCt = new OCostType();
+		oCt.setDomainId(ct.getDomainId());
+		oCt.setId(ct.getId());
+		oCt.setDescription(ct.getDescription());
+		oCt.setMaxImport(ct.getMaxImport());
+		oCt.setCostType(ct.getCostType());
+		oCt.setWithOthers(ct.getWithOthers());
+		oCt.setPerPerson(ct.getPerPerson());
+		oCt.setKm(ct.getKm());
+		oCt.setAdvancePayment(ct.getAdvancePayment());
+		oCt.setExchange(ct.getExchange());
+
+		return oCt;
 	}
 	
 	static HolidayDate createHolidayDate(OHolidayDate oHd) {

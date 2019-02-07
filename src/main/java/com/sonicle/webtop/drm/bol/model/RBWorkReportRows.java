@@ -49,7 +49,7 @@ public class RBWorkReportRows {
 	public String workTypeExternalId;
 	public String workTypeDescription;
 	public Integer duration;
-	public String rowFlag;
+	public Boolean extra;
 
 	public RBWorkReportRows(DrmManager drmMgr, WorkReportRow wrr) throws WTException {
 		this.id = wrr.getId();
@@ -59,7 +59,7 @@ public class RBWorkReportRows {
 		this.workTypeExternalId = drmMgr.getWorkType(wrr.getWorkTypeId()).getExternalId();
 		this.workTypeDescription = drmMgr.getWorkType(wrr.getWorkTypeId()).getDescription();
 		this.duration = wrr.getDuration();
-		this.rowFlag = wrr.getRowFlag();
+		this.extra = wrr.getExtra();
 	}
 	
 	public RBWorkReportRows() throws WTException {
@@ -114,12 +114,12 @@ public class RBWorkReportRows {
 		this.duration = duration;
 	}
 
-	public String getRowFlag() {
-		return rowFlag;
+	public Boolean getExtra() {
+		return extra;
 	}
 
-	public void setRowFlag(String rowFlag) {
-		this.rowFlag = rowFlag;
+	public void setExtra(Boolean extra) {
+		this.extra = extra;
 	}
 
 	public String getWorkTypeExternalId() {

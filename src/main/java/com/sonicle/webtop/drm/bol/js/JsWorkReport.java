@@ -68,7 +68,7 @@ public class JsWorkReport {
 	public Boolean chargeTo;
 	public Boolean freeSupport;
 	public Integer businessTripId;
-	public Integer dayTrasfert;
+	public Integer businessTripDays;
 	public Integer eventId;
 
 	public List<JsGridWorkReportRow> details = new ArrayList();
@@ -98,7 +98,7 @@ public class JsWorkReport {
 		this.chargeTo = report.getChargeTo();
 		this.freeSupport = report.getFreeSupport();
 		this.businessTripId = report.getBusinessTripId();
-		this.dayTrasfert = report.getDayTrasfert();
+		this.businessTripDays = report.getBusinessTripDays();
 		this.eventId = report.getEventId();
 
 		for (WorkReportRow wrkDetail : report.getDetails()) {
@@ -143,7 +143,7 @@ public class JsWorkReport {
 		rw.setChargeTo(js.chargeTo);
 		rw.setFreeSupport(js.freeSupport);
 		rw.setBusinessTripId(js.businessTripId);
-		rw.setDayTrasfert(js.dayTrasfert);
+		rw.setBusinessTripDays(js.businessTripDays);
 		rw.setEventId(js.eventId);
 
 		for (JsGridWorkReportRow jsWrkDetail : js.details) {

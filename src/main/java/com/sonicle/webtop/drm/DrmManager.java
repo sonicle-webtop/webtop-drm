@@ -53,6 +53,7 @@ import com.sonicle.webtop.drm.bol.OBusinessTrip;
 import com.sonicle.webtop.drm.bol.OCompany;
 import com.sonicle.webtop.drm.bol.OCompanyPicture;
 import com.sonicle.webtop.drm.bol.OCompanyUser;
+import com.sonicle.webtop.drm.bol.OCostType;
 import com.sonicle.webtop.drm.bol.ODocStatus;
 import com.sonicle.webtop.drm.bol.ODocStatusGroup;
 import com.sonicle.webtop.drm.bol.ODrmFolder;
@@ -64,6 +65,7 @@ import com.sonicle.webtop.drm.bol.ODrmLineManagerUsers;
 import com.sonicle.webtop.drm.bol.ODrmProfile;
 import com.sonicle.webtop.drm.bol.OLineHour;
 import com.sonicle.webtop.drm.bol.OEmployeeProfile;
+import com.sonicle.webtop.drm.bol.OExpenseNoteSetting;
 import com.sonicle.webtop.drm.bol.OHolidayDate;
 import com.sonicle.webtop.drm.bol.OHourProfile;
 import com.sonicle.webtop.drm.bol.OLeaveRequest;
@@ -96,6 +98,7 @@ import com.sonicle.webtop.drm.dal.BusinessTripDao;
 import com.sonicle.webtop.drm.dal.CompanyDAO;
 import com.sonicle.webtop.drm.dal.CompanyPictureDAO;
 import com.sonicle.webtop.drm.dal.CompanyUserDAO;
+import com.sonicle.webtop.drm.dal.CostTypeDAO;
 import com.sonicle.webtop.drm.dal.DocStatusDAO;
 import com.sonicle.webtop.drm.dal.DocStausGroupDAO;
 import com.sonicle.webtop.drm.dal.DrmFolderDAO;
@@ -107,6 +110,7 @@ import com.sonicle.webtop.drm.dal.DrmProfileDAO;
 import com.sonicle.webtop.drm.dal.DrmUserForManagerDAO;
 import com.sonicle.webtop.drm.dal.LineHourDAO;
 import com.sonicle.webtop.drm.dal.EmployeeProfileDAO;
+import com.sonicle.webtop.drm.dal.ExpenseNoteSettingDAO;
 import com.sonicle.webtop.drm.dal.HolidayDateDAO;
 import com.sonicle.webtop.drm.dal.HourProfileDAO;
 import com.sonicle.webtop.drm.dal.LeaveRequestDAO;
@@ -134,6 +138,7 @@ import com.sonicle.webtop.drm.model.BusinessTrip;
 import com.sonicle.webtop.drm.model.Company;
 import com.sonicle.webtop.drm.model.CompanyPicture;
 import com.sonicle.webtop.drm.model.CompanyUserAssociation;
+import com.sonicle.webtop.drm.model.CostType;
 import com.sonicle.webtop.drm.model.DocStatus;
 import com.sonicle.webtop.drm.model.DocStatusGroupAssociation;
 import com.sonicle.webtop.drm.model.DrmFolder;
@@ -144,6 +149,7 @@ import com.sonicle.webtop.drm.model.DrmLineManager;
 import com.sonicle.webtop.drm.model.DrmProfile;
 import com.sonicle.webtop.drm.model.LineHour;
 import com.sonicle.webtop.drm.model.EmployeeProfile;
+import com.sonicle.webtop.drm.model.ExpenseNoteSetting;
 import com.sonicle.webtop.drm.model.FileContent;
 import com.sonicle.webtop.drm.model.HolidayDate;
 import com.sonicle.webtop.drm.model.HourProfile;
@@ -2534,6 +2540,91 @@ public class DrmManager extends BaseManager {
 			if(oDocData == null) return null;
 			
 			return ManagerUtils.fillLeaveRequestDocument(new LeaveRequestDocumentWithBytes(oDocData.getBytes()), oDoc);
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public ExpenseNoteSetting getExpenseNoteSetting() throws WTException {
+		Connection con = null;
+		ExpenseNoteSettingDAO enSettDao = ExpenseNoteSettingDAO.getInstance().getInstance();
+		CostTypeDAO ctDao = CostTypeDAO.getInstance();
+
+		ExpenseNoteSetting setting = null;
+		
+		try {
+			con = WT.getConnection(SERVICE_ID);
+
+			setting = ManagerUtils.createExpenseNoteSetting(enSettDao.selectByDomainId(con, getTargetProfileId().getDomainId()));
+			
+			if (setting != null) {
+				for (OCostType oCt : ctDao.selectByDomain(con, getTargetProfileId().getDomainId())) {
+					setting.getCostTypes().add(ManagerUtils.createCostType(oCt));
+				}
+			}
+			return setting;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public void updateExpenseNoteSetting(ExpenseNoteSetting item) throws WTException {
+
+		Connection con = null;
+		ExpenseNoteSettingDAO enSettDao = ExpenseNoteSettingDAO.getInstance().getInstance();
+		CostTypeDAO ctDao = CostTypeDAO.getInstance();
+
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			ExpenseNoteSetting oldExpenseNoteSetting = getExpenseNoteSetting();
+
+			OExpenseNoteSetting setting = ManagerUtils.createOExpenseNoteSetting(item);
+
+			if (oldExpenseNoteSetting == null) {
+
+				setting.setExpenseNoteSettingId(enSettDao.getSequence(con).intValue());
+				setting.setDomainId(getTargetProfileId().getDomainId());
+
+				enSettDao.insert(con, setting);
+
+			} else {
+				enSettDao.update(con, setting);
+			}
+
+			List<CostType> cts = oldExpenseNoteSetting == null ? new ArrayList() : oldExpenseNoteSetting.getCostTypes();
+			
+			CollectionChangeSet<CostType> changesSet1 = getCollectionChanges(cts, item.getCostTypes());
+			for (CostType ct : changesSet1.inserted) {
+
+				OCostType oCt = ManagerUtils.createOCostType(ct);
+				oCt.setDomainId(getTargetProfileId().getDomainId());
+				oCt.setId(ctDao.getSequence(con).intValue());
+
+				ctDao.insert(con, oCt);
+			}
+
+			for (CostType ct : changesSet1.deleted) {
+				ctDao.deleteByIdDomainId(con, ct.getId(), ct.getDomainId());
+			}
+
+			for (CostType ct : changesSet1.updated) {
+
+				OCostType oCt = ManagerUtils.createOCostType(ct);
+				OCostType newOCt = null;
+				
+				newOCt = ctDao.selectByIdDomainId(con, oCt.getId(), oCt.getDomainId());
+
+				if(newOCt != null) ctDao.updateByIdDomainId(con, oCt);
+			}
+
+			DbUtils.commitQuietly(con);
 
 		} catch (SQLException | DAOException ex) {
 			throw new WTException(ex, "DB error");

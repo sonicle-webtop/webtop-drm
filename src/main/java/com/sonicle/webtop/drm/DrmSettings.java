@@ -69,4 +69,8 @@ public class DrmSettings {
 	public static final String WORK_REPORT_CALENDAR_ID = "workreport.calendar.id";
 	
 	public static final String LEAVE_REQUEST_CALENDAR_ID = "leaverequest.calendar.id";
+	
+	public static final String EXPENSE_NOTE_KM_COST = "expensenote.kmcost";
+	
+	public static final String EXPENSE_NOTE_DEFAULT_CURRENCY = "expensenote.defaultcurrency";
 }

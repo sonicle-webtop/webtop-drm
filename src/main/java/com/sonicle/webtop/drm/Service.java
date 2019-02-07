@@ -180,6 +180,10 @@ import com.sonicle.webtop.calendar.model.Event;
 import com.sonicle.webtop.calendar.model.EventInstance;
 import com.sonicle.webtop.calendar.model.EventKey;
 import com.sonicle.webtop.calendar.model.UpdateEventTarget;
+import com.sonicle.webtop.drm.bol.ODefaultCostType;
+import com.sonicle.webtop.drm.bol.js.JsExpenseNoteSetting;
+import com.sonicle.webtop.drm.model.ExpenseNoteSetting;
+import java.math.BigDecimal;
 
 /**
  *
@@ -252,6 +256,8 @@ public class Service extends BaseService {
 		
 		try {
 			vs.put("opportunityRequiredFields", getOpportunityRequiredFields());
+			vs.put("expenseNoteDefaultCurrency", getExpenseNoteDefaultCurrency());
+			vs.put("expenseNoteKmCost", getExpenseNoteKmCost());
 		} catch (WTException ex) {
 			java.util.logging.Logger.getLogger(Service.class.getName()).log(Level.SEVERE, null, ex);
 		}
@@ -284,6 +290,35 @@ public class Service extends BaseService {
 			
 		} catch (Exception ex) {
 			throw new WTException("Error in getOpportunityConfigurationFields", ex);
+		}
+	}
+	
+	private String getExpenseNoteDefaultCurrency() throws WTException {
+		try{
+			String value = us.getDefaultCurrency();
+			if(value == null || "".equals(value)){
+				ExpenseNoteSetting enS = manager.getExpenseNoteSetting();
+				if(enS != null) value = enS.getDefaultCurrency();
+			}
+			
+			return (value == null) ? "EUR" : value;			
+		} catch (Exception ex) {
+			throw new WTException("Error in getExpenseNoteDefaultCurrency", ex);
+		}
+	}
+	
+	private String getExpenseNoteKmCost() throws WTException {
+		try{
+			String value = us.getKmCost();
+			BigDecimal value2 = null;
+			if(value == null || "".equals(value)){
+				ExpenseNoteSetting enS = manager.getExpenseNoteSetting();
+				if(enS != null) value2 = enS.getKmCost();
+				if(value2 != null) value = value2.toString();
+			}
+			return (value == null) ? "1" : value;	
+		} catch (Exception ex) {
+			throw new WTException("Error in getExpenseNoteDefaultCurrency", ex);
 		}
 	}
 
@@ -542,6 +577,25 @@ public class Service extends BaseService {
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action LookupLeaveRequestType", ex);
+		}
+	}
+	
+	public void processLookupCostType(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+
+			List<JsSimple> costTypes = new ArrayList();
+
+			costTypes.add(new JsSimple(EnumUtils.toSerializedName(ODefaultCostType.STAY), lookupResource("costType.S")));
+			costTypes.add(new JsSimple(EnumUtils.toSerializedName(ODefaultCostType.HIGHWAY), lookupResource("costType.H")));
+			costTypes.add(new JsSimple(EnumUtils.toSerializedName(ODefaultCostType.PARK), lookupResource("costType.P")));
+			costTypes.add(new JsSimple(EnumUtils.toSerializedName(ODefaultCostType.MEALS), lookupResource("costType.M")));
+			costTypes.add(new JsSimple(EnumUtils.toSerializedName(ODefaultCostType.OTHER), lookupResource("costType.O")));
+			costTypes.add(new JsSimple(EnumUtils.toSerializedName(ODefaultCostType.KM), lookupResource("costType.K")));
+
+			new JsonResult(costTypes, costTypes.size()).printTo(out);
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupCostType", ex);
 		}
 	}
 
@@ -1979,6 +2033,38 @@ public class Service extends BaseService {
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action ManageWorkReportSetting", ex);
+		}
+	}
+	
+	public void processManageExpenseNoteSetting(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		JsExpenseNoteSetting item = null;
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+
+			if (crud.equals(Crud.READ)) {
+				ExpenseNoteSetting enSetting = manager.getExpenseNoteSetting();
+
+				if (enSetting != null) {
+					item = new JsExpenseNoteSetting(enSetting);
+				} else {
+					item = new JsExpenseNoteSetting(new ExpenseNoteSetting());
+				}
+
+				new JsonResult(item).printTo(out);
+
+			} else if (crud.equals(Crud.UPDATE)) {
+				Payload<MapItem, JsExpenseNoteSetting> pl = ServletUtils.getPayload(request, JsExpenseNoteSetting.class);
+
+				ExpenseNoteSetting enSetting = JsExpenseNoteSetting.createExpenseNoteSetting(pl.data);
+
+				manager.updateExpenseNoteSetting(enSetting);
+
+				new JsonResult().printTo(out);
+
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageExpenseNoteSetting", ex);
 		}
 	}
 

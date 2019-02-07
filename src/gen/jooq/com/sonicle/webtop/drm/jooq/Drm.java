@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Drm extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = 1195885497;
+	private static final long serialVersionUID = 1631171652;
 
 	/**
 	 * The reference instance of <code>drm</code>
@@ -42,9 +42,11 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_BUSINESS_TRIPS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_COMPANIES,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_COMPANIES_USERS,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_COST_TYPES,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_DOC_STATUSES,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_DOC_STATUSES_GROUPS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EMPLOYEE_PROFILES,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EXPENSE_NOTE_SETTINGS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_FOLDERS_GROUPS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_GROUPS_USERS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_HOUR_PROFILES,
@@ -83,10 +85,12 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.tables.Companies.COMPANIES,
 			com.sonicle.webtop.drm.jooq.tables.CompaniesPictures.COMPANIES_PICTURES,
 			com.sonicle.webtop.drm.jooq.tables.CompaniesUsers.COMPANIES_USERS,
+			com.sonicle.webtop.drm.jooq.tables.CostTypes.COST_TYPES,
 			com.sonicle.webtop.drm.jooq.tables.DocStatuses.DOC_STATUSES,
 			com.sonicle.webtop.drm.jooq.tables.DocStatusesGroups.DOC_STATUSES_GROUPS,
 			com.sonicle.webtop.drm.jooq.tables.EmployeeProfiles.EMPLOYEE_PROFILES,
 			com.sonicle.webtop.drm.jooq.tables.EnabledPrograms.ENABLED_PROGRAMS,
+			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteSettings.EXPENSE_NOTE_SETTINGS,
 			com.sonicle.webtop.drm.jooq.tables.Folders.FOLDERS,
 			com.sonicle.webtop.drm.jooq.tables.FoldersGroups.FOLDERS_GROUPS,
 			com.sonicle.webtop.drm.jooq.tables.Groups.GROUPS,

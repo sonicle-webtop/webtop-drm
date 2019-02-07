@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2017 Sonicle S.r.l.
+/* 
+ * Copyright (C) 2014 Sonicle S.r.l.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by
@@ -28,64 +28,23 @@
  * version 3, these Appropriate Legal Notices must retain the display of the
  * Sonicle logo and Sonicle copyright notice. If the display of the logo is not
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
- * display the words "Copyright (C) 2017 Sonicle S.r.l.".
+ * display the words "Copyright (C) 2014 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm;
+package com.sonicle.webtop.drm.bol.js;
 
-import com.sonicle.webtop.core.sdk.BaseUserSettings;
-import com.sonicle.webtop.core.sdk.UserProfileId;
-import static com.sonicle.webtop.drm.DrmSettings.*;
+import com.sonicle.webtop.core.sdk.bol.js.JsUserOptionsBase;
 
 /**
  *
- * @author lssndrvs
+ * @author malbinola
  */
-public class DrmUserSettings extends BaseUserSettings {
+public class JsUserOptions extends JsUserOptionsBase {
+	public String kmCost;
+	public String defaultCurrency;
 	
-	private DrmServiceSettings ss;
-
-	public DrmUserSettings(String serviceId, UserProfileId profileId) {
-		super(serviceId, profileId);
-		this.ss = new DrmServiceSettings(serviceId, profileId.getDomainId());
-	}
+	public JsUserOptions() {}
 	
-	public Integer getOpportunityCalendarId() {
-		return getInteger(OPPORTUNITY_CALENDAR_ID, null); 
-	}
-
-	public void setOpportunityCalendarId(int value) {
-		setInteger(OPPORTUNITY_CALENDAR_ID, value); 
-	}
-	
-	public Integer getWorkReportCalendarId() {
-		return getInteger(WORK_REPORT_CALENDAR_ID, null); 
-	}
-
-	public void setWorkReportCalendarId(int value) {
-		setInteger(WORK_REPORT_CALENDAR_ID, value); 
-	}
-
-	public Integer getLeaveRequestCalendarId() {
-		return getInteger(LEAVE_REQUEST_CALENDAR_ID, null); 
-	}
-
-	public void setLeaveRequestCalendarId(int value) {
-		setInteger(LEAVE_REQUEST_CALENDAR_ID, value); 
-	}
-	
-	public String getKmCost() {
-		return getString(EXPENSE_NOTE_KM_COST, null); 
-	}
-
-	public void setKmCost(String value) {
-		setString(EXPENSE_NOTE_KM_COST, value);
-	}
-	
-	public String getDefaultCurrency() {
-		return getString(EXPENSE_NOTE_DEFAULT_CURRENCY, null); 
-	}
-
-	public void setDefaultCurrency(String value) {
-		setString(EXPENSE_NOTE_DEFAULT_CURRENCY, value);
+	public JsUserOptions(String id) {
+		super(id);
 	}
 }

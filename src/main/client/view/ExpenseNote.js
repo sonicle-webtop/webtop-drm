@@ -161,21 +161,15 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 													fieldLabel: me.mys.res('expenseNote.fld-totCurrency.lbl'),
 													width: '285px'
 												},
-												WTF.lookupCombo('id', 'desc', {
+												WTF.localCombo('id', 'desc', {
 													reference: 'fldcurrency',
 													bind: '{record.currency}',
-													store: Ext.create('Sonicle.webtop.drm.store.UserGroupType', {
+													readOnly: true,
+													store: Ext.create('Sonicle.webtop.drm.store.Currency', {
 														autoLoad: true
 													}),
-													width: '100px'
-												}),
-												{
-													xtype: 'button',
-													iconCls: 'wtdrm-icon-totcurrency-xs',
-													handler: function() {
-														alert("Ciao");
-													}
-												}
+													width: '130px'
+												})
 											]
 										}
 									]
@@ -311,6 +305,8 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 				}
 			]
 		});
+		
+		me.on('viewload', me.onViewLoad);
 	},
 	
 	initActions: function () {
@@ -390,6 +386,16 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 	
 	initCxm: function () {
 		var me = this;
+	},
+	
+	onViewLoad: function(s, success) {
+		if(!success) return;
+		var me = this,
+				mo = me.getModel();
+		
+		if(me.isMode(me.MODE_NEW)) {
+			mo.set('currency', me.mys.getVar('expenseNoteDefaultCurrency'));
+		}
 	},
 	
 	addExpenseNoteDetail: function (opts) {

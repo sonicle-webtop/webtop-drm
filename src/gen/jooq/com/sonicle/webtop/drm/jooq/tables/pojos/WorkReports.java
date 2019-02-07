@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WorkReports implements java.io.Serializable {
 
-	private static final long serialVersionUID = 1402310539;
+	private static final long serialVersionUID = 1017323941;
 
 	private java.lang.String        workReportId;
 	private java.lang.Integer       companyId;
@@ -40,7 +40,7 @@ public class WorkReports implements java.io.Serializable {
 	private java.lang.Boolean       chargeTo;
 	private java.lang.Boolean       freeSupport;
 	private java.lang.Integer       businessTripId;
-	private java.lang.Short         dayTrasfert;
+	private java.lang.Short         businessTripDays;
 	private java.lang.Integer       number;
 	private java.lang.Integer       year;
 	private java.lang.Integer       eventId;
@@ -70,7 +70,7 @@ public class WorkReports implements java.io.Serializable {
 		java.lang.Boolean       chargeTo,
 		java.lang.Boolean       freeSupport,
 		java.lang.Integer       businessTripId,
-		java.lang.Short         dayTrasfert,
+		java.lang.Short         businessTripDays,
 		java.lang.Integer       number,
 		java.lang.Integer       year,
 		java.lang.Integer       eventId
@@ -97,7 +97,7 @@ public class WorkReports implements java.io.Serializable {
 		this.chargeTo = chargeTo;
 		this.freeSupport = freeSupport;
 		this.businessTripId = businessTripId;
-		this.dayTrasfert = dayTrasfert;
+		this.businessTripDays = businessTripDays;
 		this.number = number;
 		this.year = year;
 		this.eventId = eventId;
@@ -279,12 +279,12 @@ public class WorkReports implements java.io.Serializable {
 		this.businessTripId = businessTripId;
 	}
 
-	public java.lang.Short getDayTrasfert() {
-		return this.dayTrasfert;
+	public java.lang.Short getBusinessTripDays() {
+		return this.businessTripDays;
 	}
 
-	public void setDayTrasfert(java.lang.Short dayTrasfert) {
-		this.dayTrasfert = dayTrasfert;
+	public void setBusinessTripDays(java.lang.Short businessTripDays) {
+		this.businessTripDays = businessTripDays;
 	}
 
 	public java.lang.Integer getNumber() {

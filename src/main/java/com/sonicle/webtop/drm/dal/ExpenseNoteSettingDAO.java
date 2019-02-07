@@ -34,10 +34,11 @@ package com.sonicle.webtop.drm.dal;
 
 import com.sonicle.webtop.core.dal.BaseDAO;
 import com.sonicle.webtop.core.dal.DAOException;
-import com.sonicle.webtop.drm.bol.OWorkReportRow;
-import static com.sonicle.webtop.drm.jooq.Sequences.SEQ_WORK_REPORT_DETAILS;
-import static com.sonicle.webtop.drm.jooq.Tables.WORK_REPORTS_ROWS;
-import com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRowsRecord;
+import com.sonicle.webtop.drm.bol.OExpenseNoteSetting;
+import com.sonicle.webtop.drm.bol.OTimetableSetting;
+import com.sonicle.webtop.drm.jooq.Sequences;
+import static com.sonicle.webtop.drm.jooq.Tables.EXPENSE_NOTE_SETTINGS;
+import com.sonicle.webtop.drm.jooq.tables.records.ExpenseNoteSettingsRecord;
 import java.sql.Connection;
 import java.util.List;
 import org.jooq.DSLContext;
@@ -46,75 +47,68 @@ import org.jooq.DSLContext;
  *
  * @author lssndrvs
  */
-public class WorkReportRowDAO extends BaseDAO {
+public class ExpenseNoteSettingDAO extends BaseDAO {
 
-	private final static WorkReportRowDAO INSTANCE = new WorkReportRowDAO();
+	private final static ExpenseNoteSettingDAO INSTANCE = new ExpenseNoteSettingDAO();
 
-	public static WorkReportRowDAO getInstance() {
+	public static ExpenseNoteSettingDAO getInstance() {
 		return INSTANCE;
 	}
 
 	public Long getSequence(Connection con) throws DAOException {
 		DSLContext dsl = getDSL(con);
-		Long nextID = dsl.nextval(SEQ_WORK_REPORT_DETAILS);
+		Long nextID = dsl.nextval(Sequences.SEQ_EXPENSE_NOTE_SETTINGS);
 		return nextID;
 	}
-
-	public List<OWorkReportRow> selectByWorkReport(Connection con, String workReportId) throws DAOException {
+	
+	public int insert(Connection con, OExpenseNoteSetting item) throws DAOException {
 		DSLContext dsl = getDSL(con);
-		return dsl
-				.select()
-				.from(WORK_REPORTS_ROWS)
-				.where(
-						WORK_REPORTS_ROWS.WORK_REPORT_ID.equal(workReportId)
-				)
-				.fetchInto(OWorkReportRow.class);
-	}
-
-	public int insert(Connection con, OWorkReportRow item) throws DAOException {
-		DSLContext dsl = getDSL(con);
-
-		WorkReportsRowsRecord record = dsl.newRecord(WORK_REPORTS_ROWS, item);
+		ExpenseNoteSettingsRecord record = dsl.newRecord(EXPENSE_NOTE_SETTINGS, item);
 
 		return dsl
-				.insertInto(WORK_REPORTS_ROWS)
+				.insertInto(EXPENSE_NOTE_SETTINGS)
 				.set(record)
 				.execute();
 	}
 
-	public int update(Connection con, OWorkReportRow item) throws DAOException {
+	public List<OExpenseNoteSetting> selectExpenseNoteSettings(Connection con) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		return dsl
-				.update(WORK_REPORTS_ROWS)
-				.set(WORK_REPORTS_ROWS.ROW_NO, item.getRowNo())
-				.set(WORK_REPORTS_ROWS.WORK_TYPE_ID, item.getWorkTypeId())
-				.set(WORK_REPORTS_ROWS.DURATION, item.getDuration())
-				.set(WORK_REPORTS_ROWS.EXTRA, item.getExtra())
+				.select()
+				.from(EXPENSE_NOTE_SETTINGS)
+				.fetchInto(OExpenseNoteSetting.class);
+	}
+
+	public OExpenseNoteSetting selectByDomainId(Connection con, String domainId) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.select()
+				.from(EXPENSE_NOTE_SETTINGS)
+				.where(EXPENSE_NOTE_SETTINGS.DOMAIN_ID.equal(domainId))
+				.fetchOneInto(OExpenseNoteSetting.class);
+	}
+
+	public int update(Connection con, OExpenseNoteSetting item) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.update(EXPENSE_NOTE_SETTINGS)
+				.set(EXPENSE_NOTE_SETTINGS.AVERAGE_MAXIMUM, item.getAverageMaximum())
+				.set(EXPENSE_NOTE_SETTINGS.KM_COST, item.getKmCost())
+				.set(EXPENSE_NOTE_SETTINGS.DEFAULT_CURRENCY, item.getDefaultCurrency())
 				.where(
-						WORK_REPORTS_ROWS.ID.equal(item.getId())
+						EXPENSE_NOTE_SETTINGS.EXPENSE_NOTE_SETTING_ID.equal(item.getExpenseNoteSettingId())
 				)
 				.execute();
 	}
 
 	public int deleteById(Connection con, int id) {
 		DSLContext dsl = getDSL(con);
-
 		return dsl
-				.delete(WORK_REPORTS_ROWS)
+				.delete(EXPENSE_NOTE_SETTINGS)
 				.where(
-						WORK_REPORTS_ROWS.ID.equal(id)
+						EXPENSE_NOTE_SETTINGS.EXPENSE_NOTE_SETTING_ID.equal(id)
 				)
 				.execute();
 	}
 
-	public int deleteByWorkReport(Connection con, String workReportId) {
-		DSLContext dsl = getDSL(con);
-
-		return dsl
-				.delete(WORK_REPORTS_ROWS)
-				.where(
-						WORK_REPORTS_ROWS.WORK_REPORT_ID.equal(workReportId)
-				)
-				.execute();
-	}
 }

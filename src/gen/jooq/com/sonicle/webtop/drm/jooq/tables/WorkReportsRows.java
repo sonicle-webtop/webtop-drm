@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WorkReportsRows extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRowsRecord> {
 
-	private static final long serialVersionUID = -307673804;
+	private static final long serialVersionUID = -1895661401;
 
 	/**
 	 * The reference instance of <code>drm.work_reports_rows</code>
@@ -57,9 +57,9 @@ public class WorkReportsRows extends org.jooq.impl.TableImpl<com.sonicle.webtop.
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRowsRecord, java.lang.Short> DURATION = createField("duration", org.jooq.impl.SQLDataType.SMALLINT, this, "");
 
 	/**
-	 * The column <code>drm.work_reports_rows.row_flag</code>.
+	 * The column <code>drm.work_reports_rows.extra</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRowsRecord, java.lang.String> ROW_FLAG = createField("row_flag", org.jooq.impl.SQLDataType.VARCHAR.length(1), this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRowsRecord, java.lang.Boolean> EXTRA = createField("extra", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
 
 	/**
 	 * Create a <code>drm.work_reports_rows</code> table reference

@@ -30,28 +30,20 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.ExpenseNoteSetting', {
+Ext.define('Sonicle.webtop.drm.model.CostsType', {
 	extend: 'WTA.ux.data.BaseModel',
-	requires: [
-		'Sonicle.data.writer.Json',
-		'Sonicle.webtop.drm.model.CostsType'
-	],
-	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageExpenseNoteSetting', 'data', {
-		writer: {
-			type: 'sojson',
-			writeAssociations: true
-		}
-	}),
 	identifier: 'negative',
 	idProperty: 'id',
 	fields: [
-		WTF.field('expenseNoteSettingId', 'int', true),
+		WTF.field('id', 'int', true),
 		WTF.field('domainId', 'string', true),
-		WTF.field('averageMaximum', 'bool', true),
-		WTF.field('kmCost', 'float', true),
-		WTF.field('defaultCurrency', 'string', true)
-	],
-	hasMany: [
-		WTF.hasMany('costsType', 'Sonicle.webtop.drm.model.CostsType')
+		WTF.field('description', 'string', false),
+		WTF.field('maxImport', 'float', true),
+		WTF.field('costType', 'string', false),
+		WTF.field('withOthers', 'bool', true),
+		WTF.field('perPerson', 'bool', true),
+		WTF.field('km', 'bool', true),
+		WTF.field('advancePayment', 'bool', true),
+		WTF.field('exchange', 'bool', true)
 	]
 });

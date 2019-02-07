@@ -16,14 +16,14 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WorkReportsRows implements java.io.Serializable {
 
-	private static final long serialVersionUID = -1632924468;
+	private static final long serialVersionUID = 1098631832;
 
 	private java.lang.Integer id;
 	private java.lang.String  workReportId;
 	private java.lang.Short   rowNo;
 	private java.lang.Integer workTypeId;
 	private java.lang.Short   duration;
-	private java.lang.String  rowFlag;
+	private java.lang.Boolean extra;
 
 	public WorkReportsRows() {}
 
@@ -33,14 +33,14 @@ public class WorkReportsRows implements java.io.Serializable {
 		java.lang.Short   rowNo,
 		java.lang.Integer workTypeId,
 		java.lang.Short   duration,
-		java.lang.String  rowFlag
+		java.lang.Boolean extra
 	) {
 		this.id = id;
 		this.workReportId = workReportId;
 		this.rowNo = rowNo;
 		this.workTypeId = workTypeId;
 		this.duration = duration;
-		this.rowFlag = rowFlag;
+		this.extra = extra;
 	}
 
 	public java.lang.Integer getId() {
@@ -83,11 +83,11 @@ public class WorkReportsRows implements java.io.Serializable {
 		this.duration = duration;
 	}
 
-	public java.lang.String getRowFlag() {
-		return this.rowFlag;
+	public java.lang.Boolean getExtra() {
+		return this.extra;
 	}
 
-	public void setRowFlag(java.lang.String rowFlag) {
-		this.rowFlag = rowFlag;
+	public void setExtra(java.lang.Boolean extra) {
+		this.extra = extra;
 	}
 }

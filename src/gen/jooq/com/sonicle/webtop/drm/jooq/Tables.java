@@ -37,6 +37,11 @@ public class Tables {
 	public static final com.sonicle.webtop.drm.jooq.tables.CompaniesUsers COMPANIES_USERS = com.sonicle.webtop.drm.jooq.tables.CompaniesUsers.COMPANIES_USERS;
 
 	/**
+	 * The table drm.cost_types
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.CostTypes COST_TYPES = com.sonicle.webtop.drm.jooq.tables.CostTypes.COST_TYPES;
+
+	/**
 	 * The table drm.doc_statuses
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.DocStatuses DOC_STATUSES = com.sonicle.webtop.drm.jooq.tables.DocStatuses.DOC_STATUSES;
@@ -55,6 +60,11 @@ public class Tables {
 	 * The table drm.enabled_programs
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.EnabledPrograms ENABLED_PROGRAMS = com.sonicle.webtop.drm.jooq.tables.EnabledPrograms.ENABLED_PROGRAMS;
+
+	/**
+	 * The table drm.expense_note_settings
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.ExpenseNoteSettings EXPENSE_NOTE_SETTINGS = com.sonicle.webtop.drm.jooq.tables.ExpenseNoteSettings.EXPENSE_NOTE_SETTINGS;
 
 	/**
 	 * The table drm.folders

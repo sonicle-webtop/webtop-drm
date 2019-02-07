@@ -73,7 +73,7 @@ Ext.define('Sonicle.webtop.drm.model.WorkReport', {
 			defaultValue: false
 		}),
 		WTF.field('businessTripId', 'int', true),
-		WTF.field('dayTrasfert', 'int', true, {
+		WTF.field('businessTripDays', 'int', true, {
 			defaultValue: 0
 		}),
 		

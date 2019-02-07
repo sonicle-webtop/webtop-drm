@@ -51,7 +51,7 @@ public class JsGridWorkReportRow {
 		this.rowNo = wrkDetail.getRowNo();
 		this.workTypeId = wrkDetail.getWorkTypeId();
 		this.duration = ((float)wrkDetail.getDuration() / 60);
-		this.specialFlag = StringUtils.equals(wrkDetail.getRowFlag(), "Y");
+		this.specialFlag = wrkDetail.getExtra();
 	}
 
 	public static WorkReportRow createWorkReportRow(JsGridWorkReportRow js) {
@@ -61,7 +61,7 @@ public class JsGridWorkReportRow {
 		wrkDet.setRowNo(js.rowNo);
 		wrkDet.setWorkTypeId(js.workTypeId);
 		wrkDet.setDuration((int)(js.duration * 60));
-		wrkDet.setRowFlag(js.specialFlag ? "Y" : null);
+		wrkDet.setExtra(js.specialFlag);
 
 		return wrkDet;
 	}

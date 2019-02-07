@@ -34,86 +34,108 @@ package com.sonicle.webtop.drm.dal;
 
 import com.sonicle.webtop.core.dal.BaseDAO;
 import com.sonicle.webtop.core.dal.DAOException;
-import com.sonicle.webtop.drm.bol.OWorkReportRow;
-import static com.sonicle.webtop.drm.jooq.Sequences.SEQ_WORK_REPORT_DETAILS;
-import static com.sonicle.webtop.drm.jooq.Tables.WORK_REPORTS_ROWS;
-import com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRowsRecord;
+import com.sonicle.webtop.drm.bol.OCostType;
+import com.sonicle.webtop.drm.jooq.Sequences;
+import static com.sonicle.webtop.drm.jooq.Tables.COST_TYPES;
+import com.sonicle.webtop.drm.jooq.tables.records.CostTypesRecord;
 import java.sql.Connection;
 import java.util.List;
+import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 
 /**
  *
  * @author lssndrvs
  */
-public class WorkReportRowDAO extends BaseDAO {
+public class CostTypeDAO extends BaseDAO {
 
-	private final static WorkReportRowDAO INSTANCE = new WorkReportRowDAO();
+	private final static CostTypeDAO INSTANCE = new CostTypeDAO();
 
-	public static WorkReportRowDAO getInstance() {
+	public static CostTypeDAO getInstance() {
 		return INSTANCE;
 	}
-
+	
 	public Long getSequence(Connection con) throws DAOException {
 		DSLContext dsl = getDSL(con);
-		Long nextID = dsl.nextval(SEQ_WORK_REPORT_DETAILS);
+		Long nextID = dsl.nextval(Sequences.SEQ_COST_TYPES);
 		return nextID;
 	}
 
-	public List<OWorkReportRow> selectByWorkReport(Connection con, String workReportId) throws DAOException {
+	public List<OCostType> selectByDomain(Connection con, String domainId) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		return dsl
 				.select()
-				.from(WORK_REPORTS_ROWS)
+				.from(COST_TYPES)
 				.where(
-						WORK_REPORTS_ROWS.WORK_REPORT_ID.equal(workReportId)
+						COST_TYPES.DOMAIN_ID.equal(domainId)
 				)
-				.fetchInto(OWorkReportRow.class);
+				.fetchInto(OCostType.class);
+	}
+	
+	public OCostType selectByIdDomainId(Connection con, int id, String domainId) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.select()
+				.from(COST_TYPES)
+				.where(
+						COST_TYPES.DOMAIN_ID.equal(domainId)
+				).and(
+						COST_TYPES.ID.equal(id)
+				)
+				.fetchOneInto(OCostType.class);
 	}
 
-	public int insert(Connection con, OWorkReportRow item) throws DAOException {
+	public int insert(Connection con, OCostType item) throws DAOException {
 		DSLContext dsl = getDSL(con);
 
-		WorkReportsRowsRecord record = dsl.newRecord(WORK_REPORTS_ROWS, item);
+		CostTypesRecord record = dsl.newRecord(COST_TYPES, item);
 
 		return dsl
-				.insertInto(WORK_REPORTS_ROWS)
+				.insertInto(COST_TYPES)
 				.set(record)
 				.execute();
 	}
-
-	public int update(Connection con, OWorkReportRow item) throws DAOException {
+	
+	public int updateByIdDomainId(Connection con, OCostType item) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		return dsl
-				.update(WORK_REPORTS_ROWS)
-				.set(WORK_REPORTS_ROWS.ROW_NO, item.getRowNo())
-				.set(WORK_REPORTS_ROWS.WORK_TYPE_ID, item.getWorkTypeId())
-				.set(WORK_REPORTS_ROWS.DURATION, item.getDuration())
-				.set(WORK_REPORTS_ROWS.EXTRA, item.getExtra())
+				.update(COST_TYPES)
+				.set(COST_TYPES.DESCRIPTION, item.getDescription())
+				.set(COST_TYPES.MAX_IMPORT, item.getMaxImport())
+				.set(COST_TYPES.COST_TYPE, item.getCostType())
+				.set(COST_TYPES.WITH_OTHERS, item.getWithOthers())
+				.set(COST_TYPES.PER_PERSON, item.getPerPerson())
+				.set(COST_TYPES.KM, item.getKm())
+				.set(COST_TYPES.ADVANCE_PAYMENT, item.getAdvancePayment())
+				.set(COST_TYPES.EXCHANGE, item.getExchange())
 				.where(
-						WORK_REPORTS_ROWS.ID.equal(item.getId())
+						COST_TYPES.DOMAIN_ID.equal(item.getDomainId())
+				).and(
+						COST_TYPES.ID.equal(item.getId())
 				)
 				.execute();
 	}
 
-	public int deleteById(Connection con, int id) {
+	public int deleteByDomainId(Connection con, String domainId) {
 		DSLContext dsl = getDSL(con);
 
 		return dsl
-				.delete(WORK_REPORTS_ROWS)
+				.delete(COST_TYPES)
 				.where(
-						WORK_REPORTS_ROWS.ID.equal(id)
+						COST_TYPES.DOMAIN_ID.equal(domainId)
 				)
 				.execute();
 	}
-
-	public int deleteByWorkReport(Connection con, String workReportId) {
+	
+	public int deleteByIdDomainId(Connection con, int id, String domainId) {
 		DSLContext dsl = getDSL(con);
 
 		return dsl
-				.delete(WORK_REPORTS_ROWS)
+				.delete(COST_TYPES)
 				.where(
-						WORK_REPORTS_ROWS.WORK_REPORT_ID.equal(workReportId)
+						COST_TYPES.DOMAIN_ID.equal(domainId)
+				).and(
+						COST_TYPES.ID.equal(id)
 				)
 				.execute();
 	}

@@ -1877,10 +1877,21 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			}
 		});
 	},
-	expenseNoteSetting: function (opts) {
+	expenseNoteSetting: function (opts) {		
+		opts = opts || {};
+
 		var me = this,
 				vw = WT.createView(me.ID, 'view.ExpenseNoteSetting', {swapReturn: true});
-		vw.showView();
+		vw.on('viewsave', function (s, success, model) { 
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vw.showView(function () {
+					vw.begin('edit', {
+						data: {
+							id: 'en'
+						}
+					});
+				});
 	},
 	reloadExpenseNote: function (query) {
 		var me = this,

@@ -30,62 +30,19 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm;
+package com.sonicle.webtop.drm.bol;
 
-import com.sonicle.webtop.core.sdk.BaseUserSettings;
-import com.sonicle.webtop.core.sdk.UserProfileId;
-import static com.sonicle.webtop.drm.DrmSettings.*;
+import com.google.gson.annotations.SerializedName;
 
 /**
  *
  * @author lssndrvs
  */
-public class DrmUserSettings extends BaseUserSettings {
-	
-	private DrmServiceSettings ss;
-
-	public DrmUserSettings(String serviceId, UserProfileId profileId) {
-		super(serviceId, profileId);
-		this.ss = new DrmServiceSettings(serviceId, profileId.getDomainId());
-	}
-	
-	public Integer getOpportunityCalendarId() {
-		return getInteger(OPPORTUNITY_CALENDAR_ID, null); 
-	}
-
-	public void setOpportunityCalendarId(int value) {
-		setInteger(OPPORTUNITY_CALENDAR_ID, value); 
-	}
-	
-	public Integer getWorkReportCalendarId() {
-		return getInteger(WORK_REPORT_CALENDAR_ID, null); 
-	}
-
-	public void setWorkReportCalendarId(int value) {
-		setInteger(WORK_REPORT_CALENDAR_ID, value); 
-	}
-
-	public Integer getLeaveRequestCalendarId() {
-		return getInteger(LEAVE_REQUEST_CALENDAR_ID, null); 
-	}
-
-	public void setLeaveRequestCalendarId(int value) {
-		setInteger(LEAVE_REQUEST_CALENDAR_ID, value); 
-	}
-	
-	public String getKmCost() {
-		return getString(EXPENSE_NOTE_KM_COST, null); 
-	}
-
-	public void setKmCost(String value) {
-		setString(EXPENSE_NOTE_KM_COST, value);
-	}
-	
-	public String getDefaultCurrency() {
-		return getString(EXPENSE_NOTE_DEFAULT_CURRENCY, null); 
-	}
-
-	public void setDefaultCurrency(String value) {
-		setString(EXPENSE_NOTE_DEFAULT_CURRENCY, value);
-	}
+public enum ODefaultCostType {
+	@SerializedName("S") STAY,
+	@SerializedName("H") HIGHWAY,
+	@SerializedName("P") PARK,
+	@SerializedName("M") MEALS,
+	@SerializedName("O") OTHER,
+	@SerializedName("K") KM;
 }

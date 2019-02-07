@@ -75,11 +75,12 @@
 		<managerClassName>DrmManager</managerClassName>
 		<serviceClassName>Service</serviceClassName>
 		<publicServiceClassName>PublicService</publicServiceClassName>
-		<!--<userOptions>
+		
+		<userOptions>
 			<serviceClassName>UserOptionsService</serviceClassName>
 			<viewJsClassName>view.UserOptions</viewJsClassName>
 			<modelJsClassName>model.UserOptions</modelJsClassName>
-		</userOptions>-->
+		</userOptions>
 		
 		<permissions>
 			<permission group="CONFIGURATIONS" actions="MANAGE" />

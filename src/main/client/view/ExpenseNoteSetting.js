@@ -31,17 +31,25 @@
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
 Ext.define('Sonicle.webtop.drm.view.ExpenseNoteSetting', {
-	extend: 'WTA.sdk.DockableView',
+	extend: 'WTA.sdk.ModelView',
 	dockableConfig: {
 		title: '{expensenote.config.tit}',
 		iconCls: 'wtdrm-icon-configuration-generalconfiguration-xs',
-		width: 500,
+		width: 650,
 		height: 500
 	},
-	fieldTitle: 'name',
 	modelName: 'Sonicle.webtop.drm.model.ExpenseNoteSetting',
+	reloadOnClose: false,
+	
 	initComponent: function () {
 		var me = this;
+		
+		me.lookupStore = Ext.create('Ext.data.Store', {
+			autoLoad: true,
+			model: 'WTA.model.Simple',
+			proxy: WTF.proxy(me.mys.ID, 'LookupCostType')
+		});
+		
 		me.callParent(arguments);
 		me.add({
 			region: 'center',
@@ -54,28 +62,205 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteSetting', {
 					],
 					items: [
 						{
+							bind: '{record.averageMaximum}',
 							xtype: 'checkbox',
 							boxLabel: me.mys.res('expenseNote.settings.fld-average.lbl')
 						},
 						{
-							xtype: 'checkbox',
-							boxLabel: me.mys.res('expenseNote.settings.fld-tracking.lbl')
+							xtype: 'numberfield',
+							bind: '{record.kmCost}',
+							fieldLabel: me.mys.res('expenseNote.settings.fld-kmCost.lbl'),
+							minValue: 0
 						},
-						{
-							xtype: 'checkbox',
-							boxLabel: me.mys.res('expenseNote.settings.fld-mail.lbl')
-						},
-						{
-							xtype: 'checkbox',
-							boxLabel: me.mys.res('expenseNote.settings.fld-cloud.lbl')
-						},
-						{
-							xtype: 'checkbox',
-							boxLabel: me.mys.res('expenseNote.settings.fld-calendar.lbl')
-						}
+						WTF.localCombo('id', 'desc', {
+							bind: '{record.defaultCurrency}',
+							fieldLabel: me.mys.res('expenseNote.settings.fld-defaultCurrency.lbl'),
+							store: Ext.create('Sonicle.webtop.drm.store.Currency', {
+								autoLoad: true
+							})
+						})
+//						{
+//							xtype: 'checkbox',
+//							boxLabel: me.mys.res('expenseNote.settings.fld-tracking.lbl')
+//						},
+//						{
+//							xtype: 'checkbox',
+//							boxLabel: me.mys.res('expenseNote.settings.fld-mail.lbl')
+//						},
+//						{
+//							xtype: 'checkbox',
+//							boxLabel: me.mys.res('expenseNote.settings.fld-cloud.lbl')
+//						},
+//						{
+//							xtype: 'checkbox',
+//							boxLabel: me.mys.res('expenseNote.settings.fld-calendar.lbl')
+//						}
 					]
+				},
+				{
+					title: me.mys.res('costtypes.tit'),
+					xtype: 'grid',
+					reference: 'gpCostType',
+					bind: {
+						store: '{record.costsType}'
+					},
+					width: '100%',
+					border: true,
+					flex: 2,
+					columns: [
+						{
+							dataIndex: 'description',
+							editor: {
+								xtype: 'textfield',
+								allowBlank: false,
+								selectOnFocus: true
+							},
+							header: me.mys.res('gpcosttypes.description.lbl'),
+							flex: 3
+						},
+						{
+							dataIndex: 'maxImport',
+							xtype: 'numbercolumn',
+							format: '0.00',
+							editor: {
+								xtype: 'numberfield',
+								selectOnFocus: true,
+								allowDecimals: true,
+								decimalSeparator: '.',
+								decimalPrecision: 2,
+								step: 0.01
+							},
+							header: me.mys.res('gpcosttypes.maxImport.lbl'),
+							flex: 2
+						},
+						{
+							xtype: 'solookupcolumn',
+							dataIndex: 'costType',
+							store: me.lookupStore,
+							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
+								allowBlank: false,
+								store: me.lookupStore
+							})),
+							displayField: 'desc',
+							header: me.mys.res('gpcosttypes.type.lbl'),
+							flex: 3
+						},
+						{
+							dataIndex: 'withOthers',
+							xtype: 'checkcolumn',
+							editor: {
+								xtype: 'checkbox',
+								matchFieldWidth: true
+							},
+							header: me.mys.res('gpcosttypes.withOthers.lbl'),
+							flex: 2
+						},
+						{
+							dataIndex: 'perPerson',
+							xtype: 'checkcolumn',
+							editor: {
+								xtype: 'checkbox',
+								matchFieldWidth: true
+							},
+							header: me.mys.res('gpcosttypes.perPerson.lbl'),
+							flex: 2
+						},
+						{
+							dataIndex: 'km',
+							xtype: 'checkcolumn',
+							editor: {
+								xtype: 'checkbox',
+								matchFieldWidth: true
+							},
+							header: me.mys.res('gpcosttypes.km.lbl'),
+							flex: 1
+						},
+						{
+							dataIndex: 'advancePayment',
+							xtype: 'checkcolumn',
+							editor: {
+								xtype: 'checkbox',
+								matchFieldWidth: true
+							},
+							header: me.mys.res('gpcosttypes.advancePayment.lbl'),
+							flex: 2
+						},
+						{
+							dataIndex: 'exchange',
+							xtype: 'checkcolumn',
+							editor: {
+								xtype: 'checkbox',
+								matchFieldWidth: true
+							},
+							header: me.mys.res('gpcosttypes.exchange.lbl'),
+							flex: 2
+						}
+					],
+					tbar: [
+						me.addAct('add', {
+							text: WT.res('act-add.lbl'),
+							tooltip: null,
+							iconCls: 'wt-icon-add-xs',
+							handler: function () {
+								me.addCostType();
+							},
+							scope: me
+						}),
+						me.addAct('delete', {
+							text: WT.res('act-delete.lbl'),
+							tooltip: null,
+							iconCls: 'wt-icon-delete',
+							handler: function () {
+								var sm = me.lref('gpCostType').getSelectionModel();
+								me.deleteCostType(sm.getSelection());
+							},
+							scope: me
+						})
+					],
+					plugins: {
+						ptype: 'cellediting',
+						clicksToEdit: 1
+					}
+
 				}
 			]
 		});
+	},
+	
+	addCostType: function () {
+		var me = this;
+		var gp = me.lref('gpCostType'),
+				sto = gp.getStore(),
+				cep = gp.findPlugin('cellediting');
+
+
+		cep.cancelEdit();
+
+		sto.add(sto.createModel({
+			description: me.mys.res('gpcosttypes.defaultdescription.lbl'),
+			maxImport: 0,
+			costType: '',
+			withOthers: false,
+			perPerson: false,
+			km: false,
+			advancePayment: false,
+			exchange: false
+		}));
+
+		cep.startEditByPosition({row: sto.getCount(), column: 0});
+	},
+	
+	deleteCostType: function (rec) {
+		var me = this,
+				grid = me.lref('gpCostType'),
+				sto = grid.getStore(),
+				cellediting = grid.findPlugin('cellediting');
+
+		WT.confirm(WT.res('confirm.delete'), function (bid) {
+			if (bid === 'yes') {
+				cellediting.cancelEdit();
+				sto.remove(rec);
+			}
+		}, me);
 	}
 });

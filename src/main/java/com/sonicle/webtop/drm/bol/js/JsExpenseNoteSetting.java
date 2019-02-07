@@ -11,7 +11,7 @@
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
- * details.
+ * types.
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program; if not, see http://www.gnu.org/licenses or write to
@@ -30,62 +30,58 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm;
+package com.sonicle.webtop.drm.bol.js;
 
-import com.sonicle.webtop.core.sdk.BaseUserSettings;
-import com.sonicle.webtop.core.sdk.UserProfileId;
-import static com.sonicle.webtop.drm.DrmSettings.*;
+import com.sonicle.webtop.drm.model.CostType;
+import com.sonicle.webtop.drm.model.ExpenseNoteSetting;
+import com.sonicle.webtop.drm.model.HolidayDate;
+import com.sonicle.webtop.drm.model.TimetableSetting;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author lssndrvs
  */
-public class DrmUserSettings extends BaseUserSettings {
+public class JsExpenseNoteSetting {
+
+	public Integer expenseNoteSettingId;
+	public String domainId;
+	public Boolean averageMaximum;
+	public BigDecimal kmCost;
+	public String defaultCurrency;
 	
-	private DrmServiceSettings ss;
+	public List<JsGridCostType> costsType = new ArrayList();
 
-	public DrmUserSettings(String serviceId, UserProfileId profileId) {
-		super(serviceId, profileId);
-		this.ss = new DrmServiceSettings(serviceId, profileId.getDomainId());
-	}
-	
-	public Integer getOpportunityCalendarId() {
-		return getInteger(OPPORTUNITY_CALENDAR_ID, null); 
-	}
+	public JsExpenseNoteSetting(ExpenseNoteSetting setting) {
 
-	public void setOpportunityCalendarId(int value) {
-		setInteger(OPPORTUNITY_CALENDAR_ID, value); 
-	}
-	
-	public Integer getWorkReportCalendarId() {
-		return getInteger(WORK_REPORT_CALENDAR_ID, null); 
+		this.expenseNoteSettingId = setting.getExpenseNoteSettingId();
+		this.domainId = setting.getDomainId();
+		this.averageMaximum = setting.getAverageMaximum();
+		this.kmCost = setting.getKmCost();
+		this.defaultCurrency = setting.getDefaultCurrency();
+		
+		for (CostType ct : setting.getCostTypes()) {
+			this.costsType.add(new JsGridCostType(ct));
+		}
 	}
 
-	public void setWorkReportCalendarId(int value) {
-		setInteger(WORK_REPORT_CALENDAR_ID, value); 
-	}
+	public static ExpenseNoteSetting createExpenseNoteSetting(JsExpenseNoteSetting js) {
 
-	public Integer getLeaveRequestCalendarId() {
-		return getInteger(LEAVE_REQUEST_CALENDAR_ID, null); 
-	}
+		ExpenseNoteSetting enS = new ExpenseNoteSetting();
+		enS.setExpenseNoteSettingId(js.expenseNoteSettingId);
+		enS.setDomainId(js.domainId);
+		enS.setAverageMaximum(js.averageMaximum);
+		enS.setKmCost(js.kmCost);
+		enS.setDefaultCurrency(js.defaultCurrency);
 
-	public void setLeaveRequestCalendarId(int value) {
-		setInteger(LEAVE_REQUEST_CALENDAR_ID, value); 
-	}
-	
-	public String getKmCost() {
-		return getString(EXPENSE_NOTE_KM_COST, null); 
-	}
+		for (JsGridCostType ct : js.costsType) {
 
-	public void setKmCost(String value) {
-		setString(EXPENSE_NOTE_KM_COST, value);
-	}
-	
-	public String getDefaultCurrency() {
-		return getString(EXPENSE_NOTE_DEFAULT_CURRENCY, null); 
-	}
+			enS.getCostTypes().add(JsGridCostType.createCostType(ct));
 
-	public void setDefaultCurrency(String value) {
-		setString(EXPENSE_NOTE_DEFAULT_CURRENCY, value);
+		}
+
+		return enS;
 	}
 }

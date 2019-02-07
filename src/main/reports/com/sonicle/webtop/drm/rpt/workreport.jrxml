@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.0.final using JasperReports Library version 6.3.0  -->
-<!-- 2018-10-25T14:45:46 -->
+<!-- 2019-02-07T11:40:13 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="workreport" pageWidth="595" pageHeight="842" columnWidth="557" leftMargin="19" rightMargin="19" topMargin="10" bottomMargin="10" isSummaryWithPageHeaderAndFooter="true" resourceBundle="workreport" uuid="47fa44bf-1a8e-4a18-a0df-8b26982ff32e">
 	<property name="com.jaspersoft.studio.unit." value="cm"/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
@@ -90,13 +90,13 @@
 	<field name="freeSupport" class="java.lang.Boolean"/>
 	<field name="businessTripId" class="java.lang.Integer"/>
 	<field name="businessTripDescription" class="java.lang.String"/>
-	<field name="dayTransfert" class="java.lang.Integer"/>
+	<field name="businessTripDays" class="java.lang.Integer"/>
 	<field name="wrRows" class="java.util.ArrayList"/>
 	<field name="customerAddress" class="java.lang.String"/>
 	<field name="customerCity" class="java.lang.String"/>
 	<field name="warranty" class="java.lang.String"/>
 	<field name="footer" class="java.lang.String"/>
-	<field name="printDaysTransfert" class="java.lang.Boolean"/>
+	<field name="printBusinessTripDays" class="java.lang.Boolean"/>
 	<field name="printTransfertDescription" class="java.lang.Boolean"/>
 	<field name="printSignature" class="java.lang.Boolean"/>
 	<field name="picture" class="java.awt.Image"/>
@@ -256,8 +256,8 @@
 			<property name="com.jaspersoft.studio.unit.height" value="cm"/>
 			<subreport>
 				<reportElement stretchType="RelativeToBandHeight" x="0" y="12" width="289" height="13" uuid="143f3fc8-2977-4703-8a04-db428d2afa10"/>
-				<subreportParameter name="dayTransfert">
-					<subreportParameterExpression><![CDATA[$F{dayTransfert}]]></subreportParameterExpression>
+				<subreportParameter name="businessTripDays">
+					<subreportParameterExpression><![CDATA[$F{businessTripDays}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="businessTripDescription">
 					<subreportParameterExpression><![CDATA[$F{businessTripDescription}]]></subreportParameterExpression>
@@ -265,8 +265,8 @@
 				<subreportParameter name="printTransfertDescription">
 					<subreportParameterExpression><![CDATA[$F{printTransfertDescription}]]></subreportParameterExpression>
 				</subreportParameter>
-				<subreportParameter name="printDaysTransfert">
-					<subreportParameterExpression><![CDATA[$F{printDaysTransfert}]]></subreportParameterExpression>
+				<subreportParameter name="printBusinessTripDays">
+					<subreportParameterExpression><![CDATA[$F{printBusinessTripDays}]]></subreportParameterExpression>
 				</subreportParameter>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{wrRows})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{REPORT_PATH}+"workreport_sub.jasper"]]></subreportExpression>

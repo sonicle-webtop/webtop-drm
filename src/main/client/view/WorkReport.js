@@ -240,7 +240,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 													}
 													var days = Sonicle.Date.diffDays(me.lref('fldfromdate').getValue(),
 															me.lref('fldtodate').getValue());
-													me.lref('flddaytrasfert').setValue(days);
+													me.lref('fldbusinesstripdays').setValue(days);
 												}
 											},
 											fieldLabel: me.mys.res('workReport.fld-fromDate.lbl'),
@@ -322,7 +322,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 												select: function (s, rec) {
 													var days = Sonicle.Date.diffDays(me.lref('fldfromdate').getValue(),
 															me.lref('fldtodate').getValue());
-													me.lref('flddaytrasfert').setValue(days);
+													me.lref('fldbusinesstripdays').setValue(days);
 												}
 											},
 											format: WT.getShortDateFmt(),
@@ -509,7 +509,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 												xtype: 'checkbox',
 												matchFieldWidth: true
 											},
-											header: me.mys.res('gpReportRows.rowFlag.lbl')
+											header: me.mys.res('gpReportRows.extra.lbl')
 										}
 									],
 									tbar: [
@@ -542,8 +542,8 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 									items: [
 										{
 											xtype: 'numberfield',
-											reference: 'flddaytrasfert',
-											bind: '{record.dayTrasfert}',
+											reference: 'fldbusinesstripdays',
+											bind: '{record.businessTripDays}',
 											minValue: 0,
 											fieldLabel: me.mys.res('gpReportRows.hourTravel.lbl')
 										},
@@ -560,7 +560,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											 var soDate = Sonicle.Date;
 											 var days = soDate.diffDays(me.lref('fldfromdate').getValue(),
 											 me.lref('fldtodate').getValue());
-											 me.lref('flddaytrasfert').setValue(days);
+											 me.lref('fldbusinessTripDays').setValue(days);
 											 }
 											 },*/
 											triggers: {

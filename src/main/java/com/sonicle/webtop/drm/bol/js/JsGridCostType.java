@@ -11,7 +11,7 @@
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
- * details.
+ * types.
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program; if not, see http://www.gnu.org/licenses or write to
@@ -30,62 +30,60 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm;
+package com.sonicle.webtop.drm.bol.js;
 
-import com.sonicle.webtop.core.sdk.BaseUserSettings;
-import com.sonicle.webtop.core.sdk.UserProfileId;
-import static com.sonicle.webtop.drm.DrmSettings.*;
+import com.sonicle.webtop.drm.model.CostType;
+import com.sonicle.webtop.drm.model.HolidayDate;
+import com.sonicle.webtop.drm.model.TimetableSetting;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author lssndrvs
  */
-public class DrmUserSettings extends BaseUserSettings {
-	
-	private DrmServiceSettings ss;
+public class JsGridCostType {
 
-	public DrmUserSettings(String serviceId, UserProfileId profileId) {
-		super(serviceId, profileId);
-		this.ss = new DrmServiceSettings(serviceId, profileId.getDomainId());
-	}
-	
-	public Integer getOpportunityCalendarId() {
-		return getInteger(OPPORTUNITY_CALENDAR_ID, null); 
-	}
+	public Integer id;
+	public String domainId;
+	public String description;
+	public BigDecimal maxImport;
+	public String costType;
+	public Boolean withOthers;
+	public Boolean perPerson;
+	public Boolean km;
+	public Boolean advancePayment;
+	public Boolean exchange;
 
-	public void setOpportunityCalendarId(int value) {
-		setInteger(OPPORTUNITY_CALENDAR_ID, value); 
-	}
-	
-	public Integer getWorkReportCalendarId() {
-		return getInteger(WORK_REPORT_CALENDAR_ID, null); 
-	}
+	public JsGridCostType(CostType ct) {
 
-	public void setWorkReportCalendarId(int value) {
-		setInteger(WORK_REPORT_CALENDAR_ID, value); 
-	}
-
-	public Integer getLeaveRequestCalendarId() {
-		return getInteger(LEAVE_REQUEST_CALENDAR_ID, null); 
+		this.id = ct.getId();
+		this.domainId = ct.getDomainId();
+		this.description = ct.getDescription();		
+		this.maxImport = ct.getMaxImport();
+		this.costType = ct.getCostType();
+		this.withOthers = ct.getWithOthers();
+		this.perPerson = ct.getPerPerson();
+		this.km = ct.getKm();
+		this.advancePayment = ct.getAdvancePayment();
+		this.exchange = ct.getExchange();
 	}
 
-	public void setLeaveRequestCalendarId(int value) {
-		setInteger(LEAVE_REQUEST_CALENDAR_ID, value); 
-	}
-	
-	public String getKmCost() {
-		return getString(EXPENSE_NOTE_KM_COST, null); 
-	}
+	public static CostType createCostType(JsGridCostType js) {
 
-	public void setKmCost(String value) {
-		setString(EXPENSE_NOTE_KM_COST, value);
-	}
-	
-	public String getDefaultCurrency() {
-		return getString(EXPENSE_NOTE_DEFAULT_CURRENCY, null); 
-	}
+		CostType ct = new CostType();
+		ct.setId(js.id);
+		ct.setDomainId(js.domainId);
+		ct.setDescription(js.description);
+		ct.setMaxImport(js.maxImport);
+		ct.setCostType(js.costType);
+		ct.setWithOthers(js.withOthers);
+		ct.setPerPerson(js.perPerson);
+		ct.setKm(js.km);
+		ct.setAdvancePayment(js.advancePayment);
+		ct.setExchange(js.exchange);
 
-	public void setDefaultCurrency(String value) {
-		setString(EXPENSE_NOTE_DEFAULT_CURRENCY, value);
+		return ct;
 	}
 }

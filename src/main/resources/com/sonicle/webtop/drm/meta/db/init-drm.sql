@@ -1049,3 +1049,56 @@ ADD COLUMN "event_id" int4;
 
 ALTER TABLE "drm"."leave_requests"
 ADD COLUMN "event_id" int4;
+
+--------------
+--20/12/2018--
+--------------
+
+CREATE TABLE "drm"."expense_note_settings" (
+"expense_note_setting_id" int4 NOT NULL,
+"domain_id" varchar(20) NOT NULL,
+"average_maximum" bool,
+PRIMARY KEY ("expense_note_setting_id")
+);
+
+CREATE TABLE "drm"."cost_types" (
+"id" int4 NOT NULL,
+"domain_id" varchar(20) NOT NULL,
+"description" varchar(30),
+"max_import" numeric(15,2),
+"cost_type" varchar(1),
+"with_others" bool,
+"per_person" bool,
+"km" bool,
+"advance_payment" bool,
+"exchange" bool,
+PRIMARY KEY ("id")
+);
+
+CREATE SEQUENCE "drm"."seq_expense_note_settings";
+
+CREATE SEQUENCE "drm"."seq_cost_types";
+
+ALTER TABLE "drm"."expense_note_settings"
+ADD COLUMN "default_currency" varchar(3);
+
+ALTER TABLE "drm"."expense_note_settings"
+ADD COLUMN "km_cost" numeric(15,2);
+
+--------------
+--07/02/2019--
+--------------
+
+ALTER TABLE "drm"."work_reports" RENAME "day_trasfert" TO "business_trip_days";
+
+ALTER TABLE "drm"."work_reports_rows"
+ADD COLUMN "extra" bool;
+
+UPDATE work_reports_rows AS wrr
+    SET extra = CASE
+                 WHEN row_flag = 'Y' THEN true
+                ELSE false
+              END
+
+ALTER TABLE "drm"."work_reports_rows"
+DROP COLUMN "row_flag";

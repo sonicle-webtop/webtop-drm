@@ -526,7 +526,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 	editHourProfile: function (id, opts) {
 		opts = opts || {};
 		var me = this,
-				vw = WT.createView(me.mys.ID, 'view.HourProfile');
+				vw = WT.createView(me.mys.ID, 'view.HourProfile', {swapReturn: true});
 		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});

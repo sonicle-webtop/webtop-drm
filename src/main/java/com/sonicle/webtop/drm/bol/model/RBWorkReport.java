@@ -92,11 +92,11 @@ public class RBWorkReport {
 	public Boolean freeSupport;
 	public Integer businessTripId;
 	public String businessTripDescription;
-	public Integer dayTransfert;
+	public Integer businessTripDays;
 	public ArrayList<RBWorkReportRows> wrRows;
 	public String warranty;
 	public String footer;
-	public Boolean printDaysTransfert;
+	public Boolean printBusinessTripDays;
 	public Boolean printTransfertDescription;
 	public Boolean printSignature;
 	public Image picture;
@@ -140,7 +140,7 @@ public class RBWorkReport {
 		this.businessTripDescription = "";
 		if (this.businessTripId != null)
 			this.businessTripDescription=drmMgr.getBusinessTripById(this.businessTripId).getDescription();
-		this.dayTransfert = wr.getDayTrasfert();
+		this.businessTripDays = wr.getBusinessTripDays();
 		
 		wrRows = new ArrayList<>();
 		for(WorkReportRow wrr : wr.getDetails()){
@@ -156,7 +156,7 @@ public class RBWorkReport {
 		this.footer = drmMgr.getCompany(wr.getCompanyId()).getFooterColumnLeft();
 		
 		this.printTransfertDescription = ss.getPrintTransfertDescription();
-		this.printDaysTransfert = ss.getPrintDaysTransfert();
+		this.printBusinessTripDays = ss.getPrintDaysTransfert();
 		this.printSignature = ss.getPrintSignature();
 		
 		if(picture != null) {
@@ -431,12 +431,12 @@ public class RBWorkReport {
 		this.businessTripDescription = businessTripDescription;
 	}
 
-	public Integer getDayTransfert() {
-		return dayTransfert;
+	public Integer getBusinessTripDays() {
+		return businessTripDays;
 	}
 
-	public void setDayTransfert(Integer dayTransfert) {
-		this.dayTransfert = dayTransfert;
+	public void setBusinessTripDays(Integer businessTripDays) {
+		this.businessTripDays = businessTripDays;
 	}
 
 	public ArrayList<RBWorkReportRows> getWrRows() {
@@ -479,12 +479,12 @@ public class RBWorkReport {
 		this.warranty = warranty;
 	}
 
-	public Boolean getPrintDaysTransfert() {
-		return printDaysTransfert;
+	public Boolean getPrintBusinessTripDays() {
+		return printBusinessTripDays;
 	}
 
-	public void setPrintDaysTransfert(Boolean printDaysTransfert) {
-		this.printDaysTransfert = printDaysTransfert;
+	public void setPrintBusinessTripDays(Boolean printBusinessTripDays) {
+		this.printBusinessTripDays = printBusinessTripDays;
 	}
 
 	public Boolean getPrintTransfertDescription() {

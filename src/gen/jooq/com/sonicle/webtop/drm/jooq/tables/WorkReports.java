@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WorkReports extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord> {
 
-	private static final long serialVersionUID = 164727196;
+	private static final long serialVersionUID = -851883778;
 
 	/**
 	 * The reference instance of <code>drm.work_reports</code>
@@ -142,9 +142,9 @@ public class WorkReports extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.Integer> BUSINESS_TRIP_ID = createField("business_trip_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
-	 * The column <code>drm.work_reports.day_trasfert</code>.
+	 * The column <code>drm.work_reports.business_trip_days</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.Short> DAY_TRASFERT = createField("day_trasfert", org.jooq.impl.SQLDataType.SMALLINT, this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord, java.lang.Short> BUSINESS_TRIP_DAYS = createField("business_trip_days", org.jooq.impl.SQLDataType.SMALLINT, this, "");
 
 	/**
 	 * The column <code>drm.work_reports.number</code>.

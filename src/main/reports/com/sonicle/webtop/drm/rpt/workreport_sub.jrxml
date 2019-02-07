@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.0.final using JasperReports Library version 6.3.0  -->
-<!-- 2018-02-07T14:32:40 -->
+<!-- 2019-02-07T12:02:20 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="workreport_sub" pageWidth="291" pageHeight="320" columnWidth="291" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="b8bcf21f-ad61-4bc9-88ab-9bca2c77f4f8">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
@@ -11,10 +11,10 @@
 		</queryString>
 	</subDataset>
 	<parameter name="wrRows" class="java.util.ArrayList"/>
-	<parameter name="dayTransfert" class="java.lang.Integer"/>
+	<parameter name="businessTripDays" class="java.lang.Integer"/>
 	<parameter name="businessTripDescription" class="java.lang.String"/>
 	<parameter name="printTransfertDescription" class="java.lang.Boolean"/>
-	<parameter name="printDaysTransfert" class="java.lang.Boolean"/>
+	<parameter name="printBusinessTripDays" class="java.lang.Boolean"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -23,7 +23,7 @@
 	<field name="workTypeId" class="java.lang.Integer"/>
 	<field name="workTypeDescription" class="java.lang.String"/>
 	<field name="duration" class="java.lang.Integer"/>
-	<field name="rowFlag" class="java.lang.String"/>
+	<field name="extra" class="java.lang.Boolean"/>
 	<field name="workTypeExternalId" class="java.lang.String"/>
 	<field name="rowNo" class="java.lang.Integer"/>
 	<sortField name="rowNo"/>
@@ -113,12 +113,12 @@
 			</textField>
 			<textField>
 				<reportElement x="261" y="17" width="28" height="15" uuid="39b72294-b57e-4deb-a9a7-c5ece5ff6dc5">
-					<printWhenExpression><![CDATA[$P{printDaysTransfert}]]></printWhenExpression>
+					<printWhenExpression><![CDATA[$P{printBusinessTripDays}]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[($P{dayTransfert} != null && $P{dayTransfert} != 0) ? (new String($P{dayTransfert} + " GG"))  : ""]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($P{businessTripDays} != null && $P{businessTripDays} != 0) ? (new String($P{businessTripDays} + " GG"))  : ""]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="261" y="0" width="28" height="16" uuid="68a6c91d-6500-4c99-9ea3-03ac7e33a014"/>
