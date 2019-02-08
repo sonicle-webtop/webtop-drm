@@ -1480,6 +1480,21 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
+	public List<OWorkReport> listOpenWorkReportForUser()throws WTException, SQLException {
+		Connection con = null;
+		WorkReportDAO wrDao = WorkReportDAO.getInstance();
+		
+		try {		
+			con = WT.getConnection(SERVICE_ID);
+			
+			return wrDao.selectWorkReportsByUserStatus(con, getTargetProfileId().getUserId(), ODocStatus.STATUS_OPEN);
+		} catch (DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
 	public List<OOpportunity> listOpportunities(OpportunityQuery query) throws WTException {
 		Connection con = null;
 		OpportunityDAO oDao = OpportunityDAO.getInstance();

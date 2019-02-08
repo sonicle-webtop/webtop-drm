@@ -64,3 +64,5 @@
 .opportunity-grid-row-expired { background-color: rgba(255, 109, 109, 0.6); }
 .opportunity-grid-row-notexpired { background-color: rgba(185, 255, 165, 0.6); }
 .opportunity-grid-row-closed { background-color: rgba(209, 209, 209, 0.6); }
+
+.wtdrm-icon-mail-xs { background-image: url('mail_16.png') !important; }

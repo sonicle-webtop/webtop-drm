@@ -183,6 +183,7 @@ import com.sonicle.webtop.calendar.model.UpdateEventTarget;
 import com.sonicle.webtop.drm.bol.ODefaultCostType;
 import com.sonicle.webtop.drm.bol.js.JsExpenseNoteSetting;
 import com.sonicle.webtop.drm.model.ExpenseNoteSetting;
+import com.sonicle.webtop.drm.rpt.RptWorkReportSummary;
 import java.math.BigDecimal;
 
 /**
@@ -2171,6 +2172,42 @@ public class Service extends BaseService {
 			
 		} catch(Exception ex) {
 			logger.error("Error in action PrintWorkReport", ex);
+			ex.printStackTrace();
+			ServletUtils.writeErrorHandlingJs(response, ex.getMessage());
+		}
+	}
+	
+	public void processPrintWorkReportSummary(HttpServletRequest request, HttpServletResponse response) {
+		ArrayList<RBWorkReport> itemsWr = new ArrayList<>();
+		
+		try {
+			IContactsManager contactManager = (IContactsManager) WT.getServiceManager("com.sonicle.webtop.contacts", getEnv().getProfileId());
+			
+			String filename = ServletUtils.getStringParameter(request, "filename", "print");
+			List<OWorkReport> oWrs = new ArrayList<>();
+			WorkReport wr = null;
+			CompanyPicture picture = null;
+			Company company = null;
+			
+			oWrs = manager.listOpenWorkReportForUser();
+			
+			for(OWorkReport oWr : oWrs) {
+				picture = null;
+				wr = ManagerUtils.createWorkReport(oWr);
+				company = manager.getCompany(wr.getCompanyId());
+				if(company.getHasPicture()) picture = manager.getCompanyPicture(company.getCompanyId());
+				itemsWr.add(new RBWorkReport(WT.getCoreManager(), manager, contactManager, wr, ss, picture));
+			}
+			
+			ReportConfig.Builder builder = reportConfigBuilder();
+			RptWorkReportSummary rpt = new RptWorkReportSummary(builder.build());
+			rpt.setDataSource(itemsWr);
+			
+			ServletUtils.setFileStreamHeaders(response, filename + ".pdf");
+			WT.generateReportToStream(rpt, AbstractReport.OutputType.PDF, response.getOutputStream());
+			
+		} catch(Exception ex) {
+			logger.error("Error in action PrintWorkReportSummary", ex);
 			ex.printStackTrace();
 			ServletUtils.writeErrorHandlingJs(response, ex.getMessage());
 		}

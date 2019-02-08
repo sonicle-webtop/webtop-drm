@@ -397,12 +397,17 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								me.getAct('workReport', 'add'),
 								'-',
 								me.getAct('workReport', 'edit'),
-								me.getAct('workReport', 'remove')
+								me.getAct('workReport', 'remove'),
+								'-',
+								me.getAct('workReport', 'sendMail'),
+								'-',
+								me.getAct('workReport', 'printSummary')
 							],
 							listeners: {
 								rowclick: function (s, rec) {
 									me.getAct('workReport', 'edit').setDisabled(false);
 									me.getAct('workReport', 'remove').setDisabled(false);
+									me.getAct('workReport', 'sendMail').setDisabled(false);
 								},
 								rowdblclick: function (s, rec) {
 									me.editWorkReportUI(rec);
@@ -1299,6 +1304,23 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				me.deleteWorkReportUI(sel);
 			}
 		});
+		me.addAct('workReport', 'sendMail', {
+			text: me.res('act-sendMail.lbl'),
+			tooltip: null,
+			iconCls: 'wtdrm-icon-mail-xs ',
+			disabled: true,
+			handler: function () {
+				
+			}
+		});
+		me.addAct('workReport', 'printSummary', {
+			text: me.res('act-printSummary.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-print',
+			handler: function () {
+				me.printWorkReportSummary();
+			}
+		});
 		me.addAct('expenseNote', 'add', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
@@ -1804,6 +1826,11 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		var me = this, url;
 		url = WTF.processBinUrl(me.ID, 'PrintWorkReport', {ids: WTU.arrayAsParam(ids)});
 		Sonicle.URLMgr.openFile(url, {filename: 'workreport', newWindow: true});
+	},
+	printWorkReportSummary: function() {
+		var me = this, url;
+		url = WTF.processBinUrl(me.ID, 'PrintWorkReportSummary', {});
+		Sonicle.URLMgr.openFile(url, {filename: 'workreportsummary', newWindow: true});
 	},
 	addExpenseNote: function (opts) {
 		opts = opts || {};
