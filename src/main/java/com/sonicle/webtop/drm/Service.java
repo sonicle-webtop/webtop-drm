@@ -185,6 +185,9 @@ import com.sonicle.webtop.drm.bol.js.JsExpenseNoteSetting;
 import com.sonicle.webtop.drm.model.ExpenseNoteSetting;
 import com.sonicle.webtop.drm.rpt.RptWorkReportSummary;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import org.joda.time.LocalDate;
 
 /**
  *
@@ -2184,16 +2187,33 @@ public class Service extends BaseService {
 			IContactsManager contactManager = (IContactsManager) WT.getServiceManager("com.sonicle.webtop.contacts", getEnv().getProfileId());
 			
 			String filename = ServletUtils.getStringParameter(request, "filename", "print");
-			List<OWorkReport> oWrs = new ArrayList<>();
-			WorkReport wr = null;
+			String operatorId = ServletUtils.getStringParameter(request, "operatorId", null);
+			Integer companyId = ServletUtils.getIntParameter(request, "companyId", true);
+			Date from = ServletUtils.getDateParameter(request, "from", true);
+			Date to = ServletUtils.getDateParameter(request, "to", true);
+			Integer docStatusId = ServletUtils.getIntParameter(request, "docStatusId", null);
+			
+			LocalDate fromDate = new LocalDate(from);
+			LocalDate toDate = new LocalDate(to);
+			
+			List<WorkReport> wrs = new ArrayList<>();
 			CompanyPicture picture = null;
 			Company company = null;
+			String filters = "";
+			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 			
-			oWrs = manager.listOpenWorkReportForUser();
+			filters += (operatorId == null) 
+					? "Tutti gli Utenti supervisionati da " + WT.getCoreManager().getUser(new UserProfileId(getEnv().getProfileId().getDomainId(), getEnv().getProfileId().getUserId())).getDisplayName()  
+					: " Utente " + WT.getCoreManager().getUser(new UserProfileId(getEnv().getProfileId().getDomainId(), operatorId)).getDisplayName();
+			filters += " - Ditta " + manager.getCompany(companyId).getName();
+			filters += " - Dal " + sdf.format(from) + " al " + sdf.format(to);
+			filters += (docStatusId == null) ? "" : " - Status " + manager.getDocStatus(docStatusId).getDescription();
 			
-			for(OWorkReport oWr : oWrs) {
+			
+			wrs = manager.listWorkReportByFilters(operatorId, companyId, fromDate, toDate, docStatusId);
+			
+			for(WorkReport wr : wrs) {
 				picture = null;
-				wr = ManagerUtils.createWorkReport(oWr);
 				company = manager.getCompany(wr.getCompanyId());
 				if(company.getHasPicture()) picture = manager.getCompanyPicture(company.getCompanyId());
 				itemsWr.add(new RBWorkReport(WT.getCoreManager(), manager, contactManager, wr, ss, picture));
@@ -2202,6 +2222,7 @@ public class Service extends BaseService {
 			ReportConfig.Builder builder = reportConfigBuilder();
 			RptWorkReportSummary rpt = new RptWorkReportSummary(builder.build());
 			rpt.setDataSource(itemsWr);
+			rpt.getParameters().put("FILTERS_DESCRIPTION", filters);
 			
 			ServletUtils.setFileStreamHeaders(response, filename + ".pdf");
 			WT.generateReportToStream(rpt, AbstractReport.OutputType.PDF, response.getOutputStream());
