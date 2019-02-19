@@ -197,6 +197,7 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1480,14 +1481,38 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
-	public List<OWorkReport> listOpenWorkReportForUser()throws WTException, SQLException {
+	public List<WorkReport> listWorkReportByFilters(String operatorId, Integer companyId, LocalDate from, LocalDate to, Integer docStatusId)throws WTException, SQLException {
 		Connection con = null;
+		List<String> users = null;
+		List<OWorkReport> oWrs = null;
+		List<WorkReport> wrs = new ArrayList<>();
+		
+		
 		WorkReportDAO wrDao = WorkReportDAO.getInstance();
+		WorkReportRowDAO wrkDDao = WorkReportRowDAO.getInstance();
+		com.sonicle.webtop.drm.dal.UserDAO userDao = com.sonicle.webtop.drm.dal.UserDAO.getInstance();
 		
 		try {		
 			con = WT.getConnection(SERVICE_ID);
 			
-			return wrDao.selectWorkReportsByUserStatus(con, getTargetProfileId().getUserId(), ODocStatus.STATUS_OPEN);
+			if(operatorId == null){
+				users = userDao.selectUserSupervisedByDomain(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
+				users.add(0, getTargetProfileId().getUserId());
+				
+				oWrs = wrDao.selectWorkReportsByCompanyFromDateToDateStatus(con, users, companyId, from, to, docStatusId);
+			}else{
+				oWrs = wrDao.selectWorkReportsByUserCompanyFromDateToDateStatus(con, operatorId, companyId, from, to, docStatusId);
+			}
+			
+			for(OWorkReport oWr : oWrs) wrs.add(ManagerUtils.createWorkReport(oWr));
+			
+			for(WorkReport wr : wrs){
+				for (OWorkReportRow oWrkDetail : wrkDDao.selectByWorkReport(con, wr.getWorkReportId())) {
+					wr.getDetails().add(ManagerUtils.createWorkReportRow(oWrkDetail));
+				}
+			}
+			
+			return wrs;
 		} catch (DAOException ex) {
 			throw new WTException(ex, "DB error");
 		} finally {
