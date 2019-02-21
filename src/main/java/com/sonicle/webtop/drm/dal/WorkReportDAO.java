@@ -37,19 +37,14 @@ import com.sonicle.webtop.core.dal.DAOException;
 import com.sonicle.webtop.drm.WorkReportQuery;
 import com.sonicle.webtop.drm.bol.OWorkReport;
 import com.sonicle.webtop.drm.jooq.Sequences;
-import com.sonicle.webtop.drm.jooq.Tables;
-import static com.sonicle.webtop.drm.jooq.Tables.DOC_STATUSES;
 import static com.sonicle.webtop.drm.jooq.Tables.WORK_REPORTS;
 import com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord;
 import java.sql.Connection;
-import java.util.Date;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.DatePart;
 
 /**
  *
@@ -93,49 +88,6 @@ public class WorkReportDAO extends BaseDAO {
 				.orderBy(
 						WORK_REPORTS.YEAR,
 						WORK_REPORTS.NUMBER
-				)
-				.fetchInto(OWorkReport.class);
-	}
-	
-	public List<OWorkReport> selectWorkReportsByCompanyFromDateToDateStatus(Connection con, List<String> users, Integer companyId, LocalDate from, LocalDate to, Integer docStatusId) throws DAOException {
-		DSLContext dsl = getDSL(con);
-		
-		Condition searchCndt = ensureCondition2(companyId, from, to, docStatusId);
-		
-		return dsl
-				.select()
-				.from(WORK_REPORTS)
-				.where(
-					WORK_REPORTS.OPERATOR_ID.in(users)
-				)
-				.and(
-						searchCndt
-				)
-				.orderBy(
-						WORK_REPORTS.OPERATOR_ID,
-						WORK_REPORTS.CUSTOMER_ID,
-						WORK_REPORTS.FROM_DATE
-				)
-				.fetchInto(OWorkReport.class);
-	}
-	
-	public List<OWorkReport> selectWorkReportsByUserCompanyFromDateToDateStatus(Connection con, String operatorId, Integer companyId, LocalDate from, LocalDate to, Integer docStatusId) throws DAOException {
-		DSLContext dsl = getDSL(con);
-		Condition searchCndt = ensureCondition2(companyId, from, to, docStatusId);
-		
-		return dsl
-				.select()
-				.from(WORK_REPORTS)
-				.where(
-					WORK_REPORTS.OPERATOR_ID.equal(operatorId)
-				)
-				.and(
-						searchCndt
-				)
-				.orderBy(
-						WORK_REPORTS.OPERATOR_ID,
-						WORK_REPORTS.CUSTOMER_ID,
-						WORK_REPORTS.FROM_DATE
 				)
 				.fetchInto(OWorkReport.class);
 	}
@@ -273,18 +225,6 @@ public class WorkReportDAO extends BaseDAO {
 		
 		if (query.number != null) {
 			searchCndt = searchCndt.and(WORK_REPORTS.NUMBER.equal(query.number));
-		}
-
-		return searchCndt;
-	}
-	
-	private Condition ensureCondition2(Integer companyId, LocalDate from, LocalDate to, Integer docStatusId) {
-								
-		Condition searchCndt = WORK_REPORTS.COMPANY_ID.equal(companyId)
-				.and(WORK_REPORTS.FROM_DATE.between(from, to));
-		
-		if (docStatusId != null) {
-			searchCndt = searchCndt.and(WORK_REPORTS.DOC_STATUS_ID.equal(docStatusId));
 		}
 
 		return searchCndt;

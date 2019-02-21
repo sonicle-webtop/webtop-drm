@@ -182,11 +182,15 @@ import com.sonicle.webtop.calendar.model.EventKey;
 import com.sonicle.webtop.calendar.model.UpdateEventTarget;
 import com.sonicle.webtop.drm.bol.ODefaultCostType;
 import com.sonicle.webtop.drm.bol.js.JsExpenseNoteSetting;
+import com.sonicle.webtop.drm.bol.model.RBWorkReportSummary;
 import com.sonicle.webtop.drm.model.ExpenseNoteSetting;
+import com.sonicle.webtop.drm.model.WorkReportSummary;
 import com.sonicle.webtop.drm.rpt.RptWorkReportSummary;
+import java.awt.Image;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import javax.imageio.ImageIO;
 import org.joda.time.LocalDate;
 
 /**
@@ -2181,11 +2185,15 @@ public class Service extends BaseService {
 	}
 	
 	public void processPrintWorkReportSummary(HttpServletRequest request, HttpServletResponse response) {
-		ArrayList<RBWorkReport> itemsWr = new ArrayList<>();
+		ArrayList<RBWorkReportSummary> itemsWrS = new ArrayList<>();
+		List<WorkReportSummary> wrss = new ArrayList<>();
+		CompanyPicture picture = null;
+		Image imgPicture = null;
+		Company company = null;
+		String filters = "";
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		
 		try {
-			IContactsManager contactManager = (IContactsManager) WT.getServiceManager("com.sonicle.webtop.contacts", getEnv().getProfileId());
-			
 			String filename = ServletUtils.getStringParameter(request, "filename", "print");
 			String operatorId = ServletUtils.getStringParameter(request, "operatorId", null);
 			Integer companyId = ServletUtils.getIntParameter(request, "companyId", true);
@@ -2196,12 +2204,6 @@ public class Service extends BaseService {
 			LocalDate fromDate = new LocalDate(from);
 			LocalDate toDate = new LocalDate(to);
 			
-			List<WorkReport> wrs = new ArrayList<>();
-			CompanyPicture picture = null;
-			Company company = null;
-			String filters = "";
-			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-			
 			filters += (operatorId == null) 
 					? "Tutti gli Utenti supervisionati da " + WT.getCoreManager().getUser(new UserProfileId(getEnv().getProfileId().getDomainId(), getEnv().getProfileId().getUserId())).getDisplayName()  
 					: " Utente " + WT.getCoreManager().getUser(new UserProfileId(getEnv().getProfileId().getDomainId(), operatorId)).getDisplayName();
@@ -2209,20 +2211,25 @@ public class Service extends BaseService {
 			filters += " - Dal " + sdf.format(from) + " al " + sdf.format(to);
 			filters += (docStatusId == null) ? "" : " - Status " + manager.getDocStatus(docStatusId).getDescription();
 			
+			company = manager.getCompany(companyId);
+			if(company.getHasPicture()) picture = manager.getCompanyPicture(company.getCompanyId());
+			if(picture != null) {
+				try(ByteArrayInputStream bais = new ByteArrayInputStream(picture.getBytes())) {
+					imgPicture = ImageIO.read(bais);
+				}
+			}
 			
-			wrs = manager.listWorkReportByFilters(operatorId, companyId, fromDate, toDate, docStatusId);
+			wrss = manager.listWorkReportSummaryByFilters(operatorId, companyId, fromDate, toDate, docStatusId);
 			
-			for(WorkReport wr : wrs) {
-				picture = null;
-				company = manager.getCompany(wr.getCompanyId());
-				if(company.getHasPicture()) picture = manager.getCompanyPicture(company.getCompanyId());
-				itemsWr.add(new RBWorkReport(WT.getCoreManager(), manager, contactManager, wr, ss, picture));
+			for(WorkReportSummary wrs : wrss) {
+				itemsWrS.add(new RBWorkReportSummary(WT.getCoreManager(), manager, wrs));
 			}
 			
 			ReportConfig.Builder builder = reportConfigBuilder();
 			RptWorkReportSummary rpt = new RptWorkReportSummary(builder.build());
-			rpt.setDataSource(itemsWr);
+			rpt.setDataSource(itemsWrS);
 			rpt.getParameters().put("FILTERS_DESCRIPTION", filters);
+			rpt.getParameters().put("COMPANY_PICTURE", imgPicture);
 			
 			ServletUtils.setFileStreamHeaders(response, filename + ".pdf");
 			WT.generateReportToStream(rpt, AbstractReport.OutputType.PDF, response.getOutputStream());
