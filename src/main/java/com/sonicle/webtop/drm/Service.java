@@ -671,10 +671,14 @@ public class Service extends BaseService {
 					
 			IContactsManager contactManager = (IContactsManager) WT.getServiceManager("com.sonicle.webtop.contacts", getEnv().getProfileId());
 			categoryIds = contactManager.listCategoryIds();
+			categoryIds.addAll(contactManager.listIncomingCategoryIds());
 			ListContactsResult lcr = contactManager.listContacts(categoryIds, false, Grouping.ALPHABETIC, ShowBy.LASTNAME, pattern, page, limit, true);
 			for(ContactLookup c: lcr.items){
+				String fullName = StringUtils.isEmpty(c.getFullName(true)) ? "" : c.getFullName(true);
+				String company = StringUtils.isEmpty(c.getCompany()) ? "" : c.getCompany();
+				String info = (fullName.length() > 0 && company.length() > 0) ? fullName + " - " + company : fullName + company;
 				uD = WT.getUserData(c.getCategoryProfileId());
-				contacts.add(new JsSimpleSource(c.getContactId(), c.getFullName(true) + " - " + c.getCompany(), "[" + uD.getDisplayName() + " / " + c.getCategoryName() + "]"));
+				contacts.add(new JsSimpleSource(c.getContactId(), info, "[" + uD.getDisplayName() + " / " + c.getCategoryName() + "]"));
 			}
 
 			new JsonResult(contacts, lcr.fullCount).setPage(page).printTo(out);
