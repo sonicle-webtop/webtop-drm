@@ -182,6 +182,7 @@ import com.sonicle.webtop.calendar.model.EventKey;
 import com.sonicle.webtop.calendar.model.UpdateEventTarget;
 import com.sonicle.webtop.drm.bol.ODefaultCostType;
 import com.sonicle.webtop.drm.bol.js.JsExpenseNoteSetting;
+import com.sonicle.webtop.drm.bol.js.JsFilter;
 import com.sonicle.webtop.drm.bol.model.RBWorkReportSummary;
 import com.sonicle.webtop.drm.model.ExpenseNoteSetting;
 import com.sonicle.webtop.drm.model.WorkReportSummary;
@@ -644,19 +645,39 @@ public class Service extends BaseService {
 	
 	public void processLookupContacts(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
+			int page = ServletUtils.getIntParameter(request, "page", true);
+			int limit = ServletUtils.getIntParameter(request, "limit", 50);
+			String value = "";
+			String pattern;
+			
 			List<JsSimpleSource> contacts = new ArrayList();
 			List<Integer> categoryIds = new ArrayList();
 			Data uD;
+			
+			//Check for multiple filters
+			try {
+				JsFilter.List filterList = ServletUtils.getObjectParameter(request,"filter",JsFilter.List.class,false);
+				if (filterList!=null) {
+					//in this case I'm sure the filter is only one
+					for(JsFilter filter: filterList) {
+						value += filter.value;
+					}
+				}
+			} catch(Exception exc) {
+				logger.error("Excetpion",exc);
+			}
+			
+			pattern = StringUtils.isBlank(value) ? null : "%" + value + "%";
 					
 			IContactsManager contactManager = (IContactsManager) WT.getServiceManager("com.sonicle.webtop.contacts", getEnv().getProfileId());
 			categoryIds = contactManager.listCategoryIds();
-			ListContactsResult lcr = contactManager.listContacts(categoryIds, false, Grouping.ALPHABETIC, ShowBy.LASTNAME, null);
+			ListContactsResult lcr = contactManager.listContacts(categoryIds, false, Grouping.ALPHABETIC, ShowBy.LASTNAME, pattern, page, limit, true);
 			for(ContactLookup c: lcr.items){
 				uD = WT.getUserData(c.getCategoryProfileId());
-				contacts.add(new JsSimpleSource(c.getContactId(), c.getFullName(true), "[" + uD.getDisplayName() + " / " + c.getCategoryName() + "]"));
+				contacts.add(new JsSimpleSource(c.getContactId(), c.getFullName(true) + " - " + c.getCompany(), "[" + uD.getDisplayName() + " / " + c.getCategoryName() + "]"));
 			}
 
-			new JsonResult(contacts).printTo(out);
+			new JsonResult(contacts, lcr.fullCount).setPage(page).printTo(out);
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action LookupContacts", ex);

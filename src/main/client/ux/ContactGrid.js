@@ -47,11 +47,18 @@ Ext.define('Sonicle.webtop.drm.ux.ContactGrid', {
 
 	initComponent: function () {
 		var me = this;
-
-		me.lookupStore = Ext.create('Ext.data.Store', {
+		
+		me.lookupStore = Ext.create('Sonicle.data.BufferedStore',{
 			autoLoad: true,
 			model: 'WTA.ux.data.SimpleSourceModel',
-			proxy: WTF.proxy(me.sid, 'LookupContacts', 'data')
+			proxy: WTF.proxy(me.sid, 'LookupContacts', 'data', {
+				extraParams: {
+					query: null
+				}
+			}),
+			pageSize: 50,
+			leadingBufferZone: 50,
+			trailingBufferZone: 50
 		});
 
 		me.selModel = {
@@ -139,7 +146,7 @@ Ext.define('Sonicle.webtop.drm.ux.ContactGrid', {
 					valueField: 'id', 
 					displayField: 'desc',
 					searchField: 'desc',
-					emptyText: WT.res('grid.empty'),
+					emptyText: WT.res(me.sid, 'grid.empty'),
 					searchText: WT.res(me.sid, 'groupcontact.picker.search'),
 					okText: WT.res('act-ok.lbl'),
 					cancelText: WT.res('act-cancel.lbl'),
