@@ -180,10 +180,13 @@ import com.sonicle.webtop.calendar.model.Event;
 import com.sonicle.webtop.calendar.model.EventInstance;
 import com.sonicle.webtop.calendar.model.EventKey;
 import com.sonicle.webtop.calendar.model.UpdateEventTarget;
+import com.sonicle.webtop.drm.bol.OCostType;
 import com.sonicle.webtop.drm.bol.ODefaultCostType;
+import com.sonicle.webtop.drm.bol.js.JsCostType;
 import com.sonicle.webtop.drm.bol.js.JsExpenseNoteSetting;
 import com.sonicle.webtop.drm.bol.js.JsFilter;
 import com.sonicle.webtop.drm.bol.model.RBWorkReportSummary;
+import com.sonicle.webtop.drm.model.CostType;
 import com.sonicle.webtop.drm.model.ExpenseNoteSetting;
 import com.sonicle.webtop.drm.model.WorkReportSummary;
 import com.sonicle.webtop.drm.rpt.RptWorkReportSummary;
@@ -348,6 +351,21 @@ public class Service extends BaseService {
 		}
 	}
 	
+	public void processLookupCostTypes(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			List<JsCostType> jsCT = new ArrayList();
+
+			for (CostType ct : manager.listCostTypes()) {
+				jsCT.add(new JsCostType(ct));
+			}
+			
+			new JsonResult(jsCT, jsCT.size()).printTo(out);
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupCostTypes", ex);
+		}
+	}
+	
 	public void processLookupOperators(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			List<JsSimple> jsUser = new ArrayList();
@@ -422,6 +440,29 @@ public class Service extends BaseService {
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action LookupAllCompanies", ex);
+		}
+	}
+	
+	public void processLookupCustomersSuppliers(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String operator = ServletUtils.getStringParameter(request, "operator", null);
+			List<MasterData> items = new ArrayList<>();
+			List<JsSimple> customers = new ArrayList();
+			
+			if(operator != null){
+				DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID, new UserProfileId(getEnv().getProfileId().getDomain(), operator));
+				
+				items = WT.getCoreManager().listMasterData(Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER), EnumUtils.toSerializedName(MasterData.Type.SUPPLIER)));
+				
+				for(MasterData customer : items) {
+					customers.add(new JsSimple(customer.getMasterDataId(), customer.getDescription()));
+				}
+			}
+				
+			new JsonResult(customers, customers.size()).printTo(out);
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupCustomersSuppliers", ex);
 		}
 	}
 	

@@ -30,29 +30,40 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.ExpenseNoteRowDetail', {
+Ext.define('Sonicle.webtop.drm.model.ExpenseNoteDetail', {
 	extend: 'WTA.ux.data.BaseModel',
 	identifier: 'negative',
 	idProperty: 'id',
 	fields: [
-		WTF.field('expenseNoteRowDetailId', 'int', true),
+		WTF.field('expenseNoteDetailId', 'int', true),
 		WTF.field('expenseNoteId', 'int', true),
 		WTF.field('operatorId', 'string', false),
 		WTF.field('typeId', 'int', false),
-		WTF.field('total', 'int', true),
+		WTF.field('total', 'float', true, {
+			defaultValue: 0
+		}),
 		WTF.field('date', 'date', false, {dateFormat: 'Y-m-d', defaultValue: new Date()}),
 		WTF.field('paymentCompany', 'string', true),
 		WTF.field('invoice', 'string', true),
 		WTF.field('invoiceNumber', 'string', true),
-		WTF.field('present', 'string', true),
+		WTF.field('withOthers', 'string', true),
 		WTF.field('customerId', 'string', true),
 		WTF.field('pointOfSale', 'string', true),
-		WTF.field('km', 'int', true),
-		WTF.field('totalDoc', 'int', true),
+		WTF.field('km', 'float', true, {
+			defaultValue: 0
+		}),
+		WTF.field('totalDoc', 'float', true, {
+			defaultValue: 0
+		}),
 		WTF.field('consumptive', 'string', true),
 		WTF.field('currency', 'string', true),
-		WTF.field('change', 'string', true),
+		WTF.field('change', 'float', true, {
+			defaultValue: 1
+		}),
 		WTF.field('currencyCostDoc', 'string', true),
 		WTF.field('description', 'string', true)		
+	],
+	hasMany: [
+		WTF.hasMany('detailDocuments', 'Sonicle.webtop.drm.model.ExpenseNoteDetailDocument')
 	]
 });

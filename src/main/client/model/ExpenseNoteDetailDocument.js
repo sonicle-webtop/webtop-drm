@@ -30,28 +30,18 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.ExpenseNoteRow', {
+Ext.define('Sonicle.webtop.drm.model.ExpenseNoteDetailDocument', {
 	extend: 'WTA.ux.data.BaseModel',
 	identifier: 'negative',
 	idProperty: 'id',
 	fields: [
-		WTF.field('expenseNoteRowId', 'int', true),
-		WTF.field('expenseNoteId', 'int', true),
-		WTF.field('operatorId', 'string', false),
-		WTF.field('description', 'string', true),
-		WTF.field('km', 'int', true),
-		WTF.field('stay', 'int', true),
-		WTF.field('highway', 'int', true),
-		WTF.field('park', 'int', true),
-		WTF.field('meals', 'int', true),
-		WTF.field('amountKm', 'int', true),
-		WTF.field('other', 'int', true),
-		WTF.field('total', 'int', true),
-		WTF.field('date', 'date', false, {dateFormat: 'Y-m-d', defaultValue: new Date()}),
-		WTF.field('customerId', 'string', true),
-		WTF.field('paymentCompany', 'string', true),
-		WTF.field('invoice', 'string', true),
-		WTF.field('invoiceNumber', 'string', true),
-		WTF.field('pointOfSale', 'string', true)
+		WTF.field('id', 'string', false),
+		WTF.field('expenseNoteDetailId', 'string', false),
+		WTF.field('revisionTimestamp', 'date', false, {dateFormat: 'Y-m-d H:i:s'}),
+		WTF.field('revisionSequence', 'int', true),
+		WTF.field('fileName', 'string', true),
+		WTF.field('size', 'int', true),
+		WTF.field('mediaType', 'string', true)
 	]
 });
+

@@ -34,7 +34,7 @@ Ext.define('Sonicle.webtop.drm.model.ExpenseNoteSetting', {
 	extend: 'WTA.ux.data.BaseModel',
 	requires: [
 		'Sonicle.data.writer.Json',
-		'Sonicle.webtop.drm.model.CostsType'
+		'Sonicle.webtop.drm.model.CostType'
 	],
 	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageExpenseNoteSetting', 'data', {
 		writer: {
@@ -52,6 +52,6 @@ Ext.define('Sonicle.webtop.drm.model.ExpenseNoteSetting', {
 		WTF.field('defaultCurrency', 'string', true)
 	],
 	hasMany: [
-		WTF.hasMany('costsType', 'Sonicle.webtop.drm.model.CostsType')
+		WTF.hasMany('costsType', 'Sonicle.webtop.drm.model.CostType')
 	]
 });

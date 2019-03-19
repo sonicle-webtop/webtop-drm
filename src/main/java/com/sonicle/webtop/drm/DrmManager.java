@@ -3379,6 +3379,28 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
+	public List<CostType> listCostTypes() throws WTException {
+		Connection con = null;
+		CostTypeDAO ctDao = CostTypeDAO.getInstance();
+		List<CostType> cts = new ArrayList();
+		
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			for (OCostType oCt : ctDao.selectByDomain(con, getTargetProfileId().getDomainId())) {
+				cts.add(ManagerUtils.createCostType(oCt));
+			}
+
+			return cts;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
 	public List<OTimetableStamp> listTimetableStamp() throws WTException {
 		Connection con = null;
 		TimetableStampDAO tsDao = TimetableStampDAO.getInstance();

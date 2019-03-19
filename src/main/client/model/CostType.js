@@ -30,7 +30,7 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.CostsType', {
+Ext.define('Sonicle.webtop.drm.model.CostType', {
 	extend: 'WTA.ux.data.BaseModel',
 	identifier: 'negative',
 	idProperty: 'id',
