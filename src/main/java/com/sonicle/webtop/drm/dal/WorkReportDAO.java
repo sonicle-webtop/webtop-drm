@@ -37,8 +37,6 @@ import com.sonicle.webtop.core.dal.DAOException;
 import com.sonicle.webtop.drm.WorkReportQuery;
 import com.sonicle.webtop.drm.bol.OWorkReport;
 import com.sonicle.webtop.drm.jooq.Sequences;
-import com.sonicle.webtop.drm.jooq.Tables;
-import static com.sonicle.webtop.drm.jooq.Tables.DOC_STATUSES;
 import static com.sonicle.webtop.drm.jooq.Tables.WORK_REPORTS;
 import com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord;
 import java.sql.Connection;
@@ -47,7 +45,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.DatePart;
 
 /**
  *
@@ -89,29 +86,6 @@ public class WorkReportDAO extends BaseDAO {
 						.and(searchCndt)
 				)
 				.orderBy(
-						WORK_REPORTS.YEAR,
-						WORK_REPORTS.NUMBER
-				)
-				.fetchInto(OWorkReport.class);
-	}
-	
-	public List<OWorkReport> selectWorkReportsByUserStatus(Connection con, String userId, String status) throws DAOException {
-		DSLContext dsl = getDSL(con);
-
-		return dsl
-				.select()
-				.from(WORK_REPORTS)
-				.join(DOC_STATUSES).on(
-					DOC_STATUSES.DOC_STATUS_ID.equal(WORK_REPORTS.DOC_STATUS_ID)
-				)
-				.where(
-					DOC_STATUSES.TYPE.equal(status)
-				)
-				.and(
-					WORK_REPORTS.OPERATOR_ID.equal(userId)
-				)
-				.orderBy(
-						WORK_REPORTS.COMPANY_ID,
 						WORK_REPORTS.YEAR,
 						WORK_REPORTS.NUMBER
 				)

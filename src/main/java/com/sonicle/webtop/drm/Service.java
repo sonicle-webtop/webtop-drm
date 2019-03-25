@@ -180,11 +180,22 @@ import com.sonicle.webtop.calendar.model.Event;
 import com.sonicle.webtop.calendar.model.EventInstance;
 import com.sonicle.webtop.calendar.model.EventKey;
 import com.sonicle.webtop.calendar.model.UpdateEventTarget;
+import com.sonicle.webtop.drm.bol.OCostType;
 import com.sonicle.webtop.drm.bol.ODefaultCostType;
+import com.sonicle.webtop.drm.bol.js.JsCostType;
 import com.sonicle.webtop.drm.bol.js.JsExpenseNoteSetting;
+import com.sonicle.webtop.drm.bol.js.JsFilter;
+import com.sonicle.webtop.drm.bol.model.RBWorkReportSummary;
+import com.sonicle.webtop.drm.model.CostType;
 import com.sonicle.webtop.drm.model.ExpenseNoteSetting;
+import com.sonicle.webtop.drm.model.WorkReportSummary;
 import com.sonicle.webtop.drm.rpt.RptWorkReportSummary;
+import java.awt.Image;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.imageio.ImageIO;
+import org.joda.time.LocalDate;
 
 /**
  *
@@ -340,6 +351,21 @@ public class Service extends BaseService {
 		}
 	}
 	
+	public void processLookupCostTypes(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			List<JsCostType> jsCT = new ArrayList();
+
+			for (CostType ct : manager.listCostTypes()) {
+				jsCT.add(new JsCostType(ct));
+			}
+			
+			new JsonResult(jsCT, jsCT.size()).printTo(out);
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupCostTypes", ex);
+		}
+	}
+	
 	public void processLookupOperators(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			List<JsSimple> jsUser = new ArrayList();
@@ -414,6 +440,29 @@ public class Service extends BaseService {
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action LookupAllCompanies", ex);
+		}
+	}
+	
+	public void processLookupCustomersSuppliers(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String operator = ServletUtils.getStringParameter(request, "operator", null);
+			List<MasterData> items = new ArrayList<>();
+			List<JsSimple> customers = new ArrayList();
+			
+			if(operator != null){
+				DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID, new UserProfileId(getEnv().getProfileId().getDomain(), operator));
+				
+				items = WT.getCoreManager().listMasterData(Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER), EnumUtils.toSerializedName(MasterData.Type.SUPPLIER)));
+				
+				for(MasterData customer : items) {
+					customers.add(new JsSimple(customer.getMasterDataId(), customer.getDescription()));
+				}
+			}
+				
+			new JsonResult(customers, customers.size()).printTo(out);
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupCustomersSuppliers", ex);
 		}
 	}
 	
@@ -637,19 +686,43 @@ public class Service extends BaseService {
 	
 	public void processLookupContacts(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
+			int page = ServletUtils.getIntParameter(request, "page", true);
+			int limit = ServletUtils.getIntParameter(request, "limit", 50);
+			String value = "";
+			String pattern;
+			
 			List<JsSimpleSource> contacts = new ArrayList();
 			List<Integer> categoryIds = new ArrayList();
 			Data uD;
+			
+			//Check for multiple filters
+			try {
+				JsFilter.List filterList = ServletUtils.getObjectParameter(request,"filter",JsFilter.List.class,false);
+				if (filterList!=null) {
+					//in this case I'm sure the filter is only one
+					for(JsFilter filter: filterList) {
+						value += filter.value;
+					}
+				}
+			} catch(Exception exc) {
+				logger.error("Excetpion",exc);
+			}
+			
+			pattern = StringUtils.isBlank(value) ? null : "%" + value + "%";
 					
 			IContactsManager contactManager = (IContactsManager) WT.getServiceManager("com.sonicle.webtop.contacts", getEnv().getProfileId());
 			categoryIds = contactManager.listCategoryIds();
-			ListContactsResult lcr = contactManager.listContacts(categoryIds, false, Grouping.ALPHABETIC, ShowBy.LASTNAME, null);
+			categoryIds.addAll(contactManager.listIncomingCategoryIds());
+			ListContactsResult lcr = contactManager.listContacts(categoryIds, false, Grouping.ALPHABETIC, ShowBy.LASTNAME, pattern, page, limit, true);
 			for(ContactLookup c: lcr.items){
+				String fullName = StringUtils.isEmpty(c.getFullName(true)) ? "" : c.getFullName(true);
+				String company = StringUtils.isEmpty(c.getCompany()) ? "" : c.getCompany();
+				String info = (fullName.length() > 0 && company.length() > 0) ? fullName + " - " + company : fullName + company;
 				uD = WT.getUserData(c.getCategoryProfileId());
-				contacts.add(new JsSimpleSource(c.getContactId(), c.getFullName(true), "[" + uD.getDisplayName() + " / " + c.getCategoryName() + "]"));
+				contacts.add(new JsSimpleSource(c.getContactId(), info, "[" + uD.getDisplayName() + " / " + c.getCategoryName() + "]"));
 			}
 
-			new JsonResult(contacts).printTo(out);
+			new JsonResult(contacts, lcr.fullCount).setPage(page).printTo(out);
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action LookupContacts", ex);
@@ -2178,30 +2251,51 @@ public class Service extends BaseService {
 	}
 	
 	public void processPrintWorkReportSummary(HttpServletRequest request, HttpServletResponse response) {
-		ArrayList<RBWorkReport> itemsWr = new ArrayList<>();
+		ArrayList<RBWorkReportSummary> itemsWrS = new ArrayList<>();
+		List<WorkReportSummary> wrss = new ArrayList<>();
+		CompanyPicture picture = null;
+		Image imgPicture = null;
+		Company company = null;
+		String filters = "";
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		
 		try {
-			IContactsManager contactManager = (IContactsManager) WT.getServiceManager("com.sonicle.webtop.contacts", getEnv().getProfileId());
-			
 			String filename = ServletUtils.getStringParameter(request, "filename", "print");
-			List<OWorkReport> oWrs = new ArrayList<>();
-			WorkReport wr = null;
-			CompanyPicture picture = null;
-			Company company = null;
+			String operatorId = ServletUtils.getStringParameter(request, "operatorId", null);
+			Integer companyId = ServletUtils.getIntParameter(request, "companyId", true);
+			Date from = ServletUtils.getDateParameter(request, "from", true);
+			Date to = ServletUtils.getDateParameter(request, "to", true);
+			Integer docStatusId = ServletUtils.getIntParameter(request, "docStatusId", null);
 			
-			oWrs = manager.listOpenWorkReportForUser();
+			LocalDate fromDate = new LocalDate(from);
+			LocalDate toDate = new LocalDate(to);
 			
-			for(OWorkReport oWr : oWrs) {
-				picture = null;
-				wr = ManagerUtils.createWorkReport(oWr);
-				company = manager.getCompany(wr.getCompanyId());
-				if(company.getHasPicture()) picture = manager.getCompanyPicture(company.getCompanyId());
-				itemsWr.add(new RBWorkReport(WT.getCoreManager(), manager, contactManager, wr, ss, picture));
+			filters += (operatorId == null) 
+					? "Tutti gli Utenti supervisionati da " + WT.getCoreManager().getUser(new UserProfileId(getEnv().getProfileId().getDomainId(), getEnv().getProfileId().getUserId())).getDisplayName()  
+					: " Utente " + WT.getCoreManager().getUser(new UserProfileId(getEnv().getProfileId().getDomainId(), operatorId)).getDisplayName();
+			filters += " - Ditta " + manager.getCompany(companyId).getName();
+			filters += " - Dal " + sdf.format(from) + " al " + sdf.format(to);
+			filters += (docStatusId == null) ? "" : " - Status " + manager.getDocStatus(docStatusId).getDescription();
+			
+			company = manager.getCompany(companyId);
+			if(company.getHasPicture()) picture = manager.getCompanyPicture(company.getCompanyId());
+			if(picture != null) {
+				try(ByteArrayInputStream bais = new ByteArrayInputStream(picture.getBytes())) {
+					imgPicture = ImageIO.read(bais);
+				}
+			}
+			
+			wrss = manager.listWorkReportSummaryByFilters(operatorId, companyId, fromDate, toDate, docStatusId);
+			
+			for(WorkReportSummary wrs : wrss) {
+				itemsWrS.add(new RBWorkReportSummary(WT.getCoreManager(), manager, wrs));
 			}
 			
 			ReportConfig.Builder builder = reportConfigBuilder();
 			RptWorkReportSummary rpt = new RptWorkReportSummary(builder.build());
-			rpt.setDataSource(itemsWr);
+			rpt.setDataSource(itemsWrS);
+			rpt.getParameters().put("FILTERS_DESCRIPTION", filters);
+			rpt.getParameters().put("COMPANY_PICTURE", imgPicture);
 			
 			ServletUtils.setFileStreamHeaders(response, filename + ".pdf");
 			WT.generateReportToStream(rpt, AbstractReport.OutputType.PDF, response.getOutputStream());

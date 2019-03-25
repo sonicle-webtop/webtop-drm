@@ -133,6 +133,7 @@ import com.sonicle.webtop.drm.dal.WorkReportAttachmentDAO;
 import com.sonicle.webtop.drm.dal.WorkReportDAO;
 import com.sonicle.webtop.drm.dal.WorkReportRowDAO;
 import com.sonicle.webtop.drm.dal.WorkReportSettingDAO;
+import com.sonicle.webtop.drm.dal.WorkReportSummaryDAO;
 import com.sonicle.webtop.drm.dal.WorkTypeDAO;
 import com.sonicle.webtop.drm.model.BusinessTrip;
 import com.sonicle.webtop.drm.model.Company;
@@ -150,7 +151,6 @@ import com.sonicle.webtop.drm.model.DrmProfile;
 import com.sonicle.webtop.drm.model.LineHour;
 import com.sonicle.webtop.drm.model.EmployeeProfile;
 import com.sonicle.webtop.drm.model.ExpenseNoteSetting;
-import com.sonicle.webtop.drm.model.FileContent;
 import com.sonicle.webtop.drm.model.HolidayDate;
 import com.sonicle.webtop.drm.model.HourProfile;
 import com.sonicle.webtop.drm.model.LeaveRequest;
@@ -182,6 +182,7 @@ import com.sonicle.webtop.drm.model.WorkReportAttachmentWithBytes;
 import com.sonicle.webtop.drm.model.WorkReportAttachmentWithStream;
 import com.sonicle.webtop.drm.model.WorkReportRow;
 import com.sonicle.webtop.drm.model.WorkReportSetting;
+import com.sonicle.webtop.drm.model.WorkReportSummary;
 import com.sonicle.webtop.drm.model.WorkType;
 import com.sonicle.webtop.drm.util.EmailNotification;
 import eu.medsea.mimeutil.MimeType;
@@ -189,9 +190,6 @@ import freemarker.template.TemplateException;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -204,8 +202,6 @@ import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -1480,14 +1476,28 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
-	public List<OWorkReport> listOpenWorkReportForUser()throws WTException, SQLException {
+	public List<WorkReportSummary> listWorkReportSummaryByFilters(String operatorId, Integer companyId, LocalDate from, LocalDate to, Integer docStatusId)throws WTException, SQLException {
 		Connection con = null;
-		WorkReportDAO wrDao = WorkReportDAO.getInstance();
+		List<String> users = null;
+		List<WorkReportSummary> wrss = new ArrayList<>();
+		
+		
+		WorkReportSummaryDAO wrsDao = WorkReportSummaryDAO.getInstance();
+		com.sonicle.webtop.drm.dal.UserDAO userDao = com.sonicle.webtop.drm.dal.UserDAO.getInstance();
 		
 		try {		
 			con = WT.getConnection(SERVICE_ID);
 			
-			return wrDao.selectWorkReportsByUserStatus(con, getTargetProfileId().getUserId(), ODocStatus.STATUS_OPEN);
+			if(operatorId == null){
+				users = userDao.selectUserSupervisedByDomain(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
+				users.add(0, getTargetProfileId().getUserId());
+				
+				wrss = wrsDao.selectWorkReportSummaryByCompanyFromDateToDateStatus(con, users, companyId, from, to, docStatusId);
+			}else{
+				wrss = wrsDao.selectWorkReportSummaryByUserCompanyFromDateToDateStatus(con, operatorId, companyId, from, to, docStatusId);
+			}
+			
+			return wrss;
 		} catch (DAOException ex) {
 			throw new WTException(ex, "DB error");
 		} finally {
@@ -3364,6 +3374,28 @@ public class DrmManager extends BaseManager {
 		} catch (Exception ex) {
 			DbUtils.rollbackQuietly(con);
 			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public List<CostType> listCostTypes() throws WTException {
+		Connection con = null;
+		CostTypeDAO ctDao = CostTypeDAO.getInstance();
+		List<CostType> cts = new ArrayList();
+		
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			for (OCostType oCt : ctDao.selectByDomain(con, getTargetProfileId().getDomainId())) {
+				cts.add(ManagerUtils.createCostType(oCt));
+			}
+
+			return cts;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
 		} finally {
 			DbUtils.closeQuietly(con);
 		}

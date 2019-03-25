@@ -90,7 +90,7 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 		
 		me.add({
 			region: 'center',
-			xtype: 'tabpanel',
+			xtype: 'wttabpanel',
 			items: [
 				{
 					title: me.mys.res('expenseNote.tab.expenseNotetit'),
@@ -317,7 +317,7 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 			tooltip: null,
 			iconCls: 'wt-icon-add-xs',
 			handler: function () {
-				me.addExpenseNoteDetail({
+				me.addExpenseNoteDetail(me.getModel().get('operatorId'), {
 					callback: function (success) {
 						if (success) {
 							me.gpExpenseNoteDetail().getStore().load();
@@ -398,7 +398,7 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 		}
 	},
 	
-	addExpenseNoteDetail: function (opts) {
+	addExpenseNoteDetail: function (operatorId, opts) {
 		opts = opts || {};
 		var me = this,
 				vw = WT.createView(me.mys.ID, 'view.ExpenseNoteDetail', {swapReturn: true});
@@ -406,7 +406,11 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
 		vw.showView(function () {
-					vw.begin('new');
+					vw.begin('new', {
+						data: {
+							operatorId: operatorId
+						}
+					});
 				});
 	},
 	

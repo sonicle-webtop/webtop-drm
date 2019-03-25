@@ -700,15 +700,6 @@ ALTER TABLE "drm"."leave_request_documents" ADD PRIMARY KEY ("leave_request_docu
 
 CREATE SEQUENCE "drm"."seq_leave_request_documents";
 
-DROP TABLE "drm"."expense_notes", "drm"."expense_note_documents", "drm"."expense_note_document_links", "drm"."expense_note_costs", "drm"."expense_note_cost_types", "drm"."expense_note_rows", "drm"."expense_note_row_details", "drm"."expense_note_row_documents", "drm"."expense_note_row_document_links";
-
-DROP SEQUENCE "drm"."seq_expense_note_documents";
-DROP SEQUENCE "drm"."seq_expense_notes";
-DROP SEQUENCE "drm"."seq_expense_note_costs";
-DROP SEQUENCE "drm"."seq_expense_note_rows";
-DROP SEQUENCE "drm"."seq_expense_note_row_details";
-DROP SEQUENCE "drm"."seq_expense_note_row_documents";
-
 --------------
 --19/03/2018--
 --------------
@@ -938,7 +929,7 @@ ADD COLUMN "show_on_grid" bool DEFAULT false;
 --05/10/2018--
 --------------
 --INSERITO NELLA CREATE TABLE, DA IGNORARE QUESTA ALTER TABLE SE IL CAMPO è GIà STATO RINOMINATO--
-ALTER TABLE "drm"."opportunities" RENAME "won" TO "success";
+--ALTER TABLE "drm"."opportunities" RENAME "won" TO "success";
 
 --------------
 --17/10/2018--
@@ -1027,7 +1018,7 @@ ALTER TABLE "drm"."work_reports"
 ADD COLUMN "number" int4,
 ADD COLUMN "year" int4;
 
-update work_reports set 
+update drm.work_reports set 
 "number" = SPLIT_PART(work_report_no, '-', 1) :: INTEGER, 
 "year" = SPLIT_PART(work_report_no, '-', 2) :: INTEGER;
 
@@ -1053,6 +1044,8 @@ ADD COLUMN "event_id" int4;
 --------------
 --20/12/2018--
 --------------
+
+DROP TABLE "drm"."expense_note_settings";
 
 CREATE TABLE "drm"."expense_note_settings" (
 "expense_note_setting_id" int4 NOT NULL,
@@ -1094,11 +1087,11 @@ ALTER TABLE "drm"."work_reports" RENAME "day_trasfert" TO "business_trip_days";
 ALTER TABLE "drm"."work_reports_rows"
 ADD COLUMN "extra" bool;
 
-UPDATE work_reports_rows AS wrr
+UPDATE drm.work_reports_rows AS wrr
     SET extra = CASE
                  WHEN row_flag = 'Y' THEN true
                 ELSE false
               END
-
+;
 ALTER TABLE "drm"."work_reports_rows"
 DROP COLUMN "row_flag";

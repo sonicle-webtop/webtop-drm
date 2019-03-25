@@ -33,132 +33,373 @@
 Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 	extend: 'WTA.sdk.ModelView',
 	requires: [
-		'Sonicle.webtop.drm.model.ExpenseNoteDetail'
+		'Sonicle.webtop.drm.model.ExpenseNoteDetail',
+		'Sonicle.webtop.drm.model.ExpenseNoteDetailDocument',
+		'Sonicle.webtop.drm.model.CostType'
 	],
 	dockableConfig: {
 		title: '{expenseNoteDetail.tit}',
 		iconCls: 'wtdrm-icon-expensenote-xs',
-		width: 500,
-		height: 370
+		width: 450,
+		height: 390
 	},
 	fieldTitle: 'name',
 	modelName: 'Sonicle.webtop.drm.model.ExpenseNoteDetail',
 	initComponent: function () {
-		var me = this;
+		var me = this,
+			gpId = Ext.id(null, 'gridpanel');
 
 		me.callParent(arguments);
 
 		me.add({
 			region: 'center',
-			xtype: 'wtform',
+			xtype: 'wttabpanel',
 			items: [
 				{
-					xtype: 'datefield',
-					startDay: WT.getStartDay(),
-					bind: '{record.date}',
-					reference: 'flddate',
-					fieldLabel: me.mys.res('expenseNoteDetail.fld-date.lbl'),
-					width: '420px'
-				},
-				WTF.localCombo('id', 'desc', {
-					bind: '{record.description}',
-					reference: 'flddescription',
-					autoLoadOnValue: true,
-					store: {
-						
+					title: me.mys.res('expenseNoteDetail.tab.detail'),
+					xtype: 'container',
+					layout: {
+						type: 'vbox', align: 'stretch'
 					},
-					fieldLabel: me.mys.res('expenseNoteDetail.fld-description.lbl'),
-					width: '420px'
-				}),
-				{
-					xtype: 'fieldcontainer',
-					layout: 'hbox',
-					defaults: {
-						margin: '0 5 0 0'
-					},
+					refernceHolder: true,
 					items: [
-						WTF.localCombo('id', 'desc', {
-							reference: 'fldmasterdata',
-							bind: '{record.masterdata}',
-							autoLoadOnValue: true,
-							store: {
-
+						Ext.create({
+							xtype: 'wtform',
+							reference: 'mainForm',
+							modelValidation: true,
+							defaults: {
+								labelWidth: 100
 							},
-							fieldLabel: me.mys.res('expenseNoteDetail.fld-masterdata.lbl'),
-							width: '390px'
-						}),
+							items: [
+								{
+									xtype: 'datefield',
+									startDay: WT.getStartDay(),
+									bind: '{record.date}',
+									reference: 'flddate',
+									fieldLabel: me.mys.res('expenseNoteDetail.fld-date.lbl'),
+									width: 210
+								},
+								{
+									xtype: 'textfield',
+									bind: '{record.description}',
+									reference: 'flddescription',
+									fieldLabel: me.mys.res('expenseNoteDetail.fld-description.lbl'),
+									width: 420
+								},
+								WTF.localCombo('id', 'desc', {
+									reference: 'fldmasterdata',
+									bind: '{record.masterdata}',
+									autoLoadOnValue: true,
+									selectOnFocus: true,
+									store: {
+										autoLoad: true,
+										model: 'WTA.model.Simple',
+										proxy: WTF.proxy(me.mys.ID, 'LookupCustomersSuppliers', null, {
+											extraParams: {
+												operator: null
+											}
+										}),
+										listeners: {
+											beforeload: function(s,op) {
+												WTU.applyExtraParams(op.getProxy(), {operator: me.getModel().get('operatorId')});
+											}
+										}
+									},
+									fieldLabel: me.mys.res('expenseNoteDetail.fld-masterdata.lbl'),
+									width: 420
+								}),
+								{
+									xtype: 'soplaceholderfield'
+								},
+								WTF.localCombo('id', 'description', {
+									bind: '{record.costType}',
+									reference: 'fldcosttype',
+									autoLoadOnValue: true,
+									selectOnFocus: true,
+									forceSelection: true,
+									store: {
+										autoLoad: true,
+										model: 'Sonicle.webtop.drm.model.CostType',
+										proxy: WTF.proxy(me.mys.ID, 'LookupCostTypes')
+									},
+									listeners: {
+										select: function (s, r) {
+											me.lref('fldkm').setHidden(true);
+											me.lref('fldkm').setValue(null);
+											
+											me.lref('fldwithothers').setHidden(true);
+											me.lref('fldwithothers').setValue(null);	
+											
+											if(me.lref('fldcurrency').getValue() === me.mys.getVar('expenseNoteDefaultCurrency')){
+												me.lref('cntTot').setHidden(true);
+												
+												me.lref('fldchange').setReadOnly(true);
+												me.lref('fldchange').setValue(1);
+											}else{
+												me.lref('fldchange').setReadOnly(false);
+											}
+											
+											if(r.get('withOthers') === true)
+												me.lref('fldwithothers').setHidden(false);
+											if(r.get('km') === true)
+												me.lref('fldkm').setHidden(false);
+											if(r.get('exchange') === true){
+												me.lref('cntTot').setHidden(false);
+												me.lref('fldchange').setReadOnly(false);
+											}
+										}
+									},
+									fieldLabel: me.mys.res('expenseNoteDetail.fld-costtype.lbl'),
+									width: 420
+								}),
+								{
+									xtype: 'textfield',
+									bind: '{record.withOthers}',
+									reference: 'fldwithothers',
+									fieldLabel: me.mys.res('expenseNoteDetail.fld-withothers.lbl'),
+									width: 420,
+									hidden: true
+								},
+								{
+									xtype: 'numberfield',
+									bind: '{record.km}',
+									reference: 'fldkm',
+									fieldLabel: me.mys.res('expenseNoteDetail.fld-km.lbl'),
+									width: 210,
+									hidden: true,
+									listeners: {
+										blur: function (t, e, o) {	
+											var val1 = t.getValue();
+											var val2 = me.mys.getVar('expenseNoteKmCost');
+											var val3 = me.lref('fldchange').getValue();
+											
+											var tot1 = val1*val2;
+
+											me.lref('fldtotal').setValue(tot1);
+											me.lref('fldtotaldoc').setValue(tot1*val3);
+										}
+									}
+								},
+								{
+									xtype: 'fieldcontainer',
+									fieldLabel: me.mys.res('expenseNoteDetail.fld-total.lbl'),
+									layout: 'hbox',
+									defaults: {
+										margin: '0 5 0 0'
+									},
+									items: [
+										{
+											xtype: 'numberfield',
+											reference: 'fldtotal',
+											bind: '{record.total}',
+											width: 85,
+											listeners: {
+												blur: function (t, e, o) {	
+													var val1 = t.getValue();
+													var val2 = me.lref('fldchange').getValue();
+													
+													me.lref('fldtotaldoc').setValue(val1*val2);
+												}
+											}
+										},
+										WTF.localCombo('id', 'desc', {
+											reference: 'fldcurrency',
+											bind: '{record.currency}',
+											autoLoadOnValue: true,
+											store: Ext.create('Sonicle.webtop.drm.store.Currency', {
+												autoLoad: true
+											}),
+											listeners: {
+												select: function (s, r) {	
+													var rec = me.lref('fldcosttype').getStore().getById(me.lref('fldcosttype').getValue());
+														
+													if(rec === null){
+														me.lref('cntTot').setHidden(true);
+														me.lref('fldchange').setReadOnly(true);
+														me.lref('fldchange').setValue(1);
+													
+														if(r.id !== me.mys.getVar('expenseNoteDefaultCurrency')){
+															me.lref('fldchange').setReadOnly(false);
+															me.lref('cntTot').setHidden(false);
+														}
+													}else if(rec.get('exchange') === false){
+														me.lref('cntTot').setHidden(true);
+														me.lref('fldchange').setReadOnly(true);
+														me.lref('fldchange').setValue(1);
+													
+														if(r.id !== me.mys.getVar('expenseNoteDefaultCurrency'))
+															me.lref('fldchange').setReadOnly(false);
+															me.lref('cntTot').setHidden(false);
+													}
+												}
+											},
+											width: 85
+										}),
+										{
+											xtype: 'label',
+											width: 46,
+											margin: 3,
+											html: me.mys.res('expenseNoteDetail.fld-change.lbl')
+										},
+										{
+											xtype: 'numberfield',
+											reference: 'fldchange',
+											bind: '{record.change}',
+											readOnly: true,
+											width: 83,
+											listeners: {
+												blur: function (t, e, o) {	
+													var val1 = t.getValue();
+													var val2 = me.lref('fldtotal').getValue();
+													
+													me.lref('fldtotaldoc').setValue(val1*val2);
+												}
+											}
+										}
+									]
+								},
+								{
+									xtype: 'fieldcontainer',
+									reference: 'cntTot',
+									hidden: true, 
+									fieldLabel: me.mys.res('expenseNoteDetail.fld-documenttotal.lbl'),
+									layout: 'hbox',
+									defaults: {
+										margin: '0 5 0 0'
+									},
+									items: [
+										{
+											xtype: 'numberfield',
+											reference: 'fldtotaldoc',
+											bind: '{record.totalDoc}',
+											width: 85
+										},
+										WTF.localCombo('id', 'desc', {
+											reference: 'fldCurrencyCostDoc',
+											bind: '{record.currencyCostDoc}',
+											autoLoadOnValue: true,
+											readOnly: true,
+											store: Ext.create('Sonicle.webtop.drm.store.Currency', {
+												autoLoad: true
+											}),
+											width: 85
+										})
+									]
+								},
+								{
+									xtype: 'textfield',
+									bind: '{record.invoiceNumber}',
+									fieldLabel: me.mys.res('expenseNoteDetail.fld-invoicenumber.lbl'),
+									width: 420
+								},
+								{
+									xtype: 'fieldcontainer',
+									fieldLabel: '&nbsp;',
+									labelSeparator: '',
+									layout: 'hbox',
+									defaults: {
+										labelWidht: 45,
+										margin: '0 15 0 0'
+									},
+									items: [
+										{
+											xtype: 'checkbox',
+											bind: '{record.businessPayment}',
+											boxLabel: me.mys.res('expenseNoteDetail.fld-businesspayment.lbl'),
+											boxLabelAlign: 'before'
+										},
+										{
+											xtype: 'checkbox',
+											bind: '{record.reinvoice}',
+											boxLabel: me.mys.res('expenseNoteDetail.fld-reinvoice.lbl'),
+											boxLabelAlign: 'before'
+										}
+									]
+								}
+							]
+						})	
+					]
+				},
+				{
+					title: me.mys.res('expenseNoteDetail.tab.documents.tit'),
+					xtype: 'grid',
+					id: gpId,
+					reference: 'gpDocuments',
+					bind: {
+						store: '{record.detailDocuments}'
+					},
+					selModel: {
+						type: 'checkboxmodel',
+						mode: 'MULTI'
+					},
+					columns: [
 						{
-							xtype: 'button',
-							iconCls: 'wtdrm-icon-notes-xs',
-							handler: function() {
-								alert("Ciao");
+							xtype: 'solinkcolumn',
+							dataIndex: 'fileName',
+							header: me.mys.res('gpExpenseNoteDetailDocument.filename.lbl'),
+							tdCls: 'wt-theme-text-lnk',
+							flex: 3,
+							listeners: {
+								linkclick: function (s, idx, rec) {
+									me.downloadAttachment([rec.getId()]);
+								}
+							}
+						}, {
+							xtype: 'sobytescolumn',
+							dataIndex: 'size',
+							header: me.mys.res('gpExpenseNoteDetailDocument.size.lbl'),
+							flex: 1
+						}
+					],
+					tbar: [
+						me.getAct('downloadDetailDocument'),
+						me.getAct('openDetailDocument'),
+						me.getAct('deleteDetailDocument')
+					],
+					bbar: {
+						xtype: 'wtuploadbar',
+						sid: me.mys.ID,
+						uploadContext: 'UploadExpenseNoteDocument',
+						listeners: {
+							fileuploaded: function (s, file, json) {
+								me.addDocument(json.data.uploadId, file);
 							}
 						}
-					]
-				},
-				{
-					xtype: 'soplaceholderfield'
-				},
-				WTF.localCombo('id', 'desc', {
-					bind: '{record.costType}',
-					reference: 'fldcosttype',
-					autoLoadOnValue: true,
-					store: {
-						
 					},
-					fieldLabel: me.mys.res('expenseNoteDetail.fld-costtype.lbl'),
-					width: '420px'
-				}),
-				{
-					xtype: 'fieldcontainer',
-					layout: 'hbox',
-					defaults: {
-						margin: '0 5 0 0'
-					},
-					items: [
-						{
-							xtype: 'textfield',
-							bind: '{record.total}',
-							fieldLabel: me.mys.res('expenseNoteDetail.fld-total.lbl'),
-							width: '250px'
+					listeners: {
+						rowcontextmenu: function (s, rec, itm, i, e) {
+							var sm = s.getSelectionModel();
+							sm.select(rec);
+							WT.showContextMenu(e, me.getRef('cxmGridDocument'), {
+								file: rec
+							});
 						},
-						WTF.localCombo('id', 'desc', {
-							reference: 'fldvalue',
-							bind: '{record.value}',
-							autoLoadOnValue: true,
-							store: {
-
-							},
-							width: '80px'
-						}),
-						{
-							xtype: 'textfield',
-							bind: '{record.change}',
-							fieldLabel: me.mys.res('expenseNoteDetail.fld-change.lbl'),
-							labelWidth: '50px',
-							width: '220px'
+						select: function (s, rec, i, e) {
+							me.updateDisabled('downloadDetailDocument');
+							me.updateDisabled('openDetailDocument');
+							me.updateDisabled('deleteDetailDocument');
 						}
-					]
-				},
-				{
-					xtype: 'checkbox',
-					bind: '{record.businessPayment}',
-					boxLabel: me.mys.res('expenseNoteDetail.fld-businesspayment.lbl'),
-					boxLabelAlign: 'before'
-				},
-				{
-					xtype: 'textfield',
-					bind: '{record.invoiceNumber}',
-					fieldLabel: me.mys.res('expenseNoteDetail.fld-invoicenumber.lbl'),
-					width: '420px'
-				},
-				{
-					xtype: 'checkbox',
-					bind: '{record.reinvoice}',
-					boxLabel: me.mys.res('expenseNoteDetail.fld-reinvoice.lbl'),
-					boxLabelAlign: 'before'
+					},
+					plugins: [{
+						ptype: 'sofiledrop',
+						text: WT.res('sofiledrop.text')
+					}]
 				}
 			]
 		});
+		
+		me.on('viewload', me.onViewLoad);
+	},
+	
+	onViewLoad: function(s, success) {
+		if(!success) return;
+		var me = this,
+				mo = me.getModel();
+		
+		mo.set('currencyCostDoc', me.mys.getVar('expenseNoteDefaultCurrency'));
+		
+		if(me.isMode(me.MODE_NEW)) {
+			mo.set('currency', me.mys.getVar('expenseNoteDefaultCurrency'));
+		}
 	}
 });

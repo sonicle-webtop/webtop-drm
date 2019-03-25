@@ -1032,7 +1032,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});	
-		vw.showView(false, function () {
+		vw.showView(function () {
 			vw.begin('new', {
 				data: {
 					type: type

@@ -35,8 +35,7 @@ Ext.define('Sonicle.webtop.drm.model.ExpenseNote', {
 	requires: [
 		'Sonicle.data.writer.Json',
 		'Sonicle.webtop.drm.model.ExpenseNoteDocument',
-		'Sonicle.webtop.drm.model.ExpenseNoteRow',
-		'Sonicle.webtop.drm.model.ExpenseNoteRowDetail'
+		'Sonicle.webtop.drm.model.ExpenseNoteDetail'
 	],
 	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageExpenseNote', 'data', {
 		writer: {
@@ -59,7 +58,6 @@ Ext.define('Sonicle.webtop.drm.model.ExpenseNote', {
 	],
 	hasMany: [
 		WTF.hasMany('documents', 'Sonicle.webtop.drm.model.ExpenseNoteDocument'),
-		WTF.hasMany('rows', 'Sonicle.webtop.drm.model.ExpenseNoteRow'),
-		WTF.hasMany('rowDetails', 'Sonicle.webtop.drm.model.ExpenseNoteRowDetail')
+		WTF.hasMany('rowDetails', 'Sonicle.webtop.drm.model.ExpenseNoteDetail')
 	]
 });

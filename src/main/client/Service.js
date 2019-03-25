@@ -1827,10 +1827,29 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		url = WTF.processBinUrl(me.ID, 'PrintWorkReport', {ids: WTU.arrayAsParam(ids)});
 		Sonicle.URLMgr.openFile(url, {filename: 'workreport', newWindow: true});
 	},
-	printWorkReportSummary: function() {
-		var me = this, url;
-		url = WTF.processBinUrl(me.ID, 'PrintWorkReportSummary', {});
-		Sonicle.URLMgr.openFile(url, {filename: 'workreportsummary', newWindow: true});
+	printWorkReportSummary: function(opts) {
+		opts = opts || {};
+
+		var me = this,
+				vw = WT.createView(me.ID, 'view.WorkReportSummary', {
+					swapReturn: true,
+					viewCfg: {
+							dockableConfig: {
+								title: me.res('workReportSummary.tit')
+							}
+						}
+				});
+		vw.on('viewok', function(s, operatorId, companyId, from, to, docStatusId) {
+			var url = WTF.processBinUrl(me.ID, 'PrintWorkReportSummary', {
+				operatorId: operatorId,
+				companyId: companyId,
+				from: from,
+				to: to,
+				docStatusId: docStatusId
+			});
+			Sonicle.URLMgr.openFile(url, {filename: 'workreportsummary', newWindow: true});
+		});
+		vw.showView();
 	},
 	addExpenseNote: function (opts) {
 		opts = opts || {};

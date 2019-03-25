@@ -116,7 +116,8 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 											fieldLabel: me.mys.res('opportunityAction.fld-status.lbl'),
 											layout: 'hbox',
 											defaults: {
-												margin: '0 10 0 0'
+												margin: '0 10 0 0',
+												labelWidth: 45
 											},
 											items: [
 												WTF.localCombo('id', 'desc', {
@@ -145,7 +146,8 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 											fieldLabel: me.mys.res('opportunityAction.fld-fromHour.lbl'),
 											layout: 'hbox',
 											defaults: {
-												margin: '0 10 0 0'
+												margin: '0 10 0 0',
+												labelWidth: 45
 											},
 											items: [
 												WTF.lookupCombo('id', 'desc', {
