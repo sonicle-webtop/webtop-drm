@@ -32,7 +32,7 @@
  * the words "Powered by Sonicle WebTop".
  */
 Ext.define('Sonicle.webtop.drm.view.pub.Error', {
-//	extend: 'Sonicle.webtop.drm.view.pub.Error',
+	extend: 'Sonicle.webtop.core.view.pub.Error',
 	
 	initComponent: function() {
 		var me = this;
