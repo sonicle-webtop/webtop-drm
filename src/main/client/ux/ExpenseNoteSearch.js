@@ -107,20 +107,19 @@ Ext.define('Sonicle.webtop.drm.ux.ExpenseNoteSearch', {
 					width: '420px',
 					tabIndex: 103
 				},
-				WTF.localCombo('id', 'desc', {
-					reference: 'fldtatus',
+				WTF.lookupCombo('id', 'desc', {
+					reference: 'fldstatus',
 					bind: '{statusId}',
-					store: {
-						autoLoad: true,
-						model: 'WTA.model.Simple',
-						proxy: WTF.proxy(me.sid, 'LookupDocStatuses')
-					},
+					store: Ext.create('Sonicle.webtop.drm.store.StatusType', {
+						autoLoad: true
+					}),
 					triggers: {
 						clear: WTF.clearTrigger()
 					},
 					fieldLabel: WT.res(me.sid, 'expenseNote.status.lbl'),
 					width: '420px',
 					tabIndex: 105
+
 				}),
 				{
 					xtype: 'button',
@@ -189,9 +188,28 @@ Ext.define('Sonicle.webtop.drm.ux.ExpenseNoteSearch', {
 			operatorId: me.lookupReference('flduser').getValue(),
 			fromDate: SoDate.format(me.lookupReference('fldfrom').getValue(), 'Y-m-d'),
 			toDate: SoDate.format(me.lookupReference('fldto').getValue(), 'Y-m-d'),
-			statusId: me.lookupReference('fldtatus').getValue()		
+			statusId: me.lookupReference('fldstatus').getValue()		
 		};
 		
 		me.fireEvent('search', me, query);
+	},
+	
+	getData: function () {
+		var me = this,
+			SoDate = Sonicle.Date;
+
+		var query = {
+			companyId: me.lookupReference('fldcompany').getValue(),
+			operatorId: me.lookupReference('flduser').getValue(),
+			fromDate: SoDate.format(me.lookupReference('fldfrom').getValue(), 'Y-m-d'),
+			toDate: SoDate.format(me.lookupReference('fldto').getValue(), 'Y-m-d'),
+			statusId: me.lookupReference('fldstatus').getValue()		
+		};
+		
+		return query;
+	},
+	
+	getOperatorId: function () {
+		return this.lookupReference('flduser').getValue();
 	}
 });

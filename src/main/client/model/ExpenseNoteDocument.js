@@ -36,12 +36,12 @@ Ext.define('Sonicle.webtop.drm.model.ExpenseNoteDocument', {
 	idProperty: 'id',
 	fields: [
 		WTF.field('id', 'string', false),
-		WTF.field('expenseNoteId', 'string', false),
-		WTF.field('revisionTimestamp', 'date', false, {dateFormat: 'Y-m-d H:i:s'}),
-		WTF.field('revisionSequence', 'int', true),
-		WTF.field('fileName', 'string', true),
+		WTF.field('name', 'string', true),
 		WTF.field('size', 'int', true),
-		WTF.field('mediaType', 'string', true)
+		WTF.calcField('ext', 'string', ['name'], function(v, rec) {
+			return Sonicle.String.substrAfterLast(v, '.');
+		}),
+		WTF.field('_uplId', 'string', true)
 	]
 });
 

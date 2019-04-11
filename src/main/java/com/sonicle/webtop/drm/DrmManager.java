@@ -48,6 +48,7 @@ import com.sonicle.webtop.core.sdk.BaseManager;
 import com.sonicle.webtop.core.sdk.UserProfile;
 import com.sonicle.webtop.core.sdk.UserProfileId;
 import com.sonicle.webtop.core.sdk.WTException;
+import static com.sonicle.webtop.drm.ManagerUtils.createCostType;
 import static com.sonicle.webtop.drm.Service.logger;
 import com.sonicle.webtop.drm.bol.OBusinessTrip;
 import com.sonicle.webtop.drm.bol.OCompany;
@@ -65,12 +66,19 @@ import com.sonicle.webtop.drm.bol.ODrmLineManagerUsers;
 import com.sonicle.webtop.drm.bol.ODrmProfile;
 import com.sonicle.webtop.drm.bol.OLineHour;
 import com.sonicle.webtop.drm.bol.OEmployeeProfile;
+import com.sonicle.webtop.drm.bol.OExpenseNote;
+import com.sonicle.webtop.drm.bol.OExpenseNoteDetail;
+import com.sonicle.webtop.drm.bol.OExpenseNoteDetailDocument;
+import com.sonicle.webtop.drm.bol.OExpenseNoteDetailDocumentData;
+import com.sonicle.webtop.drm.bol.OExpenseNoteDocument;
+import com.sonicle.webtop.drm.bol.OExpenseNoteDocumentData;
 import com.sonicle.webtop.drm.bol.OExpenseNoteSetting;
 import com.sonicle.webtop.drm.bol.OHolidayDate;
 import com.sonicle.webtop.drm.bol.OHourProfile;
 import com.sonicle.webtop.drm.bol.OLeaveRequest;
 import com.sonicle.webtop.drm.bol.OLeaveRequestDocument;
 import com.sonicle.webtop.drm.bol.OLeaveRequestDocumentData;
+import com.sonicle.webtop.drm.bol.OLeaveRequestType;
 import com.sonicle.webtop.drm.bol.OOpportunity;
 import com.sonicle.webtop.drm.bol.OOpportunityAction;
 import com.sonicle.webtop.drm.bol.OOpportunityActionDocument;
@@ -110,6 +118,10 @@ import com.sonicle.webtop.drm.dal.DrmProfileDAO;
 import com.sonicle.webtop.drm.dal.DrmUserForManagerDAO;
 import com.sonicle.webtop.drm.dal.LineHourDAO;
 import com.sonicle.webtop.drm.dal.EmployeeProfileDAO;
+import com.sonicle.webtop.drm.dal.ExpenseNoteDAO;
+import com.sonicle.webtop.drm.dal.ExpenseNoteDetailDAO;
+import com.sonicle.webtop.drm.dal.ExpenseNoteDetailDocumentDAO;
+import com.sonicle.webtop.drm.dal.ExpenseNoteDocumentDAO;
 import com.sonicle.webtop.drm.dal.ExpenseNoteSettingDAO;
 import com.sonicle.webtop.drm.dal.HolidayDateDAO;
 import com.sonicle.webtop.drm.dal.HourProfileDAO;
@@ -150,6 +162,12 @@ import com.sonicle.webtop.drm.model.DrmLineManager;
 import com.sonicle.webtop.drm.model.DrmProfile;
 import com.sonicle.webtop.drm.model.LineHour;
 import com.sonicle.webtop.drm.model.EmployeeProfile;
+import com.sonicle.webtop.drm.model.ExpenseNote;
+import com.sonicle.webtop.drm.model.ExpenseNoteDetail;
+import com.sonicle.webtop.drm.model.ExpenseNoteDetailDocumentWithBytes;
+import com.sonicle.webtop.drm.model.ExpenseNoteDocument;
+import com.sonicle.webtop.drm.model.ExpenseNoteDocumentWithBytes;
+import com.sonicle.webtop.drm.model.ExpenseNoteDocumentWithStream;
 import com.sonicle.webtop.drm.model.ExpenseNoteSetting;
 import com.sonicle.webtop.drm.model.HolidayDate;
 import com.sonicle.webtop.drm.model.HourProfile;
@@ -1458,6 +1476,23 @@ public class DrmManager extends BaseManager {
 			DbUtils.closeQuietly(con);
 		}
 	}
+	
+	public List<OExpenseNote> listExpenseNote(ExpenseNoteQuery query) throws WTException {
+		Connection con = null;
+		ExpenseNoteDAO eNDao = ExpenseNoteDAO.getInstance();
+		List<OExpenseNote> oENotes = null;
+		try {
+			con = WT.getConnection(SERVICE_ID);
+			oENotes = eNDao.selectExpenseNotes(con, query);
+
+			return oENotes;
+			
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
 
 	public List<OWorkReport> listWorkReports(WorkReportQuery query) throws WTException {
 		Connection con = null;
@@ -2344,23 +2379,31 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	public void addLeaveRequest(LeaveRequest lv) throws WTException {
-
+	public void addLeaveRequest(LeaveRequest lv, Boolean medicalVisitsAutomaticallyApproved) throws WTException {
 		Connection con = null;
-
+		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
+		TimetableEventDAO teDao = TimetableEventDAO.getInstance();
+		EmployeeProfileDAO epDao = EmployeeProfileDAO.getInstance();
+		HourProfileDAO hpDao = HourProfileDAO.getInstance();
+		LineHourDAO lhDao = LineHourDAO.getInstance();
 		try {
 			con = WT.getConnection(SERVICE_ID, false);
 
 			DateTime employeeReqTimestamp = createRevisionTimestamp();
 
-			LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
-			LeaveRequestDocumentDAO docDao = LeaveRequestDocumentDAO.getInstance();
-
 			OLeaveRequest newLr = ManagerUtils.createOLeaveRequest(lv);
 			newLr.setLeaveRequestId(lrDao.getLeaveRequestSequence(con).intValue());
 			newLr.setDomainId(getTargetProfileId().getDomainId());
 			newLr.setEmployeeReqTimestamp(employeeReqTimestamp);
-			newLr.setStatus("O");
+			
+			if(EnumUtils.toSerializedName(OLeaveRequestType.MEDICAL_VISIT).equals(lv.getType()) && medicalVisitsAutomaticallyApproved) {
+				newLr.setStatus("C");
+				newLr.setResult(true);
+			}
+			else {
+				newLr.setStatus("O");
+			}
+			
 			newLr.setEmployeeCancReq(false);
 
 			ArrayList<OLeaveRequestDocument> oDocs = new ArrayList<>();
@@ -2372,9 +2415,50 @@ public class DrmManager extends BaseManager {
 
 			lrDao.insert(con, newLr, employeeReqTimestamp);
 
-			DbUtils.commitQuietly(con);
+			
 
-			notifyLeaveRequest(newLr);
+			if(EnumUtils.toSerializedName(OLeaveRequestType.MEDICAL_VISIT).equals(lv.getType()) && medicalVisitsAutomaticallyApproved){
+				//Insert in TimetableEvents
+				List<LocalDate> dts = ManagerUtils.getDateRange(newLr.getFromDate(), newLr.getToDate());
+
+				for(LocalDate ld : dts){
+					OTimetableEvent oTe = new OTimetableEvent();
+					oTe.setTimetableEventId(teDao.getSequence(con).intValue());
+					oTe.setDomainId(newLr.getDomainId());
+					oTe.setCompanyId(newLr.getCompanyId());
+					oTe.setUserId(newLr.getUserId());
+					oTe.setType(newLr.getType());
+					oTe.setDate(ld);
+					oTe.setLeaveRequestId(newLr.getLeaveRequestId());
+
+					String hRange = null;
+
+					if(newLr.getFromHour() == null || newLr.getToHour() == null){
+						//Get Hours from Template
+						OEmployeeProfile ep = epDao.selectEmployeeProfileByDomainUser(con, newLr.getDomainId(), newLr.getUserId());
+
+						if(ep != null){
+							OHourProfile hp = hpDao.selectHourProfileById(con, ep.getHourProfileId());
+
+							if(hp != null){
+								hRange = lhDao.selectSumLineHourByHourProfileIdDayOfWeek(con, hp.getId(), ld.getDayOfWeek());
+							}
+						}
+					}else{
+						hRange = ManagerUtils.getHourRange(newLr.getFromHour(), newLr.getToHour());
+					}
+
+					if(hRange == null) hRange = "8";
+
+					oTe.setHour(hRange);
+
+					teDao.insert(con, oTe);
+					}
+			}else{
+				notifyLeaveRequest(newLr);
+			}
+			
+			DbUtils.commitQuietly(con);
 
 		} catch (SQLException | DAOException ex) {
 			DbUtils.rollbackQuietly(con);
@@ -2991,6 +3075,228 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
+	public ExpenseNote getExpenseNote(Integer id) throws WTException {
+		Connection con = null;
+		ExpenseNoteDAO eNDAO = ExpenseNoteDAO.getInstance();
+		ExpenseNoteDetailDAO eNDetDAO = ExpenseNoteDetailDAO.getInstance();
+		ExpenseNoteDocumentDAO eNDocDao = ExpenseNoteDocumentDAO.getInstance();
+		
+		ExpenseNote eN = null;
+		
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			eN = ManagerUtils.createExpenseNote(eNDAO.selectById(con, id));
+			
+			for (OExpenseNoteDetail oEnD : eNDetDAO.selectByExpenseNote(con, id)) {
+				eN.getDetails().add(ManagerUtils.createExpenseNoteDetail(oEnD));
+			}
+			
+			for (OExpenseNoteDocument eNDoc : eNDocDao.selectByExpenseNote(con, id)) {
+				eN.getDocuments().add(ManagerUtils.createExpenseNoteDocument(eNDoc));
+			}
+
+			return eN;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public OExpenseNote addExpenseNote(ExpenseNote eN) throws WTException {
+		Connection con = null;
+		ExpenseNoteDAO eNDAO = ExpenseNoteDAO.getInstance();
+		ExpenseNoteDetailDAO eNDetDAO = ExpenseNoteDetailDAO.getInstance();
+		
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			OExpenseNote newEn = ManagerUtils.createOExpenseNote(eN);
+			newEn.setId(eNDAO.getExpenseNoteSequence(con).intValue());
+			newEn.setDomainId(getTargetProfileId().getDomainId());
+			
+			OExpenseNoteDetail newENDet = null;
+			for (ExpenseNoteDetail eNDet : eN.getDetails()) {
+				newENDet = ManagerUtils.createOExpenseNoteDetail(eNDet);
+				newENDet.setId(eNDetDAO.getSequence(con).intValue());
+				newENDet.setExpenseNoteId(newEn.getId());
+
+				eNDetDAO.insert(con, newENDet);
+			}
+
+			ArrayList<OExpenseNoteDocument> eNDocs = new ArrayList<>();
+			
+			for (ExpenseNoteDocument doc : eN.getDocuments()) {
+				if (!(doc instanceof ExpenseNoteDocumentWithStream)) throw new IOException("Attachment stream not available [" + doc.getId() + "]");
+				eNDocs.add(ManagerUtils.doExpenseNoteDocumentInsert(con, newEn.getId(), (ExpenseNoteDocumentWithStream)doc));
+			}
+
+			eNDAO.insert(con, newEn);
+
+			DbUtils.commitQuietly(con);
+
+			return newEn;
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public OExpenseNote updateExpenseNote(ExpenseNote item) throws WTException {
+		Connection con = null;
+		ExpenseNoteDAO eNDAO = ExpenseNoteDAO.getInstance();
+		ExpenseNoteDetailDAO eNDetDAO = ExpenseNoteDetailDAO.getInstance();
+		ExpenseNoteDocumentDAO eNDocDao = ExpenseNoteDocumentDAO.getInstance();
+		
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			ExpenseNote oldEN = getExpenseNote(item.getId());
+
+			OExpenseNote oEN = ManagerUtils.createOExpenseNote(item);
+			
+			//Expense Note
+			eNDAO.update(con, oEN);
+			
+			//Expense Note Detail
+			LangUtils.CollectionChangeSet<ExpenseNoteDetail> changesSet2 = LangUtils.getCollectionChanges(oldEN.getDetails(), item.getDetails());
+			
+			for (ExpenseNoteDetail eNDet : changesSet2.inserted) {
+
+				OExpenseNoteDetail oENDet = ManagerUtils.createOExpenseNoteDetail(eNDet);
+
+				oENDet.setId(eNDetDAO.getSequence(con).intValue());
+				oENDet.setExpenseNoteId(item.getId());
+
+				eNDetDAO.insert(con, oENDet);
+			}
+
+			for (ExpenseNoteDetail eNDet : changesSet2.deleted) {
+				eNDetDAO.deleteById(con, eNDet.getId());
+			}
+
+			for (ExpenseNoteDetail eNDet : changesSet2.updated) {
+				OExpenseNoteDetail oENDet = ManagerUtils.createOExpenseNoteDetail(eNDet);
+				oENDet.setExpenseNoteId(item.getId());
+
+				eNDetDAO.update(con, oENDet);
+			}
+
+			//Expense Note Document
+			List<ExpenseNoteDocument> oldDocs = ManagerUtils.createExpenseNoteDocumentList(eNDocDao.selectByExpenseNote(con, item.getId()));
+			CollectionChangeSet<ExpenseNoteDocument> changeSet = LangUtils.getCollectionChanges(oldDocs, item.getDocuments());
+
+			for (ExpenseNoteDocument doc : changeSet.inserted) {
+				if (!(doc instanceof ExpenseNoteDocumentWithStream)) throw new IOException("Attachment stream not available [" + doc.getId()+ "]");
+				ManagerUtils.doExpenseNoteDocumentInsert(con, oEN.getId(), (ExpenseNoteDocumentWithStream)doc);
+			}
+			for (ExpenseNoteDocument doc : changeSet.updated) {
+				if (!(doc instanceof ExpenseNoteDocumentWithStream)) continue;
+				ManagerUtils.doExpenseNoteDocumentUpdate(con, (ExpenseNoteDocumentWithStream)doc);
+			}
+			for (ExpenseNoteDocument doc : changeSet.deleted) {
+				eNDocDao.deleteById(con, doc.getId());
+			}
+
+			DbUtils.commitQuietly(con);
+
+			return oEN;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} catch (IOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public void deleteExpenseNote(Integer id) throws WTException {
+		Connection con = null;
+		ExpenseNoteDAO eNDAO = ExpenseNoteDAO.getInstance();
+		ExpenseNoteDetailDAO eNDetDAO = ExpenseNoteDetailDAO.getInstance();
+		ExpenseNoteDocumentDAO eNDocDao = ExpenseNoteDocumentDAO.getInstance();
+		ExpenseNoteDetailDocumentDAO eNDetDocDao = ExpenseNoteDetailDocumentDAO.getInstance();
+		
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			for(OExpenseNoteDetail oENDet : eNDetDAO.selectByExpenseNote(con, id)){
+				eNDetDAO.deleteById(con, oENDet.getId());
+				eNDetDocDao.deleteByExpenseNoteDetail(con, oENDet.getId());
+			}
+			
+			eNDocDao.deleteByExpenseNote(con, id);
+			eNDAO.deleteById(con, id);
+			
+			DbUtils.commitQuietly(con);
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public ExpenseNoteDocumentWithBytes getExpenseNoteDocument(Integer eNId, String expenseNoteDocumentId) throws WTException {
+		Connection con = null;
+		ExpenseNoteDocumentDAO docDao = ExpenseNoteDocumentDAO.getInstance();
+		OExpenseNoteDocument oENDoc = null;
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			oENDoc = docDao.select(con, expenseNoteDocumentId);
+			if(oENDoc == null) return null;
+			
+			OExpenseNoteDocumentData oDocData = docDao.selectBytesById(con, expenseNoteDocumentId);
+			if(oDocData == null) return null;
+			
+			return ManagerUtils.fillExpenseNoteDocument(new ExpenseNoteDocumentWithBytes(oDocData.getBytes()), oENDoc);
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public ExpenseNoteDetailDocumentWithBytes getExpenseNoteDetailDocument(Integer eNDDId, String expenseNoteDetailDocumentId) throws WTException {
+		Connection con = null;
+		ExpenseNoteDetailDocumentDAO docDao = ExpenseNoteDetailDocumentDAO.getInstance();
+		OExpenseNoteDetailDocument oDoc = null;
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			oDoc = docDao.select(con, expenseNoteDetailDocumentId);
+			if(oDoc == null) return null;
+			
+			OExpenseNoteDetailDocumentData oDocData = docDao.selectBytesById(con, expenseNoteDetailDocumentId);
+			if(oDocData == null) return null;
+			
+			return ManagerUtils.fillExpenseNoteDetailDocument(new ExpenseNoteDetailDocumentWithBytes(oDocData.getBytes()), oDoc);
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
 	boolean checkCustomersByProfileUser(String realCustomerId) throws WTException {
 		Connection con = null;
 		ProfileMasterdataDAO pmDao = ProfileMasterdataDAO.getInstance();
@@ -3374,6 +3680,27 @@ public class DrmManager extends BaseManager {
 		} catch (Exception ex) {
 			DbUtils.rollbackQuietly(con);
 			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public CostType getCostType(Integer typeId) throws WTException {
+		Connection con = null;
+		CostTypeDAO ctDao = CostTypeDAO.getInstance();
+		CostType ct = new CostType();
+		
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			
+			ct = createCostType(ctDao.selectByIdDomainId(con, typeId, getTargetProfileId().getDomainId()));
+
+			return ct;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
 		} finally {
 			DbUtils.closeQuietly(con);
 		}

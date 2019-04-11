@@ -148,4 +148,12 @@ public class DrmServiceSettings extends BaseServiceSettings {
 	public void setOpportunityDefaultDocStatusId(String value) {
 		setString(OPPORTUNITY_DEFAULT_DOC_STATUS_ID, value); 
 	}
+	
+	public boolean getMedicalVisitsAutomaticallyApproved() {
+		return getBoolean(LEAVE_REQUEST_MEDICAL_VISITS_AUTOMATICALLY_APPROVED, Boolean.FALSE); 
+	}
+
+	public void setMedicalVisitsAutomaticallyApproved(boolean value) {
+		setBoolean(LEAVE_REQUEST_MEDICAL_VISITS_AUTOMATICALLY_APPROVED, value); 
+	}
 }

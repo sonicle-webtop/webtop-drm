@@ -53,6 +53,10 @@ import com.sonicle.webtop.drm.bol.ODrmLineManager;
 import com.sonicle.webtop.drm.bol.ODrmLineManagerUsers;
 import com.sonicle.webtop.drm.bol.ODrmProfile;
 import com.sonicle.webtop.drm.bol.OEmployeeProfile;
+import com.sonicle.webtop.drm.bol.OExpenseNote;
+import com.sonicle.webtop.drm.bol.OExpenseNoteDetail;
+import com.sonicle.webtop.drm.bol.OExpenseNoteDetailDocument;
+import com.sonicle.webtop.drm.bol.OExpenseNoteDocument;
 import com.sonicle.webtop.drm.bol.OExpenseNoteSetting;
 import com.sonicle.webtop.drm.bol.OHolidayDate;
 import com.sonicle.webtop.drm.bol.OHourProfile;
@@ -79,6 +83,8 @@ import com.sonicle.webtop.drm.bol.OWorkReportAttachment;
 import com.sonicle.webtop.drm.bol.OWorkReportRow;
 import com.sonicle.webtop.drm.bol.OWorkReportSetting;
 import com.sonicle.webtop.drm.bol.OWorkType;
+import com.sonicle.webtop.drm.dal.ExpenseNoteDetailDocumentDAO;
+import com.sonicle.webtop.drm.dal.ExpenseNoteDocumentDAO;
 import com.sonicle.webtop.drm.dal.LeaveRequestDocumentDAO;
 import com.sonicle.webtop.drm.dal.OpportunityActionDocumentDAO;
 import com.sonicle.webtop.drm.dal.OpportunityDocumentDAO;
@@ -97,6 +103,12 @@ import com.sonicle.webtop.drm.model.DrmGroupUserAssociation;
 import com.sonicle.webtop.drm.model.DrmLineManager;
 import com.sonicle.webtop.drm.model.DrmProfile;
 import com.sonicle.webtop.drm.model.EmployeeProfile;
+import com.sonicle.webtop.drm.model.ExpenseNote;
+import com.sonicle.webtop.drm.model.ExpenseNoteDetail;
+import com.sonicle.webtop.drm.model.ExpenseNoteDetailDocument;
+import com.sonicle.webtop.drm.model.ExpenseNoteDetailDocumentWithStream;
+import com.sonicle.webtop.drm.model.ExpenseNoteDocument;
+import com.sonicle.webtop.drm.model.ExpenseNoteDocumentWithStream;
 import com.sonicle.webtop.drm.model.ExpenseNoteSetting;
 import com.sonicle.webtop.drm.model.HolidayDate;
 import com.sonicle.webtop.drm.model.HourProfile;
@@ -1485,6 +1497,7 @@ public class ManagerUtils {
 		oSetting.setRequestsPermitsNotRemunered(tSetting.getRequestsPermitsNotRemunered());
 		oSetting.setRequestsPermitsMedicalVisits(tSetting.getRequestsPermitsMedicalVisits());
 		oSetting.setRequestsPermitsContractuals(tSetting.getRequestsPermitsContractuals());
+		oSetting.setMedicalVisitsAutomaticallyApproved(tSetting.getMedicalVisitsAutomaticallyApproved());
 
 		return oSetting;
 	}
@@ -1510,6 +1523,7 @@ public class ManagerUtils {
 		tSetting.setRequestsPermitsNotRemunered(oTSetting.getRequestsPermitsNotRemunered());
 		tSetting.setRequestsPermitsMedicalVisits(oTSetting.getRequestsPermitsMedicalVisits());
 		tSetting.setRequestsPermitsContractuals(oTSetting.getRequestsPermitsContractuals());
+		tSetting.setMedicalVisitsAutomaticallyApproved(oTSetting.getMedicalVisitsAutomaticallyApproved());
 
 		return tSetting;
 	}
@@ -1886,5 +1900,251 @@ public class ManagerUtils {
 		oTr.setNote(tr.getNote());
 
 		return oTr;
+	}
+	
+	static ExpenseNote createExpenseNote(OExpenseNote oEn) {
+		if (oEn == null) {
+			return null;
+		}
+		ExpenseNote eN = new ExpenseNote();
+		eN.setId(oEn.getId());
+		eN.setDomainId(oEn.getDomainId());
+		eN.setOperatorId(oEn.getOperatorId());
+		eN.setCompanyId(oEn.getCompanyId());
+		eN.setFromDate(oEn.getFromDate());
+		eN.setToDate(oEn.getToDate());
+		eN.setTotCurrency(oEn.getTotCurrency());
+		eN.setCurrency(oEn.getCurrency());
+		eN.setDescription(oEn.getDescription());
+		eN.setStatus(oEn.getStatus());
+
+		return eN;
+	}
+
+	static OExpenseNote createOExpenseNote(ExpenseNote eN) {
+		if (eN == null) {
+			return null;
+		}
+		OExpenseNote oEn = new OExpenseNote();
+		oEn.setId(eN.getId());
+		oEn.setDomainId(eN.getDomainId());
+		oEn.setOperatorId(eN.getOperatorId());
+		oEn.setCompanyId(eN.getCompanyId());
+		oEn.setFromDate(eN.getFromDate());
+		oEn.setToDate(eN.getToDate());
+		oEn.setTotCurrency(eN.getTotCurrency());
+		oEn.setCurrency(eN.getCurrency());
+		oEn.setDescription(eN.getDescription());
+		oEn.setStatus(eN.getStatus());
+
+		return oEn;
+	}
+	
+	static ExpenseNoteDetail createExpenseNoteDetail(OExpenseNoteDetail oEnD) {
+
+		if (oEnD == null) {
+			return null;
+		}
+
+		ExpenseNoteDetail eND = new ExpenseNoteDetail();
+		eND.setId(oEnD.getId());
+		eND.setExpenseNoteId(oEnD.getExpenseNoteId());
+		eND.setOperatorId(oEnD.getOperatorId());
+		eND.setCompanyId(oEnD.getCompanyId());
+		eND.setTypeId(oEnD.getTypeId());
+		eND.setTotal(oEnD.getTotal());
+		eND.setDate(oEnD.getDate());
+		eND.setPaymentCompany(oEnD.getPaymentCompany());
+		eND.setInvoice(oEnD.getInvoice());
+		eND.setInvoiceNumber(oEnD.getInvoiceNumber());
+		eND.setWithOthers(oEnD.getWithOthers());
+		eND.setCustomerId(oEnD.getCustomerId());
+		eND.setKm(oEnD.getKm());
+		eND.setCurrency(oEnD.getCurrency());
+		eND.setChange(oEnD.getChange());
+		eND.setDescription(oEnD.getDescription());
+		eND.setTotalDoc(oEnD.getTotalDoc());
+		eND.setCurrencyDoc(oEnD.getCurrencyDoc());
+
+		return eND;
+	}
+	
+	static OExpenseNoteDetail createOExpenseNoteDetail(ExpenseNoteDetail EnD) {
+
+		if (EnD == null) {
+			return null;
+		}
+
+		OExpenseNoteDetail oEnD = new OExpenseNoteDetail();
+		oEnD.setId(EnD.getId());
+		oEnD.setExpenseNoteId(EnD.getExpenseNoteId());
+		oEnD.setOperatorId(EnD.getOperatorId());
+		oEnD.setCompanyId(EnD.getCompanyId());
+		oEnD.setTypeId(EnD.getTypeId());
+		oEnD.setTotal(EnD.getTotal());
+		oEnD.setDate(EnD.getDate());
+		oEnD.setPaymentCompany(EnD.getPaymentCompany());
+		oEnD.setInvoice(EnD.getInvoice());
+		oEnD.setInvoiceNumber(EnD.getInvoiceNumber());
+		oEnD.setWithOthers(EnD.getWithOthers());
+		oEnD.setCustomerId(EnD.getCustomerId());
+		oEnD.setKm(EnD.getKm());
+		oEnD.setCurrency(EnD.getCurrency());
+		oEnD.setChange(EnD.getChange());
+		oEnD.setDescription(EnD.getDescription());
+		oEnD.setTotalDoc(EnD.getTotalDoc());
+		oEnD.setCurrencyDoc(EnD.getCurrencyDoc());
+
+		return oEnD;
+	}
+	
+	static OExpenseNoteDocument doExpenseNoteDocumentInsert(Connection con, Integer id, ExpenseNoteDocumentWithStream document) throws DAOException, IOException {
+		ExpenseNoteDocumentDAO docDao = ExpenseNoteDocumentDAO.getInstance();
+		
+		OExpenseNoteDocument doc = createOExpenseNoteDocument(document);
+		doc.setId(IdentifierUtils.getUUIDTimeBased());
+		doc.setExpenseNoteId(id);
+		docDao.insert(con, doc, BaseDAO.createRevisionTimestamp());
+		
+		InputStream is = document.getStream();
+		try {
+			docDao.insertBytes(con, doc.getId(), IOUtils.toByteArray(is));
+		} finally {
+			IOUtils.closeQuietly(is);
+		}
+		
+		return doc;
+	}
+	
+	static OExpenseNoteDocument createOExpenseNoteDocument(ExpenseNoteDocument src) {
+		if (src == null) return null;
+		return fillOExpenseNoteDocument(new OExpenseNoteDocument(), src);
+	}
+	
+	static ExpenseNoteDocument createExpenseNoteDocument(OExpenseNoteDocument src) {
+		if (src == null) return null;
+		return fillExpenseNoteDocument(new ExpenseNoteDocument(), src);
+	}
+	
+	static <T extends OExpenseNoteDocument> T fillOExpenseNoteDocument(T tgt, ExpenseNoteDocument src) {
+		if ((tgt != null) && (src != null)) {
+			tgt.setId(src.getId());
+			tgt.setRevisionTimestamp(src.getRevisionTimestamp());
+			tgt.setRevisionSequence(src.getRevisionSequence());
+			tgt.setFilename(src.getFileName());
+			tgt.setSize(src.getSize());
+			tgt.setMediaType(src.getMediaType());
+		}
+		return tgt;
+	}
+	
+	static <T extends ExpenseNoteDocument> T fillExpenseNoteDocument(T tgt, OExpenseNoteDocument src) {
+		if ((tgt != null) && (src != null)) {
+			tgt.setId(src.getId());
+			tgt.setRevisionTimestamp(src.getRevisionTimestamp());
+			tgt.setRevisionSequence(src.getRevisionSequence());
+			tgt.setFileName(src.getFilename());
+			tgt.setSize(src.getSize());
+			tgt.setMediaType(src.getMediaType());
+		}
+		return tgt;
+	}
+	
+	static List<ExpenseNoteDocument> createExpenseNoteDocumentList(List<OExpenseNoteDocument> items) {
+		ArrayList<ExpenseNoteDocument> list = new ArrayList<>(items.size());
+		for (OExpenseNoteDocument item : items) {
+			list.add(createExpenseNoteDocument(item));
+		}
+		return list;
+	}
+	
+	static boolean doExpenseNoteDocumentUpdate(Connection con, ExpenseNoteDocumentWithStream document) throws DAOException, IOException {
+		ExpenseNoteDocumentDAO docDao = ExpenseNoteDocumentDAO.getInstance();
+		
+		OExpenseNoteDocument doc = createOExpenseNoteDocument(document);
+		docDao.update(con, doc, BaseDAO.createRevisionTimestamp());
+		
+		InputStream is = document.getStream();
+		try {
+			docDao.deleteBytesById(con, doc.getId());
+			return docDao.insertBytes(con, doc.getId(), IOUtils.toByteArray(is)) == 1;
+		} finally {
+			IOUtils.closeQuietly(is);
+		}
+	}
+	
+	static OExpenseNoteDetailDocument doExpenseNoteDetailDocumentInsert(Connection con, Integer id, ExpenseNoteDetailDocumentWithStream document) throws DAOException, IOException {
+		ExpenseNoteDetailDocumentDAO docDao = ExpenseNoteDetailDocumentDAO.getInstance();
+		
+		OExpenseNoteDetailDocument doc = createOExpenseNoteDetailDocument(document);
+		doc.setId(IdentifierUtils.getUUIDTimeBased());
+		doc.setExpenseNoteDetailId(id);
+		docDao.insert(con, doc, BaseDAO.createRevisionTimestamp());
+		
+		InputStream is = document.getStream();
+		try {
+			docDao.insertBytes(con, doc.getId(), IOUtils.toByteArray(is));
+		} finally {
+			IOUtils.closeQuietly(is);
+		}
+		
+		return doc;
+	}
+	
+	static OExpenseNoteDetailDocument createOExpenseNoteDetailDocument(ExpenseNoteDetailDocument src) {
+		if (src == null) return null;
+		return fillOExpenseNoteDetailDocument(new OExpenseNoteDetailDocument(), src);
+	}
+	
+	static ExpenseNoteDetailDocument createExpenseNoteDetailDocument(OExpenseNoteDetailDocument src) {
+		if (src == null) return null;
+		return fillExpenseNoteDetailDocument(new ExpenseNoteDetailDocument(), src);
+	}
+	
+	static <T extends OExpenseNoteDetailDocument> T fillOExpenseNoteDetailDocument(T tgt, ExpenseNoteDetailDocument src) {
+		if ((tgt != null) && (src != null)) {
+			tgt.setId(src.getId());
+			tgt.setRevisionTimestamp(src.getRevisionTimestamp());
+			tgt.setRevisionSequence(src.getRevisionSequence());
+			tgt.setFilename(src.getFileName());
+			tgt.setSize(src.getSize());
+			tgt.setMediaType(src.getMediaType());
+		}
+		return tgt;
+	}
+	
+	static <T extends ExpenseNoteDetailDocument> T fillExpenseNoteDetailDocument(T tgt, OExpenseNoteDetailDocument src) {
+		if ((tgt != null) && (src != null)) {
+			tgt.setId(src.getId());
+			tgt.setRevisionTimestamp(src.getRevisionTimestamp());
+			tgt.setRevisionSequence(src.getRevisionSequence());
+			tgt.setFileName(src.getFilename());
+			tgt.setSize(src.getSize());
+			tgt.setMediaType(src.getMediaType());
+		}
+		return tgt;
+	}
+	
+	static List<ExpenseNoteDetailDocument> createExpenseNoteDetailDocumentList(List<OExpenseNoteDetailDocument> items) {
+		ArrayList<ExpenseNoteDetailDocument> list = new ArrayList<>(items.size());
+		for (OExpenseNoteDetailDocument item : items) {
+			list.add(createExpenseNoteDetailDocument(item));
+		}
+		return list;
+	}
+	
+	static boolean doExpenseNoteDetailDocumentUpdate(Connection con, ExpenseNoteDetailDocumentWithStream document) throws DAOException, IOException {
+		ExpenseNoteDetailDocumentDAO docDao = ExpenseNoteDetailDocumentDAO.getInstance();
+		
+		OExpenseNoteDetailDocument doc = createOExpenseNoteDetailDocument(document);
+		docDao.update(con, doc, BaseDAO.createRevisionTimestamp());
+		
+		InputStream is = document.getStream();
+		try {
+			docDao.deleteBytesById(con, doc.getId());
+			return docDao.insertBytes(con, doc.getId(), IOUtils.toByteArray(is)) == 1;
+		} finally {
+			IOUtils.closeQuietly(is);
+		}
 	}
 }

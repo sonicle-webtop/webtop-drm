@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Drm extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = 1631171652;
+	private static final long serialVersionUID = 2504811;
 
 	/**
 	 * The reference instance of <code>drm</code>
@@ -46,7 +46,9 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_DOC_STATUSES,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_DOC_STATUSES_GROUPS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EMPLOYEE_PROFILES,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EXPENSE_NOTE_DETAILS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EXPENSE_NOTE_SETTINGS,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EXPENSE_NOTES,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_FOLDERS_GROUPS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_GROUPS_USERS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_HOUR_PROFILES,
@@ -90,6 +92,12 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.tables.DocStatusesGroups.DOC_STATUSES_GROUPS,
 			com.sonicle.webtop.drm.jooq.tables.EmployeeProfiles.EMPLOYEE_PROFILES,
 			com.sonicle.webtop.drm.jooq.tables.EnabledPrograms.ENABLED_PROGRAMS,
+			com.sonicle.webtop.drm.jooq.tables.ExpenseNote.EXPENSE_NOTE,
+			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteDetail.EXPENSE_NOTE_DETAIL,
+			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteDetailDocuments.EXPENSE_NOTE_DETAIL_DOCUMENTS,
+			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteDetailDocumentsData.EXPENSE_NOTE_DETAIL_DOCUMENTS_DATA,
+			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteDocuments.EXPENSE_NOTE_DOCUMENTS,
+			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteDocumentsData.EXPENSE_NOTE_DOCUMENTS_DATA,
 			com.sonicle.webtop.drm.jooq.tables.ExpenseNoteSettings.EXPENSE_NOTE_SETTINGS,
 			com.sonicle.webtop.drm.jooq.tables.Folders.FOLDERS,
 			com.sonicle.webtop.drm.jooq.tables.FoldersGroups.FOLDERS_GROUPS,

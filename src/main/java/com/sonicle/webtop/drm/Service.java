@@ -180,13 +180,21 @@ import com.sonicle.webtop.calendar.model.Event;
 import com.sonicle.webtop.calendar.model.EventInstance;
 import com.sonicle.webtop.calendar.model.EventKey;
 import com.sonicle.webtop.calendar.model.UpdateEventTarget;
-import com.sonicle.webtop.drm.bol.OCostType;
 import com.sonicle.webtop.drm.bol.ODefaultCostType;
+import com.sonicle.webtop.drm.bol.OExpenseNote;
 import com.sonicle.webtop.drm.bol.js.JsCostType;
+import com.sonicle.webtop.drm.bol.js.JsExpenseNote;
 import com.sonicle.webtop.drm.bol.js.JsExpenseNoteSetting;
 import com.sonicle.webtop.drm.bol.js.JsFilter;
+import com.sonicle.webtop.drm.bol.js.JsGridExpenseNote;
+import com.sonicle.webtop.drm.bol.model.RBTimetableEncoReport;
 import com.sonicle.webtop.drm.bol.model.RBWorkReportSummary;
 import com.sonicle.webtop.drm.model.CostType;
+import com.sonicle.webtop.drm.model.ExpenseNote;
+import com.sonicle.webtop.drm.model.ExpenseNoteDetailDocumentWithBytes;
+import com.sonicle.webtop.drm.model.ExpenseNoteDocument;
+import com.sonicle.webtop.drm.model.ExpenseNoteDocumentWithBytes;
+import com.sonicle.webtop.drm.model.ExpenseNoteDocumentWithStream;
 import com.sonicle.webtop.drm.model.ExpenseNoteSetting;
 import com.sonicle.webtop.drm.model.WorkReportSummary;
 import com.sonicle.webtop.drm.rpt.RptWorkReportSummary;
@@ -265,6 +273,7 @@ public class Service extends BaseService {
 		vs.put("defaultFreeSupport", ss.getDefaultFreeSupport());
 		vs.put("workReportDefaultStatus", ss.getWorkReportDefaultDocStatusId());
 		vs.put("opportunityDefaultStatus", ss.getOpportunityDefaultDocStatusId());
+		vs.put("medicalVisitsAutomaticallyApproved", ss.getMedicalVisitsAutomaticallyApproved());
 		
 		try {
 			vs.put("opportunityRequiredFields", getOpportunityRequiredFields());
@@ -351,15 +360,43 @@ public class Service extends BaseService {
 		}
 	}
 	
-	public void processLookupCostTypes(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
-		try {
-			List<JsCostType> jsCT = new ArrayList();
-
-			for (CostType ct : manager.listCostTypes()) {
-				jsCT.add(new JsCostType(ct));
-			}
+	public void processGetCostType(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {	
+			Integer typeId = ServletUtils.getIntParameter(request, "typeId", true);
 			
-			new JsonResult(jsCT, jsCT.size()).printTo(out);
+			CostType ct = manager.getCostType(typeId);
+				
+			new JsonResult(new JsCostType(ct)).printTo(out);
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action GetCostType", ex);
+		}
+	}
+	
+	public void processLookupCompleteCostTypes(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {			
+			List<JsCostType> cts = new ArrayList();
+			
+			for (CostType ct : manager.listCostTypes()) {
+				cts.add(new JsCostType(ct));
+			}
+				
+			new JsonResult(cts, cts.size()).printTo(out);
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupCompleteCostTypes", ex);
+		}
+	}
+	
+	public void processLookupCostTypes(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {			
+			List<JsSimple> cts = new ArrayList();
+			
+			for (CostType ct : manager.listCostTypes()) {
+				cts.add(new JsSimple(ct.getId(), ct.getDescription()));
+			}
+				
+			new JsonResult(cts, cts.size()).printTo(out);
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action LookupCostTypes", ex);
@@ -1582,6 +1619,106 @@ public class Service extends BaseService {
 			logger.error("Error in action ManagePrepareOpportunityActions", ex);
 		}
 	}
+	
+	public void processManageGridExpenseNote(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			
+			if (crud.equals(Crud.READ)) {
+				
+				String query = ServletUtils.getStringParameter(request, "query", null);
+				ExpenseNoteQuery eNQuery = ExpenseNoteQuery.fromJson(query);
+				List<JsGridExpenseNote> jsGridEN = new ArrayList();
+				
+				for (OExpenseNote oEN : manager.listExpenseNote(eNQuery)) {
+					jsGridEN.add(new JsGridExpenseNote(oEN));
+				}
+
+				new JsonResult(jsGridEN).printTo(out);
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageGridExpenseNote", ex);
+		}
+	}
+	
+	public void processManageExpenseNote(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		JsExpenseNote item = null;
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			if (crud.equals(Crud.READ)) {
+
+				Integer id = ServletUtils.getIntParameter(request, "id", true);
+
+				ExpenseNote eN = manager.getExpenseNote(id);
+
+				item = new JsExpenseNote(eN);
+
+				new JsonResult(item).printTo(out);
+
+			} else if (crud.equals(Crud.CREATE)) {
+
+				Payload<MapItem, JsExpenseNote> pl = ServletUtils.getPayload(request, JsExpenseNote.class);
+
+				ExpenseNote eN = JsExpenseNote.createExpenseNote(pl.data);
+				
+				for (JsExpenseNote.Document jsdoc : pl.data.documents) {
+					UploadedFile upFile = getUploadedFileOrThrow(jsdoc._uplId);
+					ExpenseNoteDocumentWithStream doc = new ExpenseNoteDocumentWithStream(upFile.getFile());
+					doc.setId(jsdoc.id);
+					doc.setFileName(upFile.getFilename());
+					doc.setSize(upFile.getSize());
+					doc.setMediaType(upFile.getMediaType());
+					eN.getDocuments().add(doc);
+				}
+				
+				manager.addExpenseNote(eN);
+
+				new JsonResult().printTo(out);
+
+			} else if (crud.equals(Crud.UPDATE)) {
+
+				Payload<MapItem, JsExpenseNote> pl = ServletUtils.getPayload(request, JsExpenseNote.class);
+
+				ExpenseNote eN = JsExpenseNote.createExpenseNote(pl.data);
+				
+				for (JsExpenseNote.Document jsdoc : pl.data.documents) {
+					if(!StringUtils.isBlank(jsdoc._uplId)){
+						UploadedFile upFile = getUploadedFileOrThrow(jsdoc._uplId);
+						ExpenseNoteDocumentWithStream doc = new ExpenseNoteDocumentWithStream(upFile.getFile());
+						doc.setId(jsdoc.id);
+						doc.setFileName(upFile.getFilename());
+						doc.setSize(upFile.getSize());
+						doc.setMediaType(upFile.getMediaType());
+						eN.getDocuments().add(doc);
+					}else{
+						ExpenseNoteDocument doc = new ExpenseNoteDocument();
+						doc.setId(jsdoc.id);
+						doc.setFileName(jsdoc.name);
+						doc.setSize(jsdoc.size);
+						eN.getDocuments().add(doc);
+					}
+				}
+				
+				manager.updateExpenseNote(eN);
+
+				new JsonResult().printTo(out);
+
+			} else if (crud.equals(Crud.DELETE)) {
+
+				StringArray ids = ServletUtils.getObjectParameter(request, "ids", StringArray.class, true);
+
+				ExpenseNote eN = manager.getExpenseNote(Integer.parseInt(ids.get(0)));
+				
+				manager.deleteExpenseNote(Integer.parseInt(ids.get(0)));
+
+				new JsonResult().printTo(out);
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageExpenseNote", ex);
+		}
+	}
 
 	public void processManageGridWorkReport(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
@@ -1730,7 +1867,7 @@ public class Service extends BaseService {
 				Integer eventId = createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
 				lr.setEventId(eventId);
 				
-				manager.addLeaveRequest(lr);
+				manager.addLeaveRequest(lr, ss.getMedicalVisitsAutomaticallyApproved());
 
 				new JsonResult().printTo(out);
 
@@ -1892,6 +2029,78 @@ public class Service extends BaseService {
 			
 		} catch(Throwable t) {
 			logger.error("Error in DownloadOpportunityActionDocument", t);
+			ServletUtils.writeErrorHandlingJs(response, t.getMessage());
+		}
+	}
+	
+	public void processDownloadExpenseNoteDocument(HttpServletRequest request, HttpServletResponse response) {
+
+		try {
+			boolean inline = ServletUtils.getBooleanParameter(request, "inline", false);
+			String attachmentId = ServletUtils.getStringParameter(request, "attachmentId", null);
+			
+			if (!StringUtils.isBlank(attachmentId)) {
+				Integer eNId = ServletUtils.getIntParameter(request, "eNId", true);
+				
+				ExpenseNoteDocumentWithBytes docData = manager.getExpenseNoteDocument(eNId, attachmentId);
+				InputStream is = null;
+				try {
+					is = new ByteArrayInputStream(docData.getBytes());
+					ServletUtils.writeFileResponse(response, inline, docData.getFileName(), null, docData.getSize(), is);
+				} finally {
+					IOUtils.closeQuietly(is);
+				}
+			} else {
+				String uploadId = ServletUtils.getStringParameter(request, "uploadId", true);
+				
+				UploadedFile uplFile = getUploadedFileOrThrow(uploadId);
+				InputStream is = null;
+				try {
+					is = new FileInputStream(uplFile.getFile());
+					ServletUtils.writeFileResponse(response, inline, uplFile.getFilename(), null, uplFile.getSize(), is);
+				} finally {
+					IOUtils.closeQuietly(is);
+				}
+			}
+			
+		} catch(Throwable t) {
+			logger.error("Error in DownloadExpenseNoteDocument", t);
+			ServletUtils.writeErrorHandlingJs(response, t.getMessage());
+		}
+	}
+	
+	public void processDownloadExpenseNoteDetailDocument(HttpServletRequest request, HttpServletResponse response) {
+
+		try {
+			boolean inline = ServletUtils.getBooleanParameter(request, "inline", false);
+			String attachmentId = ServletUtils.getStringParameter(request, "attachmentId", null);
+			
+			if (!StringUtils.isBlank(attachmentId)) {
+				Integer eNDId = ServletUtils.getIntParameter(request, "eNDId", true);
+				
+				ExpenseNoteDetailDocumentWithBytes docData = manager.getExpenseNoteDetailDocument(eNDId, attachmentId);
+				InputStream is = null;
+				try {
+					is = new ByteArrayInputStream(docData.getBytes());
+					ServletUtils.writeFileResponse(response, inline, docData.getFileName(), null, docData.getSize(), is);
+				} finally {
+					IOUtils.closeQuietly(is);
+				}
+			} else {
+				String uploadId = ServletUtils.getStringParameter(request, "uploadId", true);
+				
+				UploadedFile uplFile = getUploadedFileOrThrow(uploadId);
+				InputStream is = null;
+				try {
+					is = new FileInputStream(uplFile.getFile());
+					ServletUtils.writeFileResponse(response, inline, uplFile.getFilename(), null, uplFile.getSize(), is);
+				} finally {
+					IOUtils.closeQuietly(is);
+				}
+			}
+			
+		} catch(Throwable t) {
+			logger.error("Error in DownloadExpenseNoteDetailDocument", t);
 			ServletUtils.writeErrorHandlingJs(response, t.getMessage());
 		}
 	}
@@ -2161,6 +2370,10 @@ public class Service extends BaseService {
 			} else if (crud.equals(Crud.UPDATE)) {
 				Payload<MapItem, JsTimetableSetting> pl = ServletUtils.getPayload(request, JsTimetableSetting.class);
 
+				if (pl.map.has("medicalVisitsAutomaticallyApproved")) {
+					ss.setMedicalVisitsAutomaticallyApproved(pl.data.medicalVisitsAutomaticallyApproved);
+				}
+				
 				TimetableSetting tSetting = JsTimetableSetting.createTimetableSetting(pl.data);
 
 				manager.updateTimetableSetting(tSetting);
@@ -2318,6 +2531,33 @@ public class Service extends BaseService {
 			
 			for(OTimetableReport otr : trs) {
 				items.add(new RBTimetableReport(WT.getCoreManager(), manager, otr));
+			}
+			
+			ReportConfig.Builder builder = reportConfigBuilder();
+			RptTimetableReport rpt = new RptTimetableReport(builder.build());
+			rpt.setDataSource(items);
+			
+			ServletUtils.setFileStreamHeaders(response, filename + ".pdf");
+			WT.generateReportToStream(rpt, AbstractReport.OutputType.PDF, response.getOutputStream());
+			
+		} catch(Exception ex) {
+			logger.error("Error in action PrintTimetableReport", ex);
+			ex.printStackTrace();
+			ServletUtils.writeErrorHandlingJs(response, ex.getMessage());
+		}
+	}
+	
+	public void processPrintTimetableEncoReport(HttpServletRequest request, HttpServletResponse response) {
+		ArrayList<RBTimetableEncoReport> items = new ArrayList<>();
+		List<OTimetableReport> trs = null;
+		
+		try {
+			String filename = ServletUtils.getStringParameter(request, "filename", "print");
+			
+			trs = manager.getTimetableReport();
+			
+			for(OTimetableReport otr : trs) {
+				items.add(new RBTimetableEncoReport(WT.getCoreManager(), manager, otr));
 			}
 			
 			ReportConfig.Builder builder = reportConfigBuilder();

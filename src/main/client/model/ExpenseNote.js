@@ -44,20 +44,22 @@ Ext.define('Sonicle.webtop.drm.model.ExpenseNote', {
 		}
 	}),
 	identifier: 'negative',
-	idProperty: 'expenseNoteId',
+	idProperty: 'id',
 	fields: [
-		WTF.field('expenseNoteId', 'string', true),
+		WTF.field('id', 'string', true),
 		WTF.field('operatorId', 'string', false),
 		WTF.field('companyId', 'int', false),
 		WTF.field('fromDate', 'date', false, {dateFormat: 'Y-m-d', defaultValue: new Date()}),
 		WTF.field('toDate', 'date', false, {dateFormat: 'Y-m-d', defaultValue: new Date()}),
-		WTF.field('totCurrency', 'string', false),
+		WTF.field('totCurrency', 'float', true, {
+			defaultValue: 0
+		}),
 		WTF.field('currency', 'string', false),
 		WTF.field('description', 'string', true),
-		WTF.field('status', 'string', true)
+		WTF.field('status', 'string', false, {defaultValue: 'O'})
 	],
 	hasMany: [
 		WTF.hasMany('documents', 'Sonicle.webtop.drm.model.ExpenseNoteDocument'),
-		WTF.hasMany('rowDetails', 'Sonicle.webtop.drm.model.ExpenseNoteDetail')
+		WTF.hasMany('details', 'Sonicle.webtop.drm.model.ExpenseNoteDetail')
 	]
 });

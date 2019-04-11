@@ -30,49 +30,13 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm;
+package com.sonicle.webtop.drm.bol;
 
+import com.sonicle.webtop.drm.jooq.tables.pojos.ExpenseNoteDetail;
 /**
  *
  * @author lssndrvs
  */
-public class DrmSettings {
-
-	public static final String USE_STATISTIC_CUSTOMER = "customer.usestatistic";
-
-	public static final String PRINT_DAYS_TRANSFERT = "workreport.daystrasfert.print";
-
-	public static final String PRINT_TRANSFERT_DESCRIPTION = "workreport.transfert.print.description";
-
-	public static final String PRINT_SIGNATURE = "workreport.print.signature";
-
-	public static final String ROUNDING_HOUR = "workreport.roundinghour";
+public class OExpenseNoteDetail extends ExpenseNoteDetail{
 	
-	public static final String TRACKING = "workreport.tracking";
-	
-	public static final String MAIL_TRACKING = "workreport.tracking.mail";
-	
-	public static final String CLOUD_TRACKING = "workreport.tracking.cloud";
-	
-	public static final String DEFAULT_APPLY_SIGNATURE = "workreport.default.applysignature";
-	
-	public static final String DEFAULT_CHARGE_TO = "workreport.default.chargeto";
-	
-	public static final String DEFAULT_FREE_SUPPORT = "workreport.default.freesupport";
-	
-	public static final String WORK_REPORT_DEFAULT_DOC_STATUS_ID = "workreport.default.docstatusid";
-	
-	public static final String OPPORTUNITY_DEFAULT_DOC_STATUS_ID = "opportunity.default.docstatusid";
-	
-	public static final String OPPORTUNITY_CALENDAR_ID = "opportunity.calendar.id";
-	
-	public static final String WORK_REPORT_CALENDAR_ID = "workreport.calendar.id";
-	
-	public static final String LEAVE_REQUEST_CALENDAR_ID = "leaverequest.calendar.id";
-	
-	public static final String EXPENSE_NOTE_KM_COST = "expensenote.kmcost";
-	
-	public static final String EXPENSE_NOTE_DEFAULT_CURRENCY = "expensenote.defaultcurrency";
-	
-	public static final String LEAVE_REQUEST_MEDICAL_VISITS_AUTOMATICALLY_APPROVED = "leaverequest.medicalvisitsautomaticallyapproved";
 }

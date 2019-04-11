@@ -30,49 +30,44 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm;
+package com.sonicle.webtop.drm.bol.js;
+
+import com.sonicle.webtop.drm.bol.OExpenseNote;
+import com.sonicle.webtop.drm.model.ExpenseNote;
+import com.sonicle.webtop.drm.model.ExpenseNoteDetail;
+import com.sonicle.webtop.drm.model.ExpenseNoteDocument;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import org.joda.time.LocalDate;
 
 /**
  *
  * @author lssndrvs
  */
-public class DrmSettings {
+public class JsGridExpenseNote {
 
-	public static final String USE_STATISTIC_CUSTOMER = "customer.usestatistic";
+	public Integer id;
+	public String domainId;
+	public String operatorId;
+	public Integer companyId;
+	public LocalDate fromDate;
+	public LocalDate toDate;
+	public BigDecimal totCurrency;
+	public String currency;
+	public String description;
+	public String statusId;
 
-	public static final String PRINT_DAYS_TRANSFERT = "workreport.daystrasfert.print";
-
-	public static final String PRINT_TRANSFERT_DESCRIPTION = "workreport.transfert.print.description";
-
-	public static final String PRINT_SIGNATURE = "workreport.print.signature";
-
-	public static final String ROUNDING_HOUR = "workreport.roundinghour";
-	
-	public static final String TRACKING = "workreport.tracking";
-	
-	public static final String MAIL_TRACKING = "workreport.tracking.mail";
-	
-	public static final String CLOUD_TRACKING = "workreport.tracking.cloud";
-	
-	public static final String DEFAULT_APPLY_SIGNATURE = "workreport.default.applysignature";
-	
-	public static final String DEFAULT_CHARGE_TO = "workreport.default.chargeto";
-	
-	public static final String DEFAULT_FREE_SUPPORT = "workreport.default.freesupport";
-	
-	public static final String WORK_REPORT_DEFAULT_DOC_STATUS_ID = "workreport.default.docstatusid";
-	
-	public static final String OPPORTUNITY_DEFAULT_DOC_STATUS_ID = "opportunity.default.docstatusid";
-	
-	public static final String OPPORTUNITY_CALENDAR_ID = "opportunity.calendar.id";
-	
-	public static final String WORK_REPORT_CALENDAR_ID = "workreport.calendar.id";
-	
-	public static final String LEAVE_REQUEST_CALENDAR_ID = "leaverequest.calendar.id";
-	
-	public static final String EXPENSE_NOTE_KM_COST = "expensenote.kmcost";
-	
-	public static final String EXPENSE_NOTE_DEFAULT_CURRENCY = "expensenote.defaultcurrency";
-	
-	public static final String LEAVE_REQUEST_MEDICAL_VISITS_AUTOMATICALLY_APPROVED = "leaverequest.medicalvisitsautomaticallyapproved";
+	public JsGridExpenseNote(OExpenseNote oEN) {
+		this.id = oEN.getId();
+		this.domainId = oEN.getDomainId();
+		this.operatorId = oEN.getOperatorId();
+		this.companyId = oEN.getCompanyId();
+		this.fromDate = oEN.getFromDate();
+		this.toDate = oEN.getToDate();
+		this.totCurrency = oEN.getTotCurrency();
+		this.currency = oEN.getCurrency();
+		this.description = oEN.getDescription();
+		this.statusId = oEN.getStatus();
+	}
 }

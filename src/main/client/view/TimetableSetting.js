@@ -153,6 +153,11 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 							xtype: 'checkbox',
 							bind: '{record.requestsPermitsContractuals}',
 							boxLabel: me.mys.res('timetable.settings.fld-requestspermitscontractuals.lbl')
+						},
+						{
+							xtype: 'checkbox',
+							bind: '{record.medicalVisitsAutomaticallyApproved}',
+							boxLabel: me.mys.res('timetable.settings.fld-medicalVisitsAutomaticallyApproved.lbl')
 						}
 					]
 				},

@@ -62,6 +62,36 @@ public class Tables {
 	public static final com.sonicle.webtop.drm.jooq.tables.EnabledPrograms ENABLED_PROGRAMS = com.sonicle.webtop.drm.jooq.tables.EnabledPrograms.ENABLED_PROGRAMS;
 
 	/**
+	 * The table drm.expense_note
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.ExpenseNote EXPENSE_NOTE = com.sonicle.webtop.drm.jooq.tables.ExpenseNote.EXPENSE_NOTE;
+
+	/**
+	 * The table drm.expense_note_detail
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.ExpenseNoteDetail EXPENSE_NOTE_DETAIL = com.sonicle.webtop.drm.jooq.tables.ExpenseNoteDetail.EXPENSE_NOTE_DETAIL;
+
+	/**
+	 * The table drm.expense_note_detail_documents
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.ExpenseNoteDetailDocuments EXPENSE_NOTE_DETAIL_DOCUMENTS = com.sonicle.webtop.drm.jooq.tables.ExpenseNoteDetailDocuments.EXPENSE_NOTE_DETAIL_DOCUMENTS;
+
+	/**
+	 * The table drm.expense_note_detail_documents_data
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.ExpenseNoteDetailDocumentsData EXPENSE_NOTE_DETAIL_DOCUMENTS_DATA = com.sonicle.webtop.drm.jooq.tables.ExpenseNoteDetailDocumentsData.EXPENSE_NOTE_DETAIL_DOCUMENTS_DATA;
+
+	/**
+	 * The table drm.expense_note_documents
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.ExpenseNoteDocuments EXPENSE_NOTE_DOCUMENTS = com.sonicle.webtop.drm.jooq.tables.ExpenseNoteDocuments.EXPENSE_NOTE_DOCUMENTS;
+
+	/**
+	 * The table drm.expense_note_documents_data
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.ExpenseNoteDocumentsData EXPENSE_NOTE_DOCUMENTS_DATA = com.sonicle.webtop.drm.jooq.tables.ExpenseNoteDocumentsData.EXPENSE_NOTE_DOCUMENTS_DATA;
+
+	/**
 	 * The table drm.expense_note_settings
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.ExpenseNoteSettings EXPENSE_NOTE_SETTINGS = com.sonicle.webtop.drm.jooq.tables.ExpenseNoteSettings.EXPENSE_NOTE_SETTINGS;

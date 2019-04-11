@@ -91,7 +91,7 @@ Ext.define('Sonicle.webtop.drm.view.Group', {
 									}),
 									fieldLabel: me.mys.res('group.fld-userType.lbl'),
 									width: 250
-								}),
+								})
 							]
 						},
 						{

@@ -60,6 +60,7 @@ public class JsTimetableSetting {
 	public Boolean requestsPermitsNotRemunered;
 	public Boolean requestsPermitsMedicalVisits;
 	public Boolean requestsPermitsContractuals;
+	public Boolean medicalVisitsAutomaticallyApproved;
 	
 	public List<JsGridHolidayDate> holidayDates = new ArrayList();
 
@@ -81,6 +82,7 @@ public class JsTimetableSetting {
 		this.requestsPermitsNotRemunered = setting.getRequestsPermitsNotRemunered();
 		this.requestsPermitsMedicalVisits = setting.getRequestsPermitsMedicalVisits();
 		this.requestsPermitsContractuals = setting.getRequestsPermitsContractuals();
+		this.medicalVisitsAutomaticallyApproved = setting.getMedicalVisitsAutomaticallyApproved();
 		
 		for (HolidayDate hd : setting.getHolidayDates()) {
 			this.holidayDates.add(new JsGridHolidayDate(hd));
@@ -106,6 +108,7 @@ public class JsTimetableSetting {
 		tt.setRequestsPermitsNotRemunered(js.requestsPermitsNotRemunered);
 		tt.setRequestsPermitsMedicalVisits(js.requestsPermitsMedicalVisits);
 		tt.setRequestsPermitsContractuals(js.requestsPermitsContractuals);
+		tt.setMedicalVisitsAutomaticallyApproved(js.medicalVisitsAutomaticallyApproved);
 
 		for (JsGridHolidayDate hd : js.holidayDates) {
 

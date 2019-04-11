@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableSettings implements java.io.Serializable {
 
-	private static final long serialVersionUID = 1984205453;
+	private static final long serialVersionUID = 1866616681;
 
 	private java.lang.Integer timetableSettingId;
 	private java.lang.String  domainId;
@@ -34,6 +34,7 @@ public class TimetableSettings implements java.io.Serializable {
 	private java.lang.Boolean requestsPermitsContractuals;
 	private java.lang.Boolean companyExit;
 	private java.lang.Boolean manageStamp;
+	private java.lang.Boolean medicalVisitsAutomaticallyApproved;
 
 	public TimetableSettings() {}
 
@@ -53,7 +54,8 @@ public class TimetableSettings implements java.io.Serializable {
 		java.lang.Boolean requestsPermitsMedicalVisits,
 		java.lang.Boolean requestsPermitsContractuals,
 		java.lang.Boolean companyExit,
-		java.lang.Boolean manageStamp
+		java.lang.Boolean manageStamp,
+		java.lang.Boolean medicalVisitsAutomaticallyApproved
 	) {
 		this.timetableSettingId = timetableSettingId;
 		this.domainId = domainId;
@@ -71,6 +73,7 @@ public class TimetableSettings implements java.io.Serializable {
 		this.requestsPermitsContractuals = requestsPermitsContractuals;
 		this.companyExit = companyExit;
 		this.manageStamp = manageStamp;
+		this.medicalVisitsAutomaticallyApproved = medicalVisitsAutomaticallyApproved;
 	}
 
 	public java.lang.Integer getTimetableSettingId() {
@@ -199,5 +202,13 @@ public class TimetableSettings implements java.io.Serializable {
 
 	public void setManageStamp(java.lang.Boolean manageStamp) {
 		this.manageStamp = manageStamp;
+	}
+
+	public java.lang.Boolean getMedicalVisitsAutomaticallyApproved() {
+		return this.medicalVisitsAutomaticallyApproved;
+	}
+
+	public void setMedicalVisitsAutomaticallyApproved(java.lang.Boolean medicalVisitsAutomaticallyApproved) {
+		this.medicalVisitsAutomaticallyApproved = medicalVisitsAutomaticallyApproved;
 	}
 }

@@ -61,7 +61,8 @@ Ext.define('Sonicle.webtop.drm.model.TimetableSetting', {
 		WTF.field('readOnlyEvents', 'bool', true, {defaultValue: false}),
 		WTF.field('requestsPermitsNotRemunered', 'bool', true, {defaultValue: false}),
 		WTF.field('requestsPermitsMedicalVisits', 'bool', true, {defaultValue: false}),
-		WTF.field('requestsPermitsContractuals', 'bool', true, {defaultValue: false})
+		WTF.field('requestsPermitsContractuals', 'bool', true, {defaultValue: false}),
+		WTF.field('medicalVisitsAutomaticallyApproved', 'bool', true, {defaultValue: false})
 	],
 	hasMany: [
 		WTF.hasMany('holidayDates', 'Sonicle.webtop.drm.model.HolidayDate')

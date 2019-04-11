@@ -52,9 +52,19 @@ public class Sequences {
 	public static final org.jooq.Sequence<java.lang.Long> SEQ_EMPLOYEE_PROFILES = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_employee_profiles", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
+	 * The sequence <code>drm.seq_expense_note_details</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> SEQ_EXPENSE_NOTE_DETAILS = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_expense_note_details", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
 	 * The sequence <code>drm.seq_expense_note_settings</code>
 	 */
 	public static final org.jooq.Sequence<java.lang.Long> SEQ_EXPENSE_NOTE_SETTINGS = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_expense_note_settings", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
+	 * The sequence <code>drm.seq_expense_notes</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> SEQ_EXPENSE_NOTES = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_expense_notes", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
 	 * The sequence <code>drm.seq_folders_groups</code>

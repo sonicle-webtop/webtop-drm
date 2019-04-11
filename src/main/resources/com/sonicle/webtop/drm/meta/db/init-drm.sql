@@ -1095,3 +1095,91 @@ UPDATE drm.work_reports_rows AS wrr
 ;
 ALTER TABLE "drm"."work_reports_rows"
 DROP COLUMN "row_flag";
+
+--------------
+--26/03/2019--
+--------------
+
+CREATE TABLE "drm"."expense_note" (
+"id" int4 NOT NULL,
+"domain_id" varchar(20) NOT NULL,
+"operator_id" varchar(36) NOT NULL,
+"company_id" int4 NOT NULL,
+"from_date" date NOT NULL,
+"to_date" date NOT NULL,
+"tot_currency" numeric(15,2),
+"currency" varchar(3) NOT NULL,
+"description" varchar(255),
+"status" varchar(1) NOT NULL,
+PRIMARY KEY ("id")
+);
+
+CREATE TABLE "drm"."expense_note_detail" (
+"id" int4 NOT NULL,
+"expense_note_id" int4 NOT NULL,
+"operator_id" varchar(36) NOT NULL,
+"company_id" int4 NOT NULL,
+"type_id" int4 NOT NULL,
+"total" numeric(15,2) NOT NULL,
+"date" date NOT NULL,
+"payment_company" bool,
+"invoice" bool,
+"invoice_number" varchar(20),
+"with_others" varchar(255),
+"customer_id" varchar(36) NOT NULL,
+"km" numeric(15,2),
+"currency" varchar(3) NOT NULL,
+"change" numeric(15,2) NOT NULL,
+"description" varchar(255),
+"total_doc" numeric(15,2),
+"currency_doc" varchar(3),
+PRIMARY KEY ("id")
+);
+
+CREATE TABLE "drm"."expense_note_documents" (
+"id" varchar(36) NOT NULL,
+"expense_note_id" int4 NOT NULL,
+"revision_timestamp" timestamptz(6) NOT NULL,
+"revision_sequence" int2 NOT NULL,
+"filename" varchar(255) NOT NULL,
+"size" int8 NOT NULL,
+"media_type" varchar(255) NOT NULL
+);
+
+ALTER TABLE "drm"."expense_note_documents" ADD PRIMARY KEY ("id");
+
+CREATE TABLE "drm"."expense_note_documents_data" (
+"expense_note_document_id" varchar(36) NOT NULL,
+"bytes" bytea NOT NULL
+);
+
+ALTER TABLE "drm"."expense_note_documents_data" ADD PRIMARY KEY ("expense_note_document_id");
+
+ALTER TABLE "drm"."expense_note_documents_data" ADD FOREIGN KEY ("expense_note_document_id") REFERENCES "drm"."expense_note_documents" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+CREATE TABLE "drm"."expense_note_detail_documents" (
+"id" varchar(36) NOT NULL,
+"expense_note_detail_id" int4 NOT NULL,
+"revision_timestamp" timestamptz(6) NOT NULL,
+"revision_sequence" int2 NOT NULL,
+"filename" varchar(255) NOT NULL,
+"size" int8 NOT NULL,
+"media_type" varchar(255) NOT NULL
+);
+
+ALTER TABLE "drm"."expense_note_detail_documents" ADD PRIMARY KEY ("id");
+
+CREATE TABLE "drm"."expense_note_detail_documents_data" (
+"expense_note_detail_document_id" varchar(36) NOT NULL,
+"bytes" bytea NOT NULL
+);
+
+ALTER TABLE "drm"."expense_note_detail_documents_data" ADD PRIMARY KEY ("expense_note_detail_document_id");
+
+ALTER TABLE "drm"."expense_note_detail_documents_data" ADD FOREIGN KEY ("expense_note_detail_document_id") REFERENCES "drm"."expense_note_detail_documents" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+CREATE SEQUENCE "drm"."seq_expense_notes";
+CREATE SEQUENCE "drm"."seq_expense_note_details";
+
+ALTER TABLE "drm"."timetable_settings"
+ADD COLUMN "medical_visits_automatically_approved" bool;

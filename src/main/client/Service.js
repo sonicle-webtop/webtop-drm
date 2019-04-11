@@ -423,6 +423,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 						{
 							region: 'north',
 							xtype: 'wtdrmexpensenotesearch',
+							reference: 'filtersExpenseNote',
 							title: me.res('expenseNote.tit.lbl'),
 							iconCls: 'wtdrm-icon-expensenote-xs',
 							titleCollapse: true,
@@ -444,8 +445,15 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							},
 							columns: [
 								{
+									xtype: 'solookupcolumn',
+									dataIndex: 'companyId',
+									store: {
+										autoLoad: true,
+										model: 'WTA.model.Simple',
+										proxy: WTF.proxy(me.ID, 'LookupAllCompanies')
+									},
 									header: me.res('gpExpenseNote.company.lbl'),
-									dataIndex: 'company',
+									displayField: 'desc',
 									flex: 1
 								}, {
 									header: me.res('gpExpenseNote.description.lbl'),
@@ -464,28 +472,24 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									format: WT.getShortDateFmt(),
 									flex: 1
 								}, {
+									xtype: 'solookupcolumn',
+									dataIndex: 'operatorId',
+									store: {
+										autoLoad: true,
+										model: 'WTA.model.Simple',
+										proxy: WTF.proxy(me.ID, 'LookupOperators')
+									},
 									header: me.res('gpExpenseNote.operator.lbl'),
-									dataIndex: 'operator',
+									displayField: 'desc',
 									flex: 1
 								}, {
-									header: me.res('gpExpenseNote.currency.lbl'),
-									dataIndex: 'currency',
-									flex: 1
-								}, {
-									header: me.res('gpExpenseNote.kmAmount.lbl'),
-									dataIndex: 'kmAmount',
-									flex: 1
-								}, {
-									header: me.res('gpExpenseNote.total.lbl'),
-									dataIndex: 'total',
-									flex: 1
-								}, {
+									xtype: 'solookupcolumn',
+									dataIndex: 'statusId',
+									store: Ext.create('Sonicle.webtop.drm.store.StatusType', {
+										autoLoad: true
+									}),
 									header: me.res('gpExpenseNote.status.lbl'),
-									dataIndex: 'status',
-									flex: 1
-								}, {
-									header: me.res('gpExpenseNote.attachments.lbl'),
-									dataIndex: 'attachments',
+									displayField: 'desc',
 									flex: 1
 								}
 							],
@@ -1062,6 +1066,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 //								me.getAct('timetableReport', 'save'),
 //								'-',
 								me.getAct('timetableReport', 'print')
+//								me.getAct('timetableReport', 'encoPrint'),
 //								me.getAct('timetableReport', 'export')
 							]
 						}
@@ -1096,6 +1101,10 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	
 	gpWorkReportSelected: function () {
 		return this.getMainComponent().lookupReference('gpWorkReport').getSelection()[0];
+	},
+	
+	filtersExpenseNote: function () {
+		return this.getMainComponent().lookupReference('filtersExpenseNote');
 	},
 	
 	gpExpenseNote: function () {
@@ -1446,6 +1455,14 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			iconCls: 'wt-icon-print',
 			handler: function () {
 				me.printTimetableReport();
+			}
+		});
+		me.addAct('timetableReport', 'encoPrint', {
+			text: WT.res('act-print.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-print',
+			handler: function () {
+				me.printTimetableEncoReport();
 			}
 		});
 		me.addAct('timetableReport', 'export', {
@@ -1855,17 +1872,22 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		opts = opts || {};
 
 		var me = this,
+				fen = me.filtersExpenseNote(),
 				vw = WT.createView(me.ID, 'view.ExpenseNote', {swapReturn: true});
 		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
 		vw.showView(function () {
-					vw.begin('new');
+					vw.begin('new', {
+						data: {
+							operatorId: fen.getOperatorId()
+						}
+					});
 				});
 	},
 	editExpenseNoteUI: function (rec) {
 		var me = this;
-		me.editWorkReport(rec.get('expenseNoteId'), {
+		me.editExpenseNote(rec.get('id'), {
 			callback: function (success, model) {
 				if (success) {
 					this.gpExpenseNote().getStore().load();
@@ -1875,7 +1897,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			}
 		});
 	},
-	editExpenseNote: function (expenseNoteId, opts) {
+	editExpenseNote: function (id, opts) {
 		opts = opts || {};
 		var me = this,
 				vw = WT.createView(me.ID, 'view.ExpenseNote', {swapReturn: true});
@@ -1885,7 +1907,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		vw.showView(function () {
 					vw.begin('edit', {
 						data: {
-							expenseNoteId: expenseNoteId
+							id: id
 						}
 					});
 				});
@@ -1895,13 +1917,13 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				sto = me.gpExpenseNote().getStore(),
 				msg;
 		if (rec) {
-			msg = me.res('act.confirm.delete', Ext.String.ellipsis(rec.get('expenseNoteId'), 40));
+			msg = me.res('act.confirm.delete', Ext.String.ellipsis(rec.get('id'), 40));
 		} else {
 			msg = me.res('gpWorkReport.confirm.delete.selection');
 		}
 		WT.confirm(msg, function (bid) {
 			if (bid === 'yes') {
-				me.deleteExpenseNote(rec.get('expenseNoteId'), {
+				me.deleteExpenseNote(rec.get('id'), {
 					callback: function (success) {
 						if (success)
 							sto.remove(rec);
@@ -1910,13 +1932,13 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			}
 		});
 	},
-	deleteExpenseNote: function (expenseNoteId, opts) {
+	deleteExpenseNote: function (id, opts) {
 		opts = opts || {};
 		var me = this;
 		WT.ajaxReq(me.ID, 'ManageExpenseNote', {
 			params: {
 				crud: 'delete',
-				reportIds: WTU.arrayAsParam(expenseNoteId)
+				ids: WTU.arrayAsParam(id)
 			},
 			callback: function (success, json) {
 				Ext.callback(opts.callback, opts.scope || me, [success, json]);
@@ -1976,6 +1998,11 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					me.getAct('timetableRequest', 'edit').setDisabled(true);
 					me.getAct('timetableRequest', 'remove').setDisabled(true);
 					me.getAct('timetableRequest', 'requestcancellation').setDisabled(false);
+					//Ma se è attiva l'approvazione automatica dei permessi per visita medica, attivo il bottone di cancellazione fisica sulla riga di visita medica e disabilito request delete
+					if(me.getVar('medicalVisitsAutomaticallyApproved') && sel.get('type') === 'M'){
+						me.getAct('timetableRequest', 'remove').setDisabled(false);
+						me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
+					}
 				}
 			}else if(sel.get("managerId") === WT.getVar('userId')){
 				//se sono l'utente loggato ad essere il supervisore
@@ -2304,6 +2331,11 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		url = WTF.processBinUrl(me.ID, 'PrintTimetableReport', {});
 		Sonicle.URLMgr.openFile(url, {filename: 'timetablereport', newWindow: true});
 	},
+	printTimetableEncoReport: function() {
+		var me = this, url;
+		url = WTF.processBinUrl(me.ID, 'PrintTimetableEncoReport', {});
+		Sonicle.URLMgr.openFile(url, {filename: 'timetableencoreport', newWindow: true});
+	},
 	reloadTimetableStamp: function (query) {
 		var me = this,
 				pars = {},
@@ -2387,6 +2419,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				me.reloadWorkReport(me.filtersWorkReport().getData());
 				break;
 			case 3:
+				me.reloadExpenseNote(me.filtersExpenseNote().getData());
 				break;
 			case 4:
 				break;

@@ -35,13 +35,18 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 	requires: [
 		'Sonicle.webtop.drm.model.ExpenseNoteDetail',
 		'Sonicle.webtop.drm.model.ExpenseNoteDetailDocument',
-		'Sonicle.webtop.drm.model.CostType'
+		'Sonicle.webtop.drm.model.CostType',
+		'WTA.ux.grid.Attachments',
+		'WTA.ux.data.SimpleSourceModel',
+		'Sonicle.Bytes',
+		'WTA.ux.UploadBar'
 	],
 	dockableConfig: {
 		title: '{expenseNoteDetail.tit}',
 		iconCls: 'wtdrm-icon-expensenote-xs',
 		width: 450,
-		height: 390
+		height: 390,
+		modal: true
 	},
 	fieldTitle: 'name',
 	modelName: 'Sonicle.webtop.drm.model.ExpenseNoteDetail',
@@ -74,6 +79,7 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 								{
 									xtype: 'datefield',
 									startDay: WT.getStartDay(),
+									format: WT.getShortDateFmt(),
 									bind: '{record.date}',
 									reference: 'flddate',
 									fieldLabel: me.mys.res('expenseNoteDetail.fld-date.lbl'),
@@ -87,8 +93,8 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 									width: 420
 								},
 								WTF.localCombo('id', 'desc', {
-									reference: 'fldmasterdata',
-									bind: '{record.masterdata}',
+									reference: 'fldcustomer',
+									bind: '{record.customerId}',
 									autoLoadOnValue: true,
 									selectOnFocus: true,
 									store: {
@@ -111,8 +117,8 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 								{
 									xtype: 'soplaceholderfield'
 								},
-								WTF.localCombo('id', 'description', {
-									bind: '{record.costType}',
+								WTF.localCombo('id', 'desc', {
+									bind: '{record.typeId}',
 									reference: 'fldcosttype',
 									autoLoadOnValue: true,
 									selectOnFocus: true,
@@ -120,33 +126,11 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 									store: {
 										autoLoad: true,
 										model: 'Sonicle.webtop.drm.model.CostType',
-										proxy: WTF.proxy(me.mys.ID, 'LookupCostTypes')
+										proxy: WTF.proxy(me.mys.ID, 'LookupCompleteCostTypes')
 									},
 									listeners: {
-										select: function (s, r) {
-											me.lref('fldkm').setHidden(true);
-											me.lref('fldkm').setValue(null);
-											
-											me.lref('fldwithothers').setHidden(true);
-											me.lref('fldwithothers').setValue(null);	
-											
-											if(me.lref('fldcurrency').getValue() === me.mys.getVar('expenseNoteDefaultCurrency')){
-												me.lref('cntTot').setHidden(true);
-												
-												me.lref('fldchange').setReadOnly(true);
-												me.lref('fldchange').setValue(1);
-											}else{
-												me.lref('fldchange').setReadOnly(false);
-											}
-											
-											if(r.get('withOthers') === true)
-												me.lref('fldwithothers').setHidden(false);
-											if(r.get('km') === true)
-												me.lref('fldkm').setHidden(false);
-											if(r.get('exchange') === true){
-												me.lref('cntTot').setHidden(false);
-												me.lref('fldchange').setReadOnly(false);
-											}
+										select: function(t, r){
+											me.manageFieldByCostType(r);
 										}
 									},
 									fieldLabel: me.mys.res('expenseNoteDetail.fld-costtype.lbl'),
@@ -275,8 +259,8 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 											width: 85
 										},
 										WTF.localCombo('id', 'desc', {
-											reference: 'fldCurrencyCostDoc',
-											bind: '{record.currencyCostDoc}',
+											reference: 'fldCurrencyDoc',
+											bind: '{record.currencyDoc}',
 											autoLoadOnValue: true,
 											readOnly: true,
 											store: Ext.create('Sonicle.webtop.drm.store.Currency', {
@@ -304,13 +288,13 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 									items: [
 										{
 											xtype: 'checkbox',
-											bind: '{record.businessPayment}',
-											boxLabel: me.mys.res('expenseNoteDetail.fld-businesspayment.lbl'),
+											bind: '{record.paymentCompany}',
+											boxLabel: me.mys.res('expenseNoteDetail.fld-paymentcompany.lbl'),
 											boxLabelAlign: 'before'
 										},
 										{
 											xtype: 'checkbox',
-											bind: '{record.reinvoice}',
+											bind: '{record.invoice}',
 											boxLabel: me.mys.res('expenseNoteDetail.fld-reinvoice.lbl'),
 											boxLabelAlign: 'before'
 										}
@@ -321,74 +305,44 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 					]
 				},
 				{
+					xtype: 'wtattachmentsgrid',
+					hidden: true,
 					title: me.mys.res('expenseNoteDetail.tab.documents.tit'),
-					xtype: 'grid',
-					id: gpId,
-					reference: 'gpDocuments',
 					bind: {
 						store: '{record.detailDocuments}'
 					},
-					selModel: {
-						type: 'checkboxmodel',
-						mode: 'MULTI'
-					},
-					columns: [
-						{
-							xtype: 'solinkcolumn',
-							dataIndex: 'fileName',
-							header: me.mys.res('gpExpenseNoteDetailDocument.filename.lbl'),
-							tdCls: 'wt-theme-text-lnk',
-							flex: 3,
-							listeners: {
-								linkclick: function (s, idx, rec) {
-									me.downloadAttachment([rec.getId()]);
-								}
-							}
-						}, {
-							xtype: 'sobytescolumn',
-							dataIndex: 'size',
-							header: me.mys.res('gpExpenseNoteDetailDocument.size.lbl'),
-							flex: 1
-						}
-					],
-					tbar: [
-						me.getAct('downloadDetailDocument'),
-						me.getAct('openDetailDocument'),
-						me.getAct('deleteDetailDocument')
-					],
-					bbar: {
-						xtype: 'wtuploadbar',
-						sid: me.mys.ID,
-						uploadContext: 'UploadExpenseNoteDocument',
-						listeners: {
-							fileuploaded: function (s, file, json) {
-								me.addDocument(json.data.uploadId, file);
-							}
-						}
-					},
+					sid: me.mys.ID,
+					uploadContext: 'ExpenseNoteDetailDocument',
+					uploadTag: WT.uiid(me.getId()),
+					dropElementId: me.getId(),
+					typeField: 'ext',
 					listeners: {
-						rowcontextmenu: function (s, rec, itm, i, e) {
-							var sm = s.getSelectionModel();
-							sm.select(rec);
-							WT.showContextMenu(e, me.getRef('cxmGridDocument'), {
-								file: rec
-							});
+						attachmentlinkclick: function(s, rec) {
+							me.openAttachmentUI(rec, false);
 						},
-						select: function (s, rec, i, e) {
-							me.updateDisabled('downloadDetailDocument');
-							me.updateDisabled('openDetailDocument');
-							me.updateDisabled('deleteDetailDocument');
+						attachmentdownloadclick: function(s, rec) {
+							me.openAttachmentUI(rec, true);
+						},
+						attachmentdeleteclick: function(s, rec) {
+							s.getStore().remove(rec);
+						},
+						attachmentuploaded: function(s, uploadId, file) {
+							var sto = s.getStore();
+							sto.add(sto.createModel({
+								name: file.name,
+								size: file.size,
+								_uplId: uploadId
+							}));
+							me.getComponent(0).getLayout().setActiveItem(s);
 						}
-					},
-					plugins: [{
-						ptype: 'sofiledrop',
-						text: WT.res('sofiledrop.text')
-					}]
+					}
 				}
 			]
 		});
 		
+		me.on('viewinvalid', me.onViewInvalid);
 		me.on('viewload', me.onViewLoad);
+		me.on('viewclose', me.onViewClose);
 	},
 	
 	onViewLoad: function(s, success) {
@@ -396,10 +350,107 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 		var me = this,
 				mo = me.getModel();
 		
-		mo.set('currencyCostDoc', me.mys.getVar('expenseNoteDefaultCurrency'));
+		mo.set('currencyDoc', me.mys.getVar('expenseNoteDefaultCurrency'));
 		
 		if(me.isMode(me.MODE_NEW)) {
 			mo.set('currency', me.mys.getVar('expenseNoteDefaultCurrency'));
+		} else if(me.isMode(me.MODE_EDIT)) {
+			WT.ajaxReq(me.mys.ID, 'GetCostType', {
+				params: {
+					typeId: mo.get('typeId')
+				},
+				callback: function (success, json) {
+					if(success) me.manageFieldByCostTypeInEditing(json.data);
+				}
+			});
+		}
+	},
+	
+	onViewClose: function(s) {
+		s.mys.cleanupUploadedFiles(WT.uiid(s.getId()));
+	},
+	
+	onViewInvalid: function (s, mo, errs) {
+		var me = this;
+		WTU.updateFieldsErrors(me.lref('mainForm'), errs);
+	},
+	
+	
+	openAttachmentUI: function(rec, download) {
+		var me = this,
+				name = rec.get('name'),
+				uploadId = rec.get('_uplId'),
+				url;
+		
+		if (!Ext.isEmpty(uploadId)) {
+			url = WTF.processBinUrl(me.mys.ID, 'DownloadExpenseNoteDetailDocument', {
+				inline: !download,
+				uploadId: uploadId
+			});
+		} else {
+			url = WTF.processBinUrl(me.mys.ID, 'DownloadExpenseNoteDetailDocument', {
+				inline: !download,
+				eNDId: me.getModel().getId(),
+				attachmentId: rec.get('id')
+			});
+		}
+		if (download) {
+			Sonicle.URLMgr.downloadFile(url, {filename: name});
+		} else {
+			Sonicle.URLMgr.openFile(url, {filename: name});
+		}
+	},
+	
+	manageFieldByCostType: function(r) {
+		var me = this;
+		
+		me.lref('fldkm').setHidden(true);
+		me.lref('fldwithothers').setHidden(true);
+		
+		me.lref('fldkm').setValue(null);
+		me.lref('fldwithothers').setValue(null);
+		
+		if(me.lref('fldcurrency').getValue() === me.mys.getVar('expenseNoteDefaultCurrency')){
+			me.lref('cntTot').setHidden(true);
+
+			me.lref('fldchange').setReadOnly(true);
+			me.lref('fldchange').setValue(1);
+		}else{
+			me.lref('fldchange').setReadOnly(false);
+		}
+
+		if(r.get('withOthers') === true)
+			me.lref('fldwithothers').setHidden(false);
+		if(r.get('km') === true)
+			me.lref('fldkm').setHidden(false);
+		if(r.get('exchange') === true){
+			me.lref('cntTot').setHidden(false);
+			me.lref('fldchange').setReadOnly(false);
+		}
+	},
+	
+	manageFieldByCostTypeInEditing: function(r) {
+		var me = this;
+		
+		me.lref('fldkm').setHidden(true);
+		me.lref('fldwithothers').setHidden(true);
+		
+		if(me.lref('fldcurrency').getValue() === me.mys.getVar('expenseNoteDefaultCurrency')){
+			me.lref('cntTot').setHidden(true);
+
+			me.lref('fldchange').setReadOnly(true);
+			me.lref('fldchange').setValue(1);
+		}else{
+			me.lref('fldchange').setReadOnly(false);
+		}
+
+		if(r.withOthers === true)
+			me.lref('fldwithothers').setHidden(false);
+		if(r.km === true)
+			me.lref('fldkm').setHidden(false);
+		if(r.exchange === true){
+			me.lref('cntTot').setHidden(false);
+			me.lref('fldchange').setReadOnly(false);
 		}
 	}
 });

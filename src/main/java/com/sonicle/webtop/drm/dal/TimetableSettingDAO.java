@@ -105,6 +105,7 @@ public class TimetableSettingDAO extends BaseDAO {
 				.set(TIMETABLE_SETTINGS.REQUESTS_PERMITS_CONTRACTUALS, item.getRequestsPermitsContractuals())
 				.set(TIMETABLE_SETTINGS.COMPANY_EXIT, item.getCompanyExit())
 				.set(TIMETABLE_SETTINGS.MANAGE_STAMP, item.getManageStamp())
+				.set(TIMETABLE_SETTINGS.MEDICAL_VISITS_AUTOMATICALLY_APPROVED, item.getMedicalVisitsAutomaticallyApproved())
 				.where(
 						TIMETABLE_SETTINGS.TIMETABLE_SETTING_ID.equal(item.getTimetableSettingId())
 				)

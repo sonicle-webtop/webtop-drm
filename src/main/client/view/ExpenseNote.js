@@ -34,6 +34,7 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 	extend: 'WTA.sdk.ModelView',
 	requires: [
 		'Sonicle.webtop.drm.model.ExpenseNote',
+		'WTA.ux.grid.Attachments',
 		'WTA.ux.data.SimpleSourceModel',
 		'Sonicle.Bytes',
 		'WTA.ux.UploadBar'
@@ -56,6 +57,8 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 				WTF.localCombo('id', 'desc', {
 					reference: 'flduser',
 					bind: '{record.operatorId}',
+					anyMatch: true,
+					selectOnFocus: true,
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -63,10 +66,6 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 						listeners: {
 							load: function (s) {
 								if (me.isMode('new')) {
-									var meta = s.getProxy().getReader().metaData;
-									if (meta.selected) {
-										me.lookupReference('flduser').setValue(meta.selected);
-									}
 									if (s.loadCount === 1) {
 										me.lref('fldcompany').getStore().load();
 									}
@@ -79,7 +78,9 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 							me.lref('fldcompany').getStore().load();
 						}
 					},
-					fieldLabel: me.mys.res('expenseNote.fld-operator.lbl')
+					fieldLabel: me.mys.res('expenseNote.fld-operator.lbl'),
+					allowBlank: false,
+					readOnly: true
 				})
 			]
 		});
@@ -110,6 +111,8 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 							items: [
 								{
 									xtype: 'wtform',
+									reference: 'mainForm1',
+									modelValidation: true,
 									items: [
 										WTF.localCombo('id', 'desc', {
 											reference: 'fldcompany',
@@ -142,6 +145,7 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 										{
 											xtype: 'datefield',
 											startDay: WT.getStartDay(),
+											format: WT.getShortDateFmt(),
 											reference: 'fldfromdate',
 											bind: '{record.fromDate}',
 											fieldLabel: me.mys.res('expenseNote.fld-fromDate.lbl'),
@@ -155,10 +159,11 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 											},
 											items: [
 												{
-													xtype: 'textfield',
+													xtype: 'numberfield',
 													reference: 'fldtotcurrency',
 													bind: '{record.totCurrency}',
 													fieldLabel: me.mys.res('expenseNote.fld-totCurrency.lbl'),
+													readOnly: true,
 													width: '285px'
 												},
 												WTF.localCombo('id', 'desc', {
@@ -176,6 +181,8 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 								},
 								{
 									xtype: 'wtform',
+									reference: 'mainForm2',
+									modelValidation: true,
 									items: [
 										{
 											xtype: 'textfield',
@@ -209,104 +216,145 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 						{
 							xtype: 'grid',
 							reference: 'gpExpenseNoteDetail',
+							modelValidation: true,
 							title: me.mys.res('expenseNote.tab.detail.tit'),
+							bind: {
+								store: '{record.details}'
+							},
 							iconCls: '',
 							border: true,
 							flex: 2,
-							store: null,
 							columns: [
-								{text: me.mys.res('gpExpenseNoteDetail.date.lbl'), dataIndex: 'date', flex: 1},
-								{text: me.mys.res('gpExpenseNoteDetail.description.lbl'), dataIndex: 'description', flex: 2},
-								{text: me.mys.res('gpExpenseNoteDetail.customer.lbl'), dataIndex: 'customer', flex: 2},
-								{text: me.mys.res('gpExpenseNoteDetail.typeofcost.lbl'), dataIndex: 'typeOfCost', flex: 2},
-								{text: me.mys.res('gpExpenseNoteDetail.otherspresent.lbl'), dataIndex: 'othersPresent', flex: 1},
-								{text: me.mys.res('gpExpenseNoteDetail.total.lbl'), dataIndex: 'total', flex: 1},
-								{text: me.mys.res('gpExpenseNoteDetail.currency.lbl'), dataIndex: 'currency', flex: 1},
-								{text: me.mys.res('gpExpenseNoteDetail.documenttotal.lbl'), dataIndex: 'documentTotal', flex: 1},
-								{text: me.mys.res('gpExpenseNoteDetail.businesspayment.lbl'), dataIndex: 'businessPayment', flex: 1},
-								{text: me.mys.res('gpExpenseNoteDetail.invoice.lbl'), dataIndex: 'invoice', flex: 1},
-								{text: me.mys.res('gpExpenseNoteDetail.invoicenumber.lbl'), dataIndex: 'invoiceNumber', flex: 1},
-								{text: me.mys.res('gpExpenseNoteDetail.totalexceeded.lbl'), dataIndex: 'totalExceeded', flex: 1}
+								{
+									dataIndex: 'date', 
+									xtype: 'datecolumn',
+									format: 'd/m/Y',
+									header: me.mys.res('gpExpenseNoteDetail.date.lbl'), 
+									flex: 1
+								},
+								{
+									dataIndex: 'description', 
+									header: me.mys.res('gpExpenseNoteDetail.description.lbl'),
+									flex: 2
+								},
+								{
+									xtype: 'solookupcolumn',
+									dataIndex: 'customerId',
+									store: {
+										autoLoad: true,
+										model: 'WTA.model.Simple',
+										proxy: WTF.proxy(WT.ID, 'LookupCustomersSuppliers')
+									},
+									header: me.mys.res('gpExpenseNoteDetail.customer.lbl'), 
+									displayField: 'desc',
+									flex: 2
+								},
+								{
+									xtype: 'solookupcolumn',
+									dataIndex: 'typeId', 
+									store: {
+										autoLoad: true,
+										model: 'WTA.model.Simple',
+										proxy:  WTF.proxy(me.mys.ID, 'LookupCostTypes')
+									},
+									header: me.mys.res('gpExpenseNoteDetail.typeofcost.lbl'), 
+									displayField: 'desc',
+									flex: 2
+								},
+								{
+									dataIndex: 'withOthers', 
+									header: me.mys.res('gpExpenseNoteDetail.otherspresent.lbl'), 
+									flex: 1
+								},
+								{
+									dataIndex: 'total', 
+									header: me.mys.res('gpExpenseNoteDetail.total.lbl'), 
+									flex: 1
+								},
+								{
+									dataIndex: 'currency', 
+									header: me.mys.res('gpExpenseNoteDetail.currency.lbl'),
+									flex: 1
+								},
+								{
+									dataIndex: 'totalDoc', 
+									header: me.mys.res('gpExpenseNoteDetail.documenttotal.lbl'), 
+									flex: 1
+								},
+								{
+									xtype: 'checkcolumn',
+									dataIndex: 'paymentCompany', 
+									header: me.mys.res('gpExpenseNoteDetail.paymentcompany.lbl'), 
+									flex: 1
+								},
+								{
+									xtype: 'checkcolumn',
+									dataIndex: 'invoice',
+									header: me.mys.res('gpExpenseNoteDetail.invoice.lbl'),
+									flex: 1
+								},
+								{
+									dataIndex: 'invoiceNumber', 
+									header: me.mys.res('gpExpenseNoteDetail.invoicenumber.lbl'),
+									flex: 1
+								}
 							],
 							tbar: [
 								me.getAct('expenseNoteDetail', 'add'),
 								me.getAct('expenseNoteDetail', 'remove'),
 								'-',
 								me.getAct('expenseNoteDetail', 'edit')
-							]
+							],
+							listeners: {
+								rowclick: function (s, rec) {
+									me.getAct('expenseNoteDetail', 'edit').setDisabled(false);
+									me.getAct('expenseNoteDetail', 'remove').setDisabled(false);
+								},
+								rowdblclick: function (s, rec) {
+									me.editExpenseNoteDetailUI(rec);
+								}
+							}
 						}
 					]
 				},
 				{
+					xtype: 'wtattachmentsgrid',
 					title: me.mys.res('expenseNote.tab.documents.tit'),
-					xtype: 'grid',
-					id: gpId,
-					reference: 'gpDocuments',
 					bind: {
 						store: '{record.documents}'
 					},
-					selModel: {
-						type: 'checkboxmodel',
-						mode: 'MULTI'
-					},
-					columns: [
-						{
-							xtype: 'solinkcolumn',
-							dataIndex: 'fileName',
-							header: me.mys.res('gpExpenseNoteDocument.filename.lbl'),
-							tdCls: 'wt-theme-text-lnk',
-							flex: 3,
-							listeners: {
-								linkclick: function (s, idx, rec) {
-									me.downloadAttachment([rec.getId()]);
-								}
-							}
-						}, {
-							xtype: 'sobytescolumn',
-							dataIndex: 'size',
-							header: me.mys.res('gpExpenseNoteDocument.size.lbl'),
-							flex: 1
-						}
-					],
-					tbar: [
-						me.getAct('downloadDocument'),
-						me.getAct('openDocument'),
-						me.getAct('deleteDocument')
-					],
-					bbar: {
-						xtype: 'wtuploadbar',
-						sid: me.mys.ID,
-						uploadContext: 'UploadExpenseNoteDocument',
-						dropElement: gpId,
-						listeners: {
-							fileuploaded: function (s, file, json) {
-								me.addDocument(json.data.uploadId, file);
-							}
-						}
-					},
+					sid: me.mys.ID,
+					uploadContext: 'ExpenseNoteDocument',
+					uploadTag: WT.uiid(me.getId()),
+					dropElementId: me.getId(),
+					typeField: 'ext',
 					listeners: {
-						rowcontextmenu: function (s, rec, itm, i, e) {
-							var sm = s.getSelectionModel();
-							sm.select(rec);
-							WT.showContextMenu(e, me.getRef('cxmGridDocument'), {
-								file: rec
-							});
+						attachmentlinkclick: function(s, rec) {
+							me.openAttachmentUI(rec, false);
 						},
-						select: function (s, rec, i, e) {
-							me.updateDisabled('downloadDocument');
-							me.updateDisabled('openDocument');
-							me.updateDisabled('deleteDocument');
+						attachmentdownloadclick: function(s, rec) {
+							me.openAttachmentUI(rec, true);
+						},
+						attachmentdeleteclick: function(s, rec) {
+							s.getStore().remove(rec);
+						},
+						attachmentuploaded: function(s, uploadId, file) {
+							var sto = s.getStore();
+							sto.add(sto.createModel({
+								name: file.name,
+								size: file.size,
+								_uplId: uploadId
+							}));
+							me.getComponent(0).getLayout().setActiveItem(s);
 						}
-					},
-					plugins: [{
-						ptype: 'sofiledrop',
-						text: WT.res('sofiledrop.text')
-					}]
+					}
 				}
 			]
 		});
 		
+		me.on('viewinvalid', me.onViewInvalid);
 		me.on('viewload', me.onViewLoad);
+		me.on('viewclose', me.onViewClose);
 	},
 	
 	initActions: function () {
@@ -317,12 +365,8 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 			tooltip: null,
 			iconCls: 'wt-icon-add-xs',
 			handler: function () {
-				me.addExpenseNoteDetail(me.getModel().get('operatorId'), {
-					callback: function (success) {
-						if (success) {
-							me.gpExpenseNoteDetail().getStore().load();
-						}
-					}
+				me.addExpenseNoteDetail(
+					me.getModel().get('operatorId'), me.getModel().get('companyId'), {
 				});
 			}
 		});
@@ -332,7 +376,8 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 			iconCls: 'wt-icon-remove-xs',
 			disabled: true,
 			handler: function () {
-				
+				var sm = me.lref('gpExpenseNoteDetail').getSelectionModel();
+				me.deleteExpenseNoteDetail(sm.getSelection());
 			}
 		});
 		me.addAct('expenseNoteDetail', 'edit', {
@@ -341,47 +386,12 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 			iconCls: 'wt-icon-edit-xs',
 			disabled: true,
 			handler: function () {
-				
+				var sm = me.lref('gpExpenseNoteDetail').getSelectionModel();
+				me.editExpenseNoteDetailUI(
+						sm.getSelection(), {
+				});
 			}
-		});
-		
-		me.addAct('openDocument', {
-			tooltip: null,
-			iconCls: 'wtdrm-icon-openAttachment-xs',
-			disabled: true,
-			handler: function () {
-				var sel = me.getSelectedFiles();
-				if (sel.length > 0) {
-					ids = me.selectionIds(sel);
-					me.openDocuments(ids);
-				}
-			}
-		});
-		me.addAct('downloadDocument', {
-			tooltip: null,
-			iconCls: 'wtdrm-icon-downloadAttachment-xs',
-			disabled: true,
-			handler: function () {
-				var sel = me.getSelectedFiles();
-
-				if (sel.length > 0) {
-					ids = me.selectionIds(sel);
-					me.downloadDocument(ids);
-				}
-			}
-		});
-		me.addAct('deleteDocument', {
-			tooltip: null,
-			iconCls: 'wtdrm-icon-deleteAttachment-xs',
-			disabled: true,
-			handler: function () {
-				var sel = me.getSelectedFiles();
-				
-				if (sel.length > 0) {
-					me.deleteDocument(sel);
-				}
-			}
-		});
+		});		
 	},
 	
 	initCxm: function () {
@@ -398,20 +408,116 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 		}
 	},
 	
-	addExpenseNoteDetail: function (operatorId, opts) {
+	onViewInvalid: function (s, mo, errs) {
+		var me = this;
+		WTU.updateFieldsErrors(me.lref('mainForm1'), errs);
+		WTU.updateFieldsErrors(me.lref('mainForm2'), errs);
+	},
+	
+	onViewClose: function(s) {
+		s.mys.cleanupUploadedFiles(WT.uiid(s.getId()));
+	},
+	
+	openAttachmentUI: function(rec, download) {
+		var me = this,
+				name = rec.get('name'),
+				uploadId = rec.get('_uplId'),
+				url;
+		
+		if (!Ext.isEmpty(uploadId)) {
+			url = WTF.processBinUrl(me.mys.ID, 'DownloadExpenseNoteDocument', {
+				inline: !download,
+				uploadId: uploadId
+			});
+		} else {
+			url = WTF.processBinUrl(me.mys.ID, 'DownloadExpenseNoteDocument', {
+				inline: !download,
+				eNId: me.getModel().getId(),
+				attachmentId: rec.get('id')
+			});
+		}
+		if (download) {
+			Sonicle.URLMgr.downloadFile(url, {filename: name});
+		} else {
+			Sonicle.URLMgr.openFile(url, {filename: name});
+		}
+	},
+	
+	addExpenseNoteDetail: function (operatorId, companyId, opts) {
 		opts = opts || {};
 		var me = this,
 				vw = WT.createView(me.mys.ID, 'view.ExpenseNoteDetail', {swapReturn: true});
 		vw.on('viewsave', function (s, success, model) {
+			if (success) {
+				var sto = me.getModel().details();
+				sto.add(sto.createModel(model.data));
+			}
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
 		vw.showView(function () {
 					vw.begin('new', {
 						data: {
-							operatorId: operatorId
+							operatorId: operatorId,
+							companyId: companyId
 						}
 					});
 				});
+	},
+	deleteExpenseNoteDetail: function (rec) {
+		var me = this,
+				grid = me.lref('gpExpenseNoteDetail'),
+				sto = grid.getStore();
+
+		WT.confirm(WT.res('confirm.delete'), function (bid) {
+			if (bid === 'yes') {
+				sto.remove(rec);
+			}
+		}, me);
+	},
+	editExpenseNoteDetailUI: function (rec, opts) {
+		opts = opts || {};
+		var me = this,
+				vw = WT.createView(me.mys.ID, 'view.ExpenseNoteDetail', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
+			if (success) me.editExpenseNoteDetail(model.getId(), model.getData());
+		});
+		vw.showView(function () {
+					vw.begin('edit', {
+						data: me.fromToSieveExpenseNoteDetail(rec.getData())
+					});
+				});
+	},
+	editExpenseNoteDetail: function(id, data) {
+		var me = this,
+				sto = me.lref('gpExpenseNoteDetail').getStore(),
+				rec = sto.getById(id);
+		if (rec) {
+			rec.set(me.fromToSieveExpenseNoteDetail(data));
+		}
+	},
+	
+	fromToSieveExpenseNoteDetail: function(data) {
+		return {
+			id: data.id,
+			expenseNoteId: data.expenseNoteId,
+			operatorId: data.operatorId,
+			companyId: data.companyId,
+			typeId: data.typeId,
+			total: data.total,
+			date: data.date,
+			paymentCompany: data.paymentCompany,
+			invoice: data.invoice,
+			invoiceNumber: data.invoiceNumber,
+			withOthers: data.withOthers,
+			customerId: data.customerId,
+			km: data.km,
+			totalDoc: data.totalDoc,
+			currency: data.currency,
+			change: data.change,
+			currencyDoc: data.currencyDoc,
+			description: data.description,
+			detailDocuments: data.detailDocuments
+		};
 	},
 	
 	addDocument: function (uploadId, file) {

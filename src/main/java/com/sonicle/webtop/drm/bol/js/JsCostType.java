@@ -42,7 +42,7 @@ import java.math.BigDecimal;
 public class JsCostType {
 	
 	public Integer id;
-	public String description;
+	public String desc;
 	public BigDecimal maxImport;
 	public String costType;
 	public Boolean withOthers;
@@ -51,9 +51,9 @@ public class JsCostType {
 	public Boolean advancePayment;
 	public Boolean exchange;
 	
-	public JsCostType(CostType ct) {
+	public JsCostType(CostType ct){
 		this.id = ct.getId();
-		this.description = ct.getDescription();
+		this.desc = ct.getDescription();
 		this.maxImport = ct.getMaxImport();
 		this.costType = ct.getCostType();
 		this.withOthers = ct.getWithOthers();
@@ -61,22 +61,5 @@ public class JsCostType {
 		this.km = ct.getKm();
 		this.advancePayment = ct.getAdvancePayment();
 		this.exchange = ct.getExchange();
-	}
-
-	public static CostType createCostType(JsCostType js) {
-
-		CostType newCt = new CostType();
-
-		newCt.setId(js.id);
-		newCt.setDescription(js.description);
-		newCt.setMaxImport(js.maxImport);
-		newCt.setCostType(js.costType);
-		newCt.setWithOthers(js.withOthers);
-		newCt.setPerPerson(js.perPerson);
-		newCt.setKm(js.km);
-		newCt.setAdvancePayment(js.advancePayment);
-		newCt.setExchange(js.exchange);
-
-		return newCt;
 	}
 }
