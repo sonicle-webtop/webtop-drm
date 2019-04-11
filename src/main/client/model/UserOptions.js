@@ -34,7 +34,7 @@
 Ext.define('Sonicle.webtop.drm.model.UserOptions', {
 	extend: 'WTA.sdk.model.UserOptions',
 	
-	proxy: WT.optionsProxy('com.sonicle.webtop.drm'),
+	proxy: WTF.optionsProxy('com.sonicle.webtop.drm'),
 	fields: [
 		WTF.field('kmCost', 'float', true),
 		WTF.field('defaultCurrency', 'string', true)
