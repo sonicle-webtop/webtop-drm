@@ -1483,7 +1483,7 @@ public class DrmManager extends BaseManager {
 		List<OExpenseNote> oENotes = null;
 		try {
 			con = WT.getConnection(SERVICE_ID);
-			oENotes = eNDao.selectExpenseNotes(con, query);
+			oENotes = eNDao.selectExpenseNotes(con, query, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
 
 			return oENotes;
 			
@@ -1500,7 +1500,7 @@ public class DrmManager extends BaseManager {
 		List<OWorkReport> workRpts = null;
 		try {
 			con = WT.getConnection(SERVICE_ID);
-			workRpts = wrkDao.selectWorkReports(con, query);
+			workRpts = wrkDao.selectWorkReports(con, query, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
 
 			return workRpts;
 			
@@ -1547,7 +1547,7 @@ public class DrmManager extends BaseManager {
 				;
 		try {
 			con = WT.getConnection(SERVICE_ID);
-			opportunities = oDao.selectOpportunities(con, query);
+			opportunities = oDao.selectOpportunities(con, query, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
 
 			return opportunities;
 			
@@ -1565,7 +1565,7 @@ public class DrmManager extends BaseManager {
 				;
 		try {
 			con = WT.getConnection(SERVICE_ID);
-			opportunities = oDao.viewOpportunitiesAndActions(con, query);
+			opportunities = oDao.viewOpportunitiesAndActions(con, query, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
 
 			return opportunities;
 			

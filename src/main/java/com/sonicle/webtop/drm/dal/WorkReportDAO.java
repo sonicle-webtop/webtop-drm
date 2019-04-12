@@ -37,6 +37,9 @@ import com.sonicle.webtop.core.dal.DAOException;
 import com.sonicle.webtop.drm.WorkReportQuery;
 import com.sonicle.webtop.drm.bol.OWorkReport;
 import com.sonicle.webtop.drm.jooq.Sequences;
+import static com.sonicle.webtop.drm.jooq.Tables.PROFILES;
+import static com.sonicle.webtop.drm.jooq.Tables.PROFILES_MEMBERS;
+import static com.sonicle.webtop.drm.jooq.Tables.PROFILES_SUPERVISED_USERS;
 import static com.sonicle.webtop.drm.jooq.Tables.WORK_REPORTS;
 import com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord;
 import java.sql.Connection;
@@ -45,6 +48,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record1;
+import org.jooq.SelectConditionStep;
+import org.jooq.impl.DSL;
 
 /**
  *
@@ -72,10 +79,10 @@ public class WorkReportDAO extends BaseDAO {
 				.execute();
 	}
 
-	public List<OWorkReport> selectWorkReports(Connection con, WorkReportQuery query) throws DAOException {
+	public List<OWorkReport> selectWorkReports(Connection con, WorkReportQuery query, String domainId, String userId) throws DAOException {
 		DSLContext dsl = getDSL(con);
 
-		Condition searchCndt = ensureCondition(query);
+		Condition searchCndt = ensureCondition(query, domainId, userId);
 
 		return dsl
 				.select()
@@ -167,9 +174,32 @@ public class WorkReportDAO extends BaseDAO {
 		return nextID;
 	}
 
-	private Condition ensureCondition(WorkReportQuery query) {
-								
-		Condition searchCndt = WORK_REPORTS.OPERATOR_ID.equal(query.operatorId);
+	private Condition ensureCondition(WorkReportQuery query, String domainId, String userId) {
+		
+		Condition searchCndt = null;
+		
+		if(query.operatorId != null){
+			searchCndt = WORK_REPORTS.OPERATOR_ID.equal(query.operatorId);
+		}else{			
+			SelectConditionStep<Record1<String>> operators = (SelectConditionStep<Record1<String>>) DSL
+				.select(
+						PROFILES_SUPERVISED_USERS.USER_ID
+					)
+					.from(PROFILES)
+					.join(PROFILES_MEMBERS).on(
+						PROFILES.PROFILE_ID.equal(PROFILES_MEMBERS.PROFILE_ID)
+					)
+					.join(PROFILES_SUPERVISED_USERS).on(
+						PROFILES.PROFILE_ID.equal(PROFILES_SUPERVISED_USERS.PROFILE_ID)
+					)
+					.where(
+							PROFILES.DOMAIN_ID.equal(domainId)
+							.and(PROFILES_MEMBERS.USER_ID.equal(userId)
+					))
+					.union(DSL.select(DSL.inline(userId)));
+			
+			searchCndt = WORK_REPORTS.OPERATOR_ID.in(operators);
+		}
 		
 		if (query.companyId != null) {
 			searchCndt = searchCndt.and(WORK_REPORTS.COMPANY_ID.equal(query.companyId));

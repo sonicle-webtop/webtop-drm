@@ -406,6 +406,8 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 		if(me.isMode(me.MODE_NEW)) {
 			mo.set('currency', me.mys.getVar('expenseNoteDefaultCurrency'));
 		}
+		
+		if(mo.get('operatorId') === null) me.lref('flduser').setReadOnly(false);
 	},
 	
 	onViewInvalid: function (s, mo, errs) {

@@ -40,16 +40,19 @@ import com.sonicle.webtop.drm.bol.VOpportunityEntry;
 import com.sonicle.webtop.drm.jooq.Sequences;
 import static com.sonicle.webtop.drm.jooq.Tables.OPPORTUNITIES;
 import static com.sonicle.webtop.drm.jooq.Tables.OPPORTUNITY_ACTIONS;
+import static com.sonicle.webtop.drm.jooq.Tables.PROFILES;
+import static com.sonicle.webtop.drm.jooq.Tables.PROFILES_MEMBERS;
+import static com.sonicle.webtop.drm.jooq.Tables.PROFILES_SUPERVISED_USERS;
 import com.sonicle.webtop.drm.jooq.tables.records.OpportunitiesRecord;
 import java.sql.Connection;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.DatePart;
 import org.jooq.Field;
+import org.jooq.Record1;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 
 /**
@@ -74,10 +77,10 @@ public class OpportunityDAO extends BaseDAO {
 				.execute();
 	}
 
-	public List<OOpportunity> selectOpportunities(Connection con, OpportunityQuery query) throws DAOException {
+	public List<OOpportunity> selectOpportunities(Connection con, OpportunityQuery query, String domainId, String userId) throws DAOException {
 		DSLContext dsl = getDSL(con);
 
-		Condition searchCndt = ensureCondition(query, dsl);
+		Condition searchCndt = ensureCondition(query, dsl, domainId, userId);
 
 		return dsl
 				.select()
@@ -88,10 +91,10 @@ public class OpportunityDAO extends BaseDAO {
 				.fetchInto(OOpportunity.class);
 	}
 	
-	public List<VOpportunityEntry> viewOpportunitiesAndActions(Connection con, OpportunityQuery query) throws DAOException {
+	public List<VOpportunityEntry> viewOpportunitiesAndActions(Connection con, OpportunityQuery query, String domainId, String userId) throws DAOException {
 		DSLContext dsl = getDSL(con);
 
-		Condition searchCndt = ensureCondition(query, dsl);
+		Condition searchCndt = ensureCondition(query, dsl, domainId, userId);
 		
 		Field<Integer> fldOpp = DSL.val(0).as("action_id");
 		Field<Integer> fldAct = OPPORTUNITY_ACTIONS.ID.as("action_id");
@@ -247,9 +250,32 @@ public class OpportunityDAO extends BaseDAO {
 		return nextID;
 	}
 
-	private Condition ensureCondition(OpportunityQuery query, DSLContext dsl) {
-								
-		Condition searchCndt = OPPORTUNITIES.OPERATOR_ID.equal(query.operatorId);
+	private Condition ensureCondition(OpportunityQuery query, DSLContext dsl, String domainId, String userId) {
+		
+		Condition searchCndt = null;
+		
+		if(query.operatorId != null){
+			searchCndt = OPPORTUNITIES.OPERATOR_ID.equal(query.operatorId);
+		}else{			
+			SelectConditionStep<Record1<String>> operators = (SelectConditionStep<Record1<String>>) DSL
+				.select(
+						PROFILES_SUPERVISED_USERS.USER_ID
+					)
+					.from(PROFILES)
+					.join(PROFILES_MEMBERS).on(
+						PROFILES.PROFILE_ID.equal(PROFILES_MEMBERS.PROFILE_ID)
+					)
+					.join(PROFILES_SUPERVISED_USERS).on(
+						PROFILES.PROFILE_ID.equal(PROFILES_SUPERVISED_USERS.PROFILE_ID)
+					)
+					.where(
+							PROFILES.DOMAIN_ID.equal(domainId)
+							.and(PROFILES_MEMBERS.USER_ID.equal(userId)
+					))
+					.union(DSL.select(DSL.inline(userId)));
+			
+			searchCndt = OPPORTUNITIES.OPERATOR_ID.in(operators);
+		}
 		
 		if (query.companyId != null) {
 			searchCndt = searchCndt.and(OPPORTUNITIES.COMPANY_ID.equal(query.companyId));

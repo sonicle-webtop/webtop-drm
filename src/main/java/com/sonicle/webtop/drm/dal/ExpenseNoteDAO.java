@@ -38,11 +38,18 @@ import com.sonicle.webtop.drm.ExpenseNoteQuery;
 import com.sonicle.webtop.drm.bol.OExpenseNote;
 import com.sonicle.webtop.drm.jooq.Sequences;
 import static com.sonicle.webtop.drm.jooq.Tables.EXPENSE_NOTE;
+import static com.sonicle.webtop.drm.jooq.Tables.OPPORTUNITIES;
+import static com.sonicle.webtop.drm.jooq.Tables.PROFILES;
+import static com.sonicle.webtop.drm.jooq.Tables.PROFILES_MEMBERS;
+import static com.sonicle.webtop.drm.jooq.Tables.PROFILES_SUPERVISED_USERS;
 import com.sonicle.webtop.drm.jooq.tables.records.ExpenseNoteRecord;
 import java.sql.Connection;
 import java.util.List;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.SelectConditionStep;
+import org.jooq.impl.DSL;
 
 /**
  *
@@ -75,10 +82,10 @@ public class ExpenseNoteDAO extends BaseDAO {
 				.fetchOneInto(OExpenseNote.class);
 	}
 	
-	public List<OExpenseNote> selectExpenseNotes(Connection con, ExpenseNoteQuery query) throws DAOException {
+	public List<OExpenseNote> selectExpenseNotes(Connection con, ExpenseNoteQuery query, String domainId, String userId) throws DAOException {
 		DSLContext dsl = getDSL(con);
 
-		Condition searchCndt = ensureCondition(query);
+		Condition searchCndt = ensureCondition(query, domainId, userId);
 
 		return dsl
 				.select()
@@ -130,9 +137,32 @@ public class ExpenseNoteDAO extends BaseDAO {
 		return nextID;
 	}
 	
-	private Condition ensureCondition(ExpenseNoteQuery query) {
+	private Condition ensureCondition(ExpenseNoteQuery query, String domainId, String userId) {
 								
-		Condition searchCndt = EXPENSE_NOTE.OPERATOR_ID.equal(query.operatorId);
+		Condition searchCndt = null;
+		
+		if(query.operatorId != null){
+			searchCndt = EXPENSE_NOTE.OPERATOR_ID.equal(query.operatorId);
+		}else{			
+			SelectConditionStep<Record1<String>> operators = (SelectConditionStep<Record1<String>>) DSL
+				.select(
+						PROFILES_SUPERVISED_USERS.USER_ID
+					)
+					.from(PROFILES)
+					.join(PROFILES_MEMBERS).on(
+						PROFILES.PROFILE_ID.equal(PROFILES_MEMBERS.PROFILE_ID)
+					)
+					.join(PROFILES_SUPERVISED_USERS).on(
+						PROFILES.PROFILE_ID.equal(PROFILES_SUPERVISED_USERS.PROFILE_ID)
+					)
+					.where(
+							PROFILES.DOMAIN_ID.equal(domainId)
+							.and(PROFILES_MEMBERS.USER_ID.equal(userId)
+					))
+					.union(DSL.select(DSL.inline(userId)));
+			
+			searchCndt = EXPENSE_NOTE.OPERATOR_ID.in(operators);
+		}
 		
 		if (query.companyId != null) {
 			searchCndt = searchCndt.and(EXPENSE_NOTE.COMPANY_ID.equal(query.companyId));
