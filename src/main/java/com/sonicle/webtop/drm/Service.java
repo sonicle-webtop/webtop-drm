@@ -2453,6 +2453,10 @@ public class Service extends BaseService {
 			RptWorkReport rpt = new RptWorkReport(builder.build());
 			rpt.setDataSource(itemsWr);
 			
+			filename = "report"
+					+ ((null != wr.getNumber()) ? "-" + wr.getNumber() : "")
+					+ ((null != wr.getYear()) ? "-" + wr.getYear() : "");
+			
 			ServletUtils.setFileStreamHeaders(response, filename + ".pdf");
 			WT.generateReportToStream(rpt, AbstractReport.OutputType.PDF, response.getOutputStream());
 			
