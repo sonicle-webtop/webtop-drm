@@ -1057,7 +1057,7 @@ PRIMARY KEY ("expense_note_setting_id")
 CREATE TABLE "drm"."cost_types" (
 "id" int4 NOT NULL,
 "domain_id" varchar(20) NOT NULL,
-"description" varchar(30),
+"description" varchar(60),
 "max_import" numeric(15,2),
 "cost_type" varchar(1),
 "with_others" bool,
