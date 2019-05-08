@@ -750,7 +750,7 @@ public class Service extends BaseService {
 			IContactsManager contactManager = (IContactsManager) WT.getServiceManager("com.sonicle.webtop.contacts", getEnv().getProfileId());
 			categoryIds = contactManager.listCategoryIds();
 			categoryIds.addAll(contactManager.listIncomingCategoryIds());
-			ListContactsResult lcr = contactManager.listContacts(categoryIds, false, Grouping.ALPHABETIC, ShowBy.LASTNAME, pattern, page, limit, true);
+			ListContactsResult lcr = contactManager.listContacts(categoryIds, false, Grouping.ALPHABETIC, ShowBy.FIRST_LAST, pattern, page, limit, true);
 			for(ContactLookup c: lcr.items){
 				String fullName = StringUtils.isEmpty(c.getFullName(true)) ? "" : c.getFullName(true);
 				String company = StringUtils.isEmpty(c.getCompany()) ? "" : c.getCompany();
