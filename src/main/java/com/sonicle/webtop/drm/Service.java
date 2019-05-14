@@ -483,15 +483,13 @@ public class Service extends BaseService {
 	public void processLookupCustomersSuppliers(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			String operator = ServletUtils.getStringParameter(request, "operator", null);
-			List<MasterData> items = new ArrayList<>();
 			List<JsSimple> customers = new ArrayList();
 			
 			if(operator != null){
 				DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID, new UserProfileId(getEnv().getProfileId().getDomain(), operator));
 				
-				items = WT.getCoreManager().listMasterData(Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER), EnumUtils.toSerializedName(MasterData.Type.SUPPLIER)));
-				
-				for(MasterData customer : items) {
+				Map<String, MasterData> items = WT.getCoreManager().listMasterData(Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER), EnumUtils.toSerializedName(MasterData.Type.SUPPLIER)));
+				for(MasterData customer : items.values()) {
 					customers.add(new JsSimple(customer.getMasterDataId(), customer.getDescription()));
 				}
 			}
@@ -507,7 +505,6 @@ public class Service extends BaseService {
 		try {
 			String operator = ServletUtils.getStringParameter(request, "operator", null);
 			List<String> idCustomers = new ArrayList();
-			List<MasterData> items = new ArrayList<>();
 			List<JsSimple> customers = new ArrayList();
 			
 			if(operator != null){
@@ -515,12 +512,13 @@ public class Service extends BaseService {
 
 				idCustomers = manager.listCustomersByProfileUser();
 				
+				Map<String, MasterData> items = null;
 				if(idCustomers.size() > 0)
 					items = WT.getCoreManager().listMasterDataIn(idCustomers);
 				else
 					items = WT.getCoreManager().listMasterData(Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER)));
 				
-				for(MasterData customer : items) {
+				for (MasterData customer : items.values()) {
 					customers.add(new JsSimple(customer.getMasterDataId(), customer.getDescription()));
 				}
 			}
@@ -570,20 +568,20 @@ public class Service extends BaseService {
 		try {
 			DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID, new UserProfileId(getEnv().getProfileId().getDomain(), getEnv().getProfileId().getUserId()));
 			
-			List<MasterData> items = new ArrayList<>();
 			List<JsSimple> customers = new ArrayList();
 			List<String> idCustomers = new ArrayList();
 			
 			idCustomers = manager.listCustomersByProfileUser();
-				
+			
+			Map<String, MasterData> items = null;
 			if(idCustomers.size() > 0)
 				items = WT.getCoreManager().listMasterDataIn(idCustomers);
 			else
 				items = WT.getCoreManager().listMasterData(Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER)));
 			
-			items.addAll(WT.getCoreManager().listChildrenMasterData(Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER))));
+			items.putAll(WT.getCoreManager().listChildrenMasterData(Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER))));
 
-			for(MasterData customer : items) {
+			for(MasterData customer : items.values()) {
 				customers.add(new JsSimple(customer.getMasterDataId(), customer.getDescription()));
 			}
 				
@@ -753,7 +751,7 @@ public class Service extends BaseService {
 			ListContactsResult lcr = contactManager.listContacts(categoryIds, false, Grouping.ALPHABETIC, ShowBy.FIRST_LAST, pattern, page, limit, true);
 			for(ContactLookup c: lcr.items){
 				String fullName = StringUtils.isEmpty(c.getFullName(true)) ? "" : c.getFullName(true);
-				String company = StringUtils.isEmpty(c.getCompany()) ? "" : c.getCompany();
+				String company = StringUtils.isEmpty(c.getCompanyDescription()) ? "" : c.getCompanyDescription();
 				String info = (fullName.length() > 0 && company.length() > 0) ? fullName + " - " + company : fullName + company;
 				uD = WT.getUserData(c.getCategoryProfileId());
 				contacts.add(new JsSimpleSource(c.getContactId(), info, "[" + uD.getDisplayName() + " / " + c.getCategoryName() + "]"));
