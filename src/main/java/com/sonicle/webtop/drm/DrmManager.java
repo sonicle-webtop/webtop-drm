@@ -3124,6 +3124,9 @@ public class DrmManager extends BaseManager {
 				newENDet.setId(eNDetDAO.getSequence(con).intValue());
 				newENDet.setExpenseNoteId(newEn.getId());
 
+				if (newENDet.getDescription() !=null && newENDet.getDescription().trim().length() > 0)
+					WT.getCoreManager().addServiceStoreEntry(SERVICE_ID, "expenseNoteDescription", newENDet.getDescription().toUpperCase(), newENDet.getDescription());
+				
 				eNDetDAO.insert(con, newENDet);
 			}
 
@@ -3177,6 +3180,9 @@ public class DrmManager extends BaseManager {
 				oENDet.setId(eNDetDAO.getSequence(con).intValue());
 				oENDet.setExpenseNoteId(item.getId());
 
+				if (eNDet.getDescription() !=null && eNDet.getDescription().trim().length() > 0)
+					WT.getCoreManager().addServiceStoreEntry(SERVICE_ID, "expenseNoteDescription", eNDet.getDescription().toUpperCase(), eNDet.getDescription());
+				
 				eNDetDAO.insert(con, oENDet);
 			}
 
@@ -3188,6 +3194,9 @@ public class DrmManager extends BaseManager {
 				OExpenseNoteDetail oENDet = ManagerUtils.createOExpenseNoteDetail(eNDet);
 				oENDet.setExpenseNoteId(item.getId());
 
+				if (eNDet.getDescription() !=null && eNDet.getDescription().trim().length() > 0)
+					WT.getCoreManager().addServiceStoreEntry(SERVICE_ID, "expenseNoteDescription", eNDet.getDescription().toUpperCase(), eNDet.getDescription());
+				
 				eNDetDAO.update(con, oENDet);
 			}
 

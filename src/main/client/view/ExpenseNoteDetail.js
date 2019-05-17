@@ -39,7 +39,8 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 		'WTA.ux.grid.Attachments',
 		'WTA.ux.data.SimpleSourceModel',
 		'Sonicle.Bytes',
-		'WTA.ux.UploadBar'
+		'WTA.ux.UploadBar',
+		'WTA.ux.field.SuggestCombo'
 	],
 	dockableConfig: {
 		title: '{expenseNoteDetail.tit}',
@@ -53,6 +54,21 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 	initComponent: function () {
 		var me = this,
 			gpId = Ext.id(null, 'gridpanel');
+	
+		Ext.apply(me, {
+			tbar: [
+				'-',
+				me.addAct('saveAdd', {
+					text: me.mys.res('act-saveAdd.lbl'),
+					tooltip: null,
+					iconCls: 'wtdrm-icon-saveAdd-xs',
+					handler: function() {
+						me.addNewOnSave = true;
+						me.saveView(true);
+					}
+				})
+			]
+		});
 
 		me.callParent(arguments);
 
@@ -83,14 +99,18 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 									bind: '{record.date}',
 									reference: 'flddate',
 									fieldLabel: me.mys.res('expenseNoteDetail.fld-date.lbl'),
-									width: 210
+									width: 210,
+									selectOnFocus: true
 								},
 								{
-									xtype: 'textfield',
-									bind: '{record.description}',
+									xtype: 'wtsuggestcombo',
 									reference: 'flddescription',
+									bind: '{record.description}',
+									sid: me.mys.ID,
+									suggestionContext: 'expenseNoteDescription',
 									fieldLabel: me.mys.res('expenseNoteDetail.fld-description.lbl'),
-									width: 420
+									width: 420,
+									selectOnFocus: true
 								},
 								WTF.localCombo('id', 'desc', {
 									reference: 'fldcustomer',
@@ -142,7 +162,8 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 									reference: 'fldwithothers',
 									fieldLabel: me.mys.res('expenseNoteDetail.fld-withothers.lbl'),
 									width: 420,
-									hidden: true
+									hidden: true,
+									selectOnFocus: true
 								},
 								{
 									xtype: 'numberfield',
@@ -162,7 +183,8 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 											me.lref('fldtotal').setValue(tot1);
 											me.lref('fldtotaldoc').setValue(tot1*val3);
 										}
-									}
+									},
+									selectOnFocus: true
 								},
 								{
 									xtype: 'fieldcontainer',
@@ -184,7 +206,8 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 													
 													me.lref('fldtotaldoc').setValue(val1*val2);
 												}
-											}
+											},
+											selectOnFocus: true
 										},
 										WTF.localCombo('id', 'desc', {
 											reference: 'fldcurrency',
@@ -238,7 +261,8 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 													
 													me.lref('fldtotaldoc').setValue(val1*val2);
 												}
-											}
+											},
+											selectOnFocus: true
 										}
 									]
 								},
@@ -256,7 +280,8 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 											xtype: 'numberfield',
 											reference: 'fldtotaldoc',
 											bind: '{record.totalDoc}',
-											width: 85
+											width: 85,
+											selectOnFocus: true
 										},
 										WTF.localCombo('id', 'desc', {
 											reference: 'fldCurrencyDoc',
@@ -274,7 +299,8 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 									xtype: 'textfield',
 									bind: '{record.invoiceNumber}',
 									fieldLabel: me.mys.res('expenseNoteDetail.fld-invoicenumber.lbl'),
-									width: 420
+									width: 420,
+									selectOnFocus: true
 								},
 								{
 									xtype: 'fieldcontainer',
@@ -351,6 +377,9 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 				mo = me.getModel();
 		
 		mo.set('currencyDoc', me.mys.getVar('expenseNoteDefaultCurrency'));
+		
+		me.lookupReference('flddate').setMinValue(s.dateMinValue);
+		me.lookupReference('flddate').setMaxValue(s.dateMaxValue);
 		
 		if(me.isMode(me.MODE_NEW)) {
 			mo.set('currency', me.mys.getVar('expenseNoteDefaultCurrency'));

@@ -37,7 +37,8 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 		'WTA.ux.grid.Attachments',
 		'WTA.ux.data.SimpleSourceModel',
 		'Sonicle.Bytes',
-		'WTA.ux.UploadBar'
+		'WTA.ux.UploadBar',
+		'WTA.ux.field.SuggestCombo'
 	],
 	dockableConfig: {
 		title: '{expenseNote.tit}',
@@ -140,7 +141,8 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 												}
 											},
 											fieldLabel: me.mys.res('expenseNote.fld-company.lbl'),
-											width: '420px'
+											width: '420px',
+											tabIndex: 501
 										}),
 										{
 											xtype: 'datefield',
@@ -149,7 +151,9 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 											reference: 'fldfromdate',
 											bind: '{record.fromDate}',
 											fieldLabel: me.mys.res('expenseNote.fld-fromDate.lbl'),
-											width: '420px'
+											width: '420px',
+											selectOnFocus: true,
+											tabIndex: 503
 										},
 										{
 											xtype: 'fieldcontainer',
@@ -164,7 +168,9 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 													bind: '{record.totCurrency}',
 													fieldLabel: me.mys.res('expenseNote.fld-totCurrency.lbl'),
 													readOnly: true,
-													width: '285px'
+													width: '285px',
+													selectOnFocus: true,
+													tabIndex: 505
 												},
 												WTF.localCombo('id', 'desc', {
 													reference: 'fldcurrency',
@@ -173,7 +179,8 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 													store: Ext.create('Sonicle.webtop.drm.store.Currency', {
 														autoLoad: true
 													}),
-													width: '130px'
+													width: '130px',
+													tabIndex: 506
 												})
 											]
 										}
@@ -185,11 +192,15 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 									modelValidation: true,
 									items: [
 										{
-											xtype: 'textfield',
+											xtype: 'wtsuggestcombo',
 											reference: 'flddescription',
 											bind: '{record.description}',
+											sid: me.mys.ID,
+											suggestionContext: 'expenseNoteDescription',
 											fieldLabel: me.mys.res('expenseNote.fld-description.lbl'),
-											width: '420px'
+											width: '420px',
+											selectOnFocus: true,
+											tabIndex: 502
 										},
 										{
 											xtype: 'datefield',
@@ -197,7 +208,9 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 											reference: 'fldtodate',
 											bind: '{record.toDate}',
 											fieldLabel: me.mys.res('expenseNote.fld-toDate.lbl'),
-											width: '420px'
+											width: '420px',
+											selectOnFocus: true,
+											tabIndex: 504
 										},
 										WTF.lookupCombo('id', 'desc', {
 											reference: 'fldstatus',
@@ -206,8 +219,8 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 												autoLoad: true
 											}),
 											fieldLabel: me.mys.res('expenseNote.fld-status.lbl'),
-											width: '420px'
-
+											width: '420px',
+											tabIndex: 507
 										})
 									]
 								}
@@ -366,7 +379,9 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 			iconCls: 'wt-icon-add-xs',
 			handler: function () {
 				me.addExpenseNoteDetail(
-					me.getModel().get('operatorId'), me.getModel().get('companyId'), {
+					me.getModel().get('operatorId'), me.getModel().get('companyId'), me.getModel().get('fromDate'), me.getModel().get('toDate'), {
+						callback: function(){
+						}
 				});
 			}
 		});
@@ -445,25 +460,85 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 		}
 	},
 	
-	addExpenseNoteDetail: function (operatorId, companyId, opts) {
+	calculateTotal: function () {
+		var me = this,
+				totCurrency = 0;
+		
+		me.getModel().details().getData().items.forEach(function(element) {
+			totCurrency += element.data.totalDoc;
+		});
+		
+		me.getModel().set('totCurrency', totCurrency);
+	},
+	
+	addNewOnSave: function (model, fromDate, toDate, opts) {
 		opts = opts || {};
 		var me = this,
-				vw = WT.createView(me.mys.ID, 'view.ExpenseNoteDetail', {swapReturn: true});
+				vw = WT.createView(me.mys.ID, 'view.ExpenseNoteDetail', {
+				swapReturn: true,
+				viewCfg: {
+					dateMinValue: fromDate,
+					dateMaxValue: toDate
+				}
+		});
 		vw.on('viewsave', function (s, success, model) {
 			if (success) {
 				var sto = me.getModel().details();
 				sto.add(sto.createModel(model.data));
+				if(s.addNewOnSave) me.addNewOnSave(model, fromDate, toDate, opts);
+				
+				me.calculateTotal();
 			}
-			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+			Ext.callback(opts.callback, opts.scope || me, [success, model, s.addNewOnSave]);
 		});
 		vw.showView(function () {
 					vw.begin('new', {
 						data: {
-							operatorId: operatorId,
-							companyId: companyId
+							operatorId: model.get('operatorId'),
+							companyId: model.get('companyId'),
+							date: model.get('date'),
+							description: model.get('description'),
+							customerId: model.get('customerId')
 						}
 					});
 				});
+	},
+	addExpenseNoteDetail: function (operatorId, companyId, fromDate, toDate, opts) {
+		opts = opts || {};
+		var me = this,
+				vw = WT.createView(me.mys.ID, 'view.ExpenseNoteDetail', {
+					swapReturn: true,
+					viewCfg: {
+						dateMinValue: fromDate,
+						dateMaxValue: toDate
+					}
+		});
+		vw.on('viewsave', function (s, success, model) {
+			if (success) {
+				var sto = me.getModel().details();
+				sto.add(sto.createModel(model.data));
+				if(s.addNewOnSave) me.addNewOnSave(model, fromDate, toDate, opts);
+				
+				me.calculateTotal();
+			}
+			Ext.callback(opts.callback, opts.scope || me, [success, model, s.addNewOnSave]);
+		});
+		
+		var dates=[];
+		dates.push(fromDate);
+		me.getModel().details().getData().items.forEach(function(element) {
+			dates.push(element.data.date);
+		});
+		
+		vw.showView(function () {
+					vw.begin('new', {
+						data: {
+							operatorId: operatorId,
+							companyId: companyId,
+							date: new Date(Math.max.apply(null,dates))
+						}
+					});
+				});		
 	},
 	deleteExpenseNoteDetail: function (rec) {
 		var me = this,
@@ -473,15 +548,28 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 		WT.confirm(WT.res('confirm.delete'), function (bid) {
 			if (bid === 'yes') {
 				sto.remove(rec);
+				
+				me.calculateTotal();
 			}
 		}, me);
 	},
 	editExpenseNoteDetailUI: function (rec, opts) {
 		opts = opts || {};
 		var me = this,
-				vw = WT.createView(me.mys.ID, 'view.ExpenseNoteDetail', {swapReturn: true});
+				vw = WT.createView(me.mys.ID, 'view.ExpenseNoteDetail', {
+					swapReturn: true,
+					viewCfg: {
+						dateMinValue: me.getModel().get('fromDate'),
+						dateMaxValue: me.getModel().get('toDate')
+					}
+				});
 		vw.on('viewsave', function (s, success, model) {
-			if (success) me.editExpenseNoteDetail(model.getId(), model.getData());
+			if (success){
+				me.editExpenseNoteDetail(model.getId(), model.getData());
+				if(s.addNewOnSave) me.addNewOnSave(model, me.getModel().get('fromDate'),  me.getModel().get('toDate'), opts);
+				
+				me.calculateTotal();
+			} 
 		});
 		vw.showView(function () {
 					vw.begin('edit', {

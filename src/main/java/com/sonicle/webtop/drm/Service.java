@@ -1670,6 +1670,11 @@ public class Service extends BaseService {
 					eN.getDocuments().add(doc);
 				}
 				
+				//Save description for suggestions
+				if (eN.getDescription() !=null && eN.getDescription().trim().length() > 0)
+					WT.getCoreManager().addServiceStoreEntry(SERVICE_ID, "expenseNoteDescription", eN.getDescription().toUpperCase(), eN.getDescription());
+
+				
 				manager.addExpenseNote(eN);
 
 				new JsonResult().printTo(out);
@@ -1697,6 +1702,9 @@ public class Service extends BaseService {
 						eN.getDocuments().add(doc);
 					}
 				}
+				
+				if (eN.getDescription() !=null && eN.getDescription().trim().length() > 0)
+					WT.getCoreManager().addServiceStoreEntry(SERVICE_ID, "expenseNoteDescription", eN.getDescription().toUpperCase(), eN.getDescription());
 				
 				manager.updateExpenseNote(eN);
 

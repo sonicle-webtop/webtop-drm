@@ -44,8 +44,8 @@ Ext.define('Sonicle.webtop.drm.model.ExpenseNoteDetail', {
 			defaultValue: 0
 		}),
 		WTF.field('date', 'date', false, {dateFormat: 'Y-m-d', defaultValue: new Date()}),
-		WTF.field('paymentCompany', 'string', true),
-		WTF.field('invoice', 'string', true),
+		WTF.field('paymentCompany', 'bool', true),
+		WTF.field('invoice', 'bool', true),
 		WTF.field('invoiceNumber', 'string', true),
 		WTF.field('withOthers', 'string', true),
 		WTF.field('customerId', 'string', false),
