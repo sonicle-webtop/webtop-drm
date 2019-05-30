@@ -187,6 +187,7 @@ import com.sonicle.webtop.drm.bol.js.JsExpenseNote;
 import com.sonicle.webtop.drm.bol.js.JsExpenseNoteSetting;
 import com.sonicle.webtop.drm.bol.js.JsFilter;
 import com.sonicle.webtop.drm.bol.js.JsGridExpenseNote;
+import com.sonicle.webtop.drm.bol.model.RBExpenseNote;
 import com.sonicle.webtop.drm.bol.model.RBTimetableEncoReport;
 import com.sonicle.webtop.drm.bol.model.RBWorkReportSummary;
 import com.sonicle.webtop.drm.model.CostType;
@@ -197,6 +198,7 @@ import com.sonicle.webtop.drm.model.ExpenseNoteDocumentWithBytes;
 import com.sonicle.webtop.drm.model.ExpenseNoteDocumentWithStream;
 import com.sonicle.webtop.drm.model.ExpenseNoteSetting;
 import com.sonicle.webtop.drm.model.WorkReportSummary;
+import com.sonicle.webtop.drm.rpt.RptExpenseNote;
 import com.sonicle.webtop.drm.rpt.RptWorkReportSummary;
 import java.awt.Image;
 import java.math.BigDecimal;
@@ -2431,6 +2433,43 @@ public class Service extends BaseService {
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action ManageTimetableRequestCancellation", ex);
+		}
+	}
+	
+	public void processPrintExpenseNote(HttpServletRequest request, HttpServletResponse response) {
+		ArrayList<RBExpenseNote> itemsEn = new ArrayList<>();
+		
+		try {
+			
+			String filename = ServletUtils.getStringParameter(request, "filename", "print");
+			IntegerArray ids = ServletUtils.getObjectParameter(request, "ids", IntegerArray.class, true);
+			
+			ExpenseNote en = null;
+			CompanyPicture picture = null;
+			Company company = null;
+			
+			for(Integer id : ids) {
+				picture = null;
+				en = manager.getExpenseNote(id);
+				company = manager.getCompany(en.getCompanyId());
+				if(company.getHasPicture()) picture = manager.getCompanyPicture(company.getCompanyId());
+				itemsEn.add(new RBExpenseNote(WT.getCoreManager(), manager, en, ss, picture));
+			}
+			
+			ReportConfig.Builder builder = reportConfigBuilder();
+			RptExpenseNote rpt = new RptExpenseNote(builder.build());
+			rpt.setDataSource(itemsEn);
+			
+			filename = "expense_note"
+					+ ((null != en.getId()) ? "_" + en.getId() : "");
+			
+			ServletUtils.setFileStreamHeaders(response, filename + ".pdf");
+			WT.generateReportToStream(rpt, AbstractReport.OutputType.PDF, response.getOutputStream());
+			
+		} catch(Exception ex) {
+			logger.error("Error in action PrintExpenseNote", ex);
+			ex.printStackTrace();
+			ServletUtils.writeErrorHandlingJs(response, ex.getMessage());
 		}
 	}
 	

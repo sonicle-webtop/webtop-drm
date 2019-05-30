@@ -163,7 +163,9 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 									fieldLabel: me.mys.res('expenseNoteDetail.fld-withothers.lbl'),
 									width: 420,
 									hidden: true,
-									selectOnFocus: true
+									selectOnFocus: true,
+									autoCreate: true,
+									tooltip: me.mys.res('expenseNoteDetail.tooltip-withothers.lbl')
 								},
 								{
 									xtype: 'numberfield',

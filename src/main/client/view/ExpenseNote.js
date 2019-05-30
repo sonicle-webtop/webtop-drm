@@ -54,6 +54,14 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 		
 		Ext.apply(me, {
 			tbar: [
+				me.addAct('printExpenseNote', {
+					text: null,
+					tooltip: WT.res('act-print.lbl'),
+					iconCls: 'wt-icon-print',
+					handler: function() {
+						me.printExpenseNote(me.getModel().getId());
+					}
+				}),
 				'->',
 				WTF.localCombo('id', 'desc', {
 					reference: 'flduser',
@@ -411,6 +419,15 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 	
 	initCxm: function () {
 		var me = this;
+	},
+	
+	printExpenseNote: function(id) {
+		var me = this;
+		if(me.getModel().isDirty()) {
+			WT.warn(WT.res('warn.print.notsaved'));
+		} else {
+			me.mys.printExpenseNote([id]);
+		}
 	},
 	
 	onViewLoad: function(s, success) {
