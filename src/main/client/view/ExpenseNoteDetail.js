@@ -165,7 +165,14 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 									hidden: true,
 									selectOnFocus: true,
 									autoCreate: true,
-									tooltip: me.mys.res('expenseNoteDetail.tooltip-withothers.lbl')
+									listeners: {
+										afterrender: function(s) {
+											var tip = Ext.create('Ext.tip.ToolTip', {
+												target: s.id,
+												html: me.mys.res('expenseNoteDetail.tooltip-withothers.lbl')
+											});
+										}
+									}
 								},
 								{
 									xtype: 'numberfield',
