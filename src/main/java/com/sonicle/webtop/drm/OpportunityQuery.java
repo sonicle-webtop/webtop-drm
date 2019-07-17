@@ -44,6 +44,7 @@ public class OpportunityQuery {
 	public Integer companyId;
 	public String operatorId;
 	public LocalDate date;
+	public LocalDate toDate;
 	public String fromHour;
 	public String toHour;
 	public String executedWith;

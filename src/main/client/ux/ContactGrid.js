@@ -49,7 +49,7 @@ Ext.define('Sonicle.webtop.drm.ux.ContactGrid', {
 		var me = this;
 		
 		me.lookupStore = Ext.create('Sonicle.data.BufferedStore',{
-			autoLoad: true,
+			autoLoad: false,
 			model: 'WTA.ux.data.SimpleSourceModel',
 			proxy: WTF.proxy(me.sid, 'LookupContacts', 'data', {
 				extraParams: {
@@ -74,13 +74,19 @@ Ext.define('Sonicle.webtop.drm.ux.ContactGrid', {
 
 		if (!me.columns) {
 			me.hideHeaders = true;
-			me.columns = [{
-					xtype: 'solookupcolumn',
-					dataIndex: 'contactId',
-					store: me.lookupStore,
-					displayField: 'desc',
+			me.columns = [
+//				{
+//					xtype: 'solookupcolumn',
+//					dataIndex: 'contactId',
+//					store: me.lookupStore,
+//					displayField: 'desc',
+//					flex: 1
+//				}
+				{
+					dataIndex: 'desc',
 					flex: 1
-				}];
+				}
+			];
 
 			if (!me.actionsInToolbar) {
 				me.columns.push({
@@ -146,7 +152,7 @@ Ext.define('Sonicle.webtop.drm.ux.ContactGrid', {
 					valueField: 'id', 
 					displayField: 'desc',
 					searchField: 'desc',
-					emptyText: WT.res(me.sid, 'grid.empty'),
+					emptyText: WT.res(me.sid, 'grid.emptySearch'),
 					searchText: WT.res(me.sid, 'groupcontact.picker.search'),
 					okText: WT.res('act-ok.lbl'),
 					cancelText: WT.res('act-cancel.lbl'),

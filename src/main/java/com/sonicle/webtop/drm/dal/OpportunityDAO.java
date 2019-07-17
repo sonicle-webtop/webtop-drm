@@ -282,12 +282,21 @@ public class OpportunityDAO extends BaseDAO {
 		}
 		
 		if (query.date != null) {
-			searchCndt = searchCndt.and(OPPORTUNITIES.DATE.greaterOrEqual(query.date));
-			searchCndt = searchCndt.or(OPPORTUNITIES.ID.in(
-					dsl.select(OPPORTUNITY_ACTIONS.OPPORTUNITY_ID)
-							.from(OPPORTUNITY_ACTIONS)
-							.where(OPPORTUNITY_ACTIONS.DATE.greaterOrEqual(query.date))
-			));
+			if(query.toDate != null){
+				searchCndt = searchCndt.and(OPPORTUNITIES.DATE.between(query.date, query.toDate));
+				searchCndt = searchCndt.or(OPPORTUNITIES.ID.in(
+						dsl.select(OPPORTUNITY_ACTIONS.OPPORTUNITY_ID)
+								.from(OPPORTUNITY_ACTIONS)
+								.where(OPPORTUNITY_ACTIONS.DATE.between(query.date, query.toDate))
+				));
+			}else{
+				searchCndt = searchCndt.and(OPPORTUNITIES.DATE.greaterOrEqual(query.date));
+				searchCndt = searchCndt.or(OPPORTUNITIES.ID.in(
+						dsl.select(OPPORTUNITY_ACTIONS.OPPORTUNITY_ID)
+								.from(OPPORTUNITY_ACTIONS)
+								.where(OPPORTUNITY_ACTIONS.DATE.greaterOrEqual(query.date))
+				));
+			}
 		}
 		
 		if (!StringUtils.isEmpty(query.fromHour)) {

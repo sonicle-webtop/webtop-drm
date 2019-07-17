@@ -39,6 +39,8 @@ import com.sonicle.commons.LangUtils.CollectionChangeSet;
 import static com.sonicle.commons.LangUtils.getCollectionChanges;
 import com.sonicle.commons.PathUtils;
 import com.sonicle.commons.db.DbUtils;
+import com.sonicle.webtop.contacts.IContactsManager;
+import com.sonicle.webtop.contacts.model.Contact;
 import com.sonicle.webtop.core.CoreManager;
 import com.sonicle.webtop.core.app.WT;
 import com.sonicle.webtop.core.bol.OUser;
@@ -1582,6 +1584,7 @@ public class DrmManager extends BaseManager {
 		OpportunityActionDAO oActDAO = OpportunityActionDAO.getInstance();
 		OpportunityInterlocutorDAO oIDao = OpportunityInterlocutorDAO.getInstance();
 		OpportunityDocumentDAO oDDao = OpportunityDocumentDAO.getInstance();
+		IContactsManager contactManager = (IContactsManager) WT.getServiceManager("com.sonicle.webtop.contacts", getTargetProfileId());
 		
 		Opportunity o = null;
 		
@@ -1596,7 +1599,15 @@ public class DrmManager extends BaseManager {
 			}
 			
 			for (OOpportunityInterlocutor oInt : oIDao.selectByOpportunity(con, id)) {
-				o.getInterlocutors().add(ManagerUtils.createOpportunityInterlocutor(oInt));
+				OpportunityInterlocutor oI = ManagerUtils.createOpportunityInterlocutor(oInt);
+				Contact c = contactManager.getContact(oInt.getContactId());
+				if(c != null){
+					String fullName = StringUtils.isEmpty(c.getFullName(true)) ? "" : c.getFullName(true);
+					String company = (c.getCompany() == null) ? "" : (StringUtils.isEmpty(c.getCompany().getCompanyDescription()) ? "" : c.getCompany().getCompanyDescription());
+					String info = (fullName.length() > 0 && company.length() > 0) ? fullName + " - " + company : fullName + company;
+					oI.setDesc(info);
+				}
+				o.getInterlocutors().add(oI);
 			}
 
 			for (OOpportunityDocument oDoc : oDDao.selectByOpportunity(con, id)) {
@@ -1771,6 +1782,7 @@ public class DrmManager extends BaseManager {
 		OpportunityActionDAO oADao = OpportunityActionDAO.getInstance();
 		OpportunityActionInterlocutorDAO oAIDao = OpportunityActionInterlocutorDAO.getInstance();
 		OpportunityActionDocumentDAO oADDao = OpportunityActionDocumentDAO.getInstance();
+		IContactsManager contactManager = (IContactsManager) WT.getServiceManager("com.sonicle.webtop.contacts", getTargetProfileId());
 		
 		OpportunityAction oAct = null;
 		
@@ -1781,7 +1793,15 @@ public class DrmManager extends BaseManager {
 			oAct = ManagerUtils.createOpportunityAction(oADao.select(con, id));
 
 			for (OOpportunityActionInterlocutor oActInt : oAIDao.selectByOpportunityAction(con, oAct.getId())) {
-				oAct.getActionInterlocutors().add(ManagerUtils.createOpportunityActionInterlocutor(oActInt));
+				OpportunityActionInterlocutor oAI = ManagerUtils.createOpportunityActionInterlocutor(oActInt);
+				Contact c = contactManager.getContact(oActInt.getContactId());
+				if(c != null){
+					String fullName = StringUtils.isEmpty(c.getFullName(true)) ? "" : c.getFullName(true);
+					String company = (c.getCompany() == null) ? "" : (StringUtils.isEmpty(c.getCompany().getCompanyDescription()) ? "" : c.getCompany().getCompanyDescription());
+					String info = (fullName.length() > 0 && company.length() > 0) ? fullName + " - " + company : fullName + company;
+					oAI.setDesc(info);
+				}
+				oAct.getActionInterlocutors().add(oAI);
 			}
 
 			for (OOpportunityActionDocument oActDoc : oADDao.selectByOpportunityAction(con, oAct.getId())) {

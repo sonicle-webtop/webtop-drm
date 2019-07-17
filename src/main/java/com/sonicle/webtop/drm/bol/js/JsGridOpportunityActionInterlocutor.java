@@ -33,7 +33,6 @@
 package com.sonicle.webtop.drm.bol.js;
 
 import com.sonicle.webtop.drm.model.OpportunityActionInterlocutor;
-import com.sonicle.webtop.drm.model.OpportunityInterlocutor;
 /**
  *
  * @author lssndrvs
@@ -43,11 +42,13 @@ public class JsGridOpportunityActionInterlocutor {
 	public Integer id;
 	public Integer opportunityActionId;
 	public Integer contactId;
+	public String desc;
 
 	public JsGridOpportunityActionInterlocutor(OpportunityActionInterlocutor oAI) {
 		this.id = oAI.getId();
 		this.opportunityActionId = oAI.getOpportunityActionId();
 		this.contactId = oAI.getContactId();
+		this.desc = oAI.getDesc();
 	}
 
 	public static OpportunityActionInterlocutor createOpportunityActionInterlocutor(JsGridOpportunityActionInterlocutor js) {

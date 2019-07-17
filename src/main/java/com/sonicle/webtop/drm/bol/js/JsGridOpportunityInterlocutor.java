@@ -42,11 +42,13 @@ public class JsGridOpportunityInterlocutor {
 	public Integer id;
 	public Integer opportunityId;
 	public Integer contactId;
+	public String desc;
 
 	public JsGridOpportunityInterlocutor(OpportunityInterlocutor oI) {
 		this.id = oI.getId();
 		this.opportunityId = oI.getOpportunityId();
 		this.contactId = oI.getContactId();
+		this.desc = oI.getDesc();
 	}
 
 	public static OpportunityInterlocutor createOpportunityInterlocutor(JsGridOpportunityInterlocutor js) {

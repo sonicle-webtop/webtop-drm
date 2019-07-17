@@ -45,6 +45,7 @@ Ext.define('Sonicle.webtop.drm.ux.OpportunitySearch', {
 			operatorId: null,
 			companyId: null,
 			date: new Date(),
+			toDate: null,
 			fromHour: null,
 			toHour: null
 		}
@@ -151,7 +152,15 @@ Ext.define('Sonicle.webtop.drm.ux.OpportunitySearch', {
 					width: '420px'
 				}),
 				{
-					xtype: 'soplaceholderfield'
+					xtype: 'datefield',
+					reference: 'fldtodate',
+					bind: '{toDate}',
+					tabIndex: 104,
+					triggers: {
+						clear: WTF.clearTrigger()
+					},
+					fieldLabel: WT.res(me.sid, 'opportunity.fld-todate.lbl'),
+					width: '420px'
 				}
 			]
 		});
@@ -159,15 +168,20 @@ Ext.define('Sonicle.webtop.drm.ux.OpportunitySearch', {
 	
 	extractData: function () {
 		var me = this,
-			SoDate = Sonicle.Date;
-
-		var query = {
-			companyId: me.lookupReference('fldcompany').getValue(),
-			operatorId: me.lookupReference('flduser').getValue(),
-			date: SoDate.format(me.lookupReference('flddate').getValue(), 'Y-m-d')	
-		};
+				SoDate = Sonicle.Date;
 		
-		me.fireEvent('search', me, query);
+		if(me.lookupReference('flddate').getValue() == null){
+			WT.error(WT.res(me.sid, 'opportunity.error-fld-date.lbl'));
+		}else{
+			var query = {
+				companyId: me.lookupReference('fldcompany').getValue(),
+				operatorId: me.lookupReference('flduser').getValue(),
+				date: SoDate.format(me.lookupReference('flddate').getValue(), 'Y-m-d'),
+				toDate: SoDate.format(me.lookupReference('fldtodate').getValue(), 'Y-m-d')
+			};
+
+			me.fireEvent('search', me, query);
+		}
 	},
 	
 	getData: function () {
@@ -177,7 +191,8 @@ Ext.define('Sonicle.webtop.drm.ux.OpportunitySearch', {
 		var query = {
 			companyId: me.lookupReference('fldcompany').getValue(),
 			operatorId: me.lookupReference('flduser').getValue(),
-			date: SoDate.format(me.lookupReference('flddate').getValue(), 'Y-m-d')		
+			date: SoDate.format(me.lookupReference('flddate').getValue(), 'Y-m-d'),
+			toDate: SoDate.format(me.lookupReference('fldtodate').getValue(), 'Y-m-d')
 		};
 		
 		return query;
