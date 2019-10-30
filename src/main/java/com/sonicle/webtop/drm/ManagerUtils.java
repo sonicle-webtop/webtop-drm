@@ -43,6 +43,7 @@ import com.sonicle.webtop.drm.bol.OCompany;
 import com.sonicle.webtop.drm.bol.OCompanyPicture;
 import com.sonicle.webtop.drm.bol.OCompanyUser;
 import com.sonicle.webtop.drm.bol.OCostType;
+import com.sonicle.webtop.drm.bol.ODay;
 import com.sonicle.webtop.drm.bol.ODocStatus;
 import com.sonicle.webtop.drm.bol.ODocStatusGroup;
 import com.sonicle.webtop.drm.bol.ODrmFolder;
@@ -150,6 +151,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 import org.joda.time.Period;
+import org.jooq.Result;
 
 /**
  *

@@ -18,6 +18,7 @@ public class DrmTreeNode {
 	public static final String TIMETABLE_STAMP = "timetablestamp.tit";
 	public static final String TIMETABLE_REQUEST = "timetablerequest.tit";
 	public static final String TIMETABLE_REPORT = "timetablereport.tit";
+	public static final String TIMETABLE_SUMMARY = "timetablesummary.tit";
 	public static final String CONFIGURATION = "configuration.tit";
 
 	public static final String GRUPS = "groups.tit";

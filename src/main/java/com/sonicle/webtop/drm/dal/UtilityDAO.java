@@ -30,39 +30,39 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm;
+package com.sonicle.webtop.drm.dal;
 
-import com.sonicle.commons.web.json.JsonResult;
+import com.sonicle.webtop.core.dal.BaseDAO;
+import com.sonicle.webtop.core.dal.DAOException;
+import com.sonicle.webtop.drm.bol.ODay;
+import java.sql.Connection;
+import org.joda.time.LocalDate;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.ResultQuery;
 
 /**
  *
  * @author lssndrvs
  */
-public class TimetableReportQuery {
-
-	public Integer companyId;
-	public Integer month;
-	public Integer year;
-	public Integer fromDay;
-	public String crud;
-	public String targetUserId;
+public class UtilityDAO extends BaseDAO {
 	
-	public TimetableReportQuery() {
+	private final static UtilityDAO INSTANCE = new UtilityDAO();
+
+	public static UtilityDAO getInstance() {
+		return INSTANCE;
 	}
-
-	public static TimetableReportQuery fromJson(String value) {
-		if (value == null) {
-			return null;
-		}
-
-		return JsonResult.GSON.fromJson(value, TimetableReportQuery.class);
-	}
-
-	public static String toJson(TimetableReportQuery value) {
-		if (value == null) {
-			return null;
-		}
-
-		return JsonResult.GSON.toJson(value, TimetableReportQuery.class);
+	
+	public Result<Record> selectDaysByDateRange(Connection con, LocalDate from, LocalDate to) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		String query = "select to_char(CURRENT_DATE + i,'Day') as day_name, CURRENT_DATE + i as date "
+					 + "from generate_series(date '" + from + "'- CURRENT_DATE, date '" + to + "' - CURRENT_DATE ) i";
+		
+		ResultQuery<Record> resultQuery = dsl.resultQuery(query);
+		
+		Result<Record> result = resultQuery.fetch();
+		
+		return result;
 	}
 }

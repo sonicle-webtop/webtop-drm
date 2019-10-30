@@ -63,6 +63,8 @@ public class RBTimetableReport {
 	public Float hour;
 	public String detail;
 	public String note;
+	public String targetUserId;
+	public String targetUserDescription;
 		
 	public RBTimetableReport(CoreManager coreMgr, DrmManager drmMgr, OTimetableReport otr) throws WTException, IOException {		
 		this.id = otr.getId();
@@ -82,6 +84,8 @@ public class RBTimetableReport {
 		this.hour = convertInMinutes(otr.getHour());
 		this.detail = otr.getDetail();
 		this.note = otr.getNote();
+		this.targetUserId = otr.getTargetUserId();
+		this.targetUserDescription = WT.getUserData(new UserProfileId(otr.getDomainId(), otr.getTargetUserId())).getDisplayName();
 	}
 
 	private Float convertInMinutes(String hour){
@@ -256,5 +260,21 @@ public class RBTimetableReport {
 
 	public void setNote(String note) {
 		this.note = note;
+	}
+
+	public String getTargetUserId() {
+		return targetUserId;
+	}
+
+	public void setTargetUserId(String targetUserId) {
+		this.targetUserId = targetUserId;
+	}
+
+	public String getTargetUserDescription() {
+		return targetUserDescription;
+	}
+
+	public void setTargetUserDescription(String targetUserDescription) {
+		this.targetUserDescription = targetUserDescription;
 	}
 }

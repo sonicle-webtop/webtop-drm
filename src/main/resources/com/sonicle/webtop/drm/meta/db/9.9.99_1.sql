@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright (C) 2017 Sonicle S.r.l.
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -30,39 +30,12 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm;
-
-import com.sonicle.commons.web.json.JsonResult;
-
 /**
- *
- * @author lssndrvs
+ * Author:  lssndrvs
+ * Created: Oct 18, 2019
  */
-public class TimetableReportQuery {
 
-	public Integer companyId;
-	public Integer month;
-	public Integer year;
-	public Integer fromDay;
-	public String crud;
-	public String targetUserId;
-	
-	public TimetableReportQuery() {
-	}
+/*TRUNCATE TABLE timetable_report_temp;*/
 
-	public static TimetableReportQuery fromJson(String value) {
-		if (value == null) {
-			return null;
-		}
-
-		return JsonResult.GSON.fromJson(value, TimetableReportQuery.class);
-	}
-
-	public static String toJson(TimetableReportQuery value) {
-		if (value == null) {
-			return null;
-		}
-
-		return JsonResult.GSON.toJson(value, TimetableReportQuery.class);
-	}
-}
+ALTER TABLE "drm"."timetable_report_temp"
+ADD COLUMN "target_user_id" varchar(36);

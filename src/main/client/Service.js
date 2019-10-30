@@ -27,6 +27,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		'Sonicle.webtop.drm.model.GridTimetableRequests',
 		'Sonicle.webtop.drm.view.TimetableRequest',
 		'Sonicle.webtop.drm.ux.TimetableReportGenerate',
+		'Sonicle.webtop.drm.ux.TimetableSummaryExcel',
 		'Sonicle.webtop.drm.model.GridTimetableReport',
 		'Sonicle.webtop.drm.ux.TimetableStampSearch',
 		'Sonicle.webtop.drm.model.GridTimetableList',
@@ -82,7 +83,10 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			referenceHolder: true,
 			activeItem: 0,
 			items: [
-				{xtype: 'panel'},
+				{
+					xtype: 'panel',
+					itemId: 'empty'
+				},
 				{
 					xtype: 'container',
 					itemId: 'op',
@@ -922,7 +926,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							columns: [
 								{
 									header: me.res('gpTimetableReport.operator.lbl'),
-									dataIndex: 'user',
+									dataIndex: 'targetUser',
 									editable: false,
 									flex: 1
 								}, {
@@ -1071,6 +1075,39 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							]
 						}
 					]
+				},
+				{
+					xtype: 'container',
+					itemId: 'ttsumexcel',
+					layout: 'border',
+					items: [
+						{
+							region: 'center',
+							xtype: 'wtdrmtimetablesummaryexcel',
+							reference: 'filtersTimetableSummaryExcel',
+							title: me.res('timetableSummaryExcel.tit.lbl'),
+							iconCls: 'wtdrm-icon-timetable4-xs',
+							titleCollapse: false,
+							collapsible: false,
+							sid: me.ID,
+							listeners: {
+								generate: function(s, query){
+									if (query !== undefined){
+										WT.ajaxReq(me.ID, 'ExportTimetableSummaryExcel', {
+											params: {
+												query: Ext.JSON.encode(query)
+											},
+											callback: function (success, json) {
+												if(success){
+
+												}
+											}
+										});
+									}
+								}
+							}
+						}
+					]
 				}
 			]
 		}));
@@ -1129,6 +1166,10 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	
 	filtersTimetableReport: function () {
 		return this.getMainComponent().lookupReference('filtersTimetableReport');
+	},
+	
+	filtersTimetableSummaryExcel: function () {
+		return this.getMainComponent().lookupReference('filtersTimetableSummaryExcel');
 	},
 	
 	gpTimetableReport: function () {
