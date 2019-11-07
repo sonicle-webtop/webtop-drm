@@ -160,7 +160,7 @@ public class TimetableStampDAO extends BaseDAO{
 				.select(
 						TIMETABLE_STAMP.DOMAIN_ID, 
 						COMPANIES_USERS.COMPANY_ID,
-						TIMETABLE_STAMP.USER_ID, 
+						TIMETABLE_STAMP.USER_ID.as("target_user_id"), 
 						TIMETABLE_STAMP.ENTRANCE.as("date"),
 						workingHours.as("working_hours"),
 						detail.as("detail")

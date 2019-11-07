@@ -35,7 +35,6 @@ package com.sonicle.webtop.drm.dal;
 import com.sonicle.webtop.core.dal.BaseDAO;
 import com.sonicle.webtop.core.dal.DAOException;
 import com.sonicle.webtop.drm.bol.OProfileMember;
-import static com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_USERS;
 import static com.sonicle.webtop.drm.jooq.Tables.PROFILES_MEMBERS;
 import com.sonicle.webtop.drm.jooq.tables.records.ProfilesMembersRecord;
 import java.sql.Connection;
@@ -52,12 +51,6 @@ public class ProfileMemberDAO extends BaseDAO {
 
 	public static ProfileMemberDAO getInstance() {
 		return INSTANCE;
-	}
-
-	public Long getSequence(Connection con) throws DAOException {
-		DSLContext dsl = getDSL(con);
-		Long nextID = dsl.nextval(SEQ_PROFILES_USERS);
-		return nextID;
 	}
 
 	public List<OProfileMember> selectByProfile(Connection con, String profileId) throws DAOException {

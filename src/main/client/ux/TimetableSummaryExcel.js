@@ -30,20 +30,19 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.ux.TimetableReportGenerate', {
+Ext.define('Sonicle.webtop.drm.ux.TimetableSummaryExcel', {
 	extend: 'Ext.grid.Panel',
-	alias: 'widget.wtdrmtimetablereportgenerate',
+	alias: 'widget.wtdrmtimetablesummaryexcel',
 	layout: 'column',
 	referenceHolder: true,
 	sid: null,
 	
 	viewModel: {
 		data: {
-			targetUserId: null,
+			userId: null,
 			companyId: null,
-			month: new Date().getMonth() + 1,
-			year: new Date().getFullYear(),
-			fromDay: 1
+			from: Ext.Date.getFirstDateOfMonth(new Date()),
+			to: new Date()
 		}
 	},
 	
@@ -59,7 +58,7 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableReportGenerate', {
 			items: [
 				WTF.localCombo('id', 'desc', {
 					reference: 'flduser',
-					bind: '{targetUserId}',
+					bind: '{userId}',
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -69,7 +68,7 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableReportGenerate', {
 								if (s.loadCount === 1) {
 									var meta = s.getProxy().getReader().metaData;
 									if(meta.selected) {
-										me.getViewModel().set('targetUserId', meta.selected);
+										me.getViewModel().set('userId', meta.selected);
 										WTU.loadWithExtraParams(me.lookupReference('fldcompany').getStore(), {
 											operator: meta.selected
 										});
@@ -88,39 +87,21 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableReportGenerate', {
 					triggers: {
 						clear: WTF.clearTrigger()
 					},
-					fieldLabel: WT.res(me.sid, 'timetableReportGenerate.fld-operator.lbl'),
+					fieldLabel: WT.res(me.sid, 'timetableSummaryExcel.fld-operator.lbl'),
 					width: '420px',
 					tabIndex: 101
 				}),
 				{
-					xtype: 'fieldcontainer',
-					layout: 'hbox',
-					defaults: {
-						margin: '0 5 0 0',
-						labelWidth: 120
+					xtype: 'datefield',
+					startDay: WT.getStartDay(),
+					reference: 'fldfrom',
+					bind: '{from}',
+					tabIndex: 105,
+					triggers: {
+						clear: WTF.clearTrigger()
 					},
-					items: [
-						WTF.lookupCombo('id', 'desc', {
-							reference: 'fldmonth',
-							bind: '{month}',
-							store: Ext.create('Sonicle.webtop.drm.store.MonthStore', {
-								autoLoad: true
-							}),
-							fieldLabel: WT.res(me.sid, 'timetableReportGenerate.fld-monthyear.lbl'),
-							width: 270,
-							tabIndex: 103
-
-						}),
-						WTF.lookupCombo('year', 'year', {
-							reference: 'fldyear',
-							bind: '{year}',
-							store: Ext.create('Sonicle.webtop.drm.store.YearStore', {
-								autoLoad: true
-							}),
-							width: 145,
-							tabIndex: 104
-						})
-					]
+					fieldLabel: WT.res(me.sid, 'timetableSummaryExcel.fld-fromDate.lbl'),
+					width: '420px'
 				},
 				{
 					xtype: 'button',
@@ -159,48 +140,49 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableReportGenerate', {
 							}
 						}
 					},
-					fieldLabel: WT.res(me.sid, 'timetableReportGenerate.fld-company.lbl'),
+					fieldLabel: WT.res(me.sid, 'timetableSummaryExcel.fld-company.lbl'),
 					width: '420px',
 					tabIndex: 102
 				}),
-				 {
-                    xtype: 'numberfield',
-					reference: 'fldfromday',
-					bind: '{fromDay}',
-					allowBlank: false,
-					editable: false,
-                    minValue: 1,
-                    maxValue: 31,
-					fieldLabel: WT.res(me.sid, 'timetableReportGenerate.fld-fromday.lbl'),
-					tabIndex: 105
-                }
+				{
+					xtype: 'datefield',
+					startDay: WT.getStartDay(),
+					reference: 'fldto',
+					bind: '{to}',
+					tabIndex: 106,
+					triggers: {
+						clear: WTF.clearTrigger()
+					},
+					fieldLabel: WT.res(me.sid, 'timetableSummaryExcel.fld-toDate.lbl'),
+					width: '420px'
+				}
 			]
 		});
 	},
 	
 	extractData: function () {
-		var me = this;
+		var me = this,
+			SoDate = Sonicle.Date;
 
 		var query = {
 			companyId: me.lookupReference('fldcompany').getValue(),
-			targetUserId: me.lookupReference('flduser').getValue(),
-			month: me.lookupReference('fldmonth').getValue(),
-			year: me.lookupReference('fldyear').getValue(),
-			fromDay: me.lookupReference('fldfromday').getValue()
+			operatorId: me.lookupReference('flduser').getValue(),
+			fromDate: SoDate.format(me.lookupReference('fldfrom').getValue(), 'Y-m-d'),
+			toDate: SoDate.format(me.lookupReference('fldto').getValue(), 'Y-m-d')
 		};
 		
 		me.fireEvent('generate', me, query);
 	},
 	
 	getData: function () {
-		var me = this;
+		var me = this,
+			SoDate = Sonicle.Date;
 
 		var query = {
 			companyId: me.lookupReference('fldcompany').getValue(),
-			targetUserId: me.lookupReference('flduser').getValue(),
-			month: me.lookupReference('fldmonth').getValue(),
-			year: me.lookupReference('fldyear').getValue(),
-			fromDay: me.lookupReference('fldfromday').getValue()
+			operatorId: me.lookupReference('flduser').getValue(),
+			fromDate: SoDate.format(me.lookupReference('fldfrom').getValue(), 'Y-m-d'),
+			toDate: SoDate.format(me.lookupReference('fldto').getValue(), 'Y-m-d')
 		};
 		
 		return query;

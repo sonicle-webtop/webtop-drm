@@ -61,6 +61,7 @@ public class JsGridTimetableReport {
 	public String hour;
 	public String detail;
 	public String note;
+	public String targetUser;
 
 	public JsGridTimetableReport(OTimetableReport tr, DrmManager drmMgr) throws WTException {
 		this.id = tr.getId();
@@ -79,6 +80,7 @@ public class JsGridTimetableReport {
 		this.hour = tr.getHour();
 		this.detail = tr.getDetail();
 		this.note = tr.getNote();
+		this.targetUser = WT.getUserData(new UserProfileId(tr.getDomainId(), tr.getTargetUserId())).getDisplayName();
 	}
 	
 	public static TimetableReport createTimetableReport(JsGridTimetableReport js) {

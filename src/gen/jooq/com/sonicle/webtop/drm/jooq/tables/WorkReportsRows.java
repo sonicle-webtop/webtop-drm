@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WorkReportsRows extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRowsRecord> {
 
-	private static final long serialVersionUID = -1895661401;
+	private static final long serialVersionUID = -136828949;
 
 	/**
 	 * The reference instance of <code>drm.work_reports_rows</code>
@@ -96,7 +96,7 @@ public class WorkReportsRows extends org.jooq.impl.TableImpl<com.sonicle.webtop.
 	 */
 	@Override
 	public org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRowsRecord> getPrimaryKey() {
-		return com.sonicle.webtop.drm.jooq.Keys.WORK_REPORTS_DETAILS_PKEY;
+		return com.sonicle.webtop.drm.jooq.Keys.WORK_REPORTS_ROWS_PKEY;
 	}
 
 	/**
@@ -104,7 +104,7 @@ public class WorkReportsRows extends org.jooq.impl.TableImpl<com.sonicle.webtop.
 	 */
 	@Override
 	public java.util.List<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRowsRecord>> getKeys() {
-		return java.util.Arrays.<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRowsRecord>>asList(com.sonicle.webtop.drm.jooq.Keys.WORK_REPORTS_DETAILS_PKEY);
+		return java.util.Arrays.<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRowsRecord>>asList(com.sonicle.webtop.drm.jooq.Keys.WORK_REPORTS_ROWS_PKEY);
 	}
 
 	/**

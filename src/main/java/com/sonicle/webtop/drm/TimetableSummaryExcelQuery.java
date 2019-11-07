@@ -33,36 +33,35 @@
 package com.sonicle.webtop.drm;
 
 import com.sonicle.commons.web.json.JsonResult;
+import org.joda.time.LocalDate;
 
 /**
  *
  * @author lssndrvs
  */
-public class TimetableReportQuery {
+public class TimetableSummaryExcelQuery {
 
+	public String operatorId;
 	public Integer companyId;
-	public Integer month;
-	public Integer year;
-	public Integer fromDay;
-	public String crud;
-	public String targetUserId;
-	
-	public TimetableReportQuery() {
+	public LocalDate fromDate;
+	public LocalDate toDate;
+
+	public TimetableSummaryExcelQuery() {
 	}
 
-	public static TimetableReportQuery fromJson(String value) {
+	public static TimetableSummaryExcelQuery fromJson(String value) {
 		if (value == null) {
 			return null;
 		}
 
-		return JsonResult.GSON.fromJson(value, TimetableReportQuery.class);
+		return JsonResult.GSON.fromJson(value, TimetableSummaryExcelQuery.class);
 	}
 
-	public static String toJson(TimetableReportQuery value) {
+	public static String toJson(TimetableSummaryExcelQuery value) {
 		if (value == null) {
 			return null;
 		}
 
-		return JsonResult.GSON.toJson(value, TimetableReportQuery.class);
+		return JsonResult.GSON.toJson(value, TimetableSummaryExcelQuery.class);
 	}
 }

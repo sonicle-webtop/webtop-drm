@@ -30,39 +30,45 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm;
+package com.sonicle.webtop.drm.bol;
 
-import com.sonicle.commons.web.json.JsonResult;
+import org.joda.time.LocalDate;
 
 /**
  *
  * @author lssndrvs
  */
-public class TimetableReportQuery {
-
-	public Integer companyId;
-	public Integer month;
-	public Integer year;
-	public Integer fromDay;
-	public String crud;
-	public String targetUserId;
+public class ODay {
 	
-	public TimetableReportQuery() {
+	private String dayName;
+	private LocalDate date;
+	
+	public ODay(){
+	}
+	
+	public ODay(String dayName, LocalDate date){
+		this.dayName = dayName;
+		this.date = date;
+	}
+	
+	public ODay(String dayName, Long date){
+		this.dayName = dayName;
+		this.date = new LocalDate(date);
 	}
 
-	public static TimetableReportQuery fromJson(String value) {
-		if (value == null) {
-			return null;
-		}
-
-		return JsonResult.GSON.fromJson(value, TimetableReportQuery.class);
+	public String getDayName() {
+		return dayName;
 	}
 
-	public static String toJson(TimetableReportQuery value) {
-		if (value == null) {
-			return null;
-		}
+	public void setDayName(String dayName) {
+		this.dayName = dayName;
+	}
 
-		return JsonResult.GSON.toJson(value, TimetableReportQuery.class);
+	public LocalDate getDate() {
+		return date;
+	}
+
+	public void setDate(LocalDate date) {
+		this.date = date;
 	}
 }

@@ -180,6 +180,7 @@ import com.sonicle.webtop.calendar.model.Event;
 import com.sonicle.webtop.calendar.model.EventInstance;
 import com.sonicle.webtop.calendar.model.EventKey;
 import com.sonicle.webtop.calendar.model.UpdateEventTarget;
+import com.sonicle.webtop.drm.bol.ODay;
 import com.sonicle.webtop.drm.bol.ODefaultCostType;
 import com.sonicle.webtop.drm.bol.OExpenseNote;
 import com.sonicle.webtop.drm.bol.js.JsCostType;
@@ -187,7 +188,6 @@ import com.sonicle.webtop.drm.bol.js.JsExpenseNote;
 import com.sonicle.webtop.drm.bol.js.JsExpenseNoteSetting;
 import com.sonicle.webtop.drm.bol.js.JsFilter;
 import com.sonicle.webtop.drm.bol.js.JsGridExpenseNote;
-import com.sonicle.webtop.drm.bol.model.RBExpenseNote;
 import com.sonicle.webtop.drm.bol.model.RBTimetableEncoReport;
 import com.sonicle.webtop.drm.bol.model.RBWorkReportSummary;
 import com.sonicle.webtop.drm.model.CostType;
@@ -198,14 +198,29 @@ import com.sonicle.webtop.drm.model.ExpenseNoteDocumentWithBytes;
 import com.sonicle.webtop.drm.model.ExpenseNoteDocumentWithStream;
 import com.sonicle.webtop.drm.model.ExpenseNoteSetting;
 import com.sonicle.webtop.drm.model.WorkReportSummary;
-import com.sonicle.webtop.drm.rpt.RptExpenseNote;
 import com.sonicle.webtop.drm.rpt.RptWorkReportSummary;
 import java.awt.Image;
+import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.imageio.ImageIO;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.util.CellUtil;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  *
@@ -246,6 +261,7 @@ public class Service extends BaseService {
 		prog.addSubPrograms(lookupResource(DrmTreeNode.TIMETABLE_STAMP), "wtdrm-icon-timetable1-xs");
 		prog.addSubPrograms(lookupResource(DrmTreeNode.TIMETABLE_REQUEST), "wtdrm-icon-timetable2-xs");
 		prog.addSubPrograms(lookupResource(DrmTreeNode.TIMETABLE_REPORT), "wtdrm-icon-timetable3-xs");
+		//prog.addSubPrograms(lookupResource(DrmTreeNode.TIMETABLE_SUMMARY), "wtdrm-icon-timetable4-xs");
 		programs.put(prog.getId(), prog);		
 
 		groupCategories.put(EnumUtils.toSerializedName(GroupCategory.IDENTITY), lookupResource("groupCategory.I"));
@@ -2436,43 +2452,6 @@ public class Service extends BaseService {
 		}
 	}
 	
-	public void processPrintExpenseNote(HttpServletRequest request, HttpServletResponse response) {
-		ArrayList<RBExpenseNote> itemsEn = new ArrayList<>();
-		
-		try {
-			
-			String filename = ServletUtils.getStringParameter(request, "filename", "print");
-			IntegerArray ids = ServletUtils.getObjectParameter(request, "ids", IntegerArray.class, true);
-			
-			ExpenseNote en = null;
-			CompanyPicture picture = null;
-			Company company = null;
-			
-			for(Integer id : ids) {
-				picture = null;
-				en = manager.getExpenseNote(id);
-				company = manager.getCompany(en.getCompanyId());
-				if(company.getHasPicture()) picture = manager.getCompanyPicture(company.getCompanyId());
-				itemsEn.add(new RBExpenseNote(WT.getCoreManager(), manager, en, ss, picture));
-			}
-			
-			ReportConfig.Builder builder = reportConfigBuilder();
-			RptExpenseNote rpt = new RptExpenseNote(builder.build());
-			rpt.setDataSource(itemsEn);
-			
-			filename = "expense_note"
-					+ ((null != en.getId()) ? "_" + en.getId() : "");
-			
-			ServletUtils.setFileStreamHeaders(response, filename + ".pdf");
-			WT.generateReportToStream(rpt, AbstractReport.OutputType.PDF, response.getOutputStream());
-			
-		} catch(Exception ex) {
-			logger.error("Error in action PrintExpenseNote", ex);
-			ex.printStackTrace();
-			ServletUtils.writeErrorHandlingJs(response, ex.getMessage());
-		}
-	}
-	
 	public void processPrintWorkReport(HttpServletRequest request, HttpServletResponse response) {
 		ArrayList<RBWorkReport> itemsWr = new ArrayList<>();
 		
@@ -2849,6 +2828,115 @@ public class Service extends BaseService {
 		}
 	}
 	
+	public void processExportTimetableSummaryExcel(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try{
+			ArrayList<ODay> days = null;
+			String FILE_NAME = "/temp/PROGRAMM FERIE E PERMESSI.xlsx";
+			
+			String query = ServletUtils.getStringParameter(request, "query", null);
+			TimetableSummaryExcelQuery tQuery = TimetableSummaryExcelQuery.fromJson(query);
+			
+			XSSFWorkbook workbook = new XSSFWorkbook();
+			XSSFSheet sheet = workbook.createSheet("Recuperati_Foglio1");
+			
+			//Font
+			XSSFFont font = workbook.createFont();
+			font.setFontHeightInPoints((short) 8);
+			font.setFontName("Arial");
+			font.setItalic(false);
+			font.setColor(HSSFColor.BLACK.index);
+			
+			//Dates & Days name
+			days = manager.generateDaysFromRange(tQuery.fromDate, tQuery.toDate);
+			
+			//Style
+			XSSFCellStyle styleDayName = workbook.createCellStyle();
+			styleDayName.setRotation((short)90);
+			styleDayName.setBorderBottom(HSSFCellStyle.BORDER_THIN);
+			styleDayName.setVerticalAlignment(VerticalAlignment.CENTER);
+			styleDayName.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+			styleDayName.setFont(font);
+			
+			XSSFCellStyle styleDate = workbook.createCellStyle();
+			styleDate.setRotation((short)90);
+			styleDate.setVerticalAlignment(VerticalAlignment.CENTER);
+			styleDate.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+			styleDate.setFont(font);
+			
+			XSSFCellStyle styleDateWeekend = workbook.createCellStyle();
+			styleDateWeekend.setRotation((short)90);
+			styleDateWeekend.setVerticalAlignment(VerticalAlignment.CENTER);
+			styleDateWeekend.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+			styleDateWeekend.setFont(font);
+			styleDateWeekend.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());  
+			styleDateWeekend.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+			
+			XSSFCellStyle styleDip = workbook.createCellStyle();
+			styleDateWeekend.setFont(font);		
+
+			int rowNum = 0;
+			int cellNum = 1;
+			
+			Row row = sheet.createRow(rowNum++);
+			row.setHeightInPoints((short)108);
+			
+			for(ODay d : days){
+				String dayName = lookupResource("timetableSummaryExcel.day." + d.getDayName().trim());
+				Cell cell = row.createCell(cellNum++);
+				cell.setCellValue((String) dayName);
+				
+				if("Saturday".equals(d.getDayName().trim()) || "Sunday".equals(d.getDayName().trim())){
+					sheet.setColumnWidth(cellNum - 1, 1 * 256);
+				}else{
+					sheet.setColumnWidth(cellNum - 1, 5 * 256);
+				}
+				
+				cell.setCellStyle(styleDayName);
+			}
+			
+			row = sheet.createRow(rowNum++);
+			row.setHeightInPoints((short)80);
+
+			
+			Cell dipCell = row.createCell(0);
+			dipCell.setCellValue((String) "DIP");
+			dipCell.setCellStyle(styleDip);
+			
+			cellNum = 1;
+			
+			for(ODay d : days){
+				String month = lookupResource("timetableSummaryExcel.month." + d.getDate().getMonthOfYear());
+				Cell cell = row.createCell(cellNum++);
+				cell.setCellValue((String) (d.getDate().getDayOfMonth() + "-" + month + "-" + d.getDate().getYear()));
+				
+				if("Saturday".equals(d.getDayName().trim()) || "Sunday".equals(d.getDayName().trim())){
+					sheet.setColumnWidth(cellNum - 1, 1 * 256);
+					cell.setCellStyle(styleDateWeekend);
+				}else{
+					sheet.setColumnWidth(cellNum - 1, 5 * 256);
+					cell.setCellStyle(styleDate);
+				}
+			}
+			
+			//Users and Holidays			
+			
+			try {
+				FileOutputStream outputStream = new FileOutputStream(FILE_NAME);
+				workbook.write(outputStream);
+				workbook.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			new JsonResult(true).printTo(out);
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ExportSummaryExcel", ex);
+		}
+	}
+
 	public String getGridOpportunityAdditionalInfo(List<OOpportunityField> fields, VOpportunityEntry o) throws WTException{
 		String additionalInfo = "";
 		

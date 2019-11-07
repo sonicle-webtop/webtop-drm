@@ -85,26 +85,27 @@ public class TimetableReportDAO extends BaseDAO{
 				.execute();
 	}
 	
-	public List<OTimetableReport> selectByDomainId(Connection con, String domainId) throws DAOException {
+	public List<OTimetableReport> selectByDomainIdUserId(Connection con, String domainId, String userId) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		return dsl
 				.select()
 				.from(TIMETABLE_REPORT_TEMP)
 				.where(TIMETABLE_REPORT_TEMP.DOMAIN_ID.equal(domainId))
+				.and(TIMETABLE_REPORT_TEMP.USER_ID.equal(userId))
 				.orderBy(
 						TIMETABLE_REPORT_TEMP.USER_ID,
+						TIMETABLE_REPORT_TEMP.TARGET_USER_ID,
 						TIMETABLE_REPORT_TEMP.DATE
 				)
 				.fetchInto(OTimetableReport.class);
 	}
 	
-	public int deleteByDomainId(Connection con, String domainId) {
+	public int deleteByDomainIdUserId(Connection con, String domainId, String userId) {
 		DSLContext dsl = getDSL(con);
 		return dsl
 				.delete(TIMETABLE_REPORT_TEMP)
-				.where(
-						TIMETABLE_REPORT_TEMP.DOMAIN_ID.equal(domainId)
-				)
+				.where(TIMETABLE_REPORT_TEMP.DOMAIN_ID.equal(domainId))
+				.and(TIMETABLE_REPORT_TEMP.USER_ID.equal(userId))
 				.execute();
 	}
 	

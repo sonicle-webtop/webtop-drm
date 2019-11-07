@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class LineHours extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.LineHoursRecord> {
 
-	private static final long serialVersionUID = -918709141;
+	private static final long serialVersionUID = -2036565698;
 
 	/**
 	 * The reference instance of <code>drm.line_hours</code>
@@ -176,22 +176,6 @@ public class LineHours extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jo
 
 	private LineHours(java.lang.String alias, org.jooq.Table<com.sonicle.webtop.drm.jooq.tables.records.LineHoursRecord> aliased, org.jooq.Field<?>[] parameters) {
 		super(alias, com.sonicle.webtop.drm.jooq.Drm.DRM, aliased, parameters, "");
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.LineHoursRecord> getPrimaryKey() {
-		return com.sonicle.webtop.drm.jooq.Keys.EMPLOYEE_HOURS_PKEY;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public java.util.List<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.LineHoursRecord>> getKeys() {
-		return java.util.Arrays.<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.LineHoursRecord>>asList(com.sonicle.webtop.drm.jooq.Keys.EMPLOYEE_HOURS_PKEY);
 	}
 
 	/**

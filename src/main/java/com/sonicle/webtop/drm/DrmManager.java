@@ -57,6 +57,7 @@ import com.sonicle.webtop.drm.bol.OCompany;
 import com.sonicle.webtop.drm.bol.OCompanyPicture;
 import com.sonicle.webtop.drm.bol.OCompanyUser;
 import com.sonicle.webtop.drm.bol.OCostType;
+import com.sonicle.webtop.drm.bol.ODay;
 import com.sonicle.webtop.drm.bol.ODocStatus;
 import com.sonicle.webtop.drm.bol.ODocStatusGroup;
 import com.sonicle.webtop.drm.bol.ODrmFolder;
@@ -143,6 +144,7 @@ import com.sonicle.webtop.drm.dal.TimetableEventDAO;
 import com.sonicle.webtop.drm.dal.TimetableReportDAO;
 import com.sonicle.webtop.drm.dal.TimetableSettingDAO;
 import com.sonicle.webtop.drm.dal.TimetableStampDAO;
+import com.sonicle.webtop.drm.dal.UtilityDAO;
 import com.sonicle.webtop.drm.dal.WorkReportAttachmentDAO;
 import com.sonicle.webtop.drm.dal.WorkReportDAO;
 import com.sonicle.webtop.drm.dal.WorkReportRowDAO;
@@ -228,6 +230,8 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.imgscalr.Scalr;
 import org.joda.time.LocalDate;
+import org.jooq.Record;
+import org.jooq.Result;
 
 /**
  *
@@ -2788,6 +2792,33 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
+	public ArrayList<ODay> generateDaysFromRange(LocalDate fromDate, LocalDate toDate) throws WTException {
+		Connection con = null;
+		UtilityDAO uDao = UtilityDAO.getInstance();
+		Result<Record> result = null;
+		ArrayList<ODay> days = new ArrayList();
+		ODay day;
+		
+		try {
+			con = WT.getConnection(SERVICE_ID);
+
+			result = uDao.selectDaysByDateRange(con, fromDate, toDate);
+			
+			for(Record r : result){
+				day = new ODay(r.getValue(0, String.class), r.getValue(1, Long.class));
+				
+				days.add(day);
+			}
+			
+			return days;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
 	public void updateTimetableSetting(TimetableSetting item) throws WTException {
 
 		Connection con = null;
@@ -3901,13 +3932,13 @@ public class DrmManager extends BaseManager {
 
 			if(query != null){
 				//Empty Table
-				trDao.deleteByDomainId(con, getTargetProfileId().getDomainId());
+				trDao.deleteByDomainIdUserId(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
 				
 				//Reset Sequence
-				trDao.restartTimetableReportTempSequence(con);
+				//trDao.restartTimetableReportTempSequence(con);
 
 				//Get Data - Calculate Working Hours and Extraordinary (If permits from settings)
-				if(query.userId == null){
+				if(query.targetUserId == null){
 					//Get Data for All Users for Company
 					List<OUser> users = listCompanyUsers(query.companyId);
 					for (OUser usr : users) {
@@ -3921,28 +3952,33 @@ public class DrmManager extends BaseManager {
 						
 						ttrs = ManagerUtils.mergeStampAndEventByDate(ttrs);
 						
+						for(OTimetableReport itm : ttrs) itm.setTargetUserId(usr.getUserId());
+						
 						trs.addAll(ttrs);
 					}
 				}else{
 					//Get Data for Single User Selected
-					trsf = tstmpDao.getStampsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.userId, query.fromDay, query.month, query.year);
-					te = teDao.getEventsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.userId, query.fromDay, query.month, query.year);
+					trsf = tstmpDao.getStampsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
+					te = teDao.getEventsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
 
 					trs.addAll(mergeStampByDate(trsf, con));
 					trs.addAll(ManagerUtils.mergeEventByDate(ManagerUtils.createOTimetableReport(te)));
 					
 					trs = ManagerUtils.mergeStampAndEventByDate(trs);
+					
+					for(OTimetableReport itm : trs) itm.setTargetUserId(query.targetUserId);
 				}
 				
 				//Insert Data in Table
 				for(OTimetableReport otr : trs){
 					otr.setId(trDao.getTimetableReportTempSequence(con).intValue());
+					otr.setUserId(getTargetProfileId().getUserId());
 					trDao.insert(con, otr);
 				}
 			}
 			
 			//Select for DomainId
-			trs = trDao.selectByDomainId(con, getTargetProfileId().getDomainId());
+			trs = trDao.selectByDomainIdUserId(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
 			
 			DbUtils.commitQuietly(con);
 
@@ -3967,7 +4003,7 @@ public class DrmManager extends BaseManager {
 		try {
 			con = WT.getConnection(SERVICE_ID);
 
-			trs = trDao.selectByDomainId(con, getTargetProfileId().getDomainId());
+			trs = trDao.selectByDomainIdUserId(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
 
 			return trs;
 

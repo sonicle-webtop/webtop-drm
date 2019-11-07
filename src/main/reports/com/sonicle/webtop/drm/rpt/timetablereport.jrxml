@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.0.final using JasperReports Library version 6.3.0  -->
-<!-- 2018-07-17T14:06:19 -->
+<!-- 2019-10-22T15:50:08 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="timetablereport" printOrder="Horizontal" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="832" leftMargin="5" rightMargin="5" topMargin="5" bottomMargin="5" uuid="0c72a82c-982e-4a49-946e-fff85de6c39f">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
@@ -31,40 +31,42 @@
 	<field name="hour" class="java.lang.Float"/>
 	<field name="note" class="java.lang.String"/>
 	<field name="detail" class="java.lang.String"/>
-	<variable name="totWorkingHours" class="java.lang.Float" resetType="Group" resetGroup="grp_userId" incrementType="Group" incrementGroup="grp_date" calculation="Sum">
+	<field name="targetUserId" class="java.lang.String"/>
+	<field name="targetUserDescription" class="java.lang.String"/>
+	<variable name="totWorkingHours" class="java.lang.Float" resetType="Group" resetGroup="grp_targetUserId" incrementType="Group" incrementGroup="grp_date" calculation="Sum">
 		<variableExpression><![CDATA[$F{workingHours}]]></variableExpression>
 		<initialValueExpression><![CDATA[0]]></initialValueExpression>
 	</variable>
-	<variable name="totOvertime" class="java.lang.Float" resetType="Group" resetGroup="grp_userId" incrementType="Group" incrementGroup="grp_date" calculation="Sum">
+	<variable name="totOvertime" class="java.lang.Float" resetType="Group" resetGroup="grp_targetUserId" incrementType="Group" incrementGroup="grp_date" calculation="Sum">
 		<variableExpression><![CDATA[$F{overtime}]]></variableExpression>
 		<initialValueExpression><![CDATA[0]]></initialValueExpression>
 	</variable>
-	<variable name="totPaidLeave" class="java.lang.Float" resetType="Group" resetGroup="grp_userId" incrementType="Group" incrementGroup="grp_date" calculation="Sum">
+	<variable name="totPaidLeave" class="java.lang.Float" resetType="Group" resetGroup="grp_targetUserId" incrementType="Group" incrementGroup="grp_date" calculation="Sum">
 		<variableExpression><![CDATA[$F{paidLeave}]]></variableExpression>
 		<initialValueExpression><![CDATA[0]]></initialValueExpression>
 	</variable>
-	<variable name="totUnpaidLeave" class="java.lang.Float" resetType="Group" resetGroup="grp_userId" incrementType="Group" incrementGroup="grp_date" calculation="Sum">
+	<variable name="totUnpaidLeave" class="java.lang.Float" resetType="Group" resetGroup="grp_targetUserId" incrementType="Group" incrementGroup="grp_date" calculation="Sum">
 		<variableExpression><![CDATA[$F{unpaidLeave}]]></variableExpression>
 		<initialValueExpression><![CDATA[0]]></initialValueExpression>
 	</variable>
-	<variable name="totHoliday" class="java.lang.Float" resetType="Group" resetGroup="grp_userId" incrementType="Group" incrementGroup="grp_date" calculation="Sum">
+	<variable name="totHoliday" class="java.lang.Float" resetType="Group" resetGroup="grp_targetUserId" incrementType="Group" incrementGroup="grp_date" calculation="Sum">
 		<variableExpression><![CDATA[$F{holiday}]]></variableExpression>
 		<initialValueExpression><![CDATA[0]]></initialValueExpression>
 	</variable>
-	<variable name="totMedicalVisit" class="java.lang.Float" resetType="Group" resetGroup="grp_userId" incrementType="Group" incrementGroup="grp_date" calculation="Sum">
+	<variable name="totMedicalVisit" class="java.lang.Float" resetType="Group" resetGroup="grp_targetUserId" incrementType="Group" incrementGroup="grp_date" calculation="Sum">
 		<variableExpression><![CDATA[$F{medicalVisit}]]></variableExpression>
 		<initialValueExpression><![CDATA[0]]></initialValueExpression>
 	</variable>
-	<variable name="totContractual" class="java.lang.Float" resetType="Group" resetGroup="grp_userId" incrementType="Group" incrementGroup="grp_date" calculation="Sum">
+	<variable name="totContractual" class="java.lang.Float" resetType="Group" resetGroup="grp_targetUserId" incrementType="Group" incrementGroup="grp_date" calculation="Sum">
 		<variableExpression><![CDATA[$F{contractual}]]></variableExpression>
 		<initialValueExpression><![CDATA[0]]></initialValueExpression>
 	</variable>
-	<variable name="totHour" class="java.lang.Float" resetType="Group" resetGroup="grp_userId" incrementType="Group" incrementGroup="grp_date" calculation="Sum">
+	<variable name="totHour" class="java.lang.Float" resetType="Group" resetGroup="grp_targetUserId" incrementType="Group" incrementGroup="grp_date" calculation="Sum">
 		<variableExpression><![CDATA[$F{hour}]]></variableExpression>
 		<initialValueExpression><![CDATA[0]]></initialValueExpression>
 	</variable>
-	<group name="grp_userId" keepTogether="true">
-		<groupExpression><![CDATA[$F{userId}]]></groupExpression>
+	<group name="grp_targetUserId" keepTogether="true">
+		<groupExpression><![CDATA[$F{targetUserId}]]></groupExpression>
 		<groupHeader>
 			<band height="28">
 				<staticText>
@@ -84,7 +86,7 @@
 					<textElement verticalAlignment="Middle">
 						<font size="10" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{userDescription}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{targetUserDescription}]]></textFieldExpression>
 				</textField>
 				<textField>
 					<reportElement x="0" y="0" width="150" height="15" uuid="96f58e6f-7918-48b4-93d6-fbc2b2e055c1">
