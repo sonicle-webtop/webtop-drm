@@ -205,6 +205,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import javax.imageio.ImageIO;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -747,7 +748,7 @@ public class Service extends BaseService {
 			String pattern;
 			
 			List<JsSimpleSource> contacts = new ArrayList();
-			Set<Integer> categoryIds = new HashSet();
+			Set<Integer> categoryIds = new LinkedHashSet();
 			Data uD;
 			
 			//Check for multiple filters
