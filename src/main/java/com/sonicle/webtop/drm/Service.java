@@ -204,6 +204,8 @@ import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import javax.imageio.ImageIO;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.util.HSSFColor;
@@ -745,7 +747,7 @@ public class Service extends BaseService {
 			String pattern;
 			
 			List<JsSimpleSource> contacts = new ArrayList();
-			List<Integer> categoryIds = new ArrayList();
+			Set<Integer> categoryIds = new HashSet();
 			Data uD;
 			
 			//Check for multiple filters
