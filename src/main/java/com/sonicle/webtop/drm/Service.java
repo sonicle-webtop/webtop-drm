@@ -206,7 +206,9 @@ import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.Callable;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import javax.imageio.ImageIO;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.util.HSSFColor;
@@ -748,7 +750,7 @@ public class Service extends BaseService {
 			String pattern;
 			
 			List<JsSimpleSource> contacts = new ArrayList();
-			List<Integer> categoryIds = new ArrayList();
+			Set<Integer> categoryIds = new ArrayList();
 			Data uD;
 			
 			//Check for multiple filters
@@ -2976,7 +2978,7 @@ public class Service extends BaseService {
 			logger.error("Error in action ExportSummaryExcel", ex);
 		}
 	}
-	
+
 	public String getGridOpportunityAdditionalInfo(List<OOpportunityField> fields, VOpportunityEntry o) throws WTException{
 		String additionalInfo = "";
 		
@@ -3485,90 +3487,32 @@ public class Service extends BaseService {
 		}
 	}
 	
-	private Integer createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(final LeaveRequest lReq) throws WTException {
-		TimetableSetting ts = manager.getTimetableSetting();
-		UserProfileId upi = null;
-		Integer activityId = null; 
+	private Integer createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(LeaveRequest lReq) throws WTException {
+		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
+		Integer eventId = null;
+		Event ev = null;
 		
-		if(ts != null){
-			if(ts.getCalendarUserId() != null){
-				upi = new UserProfileId(getEnv().getProfileId().getDomainId(), ts.getCalendarUserId());
-			}else{
-				upi = getEnv().getProfileId();
+		if (cm != null) {
+			Integer lrCalId = us.getLeaveRequestCalendarId();
+			
+			if(lrCalId == null || !cm.existCalendar(lrCalId)){
+				lrCalId = createLeaveRequestCalendar(cm, lReq);
+				us.setLeaveRequestCalendarId(lrCalId);
 			}
 			
-			activityId = ts.getDefaultEventActivityId();
-		}else{
-			upi = getEnv().getProfileId();
-		}
-		
-		return catchEventId(upi, lReq, activityId);
-		
-		/*
-		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, upi);
-		
-		Integer eventId = null;
-		
-		if (cm != null) {
-			eventId = WT.runAsSysAdmin(new Callable<Integer>(){
-				public Integer call() throws WTException {
-					Integer lrCalId = us.getLeaveRequestCalendarId();
-			
-					if(lrCalId == null || !cm.existCalendar(lrCalId)){
-						lrCalId = createLeaveRequestCalendar(cm, lReq);
-
-						us.setLeaveRequestCalendarId(lrCalId);
-					}
-
-					if(lReq.getEventId() != null){
-						Event ev = cm.getEvent(lReq.getEventId());
-
-						if(ev != null){
-							return updateLeaveRequestEvent(cm, lReq, ev);
-						}else{
-							return createLeaveRequestEvent(cm, lReq, lrCalId, activityId);
-						}
-					}else{
-						return createLeaveRequestEvent(cm, lReq, lrCalId, activityId);
-					}		
+			if(lReq.getEventId() != null){
+				ev = cm.getEvent(lReq.getEventId());
+				
+				if(ev != null){
+					eventId = updateLeaveRequestEvent(cm, lReq, ev);
+				}else{
+					eventId = createLeaveRequestEvent(cm, lReq, lrCalId);
 				}
-			});	
+			}else{
+				eventId = createLeaveRequestEvent(cm, lReq, lrCalId);
+			}			
 		}
 		
-		return eventId;
-		*/
-	}
-	
-	private Integer catchEventId(final UserProfileId targetPid, final LeaveRequest lReq, Integer activityId) throws WTException {
-		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, targetPid);
-		
-		Integer eventId = null;
-		
-		if (cm != null) {
-			eventId = WT.runAsSysAdmin(new Callable<Integer>(){
-				public Integer call() throws WTException {
-					Integer lrCalId = us.getLeaveRequestCalendarId();
-			
-					if(lrCalId == null || cm.getCalendar(lrCalId) == null){
-						lrCalId = createLeaveRequestCalendar(cm, lReq);
-
-						us.setLeaveRequestCalendarId(lrCalId);
-					}
-
-					if(lReq.getEventId() != null){
-						Event ev = cm.getEvent(lReq.getEventId());
-
-						if(ev != null){
-							return updateLeaveRequestEvent(cm, lReq, ev);
-						}else{
-							return createLeaveRequestEvent(cm, lReq, lrCalId, activityId);
-						}
-					}else{
-						return createLeaveRequestEvent(cm, lReq, lrCalId, activityId);
-					}		
-				}
-			});	
-		}
 		return eventId;
 	}
 	
@@ -3583,7 +3527,7 @@ public class Service extends BaseService {
 		return cal.getCalendarId();
 	}
 	
-	private int createLeaveRequestEvent(ICalendarManager cm, LeaveRequest lReq, int lrCalId, Integer activityId) throws WTException{
+	private int createLeaveRequestEvent(ICalendarManager cm, LeaveRequest lReq, int lrCalId) throws WTException{
 		DateTimeZone tz = getEnv().getProfile().getTimeZone();
 		Event ev = new Event();
 		String title = "";
@@ -3593,8 +3537,6 @@ public class Service extends BaseService {
 		ev.setTimezone(tz.getID());
 		ev.setIsPrivate(true);
 		ev.setBusy(false);
-		
-		ev.setActivityId(activityId);
 		
 		if(lReq.getFromDate() != null && lReq.getToDate() != null){			
 			if(lReq.getFromHour() != null && lReq.getToHour() != null){
