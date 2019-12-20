@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ExpenseNoteDetailDocumentsData extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.ExpenseNoteDetailDocumentsDataRecord> {
 
-	private static final long serialVersionUID = -798577000;
+	private static final long serialVersionUID = -1155679544;
 
 	/**
 	 * The reference instance of <code>drm.expense_note_detail_documents_data</code>
@@ -68,7 +68,7 @@ public class ExpenseNoteDetailDocumentsData extends org.jooq.impl.TableImpl<com.
 	 */
 	@Override
 	public org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.ExpenseNoteDetailDocumentsDataRecord> getPrimaryKey() {
-		return com.sonicle.webtop.drm.jooq.Keys.EXPENSE_NOTE_DETAIL_DOCUMENTS_DATA_PKEY;
+		return com.sonicle.webtop.drm.jooq.Keys.EXPENSE_NOTE_DETAIL__DOCUMENTS_DATA_PKEY;
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class ExpenseNoteDetailDocumentsData extends org.jooq.impl.TableImpl<com.
 	 */
 	@Override
 	public java.util.List<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.ExpenseNoteDetailDocumentsDataRecord>> getKeys() {
-		return java.util.Arrays.<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.ExpenseNoteDetailDocumentsDataRecord>>asList(com.sonicle.webtop.drm.jooq.Keys.EXPENSE_NOTE_DETAIL_DOCUMENTS_DATA_PKEY);
+		return java.util.Arrays.<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.ExpenseNoteDetailDocumentsDataRecord>>asList(com.sonicle.webtop.drm.jooq.Keys.EXPENSE_NOTE_DETAIL__DOCUMENTS_DATA_PKEY);
 	}
 
 	/**
@@ -84,7 +84,7 @@ public class ExpenseNoteDetailDocumentsData extends org.jooq.impl.TableImpl<com.
 	 */
 	@Override
 	public java.util.List<org.jooq.ForeignKey<com.sonicle.webtop.drm.jooq.tables.records.ExpenseNoteDetailDocumentsDataRecord, ?>> getReferences() {
-		return java.util.Arrays.<org.jooq.ForeignKey<com.sonicle.webtop.drm.jooq.tables.records.ExpenseNoteDetailDocumentsDataRecord, ?>>asList(com.sonicle.webtop.drm.jooq.Keys.EXPENSE_NOTE_DETAIL_DOCUMENTS_DATA__EXPENSE_NOTE_DETAIL_DOCUMENTS_EXPENSE_NOTE_DETAIL_DOCUMENT_FKEY);
+		return java.util.Arrays.<org.jooq.ForeignKey<com.sonicle.webtop.drm.jooq.tables.records.ExpenseNoteDetailDocumentsDataRecord, ?>>asList(com.sonicle.webtop.drm.jooq.Keys.EXPENSE_NOTE_DETAIL_DOCUMENTS_DATA__EXPENSE_NOTE_DETAIL__DOCUMENT_EXPENSE_NOTE_DETAIL_DOCUMENT_FKEY);
 	}
 
 	/**

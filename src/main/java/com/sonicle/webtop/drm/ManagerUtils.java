@@ -1500,6 +1500,8 @@ public class ManagerUtils {
 		oSetting.setRequestsPermitsMedicalVisits(tSetting.getRequestsPermitsMedicalVisits());
 		oSetting.setRequestsPermitsContractuals(tSetting.getRequestsPermitsContractuals());
 		oSetting.setMedicalVisitsAutomaticallyApproved(tSetting.getMedicalVisitsAutomaticallyApproved());
+		oSetting.setCalendarUserId(tSetting.getCalendarUserId());
+		oSetting.setDefaultEventActivityId(tSetting.getDefaultEventActivityId());
 
 		return oSetting;
 	}
@@ -1526,6 +1528,8 @@ public class ManagerUtils {
 		tSetting.setRequestsPermitsMedicalVisits(oTSetting.getRequestsPermitsMedicalVisits());
 		tSetting.setRequestsPermitsContractuals(oTSetting.getRequestsPermitsContractuals());
 		tSetting.setMedicalVisitsAutomaticallyApproved(oTSetting.getMedicalVisitsAutomaticallyApproved());
+		tSetting.setCalendarUserId(oTSetting.getCalendarUserId());
+		tSetting.setDefaultEventActivityId(oTSetting.getDefaultEventActivityId());
 
 		return tSetting;
 	}

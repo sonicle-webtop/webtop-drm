@@ -94,7 +94,7 @@ public class TimetableReportTemp extends org.jooq.impl.TableImpl<com.sonicle.web
 	/**
 	 * The column <code>drm.timetable_report_temp.causal</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord, java.lang.String> CAUSAL = createField("causal", org.jooq.impl.SQLDataType.VARCHAR.length(5), this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord, java.lang.String> CAUSAL = createField("causal", org.jooq.impl.SQLDataType.VARCHAR.length(500), this, "");
 
 	/**
 	 * The column <code>drm.timetable_report_temp.hour</code>.
@@ -111,7 +111,7 @@ public class TimetableReportTemp extends org.jooq.impl.TableImpl<com.sonicle.web
 	 */
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord, java.lang.String> NOTE = createField("note", org.jooq.impl.SQLDataType.VARCHAR.length(500), this, "");
 
- 	/**
+	/**
 	 * The column <code>drm.timetable_report_temp.target_user_id</code>.
 	 */
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord, java.lang.String> TARGET_USER_ID = createField("target_user_id", org.jooq.impl.SQLDataType.VARCHAR.length(36), this, "");

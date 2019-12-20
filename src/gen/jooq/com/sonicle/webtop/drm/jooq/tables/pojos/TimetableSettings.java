@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableSettings implements java.io.Serializable {
 
-	private static final long serialVersionUID = 1866616681;
+	private static final long serialVersionUID = 359870311;
 
 	private java.lang.Integer timetableSettingId;
 	private java.lang.String  domainId;
@@ -35,6 +35,8 @@ public class TimetableSettings implements java.io.Serializable {
 	private java.lang.Boolean companyExit;
 	private java.lang.Boolean manageStamp;
 	private java.lang.Boolean medicalVisitsAutomaticallyApproved;
+	private java.lang.String  calendarUserId;
+	private java.lang.Integer defaultEventActivityId;
 
 	public TimetableSettings() {}
 
@@ -55,7 +57,9 @@ public class TimetableSettings implements java.io.Serializable {
 		java.lang.Boolean requestsPermitsContractuals,
 		java.lang.Boolean companyExit,
 		java.lang.Boolean manageStamp,
-		java.lang.Boolean medicalVisitsAutomaticallyApproved
+		java.lang.Boolean medicalVisitsAutomaticallyApproved,
+		java.lang.String  calendarUserId,
+		java.lang.Integer defaultEventActivityId
 	) {
 		this.timetableSettingId = timetableSettingId;
 		this.domainId = domainId;
@@ -74,6 +78,8 @@ public class TimetableSettings implements java.io.Serializable {
 		this.companyExit = companyExit;
 		this.manageStamp = manageStamp;
 		this.medicalVisitsAutomaticallyApproved = medicalVisitsAutomaticallyApproved;
+		this.calendarUserId = calendarUserId;
+		this.defaultEventActivityId = defaultEventActivityId;
 	}
 
 	public java.lang.Integer getTimetableSettingId() {
@@ -210,5 +216,21 @@ public class TimetableSettings implements java.io.Serializable {
 
 	public void setMedicalVisitsAutomaticallyApproved(java.lang.Boolean medicalVisitsAutomaticallyApproved) {
 		this.medicalVisitsAutomaticallyApproved = medicalVisitsAutomaticallyApproved;
+	}
+
+	public java.lang.String getCalendarUserId() {
+		return this.calendarUserId;
+	}
+
+	public void setCalendarUserId(java.lang.String calendarUserId) {
+		this.calendarUserId = calendarUserId;
+	}
+
+	public java.lang.Integer getDefaultEventActivityId() {
+		return this.defaultEventActivityId;
+	}
+
+	public void setDefaultEventActivityId(java.lang.Integer defaultEventActivityId) {
+		this.defaultEventActivityId = defaultEventActivityId;
 	}
 }

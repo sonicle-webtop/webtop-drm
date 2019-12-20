@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CostTypes extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.CostTypesRecord> {
 
-	private static final long serialVersionUID = -166966105;
+	private static final long serialVersionUID = -2015103836;
 
 	/**
 	 * The reference instance of <code>drm.cost_types</code>
@@ -44,7 +44,7 @@ public class CostTypes extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jo
 	/**
 	 * The column <code>drm.cost_types.description</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.CostTypesRecord, java.lang.String> DESCRIPTION = createField("description", org.jooq.impl.SQLDataType.VARCHAR.length(60), this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.CostTypesRecord, java.lang.String> DESCRIPTION = createField("description", org.jooq.impl.SQLDataType.VARCHAR.length(30), this, "");
 
 	/**
 	 * The column <code>drm.cost_types.max_import</code>.

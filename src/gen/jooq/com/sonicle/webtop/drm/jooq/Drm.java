@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Drm extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = 1434152607;
+	private static final long serialVersionUID = 2504811;
 
 	/**
 	 * The reference instance of <code>drm</code>
@@ -62,6 +62,7 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_MASTERDATA,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_MEMBERS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_SUPERVISED_USERS,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_USERS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_TIMETABLE_EVENT,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_TIMETABLE_REPORT_TEMP,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_TIMETABLE_SETTINGS,
@@ -124,7 +125,6 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.tables.ProfilesMembers.PROFILES_MEMBERS,
 			com.sonicle.webtop.drm.jooq.tables.ProfilesSupervisedUsers.PROFILES_SUPERVISED_USERS,
 			com.sonicle.webtop.drm.jooq.tables.TimetableEvents.TIMETABLE_EVENTS,
-			com.sonicle.webtop.drm.jooq.tables.TimetableEventsCopy.TIMETABLE_EVENTS_COPY,
 			com.sonicle.webtop.drm.jooq.tables.TimetableReportTemp.TIMETABLE_REPORT_TEMP,
 			com.sonicle.webtop.drm.jooq.tables.TimetableSettings.TIMETABLE_SETTINGS,
 			com.sonicle.webtop.drm.jooq.tables.TimetableStamp.TIMETABLE_STAMP,

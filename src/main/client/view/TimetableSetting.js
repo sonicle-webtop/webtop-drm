@@ -40,7 +40,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 		title: '{timetable.config.tit}',
 		iconCls: 'wtdrm-icon-configuration-generalconfiguration-xs',
 		width: 650,
-		height: 500
+		height: 550
 	},
 	modelName: 'Sonicle.webtop.drm.model.TimetableSetting',
 	initComponent: function () {
@@ -114,6 +114,50 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 							maxValue: 1000,
 							fieldLabel: me.mys.res('timetable.settings.fld-minimumextraordinary.lbl')
 						},
+						WTF.localCombo('id', 'desc', {
+							bind: '{record.calendarUserId}',
+							anyMatch: true,
+							allowBlank: true,
+							emptyText: me.mys.res('timetable.settings.fld-calendaruserid-emptytext.lbl'),
+							store: {
+								autoLoad: true,
+								model: 'WTA.model.Simple',
+								proxy: WTF.proxy(me.mys.ID, 'LookupUsers')
+							},
+							triggers: {
+								clear: WTF.clearTrigger()
+							},
+							fieldLabel: me.mys.res('timetable.settings.fld-calendaruserid.lbl')
+						}),
+						WTF.remoteCombo('id', 'desc', {
+							bind: '{record.defaultEventActivityId}',
+							autoLoadOnValue: true,
+							anyMatch: true,
+							allowBlank: true,
+							store: {
+								autoLoad: true,
+								model: 'WTA.model.ActivityLkp',
+								proxy: WTF.proxy(WT.ID, 'LookupActivities', null, {
+									extraParams: {
+										profileId: WT.getVar('profileId')
+									}
+								}),
+								filters: [{
+									filterFn: function(rec) {
+										if(rec.get('readOnly')) {
+											if(rec.getId() !== me.lref('activity').getValue()) {
+												return null;
+											}
+										}
+										return rec;
+									}
+								}]
+							},
+							triggers: {
+								clear: WTF.clearTrigger()
+							},
+							fieldLabel: me.mys.res('timetable.settings.fld-defaulteventactivity.lbl')
+						}),
 						{
 							xtype: 'checkbox',
 							bind: '{record.manageStamp}',

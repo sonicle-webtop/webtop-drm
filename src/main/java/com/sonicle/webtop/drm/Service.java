@@ -188,6 +188,7 @@ import com.sonicle.webtop.drm.bol.js.JsExpenseNote;
 import com.sonicle.webtop.drm.bol.js.JsExpenseNoteSetting;
 import com.sonicle.webtop.drm.bol.js.JsFilter;
 import com.sonicle.webtop.drm.bol.js.JsGridExpenseNote;
+import com.sonicle.webtop.drm.bol.model.RBExpenseNote;
 import com.sonicle.webtop.drm.bol.model.RBTimetableEncoReport;
 import com.sonicle.webtop.drm.bol.model.RBWorkReportSummary;
 import com.sonicle.webtop.drm.model.CostType;
@@ -198,12 +199,14 @@ import com.sonicle.webtop.drm.model.ExpenseNoteDocumentWithBytes;
 import com.sonicle.webtop.drm.model.ExpenseNoteDocumentWithStream;
 import com.sonicle.webtop.drm.model.ExpenseNoteSetting;
 import com.sonicle.webtop.drm.model.WorkReportSummary;
+import com.sonicle.webtop.drm.rpt.RptExpenseNote;
 import com.sonicle.webtop.drm.rpt.RptWorkReportSummary;
 import java.awt.Image;
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.Callable;
 import javax.imageio.ImageIO;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.util.HSSFColor;
@@ -2452,6 +2455,43 @@ public class Service extends BaseService {
 		}
 	}
 	
+	public void processPrintExpenseNote(HttpServletRequest request, HttpServletResponse response) {
+		ArrayList<RBExpenseNote> itemsEn = new ArrayList<>();
+		
+		try {
+			
+			String filename = ServletUtils.getStringParameter(request, "filename", "print");
+			IntegerArray ids = ServletUtils.getObjectParameter(request, "ids", IntegerArray.class, true);
+			
+			ExpenseNote en = null;
+			CompanyPicture picture = null;
+			Company company = null;
+			
+			for(Integer id : ids) {
+				picture = null;
+				en = manager.getExpenseNote(id);
+				company = manager.getCompany(en.getCompanyId());
+				if(company.getHasPicture()) picture = manager.getCompanyPicture(company.getCompanyId());
+				itemsEn.add(new RBExpenseNote(WT.getCoreManager(), manager, en, ss, picture));
+			}
+			
+			ReportConfig.Builder builder = reportConfigBuilder();
+			RptExpenseNote rpt = new RptExpenseNote(builder.build());
+			rpt.setDataSource(itemsEn);
+			
+			filename = "expense_note"
+					+ ((null != en.getId()) ? "_" + en.getId() : "");
+			
+			ServletUtils.setFileStreamHeaders(response, filename + ".pdf");
+			WT.generateReportToStream(rpt, AbstractReport.OutputType.PDF, response.getOutputStream());
+			
+		} catch(Exception ex) {
+			logger.error("Error in action PrintExpenseNote", ex);
+			ex.printStackTrace();
+			ServletUtils.writeErrorHandlingJs(response, ex.getMessage());
+		}
+	}
+	
 	public void processPrintWorkReport(HttpServletRequest request, HttpServletResponse response) {
 		ArrayList<RBWorkReport> itemsWr = new ArrayList<>();
 		
@@ -2936,7 +2976,7 @@ public class Service extends BaseService {
 			logger.error("Error in action ExportSummaryExcel", ex);
 		}
 	}
-
+	
 	public String getGridOpportunityAdditionalInfo(List<OOpportunityField> fields, VOpportunityEntry o) throws WTException{
 		String additionalInfo = "";
 		
@@ -3445,32 +3485,90 @@ public class Service extends BaseService {
 		}
 	}
 	
-	private Integer createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(LeaveRequest lReq) throws WTException {
-		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
-		Integer eventId = null;
-		Event ev = null;
+	private Integer createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(final LeaveRequest lReq) throws WTException {
+		TimetableSetting ts = manager.getTimetableSetting();
+		UserProfileId upi = null;
+		Integer activityId = null; 
 		
-		if (cm != null) {
-			Integer lrCalId = us.getLeaveRequestCalendarId();
-			
-			if(lrCalId == null || !cm.existCalendar(lrCalId)){
-				lrCalId = createLeaveRequestCalendar(cm, lReq);
-				us.setLeaveRequestCalendarId(lrCalId);
+		if(ts != null){
+			if(ts.getCalendarUserId() != null){
+				upi = new UserProfileId(getEnv().getProfileId().getDomainId(), ts.getCalendarUserId());
+			}else{
+				upi = getEnv().getProfileId();
 			}
 			
-			if(lReq.getEventId() != null){
-				ev = cm.getEvent(lReq.getEventId());
-				
-				if(ev != null){
-					eventId = updateLeaveRequestEvent(cm, lReq, ev);
-				}else{
-					eventId = createLeaveRequestEvent(cm, lReq, lrCalId);
-				}
-			}else{
-				eventId = createLeaveRequestEvent(cm, lReq, lrCalId);
-			}			
+			activityId = ts.getDefaultEventActivityId();
+		}else{
+			upi = getEnv().getProfileId();
 		}
 		
+		return catchEventId(upi, lReq, activityId);
+		
+		/*
+		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, upi);
+		
+		Integer eventId = null;
+		
+		if (cm != null) {
+			eventId = WT.runAsSysAdmin(new Callable<Integer>(){
+				public Integer call() throws WTException {
+					Integer lrCalId = us.getLeaveRequestCalendarId();
+			
+					if(lrCalId == null || !cm.existCalendar(lrCalId)){
+						lrCalId = createLeaveRequestCalendar(cm, lReq);
+
+						us.setLeaveRequestCalendarId(lrCalId);
+					}
+
+					if(lReq.getEventId() != null){
+						Event ev = cm.getEvent(lReq.getEventId());
+
+						if(ev != null){
+							return updateLeaveRequestEvent(cm, lReq, ev);
+						}else{
+							return createLeaveRequestEvent(cm, lReq, lrCalId, activityId);
+						}
+					}else{
+						return createLeaveRequestEvent(cm, lReq, lrCalId, activityId);
+					}		
+				}
+			});	
+		}
+		
+		return eventId;
+		*/
+	}
+	
+	private Integer catchEventId(final UserProfileId targetPid, final LeaveRequest lReq, Integer activityId) throws WTException {
+		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, targetPid);
+		
+		Integer eventId = null;
+		
+		if (cm != null) {
+			eventId = WT.runAsSysAdmin(new Callable<Integer>(){
+				public Integer call() throws WTException {
+					Integer lrCalId = us.getLeaveRequestCalendarId();
+			
+					if(lrCalId == null || cm.getCalendar(lrCalId) == null){
+						lrCalId = createLeaveRequestCalendar(cm, lReq);
+
+						us.setLeaveRequestCalendarId(lrCalId);
+					}
+
+					if(lReq.getEventId() != null){
+						Event ev = cm.getEvent(lReq.getEventId());
+
+						if(ev != null){
+							return updateLeaveRequestEvent(cm, lReq, ev);
+						}else{
+							return createLeaveRequestEvent(cm, lReq, lrCalId, activityId);
+						}
+					}else{
+						return createLeaveRequestEvent(cm, lReq, lrCalId, activityId);
+					}		
+				}
+			});	
+		}
 		return eventId;
 	}
 	
@@ -3485,7 +3583,7 @@ public class Service extends BaseService {
 		return cal.getCalendarId();
 	}
 	
-	private int createLeaveRequestEvent(ICalendarManager cm, LeaveRequest lReq, int lrCalId) throws WTException{
+	private int createLeaveRequestEvent(ICalendarManager cm, LeaveRequest lReq, int lrCalId, Integer activityId) throws WTException{
 		DateTimeZone tz = getEnv().getProfile().getTimeZone();
 		Event ev = new Event();
 		String title = "";
@@ -3495,6 +3593,8 @@ public class Service extends BaseService {
 		ev.setTimezone(tz.getID());
 		ev.setIsPrivate(true);
 		ev.setBusy(false);
+		
+		ev.setActivityId(activityId);
 		
 		if(lReq.getFromDate() != null && lReq.getToDate() != null){			
 			if(lReq.getFromHour() != null && lReq.getToHour() != null){

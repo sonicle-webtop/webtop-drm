@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class HourProfiles extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.HourProfilesRecord> {
 
-	private static final long serialVersionUID = 92940964;
+	private static final long serialVersionUID = 161961780;
 
 	/**
 	 * The reference instance of <code>drm.hour_profiles</code>
@@ -73,7 +73,7 @@ public class HourProfiles extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm
 	 */
 	@Override
 	public org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.HourProfilesRecord> getPrimaryKey() {
-		return com.sonicle.webtop.drm.jooq.Keys.HOUR_PROFILES_PKEY;
+		return com.sonicle.webtop.drm.jooq.Keys.OUR_PROFILES_PKEY;
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class HourProfiles extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm
 	 */
 	@Override
 	public java.util.List<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.HourProfilesRecord>> getKeys() {
-		return java.util.Arrays.<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.HourProfilesRecord>>asList(com.sonicle.webtop.drm.jooq.Keys.HOUR_PROFILES_PKEY);
+		return java.util.Arrays.<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.HourProfilesRecord>>asList(com.sonicle.webtop.drm.jooq.Keys.OUR_PROFILES_PKEY);
 	}
 
 	/**

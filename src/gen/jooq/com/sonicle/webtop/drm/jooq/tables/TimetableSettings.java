@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableSettings extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord> {
 
-	private static final long serialVersionUID = 1880743212;
+	private static final long serialVersionUID = 1893854082;
 
 	/**
 	 * The reference instance of <code>drm.timetable_settings</code>
@@ -115,6 +115,16 @@ public class TimetableSettings extends org.jooq.impl.TableImpl<com.sonicle.webto
 	 * The column <code>drm.timetable_settings.medical_visits_automatically_approved</code>.
 	 */
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord, java.lang.Boolean> MEDICAL_VISITS_AUTOMATICALLY_APPROVED = createField("medical_visits_automatically_approved", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
+
+	/**
+	 * The column <code>drm.timetable_settings.calendar_user_id</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord, java.lang.String> CALENDAR_USER_ID = createField("calendar_user_id", org.jooq.impl.SQLDataType.VARCHAR.length(50), this, "");
+
+	/**
+	 * The column <code>drm.timetable_settings.default_event_activity_id</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord, java.lang.Integer> DEFAULT_EVENT_ACTIVITY_ID = createField("default_event_activity_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
 	 * Create a <code>drm.timetable_settings</code> table reference

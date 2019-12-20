@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Opportunities extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.OpportunitiesRecord> {
 
-	private static final long serialVersionUID = -1774677831;
+	private static final long serialVersionUID = -1372542083;
 
 	/**
 	 * The reference instance of <code>drm.opportunities</code>
@@ -188,7 +188,7 @@ public class Opportunities extends org.jooq.impl.TableImpl<com.sonicle.webtop.dr
 	 */
 	@Override
 	public org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.OpportunitiesRecord> getPrimaryKey() {
-		return com.sonicle.webtop.drm.jooq.Keys.OPPORTUNITIES_PKEY;
+		return com.sonicle.webtop.drm.jooq.Keys.OPPORTUNITY_PKEY;
 	}
 
 	/**
@@ -196,7 +196,7 @@ public class Opportunities extends org.jooq.impl.TableImpl<com.sonicle.webtop.dr
 	 */
 	@Override
 	public java.util.List<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.OpportunitiesRecord>> getKeys() {
-		return java.util.Arrays.<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.OpportunitiesRecord>>asList(com.sonicle.webtop.drm.jooq.Keys.OPPORTUNITIES_PKEY);
+		return java.util.Arrays.<org.jooq.UniqueKey<com.sonicle.webtop.drm.jooq.tables.records.OpportunitiesRecord>>asList(com.sonicle.webtop.drm.jooq.Keys.OPPORTUNITY_PKEY);
 	}
 
 	/**

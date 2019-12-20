@@ -2015,6 +2015,11 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			me.needsReload = true;
 		}
 	},
+	printExpenseNote: function(ids) {
+		var me = this, url;
+		url = WTF.processBinUrl(me.ID, 'PrintExpenseNote', {ids: WTU.arrayAsParam(ids)});
+		Sonicle.URLMgr.openFile(url, {filename: 'expensenote', newWindow: true});
+	},
 	updateTimetableRequestAction: function (sel){
 		var me = this;
 		

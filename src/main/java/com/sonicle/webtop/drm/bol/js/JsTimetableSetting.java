@@ -61,6 +61,8 @@ public class JsTimetableSetting {
 	public Boolean requestsPermitsMedicalVisits;
 	public Boolean requestsPermitsContractuals;
 	public Boolean medicalVisitsAutomaticallyApproved;
+	public String calendarUserId;
+	public Integer defaultEventActivityId;
 	
 	public List<JsGridHolidayDate> holidayDates = new ArrayList();
 
@@ -83,6 +85,8 @@ public class JsTimetableSetting {
 		this.requestsPermitsMedicalVisits = setting.getRequestsPermitsMedicalVisits();
 		this.requestsPermitsContractuals = setting.getRequestsPermitsContractuals();
 		this.medicalVisitsAutomaticallyApproved = setting.getMedicalVisitsAutomaticallyApproved();
+		this.calendarUserId = setting.getCalendarUserId();
+		this.defaultEventActivityId = setting.getDefaultEventActivityId();
 		
 		for (HolidayDate hd : setting.getHolidayDates()) {
 			this.holidayDates.add(new JsGridHolidayDate(hd));
@@ -109,6 +113,8 @@ public class JsTimetableSetting {
 		tt.setRequestsPermitsMedicalVisits(js.requestsPermitsMedicalVisits);
 		tt.setRequestsPermitsContractuals(js.requestsPermitsContractuals);
 		tt.setMedicalVisitsAutomaticallyApproved(js.medicalVisitsAutomaticallyApproved);
+		tt.setCalendarUserId(js.calendarUserId);
+		tt.setDefaultEventActivityId(js.defaultEventActivityId);
 
 		for (JsGridHolidayDate hd : js.holidayDates) {
 
