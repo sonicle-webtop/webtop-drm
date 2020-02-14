@@ -3410,7 +3410,6 @@ public class DrmManager extends BaseManager {
 			
 			doUpdateCompanyPicture(con, companyId, picture);
 			DbUtils.commitQuietly(con);
-			writeLog("COMPANY_UPDATE", String.valueOf(companyId));
 			
 		} catch(SQLException | DAOException ex) {
 			DbUtils.rollbackQuietly(con);
