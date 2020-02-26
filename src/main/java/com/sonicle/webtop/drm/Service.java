@@ -3193,7 +3193,7 @@ public class Service extends BaseService {
 			title += "/ " + wrkRpt.getReferenceNo()+ " ";
 		evI.setTitle(title);
 
-		cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false, false, false);
+		cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false, false);
 		
 		return evI.getEventId();
 	}
@@ -3324,7 +3324,7 @@ public class Service extends BaseService {
 		if(o.getActivityId() != null)
 			evI.setActivityId(o.getActivityId());
 
-		cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false, false, false);
+		cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false, false);
 		
 		return evI.getEventId();
 	}
@@ -3448,7 +3448,7 @@ public class Service extends BaseService {
 
 		evI.setTitle(title);
 
-		cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false, false, false);
+		cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false, false);
 		
 		return evI.getEventId();
 	}
@@ -3470,7 +3470,7 @@ public class Service extends BaseService {
 				if(ev != null){
 					EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
 					evI.setTitle(title);
-					cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false, false, false);
+					cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false, false);
 				}
 			}
 		}
@@ -3665,7 +3665,7 @@ public class Service extends BaseService {
 		
 		evI.setTitle(title);
 
-		cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false, false, false);
+		cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false, false);
 		
 		return evI.getEventId();
 	}
