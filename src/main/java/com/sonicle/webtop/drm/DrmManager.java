@@ -1567,8 +1567,7 @@ public class DrmManager extends BaseManager {
 	public List<VOpportunityEntry> listOpportunitiesAndActions(OpportunityQuery query) throws WTException {
 		Connection con = null;
 		OpportunityDAO oDao = OpportunityDAO.getInstance();
-		List<VOpportunityEntry> opportunities = null
-				;
+		List<VOpportunityEntry> opportunities = null;
 		try {
 			con = WT.getConnection(SERVICE_ID);
 			opportunities = oDao.viewOpportunitiesAndActions(con, query, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());

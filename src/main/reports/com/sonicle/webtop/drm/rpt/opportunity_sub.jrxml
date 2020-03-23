@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.3.0.final using JasperReports Library version 6.3.0  -->
+<!-- 2020-03-11T17:16:28 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="opportunity_sub" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="50f218e9-bd31-4002-b76c-ef5f9fbb4d7e">
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<parameter name="PARAM_WT_DATE_FORMAT_SHORT" class="java.lang.String">
+		<defaultValueExpression><![CDATA["dd/MM/yyyy"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="oActs" class="java.util.ArrayList"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="startDate" class="java.util.Date"/>
+	<field name="endDate" class="java.util.Date"/>
+	<field name="activityDescription" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="subsequentActions" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="224" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="0" width="595" height="1" uuid="96ca3098-3a30-4a65-9ac6-4c40c9de05d4">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+			</line>
+			<staticText>
+				<reportElement x="0" y="10" width="125" height="16" uuid="7bd2fda1-0fcb-4c9e-b558-67e32ccc3129">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data e ora inizio:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="30" width="125" height="16" uuid="e3e2542b-43fc-4757-9be2-c48b81e77c71">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data e ora fine:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="140" y="10" width="435" height="16" uuid="cef38a90-3dd3-4c74-803a-e02dc6022871">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{startDate} == null ? "" : $F{startDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="140" y="30" width="435" height="16" uuid="8f7be62a-8ad9-47be-8052-f3c7add49c28">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{endDate} == null ? "" : $F{endDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="50" width="125" height="16" uuid="34d3261d-8093-467d-9dad-67a723c7a36a">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Attività:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="70" width="125" height="16" uuid="3f4c1f51-714b-45be-85a7-bfc19e0dcf3e">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Descrizione:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="90" width="125" height="16" uuid="01c3e463-3c38-43df-980e-77a556d9122e">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Azioni successive:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="140" y="50" width="435" height="16" uuid="39fb3d10-da31-4a7b-be25-5494d469bf1c">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{activityDescription} == null ? "" : $F{activityDescription}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="140" y="70" width="435" height="16" uuid="24143308-c134-433c-8c1d-bcf95b60bf13">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{description} == null ? "" : $F{description}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="140" y="90" width="435" height="130" uuid="b4a359c2-23e3-4eca-98ac-d2d840fa7d38"/>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{subsequentActions} == null ? "" : $F{subsequentActions}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

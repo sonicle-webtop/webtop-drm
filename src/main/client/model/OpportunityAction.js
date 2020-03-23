@@ -49,9 +49,8 @@ Ext.define('Sonicle.webtop.drm.model.OpportunityAction', {
 		WTF.field('opportunityId', 'int', true),
 		WTF.field('operatorId', 'string', false),
 		WTF.field('statusId', 'int', false),
-		WTF.field('date', 'date', false, {dateFormat: 'Y-m-d', defaultValue: new Date()}),
-		WTF.field('fromHour', 'string', true),
-		WTF.field('toHour', 'string', true),
+		WTF.field('startDate', 'date', false, {dateFormat: 'Y-m-d H:i:s', defaultValue: new Date()}),
+		WTF.field('endDate', 'date', false, {dateFormat: 'Y-m-d H:i:s', defaultValue: new Date()}),
 		WTF.field('description', 'string', false),
 		WTF.field('place', 'string', true),
 		WTF.field('subsequentActions', 'string', false),
@@ -61,6 +60,69 @@ Ext.define('Sonicle.webtop.drm.model.OpportunityAction', {
 	hasMany: [
 		WTF.hasMany('actionInterlocutors', 'Sonicle.webtop.drm.model.OpportunityActionInterlocutor'),
 		WTF.hasMany('actionDocuments', 'Sonicle.webtop.drm.model.OpportunityActionDocument')
-	]
+	],
+	
+	setStart: function(date) {
+		var me = this,
+				dt = Ext.isDate(date) ? date : new Date(),
+				dur = Sonicle.Date.diff(me.get('startDate'), me.get('endDate'), Ext.Date.MINUTE, true);
+		
+		me.set('startDate', dt);
+		me.set('endDate', Ext.Date.add(dt, Ext.Date.MINUTE, dur, true));
+	},
+	
+	setEnd: function(date) {
+		var me = this,
+				dt = Ext.isDate(date) ? date : new Date(),
+				dur = Sonicle.Date.diff(me.get('startDate'), me.get('endDate'), Ext.Date.MINUTE, true),
+				sta = me.get('startDate');
+		
+		me.set('endDate', dt);
+		if (!Ext.isDate(sta)) return;
+		if (dt < sta) me.set('startDate', Ext.Date.add(dt, Ext.Date.MINUTE, -dur, true));
+	},
+	
+	setStartDate: function(date) {
+		var me = this,
+				dt = Ext.isDate(date) ? date : new Date(),
+				dur = Sonicle.Date.diff(me.get('startDate'), me.get('endDate'), Ext.Date.MINUTE, true),
+				v;
+		
+		v = me.setDatePart('startDate', dt);
+		me.set('endDate', Ext.Date.add(v, Ext.Date.MINUTE, dur, true));
+	},
+	
+	setStartTime: function(date) {
+		var me = this,
+				dt = Ext.isDate(date) ? date : new Date(),
+				dur = Sonicle.Date.diff(me.get('startDate'), me.get('endDate'), Ext.Date.MINUTE, true),
+				v;
+		
+		v = me.setTimePart('startDate', dt);
+		me.set('endDate', Ext.Date.add(v, Ext.Date.MINUTE, dur, true));
+	},
+	
+	setEndDate: function(date) {
+		var me = this,
+				dt = Ext.isDate(date) ? date : new Date(),
+				sta = me.get('startDate'),
+				dur = Sonicle.Date.diff(sta, me.get('endDate'), Ext.Date.MINUTE, true),
+				v;
+		
+		v = me.setDatePart('endDate', dt);
+		if (!Ext.isDate(sta)) return;
+		if (v < sta) me.set('startDate', Ext.Date.add(v, Ext.Date.MINUTE, -dur, true));
+	},
+	
+	setEndTime: function(date) {
+		var me = this,
+				dt = Ext.isDate(date) ? date : new Date(),
+				sta = me.get('startDate'),
+				v;
+		
+		v = me.setTimePart('endDate', dt);
+		if (!Ext.isDate(sta)) return;
+		if (v < sta) me.set('startDate', v);
+	}
 });
 

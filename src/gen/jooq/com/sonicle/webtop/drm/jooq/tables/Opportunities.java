@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Opportunities extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.OpportunitiesRecord> {
 
-	private static final long serialVersionUID = -1372542083;
+	private static final long serialVersionUID = -1540099709;
 
 	/**
 	 * The reference instance of <code>drm.opportunities</code>
@@ -50,21 +50,6 @@ public class Opportunities extends org.jooq.impl.TableImpl<com.sonicle.webtop.dr
 	 * The column <code>drm.opportunities.operator_id</code>.
 	 */
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.OpportunitiesRecord, java.lang.String> OPERATOR_ID = createField("operator_id", org.jooq.impl.SQLDataType.VARCHAR.length(36).nullable(false), this, "");
-
-	/**
-	 * The column <code>drm.opportunities.date</code>.
-	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.OpportunitiesRecord, org.joda.time.LocalDate> DATE = createField("date", org.jooq.impl.SQLDataType.DATE.nullable(false), this, "", new com.sonicle.webtop.core.jooq.LocalDateConverter());
-
-	/**
-	 * The column <code>drm.opportunities.from_hour</code>.
-	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.OpportunitiesRecord, java.lang.String> FROM_HOUR = createField("from_hour", org.jooq.impl.SQLDataType.VARCHAR.length(5), this, "");
-
-	/**
-	 * The column <code>drm.opportunities.to_hour</code>.
-	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.OpportunitiesRecord, java.lang.String> TO_HOUR = createField("to_hour", org.jooq.impl.SQLDataType.VARCHAR.length(5), this, "");
 
 	/**
 	 * The column <code>drm.opportunities.executed_with</code>.
@@ -160,6 +145,16 @@ public class Opportunities extends org.jooq.impl.TableImpl<com.sonicle.webtop.dr
 	 * The column <code>drm.opportunities.event_id</code>.
 	 */
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.OpportunitiesRecord, java.lang.Integer> EVENT_ID = createField("event_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+	/**
+	 * The column <code>drm.opportunities.start_date</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.OpportunitiesRecord, org.joda.time.DateTime> START_DATE = createField("start_date", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "", new com.sonicle.webtop.core.jooq.DateTimeConverter());
+
+	/**
+	 * The column <code>drm.opportunities.end_date</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.OpportunitiesRecord, org.joda.time.DateTime> END_DATE = createField("end_date", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "", new com.sonicle.webtop.core.jooq.DateTimeConverter());
 
 	/**
 	 * Create a <code>drm.opportunities</code> table reference

@@ -41,9 +41,8 @@ Ext.define('Sonicle.webtop.drm.model.GridOpportunities', {
 		WTF.roField('compositeId', 'string'),
 		WTF.roField('companyId', 'int'),
 		WTF.roField('operatorId', 'string'),
-		WTF.roField('date', 'date', {dateFormat: 'Y-m-d'}),
-		WTF.roField('fromHour', 'string'),
-		WTF.roField('toHour', 'string'),
+		WTF.roField('startDate', 'date', {dateFormat: 'Y-m-d H:i'}),
+		WTF.roField('endDate', 'date', {dateFormat: 'Y-m-d H:i'}),
 		WTF.roField('additionalInfo', 'string'),
 		
 		WTF.roField('isTotallyClosed', 'bool')

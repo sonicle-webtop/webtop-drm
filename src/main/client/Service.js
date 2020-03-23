@@ -96,7 +96,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							region: 'north',
 							xtype: 'wtdrmopportunitysearch',
 							reference: 'filtersOpportunity',
-							title: me.res('gpOpportunity.tit.lbl'),
+							title: (me.getVar('opportunityTitle') == null  || me.getVar('opportunityTitle') == '') ? me.res('gpOpportunity.tit.lbl') : me.getVar('opportunityTitle'),
 							iconCls: 'wtdrm-icon-opportunity-xs',
 							titleCollapse: true,
 							collapsible: true,
@@ -117,7 +117,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 										return 'opportunity-grid-row-closed';
 									} else{
 										if(r.get('actionId') !== 0){
-											if(r.get('date') >= new Date().setHours(0,0,0,0)) 
+											if(r.get('startDate') >= new Date()) 
 												return 'opportunity-grid-row-notexpired';
 											else 
 												return 'opportunity-grid-row-expired';
@@ -172,21 +172,18 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									flex: 3
 								},
 								{
-									dataIndex: 'date',
-									header: me.res('gpOpportunity.date.lbl'),
+									dataIndex: 'startDate',
+									header: me.res('gpOpportunity.fromdate.lbl'),
 									xtype: 'datecolumn',
-									format: WT.getShortDateFmt(),
-									flex: 2
+									format: WT.getShortDateTimeFmt(),
+									flex: 3
 								},
 								{
-									dataIndex: 'fromHour',
-									header: me.res('gpOpportunity.fromhour.lbl'),
-									flex: 2
-								},
-								{
-									dataIndex: 'toHour',
-									header: me.res('gpOpportunity.tohour.lbl'),
-									flex: 2
+									dataIndex: 'endDate',
+									header: me.res('gpOpportunity.todate.lbl'),
+									xtype: 'datecolumn',
+									format: WT.getShortDateTimeFmt(),
+									flex: 3
 								},
 								{
 									dataIndex: 'additionalInfo',
@@ -402,8 +399,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								'-',
 								me.getAct('workReport', 'edit'),
 								me.getAct('workReport', 'remove'),
-								'-',
-								me.getAct('workReport', 'sendMail'),
 								'-',
 								me.getAct('workReport', 'printSummary')
 							],
@@ -1354,15 +1349,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				me.deleteWorkReportUI(sel);
 			}
 		});
-		me.addAct('workReport', 'sendMail', {
-			text: me.res('act-sendMail.lbl'),
-			tooltip: null,
-			iconCls: 'wtdrm-icon-mail-xs ',
-			disabled: true,
-			handler: function () {
-				
-			}
-		});
 		me.addAct('workReport', 'printSummary', {
 			text: me.res('act-printSummary.lbl'),
 			tooltip: null,
@@ -1550,7 +1536,13 @@ Ext.define('Sonicle.webtop.drm.Service', {
 
 		var me = this,
 			fop = me.filtersOpportunity(),
-			vw = WT.createView(me.ID, 'view.Opportunity', {swapReturn: true});
+			vw = WT.createView(me.ID, 'view.Opportunity', {
+							swapReturn: true, 
+							viewCfg: {
+								dockableConfig: {
+									title: (me.getVar('opportunityTitle') == null  || me.getVar('opportunityTitle') == '') ? me.res('opportunity.tit') : me.getVar('opportunityTitle')
+								}
+							}});
 		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
@@ -1583,7 +1575,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	editOpportunity: function (id, opts) {
 		opts = opts || {};
 		var me = this,
-				vw = WT.createView(me.ID, 'view.Opportunity', {swapReturn: true});
+				vw = WT.createView(me.ID, 'view.Opportunity', {
+								swapReturn: true, viewCfg: {
+									dockableConfig: {
+										title: (me.getVar('opportunityTitle') == null  || me.getVar('opportunityTitle') == '') ? me.res('opportunity.tit') : me.getVar('opportunityTitle')
+									}
+								}});
 		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
@@ -1759,6 +1756,11 @@ Ext.define('Sonicle.webtop.drm.Service', {
 						}
 					});
 				});
+	},
+	printOpportunity: function(ids) {
+		var me = this, url;
+		url = WTF.processBinUrl(me.ID, 'PrintOpportunity', {ids: WTU.arrayAsParam(ids)});
+		Sonicle.URLMgr.openFile(url, {filename: 'opportunity', newWindow: true});
 	},
 	
 	addWorkReport: function (opts) {

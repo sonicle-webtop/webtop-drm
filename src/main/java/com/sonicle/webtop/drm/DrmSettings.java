@@ -64,6 +64,10 @@ public class DrmSettings {
 	
 	public static final String OPPORTUNITY_DEFAULT_DOC_STATUS_ID = "opportunity.default.docstatusid";
 	
+	public static final String OPPORTUNITY_GENERAL_TITLE = "opportunity.general.title";
+	
+	public static final String OPPORTUNITY_GENERAL_ENABLE_PRINT = "opportunity.general.enableprint";
+	
 	public static final String OPPORTUNITY_CALENDAR_ID = "opportunity.calendar.id";
 	
 	public static final String WORK_REPORT_CALENDAR_ID = "workreport.calendar.id";
@@ -75,4 +79,8 @@ public class DrmSettings {
 	public static final String EXPENSE_NOTE_DEFAULT_CURRENCY = "expensenote.defaultcurrency";
 	
 	public static final String LEAVE_REQUEST_MEDICAL_VISITS_AUTOMATICALLY_APPROVED = "leaverequest.medicalvisitsautomaticallyapproved";
+	
+	public static final String WORKDAY_START = "workday.start";
+	
+	public static final String WORKDAY_END = "workday.end";
 }

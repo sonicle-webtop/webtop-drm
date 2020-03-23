@@ -16,49 +16,46 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OpportunityActions implements java.io.Serializable {
 
-	private static final long serialVersionUID = 205653191;
+	private static final long serialVersionUID = 452979135;
 
-	private java.lang.Integer       id;
-	private java.lang.Integer       opportunityId;
-	private java.lang.String        operatorId;
-	private java.lang.Integer       statusId;
-	private org.joda.time.LocalDate date;
-	private java.lang.String        fromHour;
-	private java.lang.String        toHour;
-	private java.lang.String        description;
-	private java.lang.String        place;
-	private java.lang.String        subsequentActions;
-	private java.lang.Integer       activityId;
-	private java.lang.Integer       eventId;
+	private java.lang.Integer      id;
+	private java.lang.Integer      opportunityId;
+	private java.lang.String       operatorId;
+	private java.lang.Integer      statusId;
+	private java.lang.String       description;
+	private java.lang.String       place;
+	private java.lang.String       subsequentActions;
+	private java.lang.Integer      activityId;
+	private java.lang.Integer      eventId;
+	private org.joda.time.DateTime startDate;
+	private org.joda.time.DateTime endDate;
 
 	public OpportunityActions() {}
 
 	public OpportunityActions(
-		java.lang.Integer       id,
-		java.lang.Integer       opportunityId,
-		java.lang.String        operatorId,
-		java.lang.Integer       statusId,
-		org.joda.time.LocalDate date,
-		java.lang.String        fromHour,
-		java.lang.String        toHour,
-		java.lang.String        description,
-		java.lang.String        place,
-		java.lang.String        subsequentActions,
-		java.lang.Integer       activityId,
-		java.lang.Integer       eventId
+		java.lang.Integer      id,
+		java.lang.Integer      opportunityId,
+		java.lang.String       operatorId,
+		java.lang.Integer      statusId,
+		java.lang.String       description,
+		java.lang.String       place,
+		java.lang.String       subsequentActions,
+		java.lang.Integer      activityId,
+		java.lang.Integer      eventId,
+		org.joda.time.DateTime startDate,
+		org.joda.time.DateTime endDate
 	) {
 		this.id = id;
 		this.opportunityId = opportunityId;
 		this.operatorId = operatorId;
 		this.statusId = statusId;
-		this.date = date;
-		this.fromHour = fromHour;
-		this.toHour = toHour;
 		this.description = description;
 		this.place = place;
 		this.subsequentActions = subsequentActions;
 		this.activityId = activityId;
 		this.eventId = eventId;
+		this.startDate = startDate;
+		this.endDate = endDate;
 	}
 
 	public java.lang.Integer getId() {
@@ -91,30 +88,6 @@ public class OpportunityActions implements java.io.Serializable {
 
 	public void setStatusId(java.lang.Integer statusId) {
 		this.statusId = statusId;
-	}
-
-	public org.joda.time.LocalDate getDate() {
-		return this.date;
-	}
-
-	public void setDate(org.joda.time.LocalDate date) {
-		this.date = date;
-	}
-
-	public java.lang.String getFromHour() {
-		return this.fromHour;
-	}
-
-	public void setFromHour(java.lang.String fromHour) {
-		this.fromHour = fromHour;
-	}
-
-	public java.lang.String getToHour() {
-		return this.toHour;
-	}
-
-	public void setToHour(java.lang.String toHour) {
-		this.toHour = toHour;
 	}
 
 	public java.lang.String getDescription() {
@@ -155,5 +128,21 @@ public class OpportunityActions implements java.io.Serializable {
 
 	public void setEventId(java.lang.Integer eventId) {
 		this.eventId = eventId;
+	}
+
+	public org.joda.time.DateTime getStartDate() {
+		return this.startDate;
+	}
+
+	public void setStartDate(org.joda.time.DateTime startDate) {
+		this.startDate = startDate;
+	}
+
+	public org.joda.time.DateTime getEndDate() {
+		return this.endDate;
+	}
+
+	public void setEndDate(org.joda.time.DateTime endDate) {
+		this.endDate = endDate;
 	}
 }

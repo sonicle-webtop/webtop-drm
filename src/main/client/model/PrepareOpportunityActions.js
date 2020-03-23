@@ -47,10 +47,74 @@ Ext.define('Sonicle.webtop.drm.model.PrepareOpportunityActions', {
 		WTF.field('id', 'int', false),
 		WTF.field('opportunityId', 'int', true),
 		WTF.field('operatorId', 'string', true),
-		WTF.field('date', 'date', true, {dateFormat: 'Y-m-d', defaultValue: new Date()})
+		WTF.field('startDate', 'date', true, {dateFormat: 'Y-m-d H:i:s', defaultValue: new Date()}),
+		WTF.field('endDate', 'date', true, {dateFormat: 'Y-m-d H:i:s', defaultValue: new Date()})
 	],
 	hasMany: [
 		WTF.hasMany('actionActivities', 'Sonicle.webtop.drm.model.Activity')
-	]
+	],
+	
+	setStart: function(date) {
+		var me = this,
+				dt = Ext.isDate(date) ? date : new Date(),
+				dur = Sonicle.Date.diff(me.get('startDate'), me.get('endDate'), Ext.Date.MINUTE, true);
+		
+		me.set('startDate', dt);
+		me.set('endDate', Ext.Date.add(dt, Ext.Date.MINUTE, dur, true));
+	},
+	
+	setEnd: function(date) {
+		var me = this,
+				dt = Ext.isDate(date) ? date : new Date(),
+				dur = Sonicle.Date.diff(me.get('startDate'), me.get('endDate'), Ext.Date.MINUTE, true),
+				sta = me.get('startDate');
+		
+		me.set('endDate', dt);
+		if (!Ext.isDate(sta)) return;
+		if (dt < sta) me.set('startDate', Ext.Date.add(dt, Ext.Date.MINUTE, -dur, true));
+	},
+	
+	setStartDate: function(date) {
+		var me = this,
+				dt = Ext.isDate(date) ? date : new Date(),
+				dur = Sonicle.Date.diff(me.get('startDate'), me.get('endDate'), Ext.Date.MINUTE, true),
+				v;
+		
+		v = me.setDatePart('startDate', dt);
+		me.set('endDate', Ext.Date.add(v, Ext.Date.MINUTE, dur, true));
+	},
+	
+	setStartTime: function(date) {
+		var me = this,
+				dt = Ext.isDate(date) ? date : new Date(),
+				dur = Sonicle.Date.diff(me.get('startDate'), me.get('endDate'), Ext.Date.MINUTE, true),
+				v;
+		
+		v = me.setTimePart('startDate', dt);
+		me.set('endDate', Ext.Date.add(v, Ext.Date.MINUTE, dur, true));
+	},
+	
+	setEndDate: function(date) {
+		var me = this,
+				dt = Ext.isDate(date) ? date : new Date(),
+				sta = me.get('startDate'),
+				dur = Sonicle.Date.diff(sta, me.get('endDate'), Ext.Date.MINUTE, true),
+				v;
+		
+		v = me.setDatePart('endDate', dt);
+		if (!Ext.isDate(sta)) return;
+		if (v < sta) me.set('startDate', Ext.Date.add(v, Ext.Date.MINUTE, -dur, true));
+	},
+	
+	setEndTime: function(date) {
+		var me = this,
+				dt = Ext.isDate(date) ? date : new Date(),
+				sta = me.get('startDate'),
+				v;
+		
+		v = me.setTimePart('endDate', dt);
+		if (!Ext.isDate(sta)) return;
+		if (v < sta) me.set('startDate', v);
+	}
 });
 

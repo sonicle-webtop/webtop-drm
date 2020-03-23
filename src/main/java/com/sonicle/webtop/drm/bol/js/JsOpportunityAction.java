@@ -37,7 +37,8 @@ import com.sonicle.webtop.drm.model.OpportunityActionDocument;
 import com.sonicle.webtop.drm.model.OpportunityActionInterlocutor;
 import java.util.ArrayList;
 import java.util.List;
-import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  *
@@ -49,9 +50,8 @@ public class JsOpportunityAction {
 	public Integer opportunityId;
 	public String operatorId;
 	public Integer statusId;
-	public LocalDate date;
-	public String fromHour;
-	public String toHour;
+	public String startDate;
+	public String endDate;
 	public String description;
 	public String place;
 	public String subsequentActions;
@@ -62,13 +62,15 @@ public class JsOpportunityAction {
 	public List<Document> actionDocuments = new ArrayList();
 
 	public JsOpportunityAction(OpportunityAction oAct) {
+		
+		DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+		
 		this.id = oAct.getId();
 		this.opportunityId = oAct.getOpportunityId();
 		this.operatorId = oAct.getOperatorId();
 		this.statusId = oAct.getStatusId();
-		this.date = oAct.getDate();
-		this.fromHour = oAct.getFromHour();
-		this.toHour = oAct.getToHour();
+		this.startDate = formatter.print(oAct.getStartDate());
+		this.endDate = formatter.print(oAct.getEndDate());
 		this.description = oAct.getDescription();
 		this.place = oAct.getPlace();
 		this.subsequentActions = oAct.getSubsequentActions();
@@ -90,15 +92,16 @@ public class JsOpportunityAction {
 	}
 
 	public static OpportunityAction createOpportunityAction(JsOpportunityAction js) {
+		
+		DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
 
 		OpportunityAction oAct = new OpportunityAction();
 		oAct.setId(js.id);
 		oAct.setOpportunityId(js.opportunityId);
 		oAct.setOperatorId(js.operatorId);
 		oAct.setStatusId(js.statusId);
-		oAct.setDate(js.date);
-		oAct.setFromHour(js.fromHour);
-		oAct.setToHour(js.toHour);
+		oAct.setStartDate(formatter.parseDateTime(js.startDate));
+		oAct.setEndDate(formatter.parseDateTime(js.endDate));
 		oAct.setDescription(js.description);
 		oAct.setPlace(js.place);
 		oAct.setSubsequentActions(js.subsequentActions);

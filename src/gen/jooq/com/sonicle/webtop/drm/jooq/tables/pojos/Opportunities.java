@@ -16,72 +16,67 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Opportunities implements java.io.Serializable {
 
-	private static final long serialVersionUID = -631698376;
+	private static final long serialVersionUID = 1026485240;
 
-	private java.lang.Integer       id;
-	private java.lang.String        domainId;
-	private java.lang.Integer       companyId;
-	private java.lang.String        operatorId;
-	private org.joda.time.LocalDate date;
-	private java.lang.String        fromHour;
-	private java.lang.String        toHour;
-	private java.lang.String        executedWith;
-	private java.lang.String        customerId;
-	private java.lang.String        customerStatId;
-	private java.lang.String        sector;
-	private java.lang.String        description;
-	private java.lang.String        place;
-	private java.lang.String        objective;
-	private java.lang.Integer       causalId;
-	private java.lang.Integer       activityId;
-	private java.lang.String        objective_2;
-	private java.lang.String        result;
-	private java.lang.String        discoveries;
-	private java.lang.String        customerPotential;
-	private java.lang.String        notes;
-	private java.lang.Integer       statusId;
-	private java.lang.String        signedBy;
-	private java.lang.Boolean       signature;
-	private java.lang.Boolean       success;
-	private java.lang.Integer       eventId;
+	private java.lang.Integer      id;
+	private java.lang.String       domainId;
+	private java.lang.Integer      companyId;
+	private java.lang.String       operatorId;
+	private java.lang.String       executedWith;
+	private java.lang.String       customerId;
+	private java.lang.String       customerStatId;
+	private java.lang.String       sector;
+	private java.lang.String       description;
+	private java.lang.String       place;
+	private java.lang.String       objective;
+	private java.lang.Integer      causalId;
+	private java.lang.Integer      activityId;
+	private java.lang.String       objective_2;
+	private java.lang.String       result;
+	private java.lang.String       discoveries;
+	private java.lang.String       customerPotential;
+	private java.lang.String       notes;
+	private java.lang.Integer      statusId;
+	private java.lang.String       signedBy;
+	private java.lang.Boolean      signature;
+	private java.lang.Boolean      success;
+	private java.lang.Integer      eventId;
+	private org.joda.time.DateTime startDate;
+	private org.joda.time.DateTime endDate;
 
 	public Opportunities() {}
 
 	public Opportunities(
-		java.lang.Integer       id,
-		java.lang.String        domainId,
-		java.lang.Integer       companyId,
-		java.lang.String        operatorId,
-		org.joda.time.LocalDate date,
-		java.lang.String        fromHour,
-		java.lang.String        toHour,
-		java.lang.String        executedWith,
-		java.lang.String        customerId,
-		java.lang.String        customerStatId,
-		java.lang.String        sector,
-		java.lang.String        description,
-		java.lang.String        place,
-		java.lang.String        objective,
-		java.lang.Integer       causalId,
-		java.lang.Integer       activityId,
-		java.lang.String        objective_2,
-		java.lang.String        result,
-		java.lang.String        discoveries,
-		java.lang.String        customerPotential,
-		java.lang.String        notes,
-		java.lang.Integer       statusId,
-		java.lang.String        signedBy,
-		java.lang.Boolean       signature,
-		java.lang.Boolean       success,
-		java.lang.Integer       eventId
+		java.lang.Integer      id,
+		java.lang.String       domainId,
+		java.lang.Integer      companyId,
+		java.lang.String       operatorId,
+		java.lang.String       executedWith,
+		java.lang.String       customerId,
+		java.lang.String       customerStatId,
+		java.lang.String       sector,
+		java.lang.String       description,
+		java.lang.String       place,
+		java.lang.String       objective,
+		java.lang.Integer      causalId,
+		java.lang.Integer      activityId,
+		java.lang.String       objective_2,
+		java.lang.String       result,
+		java.lang.String       discoveries,
+		java.lang.String       customerPotential,
+		java.lang.String       notes,
+		java.lang.Integer      statusId,
+		java.lang.String       signedBy,
+		java.lang.Boolean      signature,
+		java.lang.Boolean      success,
+		java.lang.Integer      eventId,
+		org.joda.time.DateTime startDate,
+		org.joda.time.DateTime endDate
 	) {
 		this.id = id;
 		this.domainId = domainId;
 		this.companyId = companyId;
 		this.operatorId = operatorId;
-		this.date = date;
-		this.fromHour = fromHour;
-		this.toHour = toHour;
 		this.executedWith = executedWith;
 		this.customerId = customerId;
 		this.customerStatId = customerStatId;
@@ -101,6 +96,8 @@ public class Opportunities implements java.io.Serializable {
 		this.signature = signature;
 		this.success = success;
 		this.eventId = eventId;
+		this.startDate = startDate;
+		this.endDate = endDate;
 	}
 
 	public java.lang.Integer getId() {
@@ -133,30 +130,6 @@ public class Opportunities implements java.io.Serializable {
 
 	public void setOperatorId(java.lang.String operatorId) {
 		this.operatorId = operatorId;
-	}
-
-	public org.joda.time.LocalDate getDate() {
-		return this.date;
-	}
-
-	public void setDate(org.joda.time.LocalDate date) {
-		this.date = date;
-	}
-
-	public java.lang.String getFromHour() {
-		return this.fromHour;
-	}
-
-	public void setFromHour(java.lang.String fromHour) {
-		this.fromHour = fromHour;
-	}
-
-	public java.lang.String getToHour() {
-		return this.toHour;
-	}
-
-	public void setToHour(java.lang.String toHour) {
-		this.toHour = toHour;
 	}
 
 	public java.lang.String getExecutedWith() {
@@ -309,5 +282,21 @@ public class Opportunities implements java.io.Serializable {
 
 	public void setEventId(java.lang.Integer eventId) {
 		this.eventId = eventId;
+	}
+
+	public org.joda.time.DateTime getStartDate() {
+		return this.startDate;
+	}
+
+	public void setStartDate(org.joda.time.DateTime startDate) {
+		this.startDate = startDate;
+	}
+
+	public org.joda.time.DateTime getEndDate() {
+		return this.endDate;
+	}
+
+	public void setEndDate(org.joda.time.DateTime endDate) {
+		this.endDate = endDate;
 	}
 }

@@ -33,6 +33,7 @@
 package com.sonicle.webtop.drm;
 
 import com.sonicle.commons.db.DbUtils;
+import com.sonicle.commons.time.DateTimeUtils;
 import com.sonicle.commons.web.Crud;
 import com.sonicle.commons.web.ServletUtils;
 import com.sonicle.commons.web.json.JsonResult;
@@ -45,6 +46,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 
 /**
@@ -61,6 +63,7 @@ public class UserOptionsService extends BaseUserOptionsService {
 		try {
 			String crud = ServletUtils.getStringParameter(request, "crud", true);
 			DrmUserSettings dus = new DrmUserSettings(SERVICE_ID, getTargetProfileId());
+			DateTimeFormatter hmf = DateTimeUtils.createHmFormatter();
 			
 			if(crud.equals(Crud.READ)) {
 				JsUserOptions jso = new JsUserOptions(getTargetProfileId().toString());
@@ -68,6 +71,8 @@ public class UserOptionsService extends BaseUserOptionsService {
 				// Main
 				jso.kmCost = dus.getKmCost();
 				jso.defaultCurrency = dus.getDefaultCurrency();
+				jso.workdayStart = hmf.print(dus.getWorkdayStart());
+				jso.workdayEnd = hmf.print(dus.getWorkdayEnd());
 				
 				new JsonResult(jso).printTo(out);
 				

@@ -47,7 +47,9 @@ import com.sonicle.webtop.drm.jooq.tables.records.OpportunitiesRecord;
 import java.sql.Connection;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
@@ -107,10 +109,9 @@ public class OpportunityDAO extends BaseDAO {
 						fldOpp,
 						OPPORTUNITIES.COMPANY_ID,
 						OPPORTUNITIES.OPERATOR_ID,
-						OPPORTUNITIES.DATE,
+						OPPORTUNITIES.START_DATE,
 						fldXDate,
-						OPPORTUNITIES.FROM_HOUR,
-						OPPORTUNITIES.TO_HOUR,
+						OPPORTUNITIES.END_DATE,
 						OPPORTUNITIES.EXECUTED_WITH,
 						OPPORTUNITIES.CUSTOMER_ID,
 						OPPORTUNITIES.CUSTOMER_STAT_ID,
@@ -141,10 +142,9 @@ public class OpportunityDAO extends BaseDAO {
 								fldAct,
 								OPPORTUNITIES.COMPANY_ID,
 								OPPORTUNITY_ACTIONS.OPERATOR_ID,
-								OPPORTUNITY_ACTIONS.DATE,
-								OPPORTUNITY_ACTIONS.DATE.as("x_date"),
-								OPPORTUNITY_ACTIONS.FROM_HOUR,
-								OPPORTUNITY_ACTIONS.TO_HOUR,
+								OPPORTUNITY_ACTIONS.START_DATE,
+								OPPORTUNITY_ACTIONS.START_DATE.as("x_date"),
+								OPPORTUNITY_ACTIONS.END_DATE,
 								OPPORTUNITIES.EXECUTED_WITH,
 								OPPORTUNITIES.CUSTOMER_ID,
 								OPPORTUNITIES.CUSTOMER_STAT_ID,
@@ -175,8 +175,7 @@ public class OpportunityDAO extends BaseDAO {
 								searchCndt
 						)
 						.orderBy(
-								OPPORTUNITY_ACTIONS.DATE,
-								OPPORTUNITY_ACTIONS.FROM_HOUR
+								OPPORTUNITY_ACTIONS.START_DATE
 						)
 				)
 				.orderBy(
@@ -204,9 +203,8 @@ public class OpportunityDAO extends BaseDAO {
 				.update(OPPORTUNITIES)
 				.set(OPPORTUNITIES.COMPANY_ID, item.getCompanyId())
 				.set(OPPORTUNITIES.OPERATOR_ID, item.getOperatorId())
-				.set(OPPORTUNITIES.DATE, item.getDate())
-				.set(OPPORTUNITIES.FROM_HOUR, item.getFromHour())
-				.set(OPPORTUNITIES.TO_HOUR, item.getToHour())
+				.set(OPPORTUNITIES.START_DATE, item.getStartDate())
+				.set(OPPORTUNITIES.END_DATE, item.getEndDate())
 				.set(OPPORTUNITIES.EXECUTED_WITH, item.getExecutedWith())
 				.set(OPPORTUNITIES.CUSTOMER_ID, item.getCustomerId())
 				.set(OPPORTUNITIES.CUSTOMER_STAT_ID, item.getCustomerStatId())
@@ -283,28 +281,20 @@ public class OpportunityDAO extends BaseDAO {
 		
 		if (query.date != null) {
 			if(query.toDate != null){
-				searchCndt = searchCndt.and(OPPORTUNITIES.DATE.between(query.date, query.toDate));
+				searchCndt = searchCndt.and(OPPORTUNITIES.START_DATE.between(query.date.toDateTime(LocalTime.MIDNIGHT), query.toDate.toDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59)));
 				searchCndt = searchCndt.or(OPPORTUNITIES.ID.in(
 						dsl.select(OPPORTUNITY_ACTIONS.OPPORTUNITY_ID)
 								.from(OPPORTUNITY_ACTIONS)
-								.where(OPPORTUNITY_ACTIONS.DATE.between(query.date, query.toDate))
+								.where(OPPORTUNITY_ACTIONS.START_DATE.between(query.date.toDateTime(LocalTime.MIDNIGHT), query.toDate.toDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59)))
 				));
 			}else{
-				searchCndt = searchCndt.and(OPPORTUNITIES.DATE.greaterOrEqual(query.date));
+				searchCndt = searchCndt.and(OPPORTUNITIES.START_DATE.greaterOrEqual(query.date.toDateTime(LocalTime.MIDNIGHT)));
 				searchCndt = searchCndt.or(OPPORTUNITIES.ID.in(
 						dsl.select(OPPORTUNITY_ACTIONS.OPPORTUNITY_ID)
 								.from(OPPORTUNITY_ACTIONS)
-								.where(OPPORTUNITY_ACTIONS.DATE.greaterOrEqual(query.date))
+								.where(OPPORTUNITY_ACTIONS.START_DATE.greaterOrEqual(query.date.toDateTime(LocalTime.MIDNIGHT)))
 				));
 			}
-		}
-		
-		if (!StringUtils.isEmpty(query.fromHour)) {
-			searchCndt = searchCndt.and(OPPORTUNITIES.FROM_HOUR.equal(query.fromHour));
-		}
-		
-		if (!StringUtils.isEmpty(query.toHour)) {
-			searchCndt = searchCndt.and(OPPORTUNITIES.TO_HOUR.equal(query.toHour));
 		}
 		
 		if (!StringUtils.isEmpty(query.executedWith)) {

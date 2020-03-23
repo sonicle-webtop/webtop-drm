@@ -45,7 +45,9 @@ Ext.define('Sonicle.webtop.drm.model.OpportunitySetting', {
 	idProperty: 'id',
 	fields: [
 		WTF.field('id', 'string', false),
-		WTF.field('defaultStatus', 'string', true)
+		WTF.field('defaultStatus', 'string', true),
+		WTF.field('title', 'string', true),
+		WTF.field('enablePrint', 'bool', true)
 	],
 	hasMany: [
 		WTF.hasMany('generalFields', 'Sonicle.webtop.drm.model.OpportunityField'),

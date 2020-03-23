@@ -47,6 +47,8 @@ import org.apache.commons.lang3.StringUtils;
 public class JsOpportunitySetting {
 	
 	public String defaultStatus;
+	public String title;
+	public Boolean enablePrint;
 
 	public List<OpportunityField> generalFields = new ArrayList();
 	public List<OpportunityField> visitReportFields = new ArrayList();
@@ -55,6 +57,8 @@ public class JsOpportunitySetting {
 	public JsOpportunitySetting(OpportunitySetting oSetting) {
 		
 		this.defaultStatus = null;
+		this.title = null;
+		this.enablePrint = null;
 		
 		this.generalFields = oSetting.getGeneralFields();
 		this.visitReportFields = oSetting.getVisitReportFields();

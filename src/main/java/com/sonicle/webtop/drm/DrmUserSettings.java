@@ -35,6 +35,7 @@ package com.sonicle.webtop.drm;
 import com.sonicle.webtop.core.sdk.BaseUserSettings;
 import com.sonicle.webtop.core.sdk.UserProfileId;
 import static com.sonicle.webtop.drm.DrmSettings.*;
+import org.joda.time.LocalTime;
 
 /**
  *
@@ -87,5 +88,25 @@ public class DrmUserSettings extends BaseUserSettings {
 
 	public void setDefaultCurrency(String value) {
 		setString(EXPENSE_NOTE_DEFAULT_CURRENCY, value);
+	}
+	
+	public LocalTime getWorkdayStart() {
+		LocalTime value = getTime(WORKDAY_START, (LocalTime)null, "HH:mm");
+		if(value != null) return value;
+		return ss.getDefaultWorkdayStart();
+	}
+	
+	public boolean setWorkdayStart(LocalTime value) {
+		return setTime(WORKDAY_START, value, "HH:mm");
+	}
+	
+	public LocalTime getWorkdayEnd() {
+		LocalTime value = getTime(WORKDAY_END, (LocalTime)null, "HH:mm");
+		if(value != null) return value;
+		return ss.getDefaultWorkdayEnd();
+	}
+	
+	public boolean setWorkdayEnd(LocalTime value) {
+		return setTime(WORKDAY_END, value, "HH:mm");
 	}
 }

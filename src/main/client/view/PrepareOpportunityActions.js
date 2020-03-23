@@ -42,8 +42,8 @@ Ext.define('Sonicle.webtop.drm.view.PrepareOpportunityActions', {
 	dockableConfig: {
 		title: '{prepareOpportunityActions.tit}',
 		iconCls: 'wtdrm-icon-prepareopportunityaction-xs',
-		width: 220,
-		height: 300,
+		width: 325,
+		height: 324,
 		modal: true,
 		minimizable: false
 	},
@@ -51,7 +51,47 @@ Ext.define('Sonicle.webtop.drm.view.PrepareOpportunityActions', {
 	
 	constructor: function(cfg) {
 		var me = this;
+		
 		me.callParent([cfg]);
+		
+		WTU.applyFormulas(me.getVM(), {
+			startDate: {
+				bind: {bindTo: '{record.startDate}'},
+				get: function(val) {
+					return val ? Ext.Date.clone(val): null;
+				},
+				set: function(val) {
+					this.get('record').setStartDate(val);
+				}
+			},
+			startTime: {
+				bind: {bindTo: '{record.startDate}'},
+				get: function(val) {
+					return (val) ? Ext.Date.clone(val): null;
+				},
+				set: function(val) {
+					this.get('record').setStartTime(val);
+				}
+			},
+			endDate: {
+				bind: {bindTo: '{record.endDate}'},
+				get: function(val) {
+					return val ? Ext.Date.clone(val): null;
+				},
+				set: function(val) {
+					this.get('record').setEndDate(val);
+				}
+			},
+			endTime: {
+				bind: {bindTo: '{record.endDate}'},
+				get: function(val) {
+					return val ? Ext.Date.clone(val): null;
+				},
+				set: function(val) {
+					this.get('record').setEndTime(val);
+				}
+			}
+		});
 	},
 	
 	initComponent: function () {
@@ -78,19 +118,74 @@ Ext.define('Sonicle.webtop.drm.view.PrepareOpportunityActions', {
 							reference: 'mainForm',
 							modelValidation: true,
 							defaults: {
-								labelWidth: 45
+								labelWidth: 75
 							},
 							items: [
 								{
-									xtype: 'datefield',
-									startDay: WT.getStartDay(),
-									reference: 'date',
-									bind: '{record.date}',
-									format: WT.getShortDateFmt(),
-									tabIndex: 402,
-									selectOnFocus: true,
-									fieldLabel: me.mys.res('prepareOpportunityActions.fld-date.lbl')
-								}
+									xtype: 'fieldcontainer',
+									fieldLabel: me.mys.res('prepareOpportunityActions.fld-startDate.lbl'),
+									layout: 'hbox',
+									defaults: {
+										margin: '0 10 0 0'
+									},
+									items: [{
+										xtype: 'datefield',
+										bind: {
+											value: '{startDate}'
+										},
+										startDay: WT.getStartDay(),
+										format: WT.getShortDateFmt(),
+										margin: '0 5 0 0',
+										width: 105
+									}, {
+										xtype: 'timefield',
+										bind: {
+											value: '{startTime}'
+										},
+										format: WT.getShortTimeFmt(),
+										margin: '0 5 0 0',
+										width: 80
+									}, {
+										xtype: 'button',
+										iconCls: 'wtcal-icon-now-xs',
+										tooltip: me.mys.res('prepareOpportunityActions.btn-now.tip'),
+										handler: function() {
+											me.getModel().setStartTime(new Date());
+										}
+									}]
+								}, {
+									xtype: 'fieldcontainer',
+									fieldLabel: me.mys.res('prepareOpportunityActions.fld-endDate.lbl'),
+									layout: 'hbox',
+									defaults: {
+										margin: '0 10 0 0'
+									},
+									items: [{
+										xtype: 'datefield',
+										bind: {
+											value: '{endDate}'
+										},
+										startDay: WT.getStartDay(),
+										format: WT.getShortDateFmt(),
+										margin: '0 5 0 0',
+										width: 105
+									}, {
+										xtype: 'timefield',
+										bind: {
+											value: '{endTime}'
+										},
+										format: WT.getShortTimeFmt(),
+										margin: '0 5 0 0',
+										width: 80
+									}, {
+										xtype: 'button',
+										iconCls: 'wtcal-icon-now-xs',
+										tooltip: me.mys.res('prepareOpportunityActions.btn-now.tip'),
+										handler: function() {
+											me.getModel().setEndTime(new Date());
+										}
+									}]
+								},
 							]
 						})
 					]

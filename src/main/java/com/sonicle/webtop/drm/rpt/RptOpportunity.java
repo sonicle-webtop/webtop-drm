@@ -30,44 +30,20 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm.bol.js;
+package com.sonicle.webtop.drm.rpt;
 
-import com.sonicle.webtop.drm.bol.VOpportunityEntry;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import com.sonicle.webtop.core.io.output.AbstractReport;
+import com.sonicle.webtop.core.io.output.ReportConfig;
 
 /**
  *
  * @author lssndrvs
  */
-public class JsGridOpportunity {
-
-	public Integer id;
-	public String domainId;
-	public Integer actionId;
-	public String compositeId;
-	public Integer companyId;
-	public String operatorId;
-	public String startDate;
-	public String endDate;
-	public String additionalInfo;
+public class RptOpportunity extends AbstractReport{
 	
-	public Boolean isTotallyClosed;
-
-	public JsGridOpportunity(VOpportunityEntry o) {
-		
-		DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");
-		
-		this.id = o.getId();
-		this.domainId = o.getDomainId();
-		this.actionId = o.getActionId();
-		this.compositeId = o.getId() + "." + o.getActionId();
-		this.companyId = o.getCompanyId();
-		this.operatorId = o.getOperatorId();
-		this.startDate = formatter.print(o.getStartDate());
-		this.endDate = formatter.print(o.getEndDate());
-		
-		this.isTotallyClosed = false;
+	public RptOpportunity(ReportConfig config) {
+		super(config);
+		this.name = "opportunity";
+		this.resourceBundleName = this.name;
 	}
-
 }

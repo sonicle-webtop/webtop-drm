@@ -62,6 +62,14 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 						me.printExpenseNote(me.getModel().getId());
 					}
 				}),
+				me.addAct('sendMail', {
+					text: me.res('act-sendMail.lbl'),
+					tooltip: null,
+					iconCls: 'wtdrm-icon-mail-xs ',
+					handler: function () {
+						me.sendMail(me.getModel().getId());
+					}
+				}),
 				'->',
 				WTF.localCombo('id', 'desc', {
 					reference: 'flduser',
@@ -427,6 +435,40 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 			WT.warn(WT.res('warn.print.notsaved'));
 		} else {
 			me.mys.printExpenseNote([id]);
+		}
+	},
+	
+	sendMail: function(id) {
+		var me = this;
+		if(me.getModel().isDirty()) {
+			WT.warn(WT.res('warn.print.notsaved'));
+		} else {
+			me.wait();
+			var opts = {};
+			var	mapi = WT.getServiceApi('com.sonicle.webtop.mail');
+			if (mapi) {
+				var meid = mapi.buildMessageEditorId();
+				WT.ajaxReq(me.mys.ID, 'PrepareSendExpenseNoteAsEmail', {
+					params: {
+						uploadTag: meid,
+						ids: WTU.arrayAsParam(id)
+					},
+					callback: function(success, json) {
+						mapi.newMessage({
+							messageEditorId: meid,
+							format: 'html',
+							content: '<br>',
+							attachments: json.data
+						}, {
+							dirty: true,
+							contentReady: false,
+							appendContent: false
+						});
+						Ext.callback(opts.callback, opts.scope || me.mys, [true]);
+						me.unwait();
+					}
+				});
+			}
 		}
 	},
 	

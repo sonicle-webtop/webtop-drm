@@ -37,7 +37,10 @@ import com.sonicle.webtop.drm.model.OpportunityDocument;
 import com.sonicle.webtop.drm.model.OpportunityInterlocutor;
 import java.util.ArrayList;
 import java.util.List;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  *
@@ -49,9 +52,8 @@ public class JsOpportunity {
 	public String domainId;
 	public Integer companyId;
 	public String operatorId;
-	public LocalDate date;
-	public String fromHour;
-	public String toHour;
+	public String startDate;
+	public String endDate;
 	public String executedWith;
 	public String customerId;
 	public String customerStatId;
@@ -76,13 +78,15 @@ public class JsOpportunity {
 	public List<Document> documents = new ArrayList();
 
 	public JsOpportunity(Opportunity o) {
+		
+		DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+		
 		this.id = o.getId();
 		this.domainId = o.getDomainId();
 		this.companyId = o.getCompanyId();
 		this.operatorId = o.getOperatorId();
-		this.date = o.getDate();
-		this.fromHour = o.getFromHour();
-		this.toHour = o.getToHour();
+		this.startDate = formatter.print(o.getStartDate());
+		this.endDate = formatter.print(o.getEndDate());
 		this.executedWith = o.getExecutedWith();
 		this.customerId = o.getCustomerId();
 		this.customerStatId = o.getCustomerStatId();
@@ -118,15 +122,16 @@ public class JsOpportunity {
 	}
 
 	public static Opportunity createOpportunity(JsOpportunity js) {
-
+		
+		DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+		
 		Opportunity o = new Opportunity();
 		o.setId(js.id);
 		o.setDomainId(js.domainId);
 		o.setCompanyId(js.companyId);
 		o.setOperatorId(js.operatorId);
-		o.setDate(js.date);
-		o.setFromHour(js.fromHour);
-		o.setToHour(js.toHour);
+		o.setStartDate(formatter.parseDateTime(js.startDate));
+		o.setEndDate(formatter.parseDateTime(js.endDate));
 		o.setExecutedWith(js.executedWith);
 		o.setCustomerId(js.customerId);
 		o.setCustomerStatId(js.customerStatId);

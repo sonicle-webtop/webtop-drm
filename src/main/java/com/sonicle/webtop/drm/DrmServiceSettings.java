@@ -33,7 +33,9 @@
 package com.sonicle.webtop.drm;
 
 import com.sonicle.webtop.core.sdk.BaseServiceSettings;
+import static com.sonicle.webtop.core.sdk.BaseServiceSettings.DEFAULT_PREFIX;
 import static com.sonicle.webtop.drm.DrmSettings.*;
+import org.joda.time.LocalTime;
 
 /**
  *
@@ -149,11 +151,35 @@ public class DrmServiceSettings extends BaseServiceSettings {
 		setString(OPPORTUNITY_DEFAULT_DOC_STATUS_ID, value); 
 	}
 	
+	public String getOpportunityGeneralTitle() {
+		return getString(OPPORTUNITY_GENERAL_TITLE, ""); 
+	}
+	
+	public void setOpportunityGeneralTitle(String value) {
+		setString(OPPORTUNITY_GENERAL_TITLE, value); 
+	}
+	
+	public boolean getOpportunityGeneralEnablePrint() {
+		return getBoolean(OPPORTUNITY_GENERAL_ENABLE_PRINT, Boolean.FALSE); 
+	}
+	
+	public void setOpportunityGeneralEnablePrint(boolean value) {
+		setBoolean(OPPORTUNITY_GENERAL_ENABLE_PRINT, value); 
+	}
+	
 	public boolean getMedicalVisitsAutomaticallyApproved() {
 		return getBoolean(LEAVE_REQUEST_MEDICAL_VISITS_AUTOMATICALLY_APPROVED, Boolean.FALSE); 
 	}
 
 	public void setMedicalVisitsAutomaticallyApproved(boolean value) {
 		setBoolean(LEAVE_REQUEST_MEDICAL_VISITS_AUTOMATICALLY_APPROVED, value); 
+	}
+	
+	public LocalTime getDefaultWorkdayStart() {
+		return getTime(DEFAULT_PREFIX + WORKDAY_START, "09:00", "HH:mm");
+	}
+	
+	public LocalTime getDefaultWorkdayEnd() {
+		return getTime(DEFAULT_PREFIX + WORKDAY_END, "18:00", "HH:mm");
 	}
 }

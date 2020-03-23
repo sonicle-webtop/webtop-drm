@@ -106,7 +106,7 @@ Ext.define('Sonicle.webtop.drm.ux.OpportunitySearch', {
 					triggers: {
 						clear: WTF.clearTrigger()
 					},
-					fieldLabel: WT.res(me.sid, 'opportunity.fld-date.lbl'),
+					fieldLabel: WT.res(me.sid, 'opportunity.fld-startDate.lbl'),
 					width: '420px'
 				},
 				{
@@ -159,7 +159,7 @@ Ext.define('Sonicle.webtop.drm.ux.OpportunitySearch', {
 					triggers: {
 						clear: WTF.clearTrigger()
 					},
-					fieldLabel: WT.res(me.sid, 'opportunity.fld-todate.lbl'),
+					fieldLabel: WT.res(me.sid, 'opportunity.fld-endDate.lbl'),
 					width: '420px'
 				}
 			]

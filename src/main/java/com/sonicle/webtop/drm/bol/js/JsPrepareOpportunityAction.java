@@ -35,7 +35,10 @@ package com.sonicle.webtop.drm.bol.js;
 import com.sonicle.webtop.drm.model.OpportunityAction;
 import java.util.ArrayList;
 import java.util.List;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  *
@@ -47,7 +50,8 @@ public class JsPrepareOpportunityAction {
 	public Integer opportunityId;
 	public String operatorId;
 	public Integer statusId;
-	public LocalDate date;
+	public String startDate;
+	public String endDate;
 	public Integer activityId;
 
 	private List<JsActivity> actionActivities = new ArrayList();
@@ -56,6 +60,8 @@ public class JsPrepareOpportunityAction {
 	}
 
 	public static List<OpportunityAction> createOpportunityActions(JsPrepareOpportunityAction js) {
+		
+		DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
 
 		List<OpportunityAction> oActs = new ArrayList();
 		OpportunityAction oAct;
@@ -67,7 +73,8 @@ public class JsPrepareOpportunityAction {
 			oAct.setOpportunityId(js.opportunityId);
 			oAct.setOperatorId(js.operatorId);
 			oAct.setStatusId(js.statusId);
-			oAct.setDate(js.date);
+			oAct.setStartDate(formatter.parseDateTime(js.startDate));
+			oAct.setEndDate(formatter.parseDateTime(js.endDate));
 			
 			oAct.setActivityId(jsAct.id);
 			

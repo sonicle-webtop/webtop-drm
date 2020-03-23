@@ -35,6 +35,7 @@ package com.sonicle.webtop.drm;
 import com.sonicle.commons.EnumUtils;
 import com.sonicle.commons.LangUtils;
 import com.sonicle.commons.net.IPUtils;
+import com.sonicle.commons.time.DateTimeUtils;
 import com.sonicle.commons.web.Crud;
 import com.sonicle.commons.web.ServletUtils;
 import com.sonicle.commons.web.ServletUtils.IntegerArray;
@@ -189,6 +190,7 @@ import com.sonicle.webtop.drm.bol.js.JsExpenseNoteSetting;
 import com.sonicle.webtop.drm.bol.js.JsFilter;
 import com.sonicle.webtop.drm.bol.js.JsGridExpenseNote;
 import com.sonicle.webtop.drm.bol.model.RBExpenseNote;
+import com.sonicle.webtop.drm.bol.model.RBOpportunity;
 import com.sonicle.webtop.drm.bol.model.RBTimetableEncoReport;
 import com.sonicle.webtop.drm.bol.model.RBWorkReportSummary;
 import com.sonicle.webtop.drm.model.CostType;
@@ -200,13 +202,15 @@ import com.sonicle.webtop.drm.model.ExpenseNoteDocumentWithStream;
 import com.sonicle.webtop.drm.model.ExpenseNoteSetting;
 import com.sonicle.webtop.drm.model.WorkReportSummary;
 import com.sonicle.webtop.drm.rpt.RptExpenseNote;
+import com.sonicle.webtop.drm.rpt.RptOpportunity;
 import com.sonicle.webtop.drm.rpt.RptWorkReportSummary;
 import java.awt.Image;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -214,18 +218,15 @@ import javax.imageio.ImageIO;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
-import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 /**
@@ -254,7 +255,11 @@ public class Service extends BaseService {
 
 		RootProgramNode prog = null;
 		
-		prog = new RootProgramNode(lookupResource(DrmTreeNode.OPPORTUNITY), "wtdrm-icon-opportunity-xs");
+		if("".equals(ss.getOpportunityGeneralTitle()) || null == ss.getOpportunityGeneralTitle())
+			prog = new RootProgramNode(lookupResource(DrmTreeNode.OPPORTUNITY), "wtdrm-icon-opportunity-xs");
+		else
+			prog = new RootProgramNode(ss.getOpportunityGeneralTitle(), "wtdrm-icon-opportunity-xs");
+		
 		programs.put(prog.getId(), prog);
 
 		prog = new RootProgramNode(lookupResource(DrmTreeNode.WORK_REPORT), "wtdrm-icon-workreport-xs");
@@ -283,7 +288,8 @@ public class Service extends BaseService {
 	public ServiceVars returnServiceVars() {
 
 		ServiceVars vs = new ServiceVars();
-
+		DateTimeFormatter hmf = DateTimeUtils.createHmFormatter();
+		
 		vs.put("useStatisticCustomer", ss.getUseStatisticCustomer());
 		vs.put("printDaysTransfert", ss.getPrintDaysTransfert());
 		vs.put("printTransfertDescription", ss.getPrintTransfertDescription());
@@ -297,7 +303,11 @@ public class Service extends BaseService {
 		vs.put("defaultFreeSupport", ss.getDefaultFreeSupport());
 		vs.put("workReportDefaultStatus", ss.getWorkReportDefaultDocStatusId());
 		vs.put("opportunityDefaultStatus", ss.getOpportunityDefaultDocStatusId());
+		vs.put("opportunityTitle", ss.getOpportunityGeneralTitle());
+		vs.put("opportunityEnablePrint", ss.getOpportunityGeneralEnablePrint());
 		vs.put("medicalVisitsAutomaticallyApproved", ss.getMedicalVisitsAutomaticallyApproved());
+		vs.put("workdayStart", hmf.print(us.getWorkdayStart()));
+		vs.put("workdayEnd", hmf.print(us.getWorkdayEnd()));
 		
 		try {
 			vs.put("opportunityRequiredFields", getOpportunityRequiredFields());
@@ -2232,6 +2242,8 @@ public class Service extends BaseService {
 					item = new JsOpportunitySetting(setting);
 					
 					item.defaultStatus = ss.getOpportunityDefaultDocStatusId();
+					item.title = ss.getOpportunityGeneralTitle();
+					item.enablePrint = ss.getOpportunityGeneralEnablePrint();
 				} else {
 					item = new JsOpportunitySetting(new OpportunitySetting());
 				}
@@ -2246,6 +2258,12 @@ public class Service extends BaseService {
 				
 				if (pl.map.has("defaultStatus")) {
 					ss.setOpportunityDefaultDocStatusId(pl.data.defaultStatus);
+				}
+				if (pl.map.has("title")) {
+					ss.setOpportunityGeneralTitle(pl.data.title);
+				}
+				if (pl.map.has("enablePrint")) {
+					ss.setOpportunityGeneralEnablePrint(pl.data.enablePrint);
 				}
 				
 				manager.updateOpportunitySetting(setting);
@@ -3259,17 +3277,11 @@ public class Service extends BaseService {
 		ev.setIsPrivate(true);
 		ev.setBusy(false);
 		
-		if(o.getDate() != null){			
-			if(o.getFromHour() != null && o.getToHour() != null){
-				ev.setAllDay(false);
-				
-				ev.setDatesAndTimes(false, tz.getID(), o.getDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(o.getFromHour().split(":")[0]), Integer.parseInt(o.getFromHour().split(":")[1]), 0, 0), o.getDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(o.getToHour().split(":")[0]), Integer.parseInt(o.getToHour().split(":")[1]), 0, 0));
-			}else{
+		if(o.getStartDate() != null){			
 				ev.setAllDay(true);
 				
-				ev.setStartDate(o.getDate().toDateTimeAtStartOfDay(tz));
-				ev.setEndDate(o.getDate().toDateTimeAtStartOfDay(tz));
-			}
+				ev.setStartDate(o.getStartDate());
+				ev.setEndDate(o.getEndDate());
 		}
 		if(o.getPlace() != null)
 			ev.setLocation(o.getPlace());
@@ -3297,17 +3309,11 @@ public class Service extends BaseService {
 
 		evI.setTimezone(tz.getID());
 		
-		if(o.getDate() != null){			
-			if(o.getFromHour() != null && o.getToHour() != null){
-				evI.setAllDay(false);
-				
-				evI.setDatesAndTimes(false, tz.getID(), o.getDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(o.getFromHour().split(":")[0]), Integer.parseInt(o.getFromHour().split(":")[1]), 0, 0), o.getDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(o.getToHour().split(":")[0]), Integer.parseInt(o.getToHour().split(":")[1]), 0, 0));
-			}else{
+		if(o.getStartDate() != null){			
 				evI.setAllDay(true);
 				
-				evI.setStartDate(o.getDate().toDateTimeAtStartOfDay(tz));
-				evI.setEndDate(o.getDate().toDateTimeAtStartOfDay(tz));
-			}
+				evI.setStartDate(o.getStartDate());
+				evI.setEndDate(o.getEndDate());
 		}
 		if(o.getPlace() != null)
 			evI.setLocation(o.getPlace());
@@ -3382,17 +3388,11 @@ public class Service extends BaseService {
 		ev.setIsPrivate(true);
 		ev.setBusy(false);
 		
-		if(oAct.getDate() != null){			
-			if(oAct.getFromHour() != null && oAct.getToHour() != null){
-				ev.setAllDay(false);
-				
-				ev.setDatesAndTimes(false, tz.getID(), oAct.getDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(oAct.getFromHour().split(":")[0]), Integer.parseInt(oAct.getFromHour().split(":")[1]), 0, 0), oAct.getDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(oAct.getToHour().split(":")[0]), Integer.parseInt(oAct.getToHour().split(":")[1]), 0, 0));
-			}else{
+		if(oAct.getStartDate() != null){			
 				ev.setAllDay(true);
 				
-				ev.setStartDate(oAct.getDate().toDateTimeAtStartOfDay(tz));
-				ev.setEndDate(oAct.getDate().toDateTimeAtStartOfDay(tz));
-			}
+				ev.setStartDate(oAct.getStartDate());
+				ev.setEndDate(oAct.getEndDate());
 		}
 		if(o.getDescription() != null)
 			title += o.getDescription() + " > ";
@@ -3421,17 +3421,11 @@ public class Service extends BaseService {
 
 		evI.setTimezone(tz.getID());
 		
-		if(oAct.getDate() != null){			
-			if(oAct.getFromHour() != null && oAct.getToHour() != null){
-				evI.setAllDay(false);
-				
-				evI.setDatesAndTimes(false, tz.getID(), oAct.getDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(oAct.getFromHour().split(":")[0]), Integer.parseInt(oAct.getFromHour().split(":")[1]), 0, 0), oAct.getDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(oAct.getToHour().split(":")[0]), Integer.parseInt(oAct.getToHour().split(":")[1]), 0, 0));
-			}else{
+		if(oAct.getStartDate() != null){			
 				evI.setAllDay(true);
 				
-				evI.setStartDate(oAct.getDate().toDateTimeAtStartOfDay(tz));
-				evI.setEndDate(oAct.getDate().toDateTimeAtStartOfDay(tz));
-			}
+				evI.setStartDate(oAct.getStartDate());
+				evI.setEndDate(oAct.getEndDate());
 		}
 		if(o.getDescription() != null)
 			title += o.getDescription() + " > ";
@@ -3679,6 +3673,259 @@ public class Service extends BaseService {
 				if(ev != null)
 					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(lReq.getEventId(), null), false);
 			}
+		}
+	}
+	
+	public void processPrintOpportunity(HttpServletRequest request, HttpServletResponse response) {
+		ArrayList<RBOpportunity> itemsO = new ArrayList<>();
+		
+		try {
+			String filename = ServletUtils.getStringParameter(request, "filename", "print");
+			IntegerArray ids = ServletUtils.getObjectParameter(request, "ids", IntegerArray.class, true);
+			
+			Opportunity o = null;
+			CompanyPicture picture = null;
+			Company company = null;
+			
+			for(Integer id : ids) {
+				picture = null;
+				o = manager.getOpportunity(id);
+				company = manager.getCompany(o.getCompanyId());
+				if(company.getHasPicture()) picture = manager.getCompanyPicture(company.getCompanyId());
+				itemsO.add(new RBOpportunity(WT.getCoreManager(), manager, o, ss, picture));
+			}
+			
+			ReportConfig.Builder builder = reportConfigBuilder();
+			RptOpportunity rpt = new RptOpportunity(builder.build());
+			rpt.setDataSource(itemsO);
+			
+			filename = ""
+					+ ((null != ss.getOpportunityGeneralTitle()) ? ss.getOpportunityGeneralTitle() : "Opportunità")
+					+ ((null != o.getSector()) ? "-" + o.getSector() : "");
+			
+			ServletUtils.setFileStreamHeaders(response, filename + ".pdf");
+			WT.generateReportToStream(rpt, AbstractReport.OutputType.PDF, response.getOutputStream());
+			
+		} catch(Exception ex) {
+			logger.error("Error in action PrintOpportunity", ex);
+			ex.printStackTrace();
+			ServletUtils.writeErrorHandlingJs(response, ex.getMessage());
+		}
+	}
+	
+	public void processPrepareSendOpportunityAsEmail(HttpServletRequest request, HttpServletResponse response, PrintWriter out) throws FileNotFoundException, WTException {
+		ArrayList<MapItem> items = new ArrayList<>();
+		ArrayList<RBOpportunity> itemsO = new ArrayList<>();
+		File file = WT.createTempFile("DRM");
+		
+		try {
+			String tag = ServletUtils.getStringParameter(request, "uploadTag", true);
+			IntegerArray ids = ServletUtils.getObjectParameter(request, "ids", IntegerArray.class, true);
+			
+			Opportunity o = null;
+			CompanyPicture picture = null;
+			Company company = null;
+			
+			for(Integer id : ids) {
+				picture = null;
+				o = manager.getOpportunity(id);
+				company = manager.getCompany(o.getCompanyId());
+				if(company.getHasPicture()) picture = manager.getCompanyPicture(company.getCompanyId());
+				itemsO.add(new RBOpportunity(WT.getCoreManager(), manager, o, ss, picture));
+			}
+			
+			ReportConfig.Builder builder = reportConfigBuilder();
+			RptOpportunity rpt = new RptOpportunity(builder.build());
+			rpt.setDataSource(itemsO);
+			
+			final String filename = ""
+					+ ((null != ss.getOpportunityGeneralTitle()) ? ss.getOpportunityGeneralTitle() : "Opportunità")
+					+ ((null != o.getSector()) ? "-" + o.getSector() : "")
+					+ ".pdf";
+			
+			FileOutputStream fos = null;
+			try {
+				fos = new FileOutputStream(file);
+				WT.generateReportToStream(rpt, AbstractReport.OutputType.PDF, fos);	
+			} finally {
+				IOUtils.closeQuietly(fos);
+			}
+			
+			UploadedFile upfile = addAsUploadedFile(tag, filename, "pdf", new FileInputStream(file));
+			items.add(new MapItem()
+					.add("uploadId", upfile.getUploadId())
+					.add("fileName", filename)
+					.add("fileSize", upfile.getSize())
+				);
+			
+			//Attachments
+			for(OpportunityDocument oDoc : o.getDocuments()){
+				OpportunityDocumentWithBytes docData = manager.getOpportunityDocument(o.getId(), oDoc.getId());
+				file = WT.createTempFile("DRM");
+				InputStream is = null;
+				try {
+					is = new ByteArrayInputStream(docData.getBytes());
+					IOUtils.copy(is, new FileOutputStream(file));
+				} finally {
+					IOUtils.closeQuietly(is);
+				}
+				upfile = addAsUploadedFile(tag, oDoc.getFileName(), oDoc.getMediaType(), new FileInputStream(file));
+				items.add(new MapItem()
+						.add("uploadId", upfile.getUploadId())
+						.add("fileName", upfile.getFilename())
+						.add("fileSize", upfile.getSize())
+					);
+			}
+			
+			new JsonResult(items).printTo(out);
+			
+		} catch(Exception ex) {
+			logger.error("Error in PrepareSendOpportunityAsEmail", ex);
+			new JsonResult(ex).printTo(out);
+		}
+	}
+	
+	public void processPrepareSendWorkReportAsEmail(HttpServletRequest request, HttpServletResponse response, PrintWriter out) throws FileNotFoundException, WTException {
+		ArrayList<MapItem> items = new ArrayList<>();
+		ArrayList<RBWorkReport> itemsWr = new ArrayList<>();
+		File file = WT.createTempFile("DRM");
+		
+		try {
+			String tag = ServletUtils.getStringParameter(request, "uploadTag", true);
+			StringArray ids = ServletUtils.getObjectParameter(request, "ids", StringArray.class, true);
+			IContactsManager contactManager = (IContactsManager) WT.getServiceManager("com.sonicle.webtop.contacts", getEnv().getProfileId());
+			
+			WorkReport wr = null;
+			CompanyPicture picture = null;
+			Company company = null;
+			
+			for(String id : ids) {
+				picture = null;
+				wr = manager.getWorkReport(id);
+				company = manager.getCompany(wr.getCompanyId());
+				if(company.getHasPicture()) picture = manager.getCompanyPicture(company.getCompanyId());
+				itemsWr.add(new RBWorkReport(WT.getCoreManager(), manager, contactManager, wr, ss, picture));
+			}
+			
+			ReportConfig.Builder builder = reportConfigBuilder();
+			RptWorkReport rpt = new RptWorkReport(builder.build());
+			rpt.setDataSource(itemsWr);
+			
+			final String filename = "report"
+					+ ((null != wr.getNumber()) ? "-" + wr.getNumber() : "")
+					+ ((null != wr.getYear()) ? "-" + wr.getYear() : "")
+					+ ".pdf";
+			
+			FileOutputStream fos = null;
+			try {
+				fos = new FileOutputStream(file);
+				WT.generateReportToStream(rpt, AbstractReport.OutputType.PDF, fos);	
+			} finally {
+				IOUtils.closeQuietly(fos);
+			}
+			
+			UploadedFile upfile = addAsUploadedFile(tag, filename, "pdf", new FileInputStream(file));
+			items.add(new MapItem()
+					.add("uploadId", upfile.getUploadId())
+					.add("fileName", filename)
+					.add("fileSize", upfile.getSize())
+				);
+			
+			//Attachments
+			for(WorkReportAttachment wrAtt : wr.getAttachments()){
+				WorkReportAttachmentWithBytes docData = manager.getWorkReportAttachment(wr.getWorkReportId(), wrAtt.getWorkReportAttachmentId());
+				file = WT.createTempFile("DRM");
+				InputStream is = null;
+				try {
+					is = new ByteArrayInputStream(docData.getBytes());
+					IOUtils.copy(is, new FileOutputStream(file));
+				} finally {
+					IOUtils.closeQuietly(is);
+				}
+				upfile = addAsUploadedFile(tag, wrAtt.getFileName(), wrAtt.getMediaType(), new FileInputStream(file));
+				items.add(new MapItem()
+						.add("uploadId", upfile.getUploadId())
+						.add("fileName", upfile.getFilename())
+						.add("fileSize", upfile.getSize())
+					);
+			}
+			
+			new JsonResult(items).printTo(out);
+			
+		} catch(Exception ex) {
+			logger.error("Error in PrepareSendWorkReportAsEmail", ex);
+			new JsonResult(ex).printTo(out);
+		}
+	}
+	
+	public void processPrepareSendExpenseNoteAsEmail(HttpServletRequest request, HttpServletResponse response, PrintWriter out) throws FileNotFoundException, WTException {
+		ArrayList<MapItem> items = new ArrayList<>();
+		ArrayList<RBExpenseNote> itemsEn = new ArrayList<>();
+		File file = WT.createTempFile("DRM");
+		
+		try {
+			String tag = ServletUtils.getStringParameter(request, "uploadTag", true);
+			IntegerArray ids = ServletUtils.getObjectParameter(request, "ids", IntegerArray.class, true);
+			
+			ExpenseNote en = null;
+			CompanyPicture picture = null;
+			Company company = null;
+			
+			for(Integer id : ids) {
+				picture = null;
+				en = manager.getExpenseNote(id);
+				company = manager.getCompany(en.getCompanyId());
+				if(company.getHasPicture()) picture = manager.getCompanyPicture(company.getCompanyId());
+				itemsEn.add(new RBExpenseNote(WT.getCoreManager(), manager, en, ss, picture));
+			}
+			
+			ReportConfig.Builder builder = reportConfigBuilder();
+			RptExpenseNote rpt = new RptExpenseNote(builder.build());
+			rpt.setDataSource(itemsEn);
+			
+			final String filename = "expense_note"
+					+ ((null != en.getId()) ? "_" + en.getId() : "")
+					+ ".pdf";
+			
+			FileOutputStream fos = null;
+			try {
+				fos = new FileOutputStream(file);
+				WT.generateReportToStream(rpt, AbstractReport.OutputType.PDF, fos);	
+			} finally {
+				IOUtils.closeQuietly(fos);
+			}
+			
+			UploadedFile upfile = addAsUploadedFile(tag, filename, "pdf", new FileInputStream(file));
+			items.add(new MapItem()
+					.add("uploadId", upfile.getUploadId())
+					.add("fileName", filename)
+					.add("fileSize", upfile.getSize())
+				);
+			
+			//Attachments
+			for(ExpenseNoteDocument enDoc : en.getDocuments()){
+				ExpenseNoteDocumentWithBytes docData = manager.getExpenseNoteDocument(en.getId(), enDoc.getId());
+				file = WT.createTempFile("DRM");
+				InputStream is = null;
+				try {
+					is = new ByteArrayInputStream(docData.getBytes());
+					IOUtils.copy(is, new FileOutputStream(file));
+				} finally {
+					IOUtils.closeQuietly(is);
+				}
+				upfile = addAsUploadedFile(tag, enDoc.getFileName(), enDoc.getMediaType(), new FileInputStream(file));
+				items.add(new MapItem()
+						.add("uploadId", upfile.getUploadId())
+						.add("fileName", upfile.getFilename())
+						.add("fileSize", upfile.getSize())
+					);
+			}
+			
+			new JsonResult(items).printTo(out);
+			
+		} catch(Exception ex) {
+			logger.error("Error in PrepareSendExpenseNoteAsEmail", ex);
+			new JsonResult(ex).printTo(out);
 		}
 	}
 }

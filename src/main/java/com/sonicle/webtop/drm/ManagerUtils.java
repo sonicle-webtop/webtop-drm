@@ -1163,9 +1163,8 @@ public class ManagerUtils {
 		o.setDomainId(oOpt.getDomainId());
 		o.setCompanyId(oOpt.getCompanyId());
 		o.setOperatorId(oOpt.getOperatorId());
-		o.setDate(oOpt.getDate());
-		o.setFromHour(oOpt.getFromHour());
-		o.setToHour(oOpt.getToHour());
+		o.setStartDate(oOpt.getStartDate());
+		o.setEndDate(oOpt.getEndDate());
 		o.setExecutedWith(oOpt.getExecutedWith());
 		o.setCustomerId(oOpt.getCustomerId());
 		o.setCustomerStatId(oOpt.getCustomerStatId());
@@ -1198,9 +1197,8 @@ public class ManagerUtils {
 		oOpt.setDomainId(o.getDomainId());
 		oOpt.setCompanyId(o.getCompanyId());
 		oOpt.setOperatorId(o.getOperatorId());
-		oOpt.setDate(o.getDate());
-		oOpt.setFromHour(o.getFromHour());
-		oOpt.setToHour(o.getToHour());
+		oOpt.setStartDate(o.getStartDate());
+		oOpt.setEndDate(o.getEndDate());
 		oOpt.setExecutedWith(o.getExecutedWith());
 		oOpt.setCustomerId(o.getCustomerId());
 		oOpt.setCustomerStatId(o.getCustomerStatId());
@@ -1235,9 +1233,8 @@ public class ManagerUtils {
 		oAct.setOpportunityId(act.getOpportunityId());
 		oAct.setOperatorId(act.getOperatorId());
 		oAct.setStatusId(act.getStatusId());
-		oAct.setDate(act.getDate());
-		oAct.setFromHour(act.getFromHour());
-		oAct.setToHour(act.getToHour());
+		oAct.setStartDate(act.getStartDate());
+		oAct.setEndDate(act.getEndDate());
 		oAct.setDescription(act.getDescription());
 		oAct.setPlace(act.getPlace());
 		oAct.setSubsequentActions(act.getSubsequentActions());
@@ -1258,9 +1255,8 @@ public class ManagerUtils {
 		act.setOpportunityId(oAct.getOpportunityId());
 		act.setOperatorId(oAct.getOperatorId());
 		act.setStatusId(oAct.getStatusId());
-		act.setDate(oAct.getDate());
-		act.setFromHour(oAct.getFromHour());
-		act.setToHour(oAct.getToHour());
+		act.setStartDate(oAct.getStartDate());
+		act.setEndDate(oAct.getEndDate());
 		act.setDescription(oAct.getDescription());
 		act.setPlace(oAct.getPlace());
 		act.setSubsequentActions(oAct.getSubsequentActions());

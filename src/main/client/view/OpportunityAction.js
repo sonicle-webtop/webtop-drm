@@ -44,7 +44,7 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 		title: '{opportunityAction.tit}',
 		iconCls: 'wtdrm-icon-opportunityaction-xs',
 		width: 535,
-		height: 470,
+		height: 494,
 		modal: true,
 		minimizable: false
 	},
@@ -53,7 +53,47 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 	
 	constructor: function(cfg) {
 		var me = this;
+		
 		me.callParent([cfg]);
+		
+		WTU.applyFormulas(me.getVM(), {
+			startDate: {
+				bind: {bindTo: '{record.startDate}'},
+				get: function(val) {
+					return val ? Ext.Date.clone(val): null;
+				},
+				set: function(val) {
+					this.get('record').setStartDate(val);
+				}
+			},
+			startTime: {
+				bind: {bindTo: '{record.startDate}'},
+				get: function(val) {
+					return (val) ? Ext.Date.clone(val): null;
+				},
+				set: function(val) {
+					this.get('record').setStartTime(val);
+				}
+			},
+			endDate: {
+				bind: {bindTo: '{record.endDate}'},
+				get: function(val) {
+					return val ? Ext.Date.clone(val): null;
+				},
+				set: function(val) {
+					this.get('record').setEndDate(val);
+				}
+			},
+			endTime: {
+				bind: {bindTo: '{record.endDate}'},
+				get: function(val) {
+					return val ? Ext.Date.clone(val): null;
+				},
+				set: function(val) {
+					this.get('record').setEndTime(val);
+				}
+			}
+		});
 	},
 	
 	initComponent: function () {
@@ -111,77 +151,80 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 										labelWidth: 90
 									},
 									items: [
-										{
-											xtype: 'fieldcontainer',
+										WTF.localCombo('id', 'desc', {
+											reference: 'status',
+											bind: '{record.statusId}',
+											store: {
+												autoLoad: true,
+												model: 'WTA.model.Simple',
+												proxy: WTF.proxy(me.mys.ID, 'LookupDocStatuses')
+											},
+											tabIndex: 401,
 											fieldLabel: me.mys.res('opportunityAction.fld-status.lbl'),
-											layout: 'hbox',
-											defaults: {
-												margin: '0 10 0 0',
-												labelWidth: 45
-											},
-											items: [
-												WTF.localCombo('id', 'desc', {
-													reference: 'status',
-													bind: '{record.statusId}',
-													store: {
-														autoLoad: true,
-														model: 'WTA.model.Simple',
-														proxy: WTF.proxy(me.mys.ID, 'LookupDocStatuses')
-													},
-													tabIndex: 401
-												}), 
-												{
-													xtype: 'datefield',
-													startDay: WT.getStartDay(),
-													reference: 'date',
-													bind: '{record.date}',
-													format: WT.getShortDateFmt(),
-													tabIndex: 402,
-													selectOnFocus: true,
-													fieldLabel: me.mys.res('opportunityAction.fld-date.lbl')
-												}
-											]
-										},{
+										}), {
 											xtype: 'fieldcontainer',
-											fieldLabel: me.mys.res('opportunityAction.fld-fromHour.lbl'),
+											fieldLabel: me.mys.res('opportunityAction.fld-startDate.lbl'),
 											layout: 'hbox',
 											defaults: {
-												margin: '0 10 0 0',
-												labelWidth: 45
+												margin: '0 10 0 0'
 											},
-											items: [
-												WTF.lookupCombo('id', 'desc', {
-													reference: 'fromhour',
-													bind: '{record.fromHour}',
-													allowBlank: true,
-													editable: true,
-													forceSelection: false,
-													queryMode: 'local',
-													triggerAction: 'all',
-													regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
-													regexText: me.mys.res('gpLineHours.column.format.lbl'),
-													tabIndex: 403,
-													store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-														autoLoad: true
-													})
-												}), 
-												WTF.lookupCombo('id', 'desc', {
-													reference: 'tohour',
-													bind: '{record.toHour}',
-													fieldLabel: me.mys.res('opportunityAction.fld-toHour.lbl'),
-													allowBlank: true,
-													editable: true,
-													forceSelection: false,
-													queryMode: 'local',
-													triggerAction: 'all',
-													regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
-													regexText: me.mys.res('gpLineHours.column.format.lbl'),
-													tabIndex: 404,
-													store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-														autoLoad: true
-													})
-												})
-											]
+											items: [{
+												xtype: 'datefield',
+												bind: {
+													value: '{startDate}'
+												},
+												startDay: WT.getStartDay(),
+												format: WT.getShortDateFmt(),
+												margin: '0 5 0 0',
+												width: 105
+											}, {
+												xtype: 'timefield',
+												bind: {
+													value: '{startTime}'
+												},
+												format: WT.getShortTimeFmt(),
+												margin: '0 5 0 0',
+												width: 80
+											}, {
+												xtype: 'button',
+												iconCls: 'wtcal-icon-now-xs',
+												tooltip: me.mys.res('opportunityAction.btn-now.tip'),
+												handler: function() {
+													me.getModel().setStartTime(new Date());
+												}
+											}]
+										}, {
+											xtype: 'fieldcontainer',
+											fieldLabel: me.mys.res('opportunityAction.fld-endDate.lbl'),
+											layout: 'hbox',
+											defaults: {
+												margin: '0 10 0 0'
+											},
+											items: [{
+												xtype: 'datefield',
+												bind: {
+													value: '{endDate}'
+												},
+												startDay: WT.getStartDay(),
+												format: WT.getShortDateFmt(),
+												margin: '0 5 0 0',
+												width: 105
+											}, {
+												xtype: 'timefield',
+												bind: {
+													value: '{endTime}'
+												},
+												format: WT.getShortTimeFmt(),
+												margin: '0 5 0 0',
+												width: 80
+											}, {
+												xtype: 'button',
+												iconCls: 'wtcal-icon-now-xs',
+												tooltip: me.mys.res('opportunityAction.btn-now.tip'),
+												handler: function() {
+													me.getModel().setEndTime(new Date());
+												}
+											}]
 										}, {
 											xtype: 'textfield',
 											fieldLabel: me.mys.res('opportunityAction.fld-place.lbl'),

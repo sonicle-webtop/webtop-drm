@@ -44,10 +44,55 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 		title: '{opportunity.tit}',
 		iconCls: 'wtdrm-icon-opportunity-xs',
 		width: 920,
-		height: 550
+		height: 572
 	},
 	fieldTitle: 'id',
 	modelName: 'Sonicle.webtop.drm.model.Opportunity',
+	
+	constructor: function(cfg) {
+		var me = this;
+		
+		me.callParent([cfg]);
+		
+		WTU.applyFormulas(me.getVM(), {
+			startDate: {
+				bind: {bindTo: '{record.startDate}'},
+				get: function(val) {
+					return val ? Ext.Date.clone(val): null;
+				},
+				set: function(val) {
+					this.get('record').setStartDate(val);
+				}
+			},
+			startTime: {
+				bind: {bindTo: '{record.startDate}'},
+				get: function(val) {
+					return (val) ? Ext.Date.clone(val): null;
+				},
+				set: function(val) {
+					this.get('record').setStartTime(val);
+				}
+			},
+			endDate: {
+				bind: {bindTo: '{record.endDate}'},
+				get: function(val) {
+					return val ? Ext.Date.clone(val): null;
+				},
+				set: function(val) {
+					this.get('record').setEndDate(val);
+				}
+			},
+			endTime: {
+				bind: {bindTo: '{record.endDate}'},
+				get: function(val) {
+					return val ? Ext.Date.clone(val): null;
+				},
+				set: function(val) {
+					this.get('record').setEndTime(val);
+				}
+			}
+		});
+	},
 	
 	initComponent: function () {
 		var me = this,
@@ -325,6 +370,24 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 
 		Ext.apply(me, {
 			tbar: [
+				me.addAct('printOpportunity', {
+					text: null,
+					tooltip: WT.res('act-print.lbl'),
+					iconCls: 'wt-icon-print',
+					hidden: !me.mys.getVar('opportunityEnablePrint'),
+					handler: function() {
+						me.printOpportunity(me.getModel().getId());
+					}
+				}),
+				me.addAct('sendMail', {
+					text: me.res('act-sendMail.lbl'),
+					tooltip: null,
+					iconCls: 'wtdrm-icon-mail-xs ',
+					hidden: !me.mys.getVar('opportunityEnablePrint'),
+					handler: function () {
+						me.sendMail(me.getModel().getId());
+					}
+				}),
 				'->',
 				WTF.localCombo('id', 'desc', {
 					reference: 'user',
@@ -369,6 +432,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 		me.add({
 			region: 'center',
 			xtype: 'wttabpanel',
+			reference: 'mainPanel',
 			items: [
 				{
 					xtype: 'container',
@@ -376,6 +440,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 						type: 'vbox', align: 'stretch'
 					},
 					title: me.mys.res('opportunity.general.tit'),
+					reference: 'general',
 					items: [
 						{
 							xtype: 'container',
@@ -419,22 +484,71 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 											fieldLabel: me.mys.res('opportunity.fld-company.lbl'),
 											width: '420px'
 										}),
-										WTF.lookupCombo('id', 'desc', {
-											reference: 'fromhour',
-											bind: '{record.fromHour}',
-											fieldLabel: me.mys.res('opportunity.fld-fromhour.lbl'),
-											allowBlank: true,
-											editable: true,
-											forceSelection: false,
-											queryMode: 'local',
-											triggerAction: 'all',
-											regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
-											regexText: me.mys.res('gpLineHours.column.format.lbl'),
-											tabIndex: 303,
-											store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-												autoLoad: true
-											})
-										})
+										{
+											xtype: 'fieldcontainer',
+											fieldLabel: me.mys.res('opportunity.fld-startDate.lbl'),
+											layout: 'hbox',
+											defaults: {
+												margin: '0 10 0 0'
+											},
+											items: [{
+												xtype: 'datefield',
+												bind: {
+													value: '{startDate}'
+												},
+												startDay: WT.getStartDay(),
+												format: WT.getShortDateFmt(),
+												margin: '0 5 0 0',
+												width: 105
+											}, {
+												xtype: 'timefield',
+												bind: {
+													value: '{startTime}'
+												},
+												format: WT.getShortTimeFmt(),
+												margin: '0 5 0 0',
+												width: 80
+											}, {
+												xtype: 'button',
+												iconCls: 'wtcal-icon-now-xs',
+												tooltip: me.mys.res('opportunity.btn-now.tip'),
+												handler: function() {
+													me.getModel().setStartTime(new Date());
+												}
+											}]
+										}, {
+											xtype: 'fieldcontainer',
+											fieldLabel: me.mys.res('opportunity.fld-endDate.lbl'),
+											layout: 'hbox',
+											defaults: {
+												margin: '0 10 0 0'
+											},
+											items: [{
+												xtype: 'datefield',
+												bind: {
+													value: '{endDate}'
+												},
+												startDay: WT.getStartDay(),
+												format: WT.getShortDateFmt(),
+												margin: '0 5 0 0',
+												width: 105
+											}, {
+												xtype: 'timefield',
+												bind: {
+													value: '{endTime}'
+												},
+												format: WT.getShortTimeFmt(),
+												margin: '0 5 0 0',
+												width: 80
+											}, {
+												xtype: 'button',
+												iconCls: 'wtcal-icon-now-xs',
+												tooltip: me.mys.res('opportunity.btn-now.tip'),
+												handler: function() {
+													me.getModel().setEndTime(new Date());
+												}
+											}]
+										}
 									]
 								}, {
 									xtype: 'wtform',
@@ -445,32 +559,14 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 									},
 									items: [
 										{
-											xtype: 'datefield',
-											startDay: WT.getStartDay(),
-											reference: 'date',
-											bind: '{record.date}',
-											format: WT.getShortDateFmt(),
-											tabIndex: 302,
-											selectOnFocus: true,
-											fieldLabel: me.mys.res('opportunity.fld-date.lbl'),
-											width: '420px'
+											xtype: 'soplaceholderfield'
 										},
-										WTF.lookupCombo('id', 'desc', {
-											reference: 'tohour',
-											bind: '{record.toHour}',
-											fieldLabel: me.mys.res('opportunity.fld-tohour.lbl'),
-											allowBlank: true,
-											editable: true,
-											forceSelection: false,
-											queryMode: 'local',
-											triggerAction: 'all',
-											regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
-											regexText: me.mys.res('gpLineHours.column.format.lbl'),
-											tabIndex: 304,
-											store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-												autoLoad: true
-											})
-										})
+										{
+											xtype: 'soplaceholderfield'
+										},
+										{
+											xtype: 'soplaceholderfield'
+										},
 									]
 								}
 							]
@@ -498,6 +594,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 					]
 				},{
 					title: me.mys.res('opportunity.visitreport.tit'),
+					reference: 'visitreport',
 					xtype: 'container',
 					layout: 'border',
 					refernceHolder: true,
@@ -518,6 +615,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 					]
 				},{
 					title: me.mys.res('opportunity.notessignature.tit'),
+					reference: 'notessignature',
 					xtype: 'container',
 					layout: 'border',
 					refernceHolder: true,
@@ -663,6 +761,24 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 		if(me.isMode(me.MODE_NEW)) {
 			mo.set('statusId', me.mys.getVar('opportunityDefaultStatus'));
 		}
+		
+		var isVisible = false;
+		Ext.each(me.lref('mainForm').items.items, function(element) {
+			if(element.isVisible() || !element.hidden) isVisible = true;
+		});
+		if(!isVisible) me.lref('general').tab.hide();
+		
+		isVisible = false;
+		Ext.each(me.lref('visitReportForm').items.items, function(element) {
+			if(element.isVisible() || !element.hidden) isVisible = true;
+		});
+		if(!isVisible) me.lref('visitreport').tab.hide();
+		
+		isVisible = false;
+		Ext.each(me.lref('notesSignatureForm').items.items, function(element) {
+			if(element.isVisible() || !element.hidden) isVisible = true;
+		});
+		if(!isVisible) me.lref('notessignature').tab.hide();
 	},
 	onViewClose: function(s) {
 		s.mys.cleanupUploadedFiles(WT.uiid(s.getId()));
@@ -689,5 +805,46 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 		WTU.updateFieldsErrors(me.lref('mainForm'), errs);
 		WTU.updateFieldsErrors(me.lref('visitReportForm'), errs);
 		WTU.updateFieldsErrors(me.lref('notesSignatureForm'), errs);
+	},
+	printOpportunity: function(id) {
+		var me = this;
+		if(me.getModel().isDirty()) {
+			WT.warn(WT.res('warn.print.notsaved'));
+		} else {
+			me.mys.printOpportunity([id]);
+		}
+	},
+	sendMail: function(id) {
+		var me = this;
+		if(me.getModel().isDirty()) {
+			WT.warn(WT.res('warn.print.notsaved'));
+		} else {
+			me.wait();
+			var opts = {};
+			var	mapi = WT.getServiceApi('com.sonicle.webtop.mail');
+			if (mapi) {
+				var meid = mapi.buildMessageEditorId();
+				WT.ajaxReq(me.mys.ID, 'PrepareSendOpportunityAsEmail', {
+					params: {
+						uploadTag: meid,
+						ids: WTU.arrayAsParam(id)
+					},
+					callback: function(success, json) {
+						mapi.newMessage({
+							messageEditorId: meid,
+							format: 'html',
+							content: '<br>',
+							attachments: json.data
+						}, {
+							dirty: true,
+							contentReady: false,
+							appendContent: false
+						});
+						Ext.callback(opts.callback, opts.scope || me.mys, [true]);
+						me.unwait();
+					}
+				});
+			}
+		}
 	}
 });

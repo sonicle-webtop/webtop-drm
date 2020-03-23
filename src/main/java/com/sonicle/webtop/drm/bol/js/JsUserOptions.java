@@ -41,6 +41,8 @@ import com.sonicle.webtop.core.sdk.bol.js.JsUserOptionsBase;
 public class JsUserOptions extends JsUserOptionsBase {
 	public String kmCost;
 	public String defaultCurrency;
+	public String workdayStart;
+	public String workdayEnd;
 	
 	public JsUserOptions() {}
 	

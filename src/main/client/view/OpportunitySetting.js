@@ -265,6 +265,25 @@ Ext.define('Sonicle.webtop.drm.view.OpportunitySetting', {
 				},
 				{
 					xtype: 'wtform',
+					title: me.mys.res('opportunity.config.general.tit'),
+					defaults: {
+						labelWidth: 80
+					},
+					items: [
+						{
+							xtype: 'textfield',
+							bind: '{record.title}',
+							fieldLabel: me.mys.res('opportunity.config.fld-title.lbl')
+						},
+						{
+							xtype: 'checkbox',
+							bind: '{record.enablePrint}',
+							boxLabel: me.mys.res('opportunity.config.fld-enablePrint.lbl')
+						}
+					]
+				},
+				{
+					xtype: 'wtform',
 					title: me.mys.res('opportunity.config.default.tit'),
 					defaults: {
 						labelWidth: 80
