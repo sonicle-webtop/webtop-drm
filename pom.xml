@@ -7,12 +7,12 @@
 	<packaging>jar</packaging>
 	<name>webtop-drm</name>
 	
-	
 	<parent>
 		<groupId>com.sonicle.webtop</groupId>
 		<artifactId>webtop-superpom-service</artifactId>
-		<version>1</version>
+		<version>3</version>
 	</parent>
+	
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
