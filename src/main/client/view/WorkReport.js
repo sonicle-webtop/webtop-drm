@@ -175,7 +175,11 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											},
 											sourceField: 'src',
 											fieldLabel: me.mys.res('workReport.fld-contact.lbl'),
-											width: '420px'
+											width: '420px',
+											matchFieldWidth: false,
+											listConfig: {
+												width: '600px'
+											},
 										}),
 										WTF.localCombo('id', 'desc', {
 											reference: 'fldmasterdata',
