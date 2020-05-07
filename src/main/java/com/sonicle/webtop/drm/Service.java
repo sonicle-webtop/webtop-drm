@@ -181,6 +181,8 @@ import com.sonicle.webtop.calendar.model.Event;
 import com.sonicle.webtop.calendar.model.EventInstance;
 import com.sonicle.webtop.calendar.model.EventKey;
 import com.sonicle.webtop.calendar.model.UpdateEventTarget;
+import com.sonicle.webtop.contacts.model.ContactQuery;
+import com.sonicle.webtop.contacts.model.ContactType;
 import com.sonicle.webtop.drm.bol.ODay;
 import com.sonicle.webtop.drm.bol.ODefaultCostType;
 import com.sonicle.webtop.drm.bol.OExpenseNote;
@@ -761,7 +763,7 @@ public class Service extends BaseService {
 			String pattern;
 			
 			List<JsSimpleSource> contacts = new ArrayList();
-			Set<Integer> categoryIds = new LinkedHashSet();
+			ArrayList<Integer> categoryIds = new ArrayList<>();
 			Data uD;
 			
 			//Check for multiple filters
@@ -780,9 +782,11 @@ public class Service extends BaseService {
 			pattern = StringUtils.isBlank(value) ? null : "%" + value + "%";
 					
 			IContactsManager contactManager = (IContactsManager) WT.getServiceManager("com.sonicle.webtop.contacts", getEnv().getProfileId());
-			categoryIds = contactManager.listCategoryIds();
+			categoryIds.addAll(contactManager.listCategoryIds());
 			categoryIds.addAll(contactManager.listIncomingCategoryIds());
-			ListContactsResult lcr = contactManager.listContacts(categoryIds, false, Grouping.ALPHABETIC, ShowBy.FIRST_LAST, pattern, page, limit, true);
+			ListContactsResult lcr = contactManager.listContacts(categoryIds, ContactType.CONTACT, Grouping.ALPHABETIC, ShowBy.FIRST_LAST, pattern);
+			//ListContactsResult lcr = contactManager.listContacts(categoryIds, ContactType.CONTACT, Grouping.ALPHABETIC, ShowBy.FIRST_LAST, ContactQuery.toCondition(pattern), page, limit, true);
+			
 			for(ContactLookup c: lcr.items){
 				String fullName = StringUtils.isEmpty(c.getFullName(true)) ? "" : c.getFullName(true);
 				String company = StringUtils.isEmpty(c.getCompanyDescription()) ? "" : c.getCompanyDescription();
@@ -791,7 +795,8 @@ public class Service extends BaseService {
 				contacts.add(new JsSimpleSource(c.getContactId(), info, "[" + uD.getDisplayName() + " / " + c.getCategoryName() + "]"));
 			}
 
-			new JsonResult(contacts, lcr.fullCount).setPage(page).printTo(out);
+			//new JsonResult(contacts, lcr.fullCount).setPage(page).printTo(out);
+			new JsonResult(contacts, contacts.size()).setPage(page).printTo(out);
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action LookupContacts", ex);
@@ -3491,7 +3496,8 @@ public class Service extends BaseService {
  			if(ts.getCalendarUserId() != null){
  				upi = new UserProfileId(getEnv().getProfileId().getDomainId(), ts.getCalendarUserId());
  			}else{
- 				upi = getEnv().getProfileId();
+ 				//upi = getEnv().getProfileId();
+				upi = new UserProfileId(getEnv().getProfileId().getDomainId(), lReq.getUserId());
  			}
  			
  			activityId = ts.getDefaultEventActivityId();
@@ -3540,12 +3546,13 @@ public class Service extends BaseService {
 		if (cm != null) {
 			eventId = WT.runPrivileged(new Callable<Integer>(){
 				public Integer call() throws WTException {
-					Integer lrCalId = us.getLeaveRequestCalendarId();
+					DrmUserSettings tus=new DrmUserSettings(SERVICE_ID,targetPid);
+					Integer lrCalId = tus.getLeaveRequestCalendarId();
 			
 					if(lrCalId == null || cm.getCalendar(lrCalId) == null){
 						lrCalId = createLeaveRequestCalendar(cm, lReq);
 
-						us.setLeaveRequestCalendarId(lrCalId);
+						tus.setLeaveRequestCalendarId(lrCalId);
 					}
 
 					if(lReq.getEventId() != null){
