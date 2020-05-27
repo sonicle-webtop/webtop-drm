@@ -17,6 +17,16 @@ package com.sonicle.webtop.drm.jooq;
 public class Tables {
 
 	/**
+	 * The table drm.activities
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.Activities ACTIVITIES = com.sonicle.webtop.drm.jooq.tables.Activities.ACTIVITIES;
+
+	/**
+	 * The table drm.activities_groups
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.ActivitiesGroups ACTIVITIES_GROUPS = com.sonicle.webtop.drm.jooq.tables.ActivitiesGroups.ACTIVITIES_GROUPS;
+
+	/**
 	 * The table drm.business_trips
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.BusinessTrips BUSINESS_TRIPS = com.sonicle.webtop.drm.jooq.tables.BusinessTrips.BUSINESS_TRIPS;
@@ -127,6 +137,21 @@ public class Tables {
 	public static final com.sonicle.webtop.drm.jooq.tables.HourProfiles HOUR_PROFILES = com.sonicle.webtop.drm.jooq.tables.HourProfiles.HOUR_PROFILES;
 
 	/**
+	 * The table drm.job_attachments
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.JobAttachments JOB_ATTACHMENTS = com.sonicle.webtop.drm.jooq.tables.JobAttachments.JOB_ATTACHMENTS;
+
+	/**
+	 * The table drm.job_attachments_data
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.JobAttachmentsData JOB_ATTACHMENTS_DATA = com.sonicle.webtop.drm.jooq.tables.JobAttachmentsData.JOB_ATTACHMENTS_DATA;
+
+	/**
+	 * The table drm.jobs
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.Jobs JOBS = com.sonicle.webtop.drm.jooq.tables.Jobs.JOBS;
+
+	/**
 	 * The table drm.leave_request_documents
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.LeaveRequestDocuments LEAVE_REQUEST_DOCUMENTS = com.sonicle.webtop.drm.jooq.tables.LeaveRequestDocuments.LEAVE_REQUEST_DOCUMENTS;
@@ -222,6 +247,26 @@ public class Tables {
 	public static final com.sonicle.webtop.drm.jooq.tables.ProfilesSupervisedUsers PROFILES_SUPERVISED_USERS = com.sonicle.webtop.drm.jooq.tables.ProfilesSupervisedUsers.PROFILES_SUPERVISED_USERS;
 
 	/**
+	 * The table drm.ticket_attachments
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.TicketAttachments TICKET_ATTACHMENTS = com.sonicle.webtop.drm.jooq.tables.TicketAttachments.TICKET_ATTACHMENTS;
+
+	/**
+	 * The table drm.ticket_attachments_data
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.TicketAttachmentsData TICKET_ATTACHMENTS_DATA = com.sonicle.webtop.drm.jooq.tables.TicketAttachmentsData.TICKET_ATTACHMENTS_DATA;
+
+	/**
+	 * The table drm.ticket_categories
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.TicketCategories TICKET_CATEGORIES = com.sonicle.webtop.drm.jooq.tables.TicketCategories.TICKET_CATEGORIES;
+
+	/**
+	 * The table drm.tickets
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.Tickets TICKETS = com.sonicle.webtop.drm.jooq.tables.Tickets.TICKETS;
+
+	/**
 	 * The table drm.timetable_events
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.TimetableEvents TIMETABLE_EVENTS = com.sonicle.webtop.drm.jooq.tables.TimetableEvents.TIMETABLE_EVENTS;
@@ -240,6 +285,21 @@ public class Tables {
 	 * The table drm.timetable_stamp
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.TimetableStamp TIMETABLE_STAMP = com.sonicle.webtop.drm.jooq.tables.TimetableStamp.TIMETABLE_STAMP;
+
+	/**
+	 * The table drm.vw_jobs
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.VwJobs VW_JOBS = com.sonicle.webtop.drm.jooq.tables.VwJobs.VW_JOBS;
+
+	/**
+	 * The table drm.vw_tickets
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.VwTickets VW_TICKETS = com.sonicle.webtop.drm.jooq.tables.VwTickets.VW_TICKETS;
+
+	/**
+	 * The table drm.vw_work_reports
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.VwWorkReports VW_WORK_REPORTS = com.sonicle.webtop.drm.jooq.tables.VwWorkReports.VW_WORK_REPORTS;
 
 	/**
 	 * The table drm.work_reports

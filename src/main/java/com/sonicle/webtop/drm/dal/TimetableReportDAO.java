@@ -104,8 +104,11 @@ public class TimetableReportDAO extends BaseDAO{
 		DSLContext dsl = getDSL(con);
 		return dsl
 				.delete(TIMETABLE_REPORT_TEMP)
-				.where(TIMETABLE_REPORT_TEMP.DOMAIN_ID.equal(domainId))
-				.and(TIMETABLE_REPORT_TEMP.USER_ID.equal(userId))
+				.where(
+						TIMETABLE_REPORT_TEMP.DOMAIN_ID.equal(domainId)
+				).and(
+						TIMETABLE_REPORT_TEMP.USER_ID.equal(userId)
+				)
 				.execute();
 	}
 	

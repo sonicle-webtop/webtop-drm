@@ -182,4 +182,36 @@ public class DrmServiceSettings extends BaseServiceSettings {
 	public LocalTime getDefaultWorkdayEnd() {
 		return getTime(DEFAULT_PREFIX + WORKDAY_END, "18:00", "HH:mm");
 	}
+	
+	public String getTicketDefaultDocStatusId() {
+		return getString(TICKET_DEFAULT_DOC_STATUS_ID, ""); 
+	}
+
+	public void setTicketDefaultDocStatusId(String value) {
+		setString(TICKET_DEFAULT_DOC_STATUS_ID, value); 
+	}
+	
+	public String getTicketDefaultPriorityId() {
+		return getString(TICKET_DEFAULT_PRIORITY_ID, ""); 
+	}
+
+	public void setTicketDefaultPriorityId(String value) {
+		setString(TICKET_DEFAULT_PRIORITY_ID, value); 
+	}
+	
+	public String getTicketDefaultTicketCategoryId() {
+		return getString(TICKET_DEFAULT_TICKET_CATEGORY_ID, ""); 
+	}
+
+	public void setTicketDefaultTicketCategoryId(String value) {
+		setString(TICKET_DEFAULT_TICKET_CATEGORY_ID, value); 
+	}
+	
+	public String getTicketDefaultCloseDocStatusId() {
+		return getString(TICKET_DEFAULT_CLOSE_DOC_STATUS_ID, ""); 
+	}
+
+	public void setTicketDefaultCloseDocStatusId(String value) {
+		setString(TICKET_DEFAULT_CLOSE_DOC_STATUS_ID, value); 
+	}
 }

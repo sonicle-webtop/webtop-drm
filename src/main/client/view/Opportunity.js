@@ -49,6 +49,8 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 	fieldTitle: 'id',
 	modelName: 'Sonicle.webtop.drm.model.Opportunity',
 	
+	activeType: 'opportunities',
+	
 	constructor: function(cfg) {
 		var me = this;
 		
@@ -243,7 +245,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 					triggers: {
 						clear: WTF.clearTrigger()
 					}
-				}), activity: WTF.remoteCombo('id', 'desc', {
+				})/*, activity: WTF.remoteCombo('id', 'desc', {
 					reference: 'activity',
 					bind: '{record.activityId}',
 					autoLoadOnValue: true,
@@ -252,11 +254,46 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 					store: {
 						model: 'WTA.model.ActivityLkp',
 						//Rimuovere gli extraParams quando Matteo m fa la modifica
-						proxy: WTF.proxy(WT.ID, 'LookupActivities', null, {
+						proxy: WTF.proxy(me.mys.ID, 'LookupActivities', null, {
 							extraParams: {
 								profileId: WT.getVar('profileId')
 							}
 						}),
+						filters: [{
+							filterFn: function(rec) {
+								if(rec.get('readOnly')) {
+									if(rec.getId() !== me.lref('activity').getValue()) {
+										return null;
+									}
+								}
+								return rec;
+							}
+						}]
+					},
+					triggers: {
+						clear: WTF.clearTrigger()
+					}
+				})*/, activity: WTF.localCombo('activityId', 'description', {
+					reference: 'activity',
+					bind: '{record.activityId}',
+					autoLoadOnValue: true,
+					width: '420px',
+					hidden: true,
+					store: {
+						autoLoad: true,
+						model: 'WTA.model.Simple',
+						proxy: WTF.proxy(me.mys.ID, 'LookupActivities', null, {
+							extraParams: {
+								type: null
+							}
+						}),
+						listeners: {
+							beforeload: function(s, op) {
+								WTU.applyExtraParams(op.getProxy(), {
+									type: me.activeType
+								});
+							}
+						},
 						filters: [{
 							filterFn: function(rec) {
 								if(rec.get('readOnly')) {
@@ -566,7 +603,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 										},
 										{
 											xtype: 'soplaceholderfield'
-										},
+										}
 									]
 								}
 							]

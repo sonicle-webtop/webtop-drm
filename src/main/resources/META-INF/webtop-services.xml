@@ -81,7 +81,7 @@
 			<serviceClassName>UserOptionsService</serviceClassName>
 			<viewJsClassName>view.UserOptions</viewJsClassName>
 			<modelJsClassName>model.UserOptions</modelJsClassName>
-		</userOptions>
+		</userOptions>	
 		
 		<permissions>
 			<permission group="CONFIGURATIONS" actions="MANAGE" />
@@ -93,6 +93,10 @@
 			<permission group="EXPENSE_NOTE_SETTINGS" actions="MANAGE" />
 			<permission group="TIMETABLE" actions="READ,DELETE,UPDATE" />
 			<permission group="TIMETABLE_SETTINGS" actions="MANAGE" />
+			<permission group="JOB" actions="READ,DELETE,UPDATE" />
+			<permission group="JOB_SETTINGS" actions="MANAGE" />
+			<permission group="TICKET" actions="READ,DELETE,UPDATE" />
+			<permission group="TICKET_SETTINGS" actions="MANAGE" />			
 		</permissions>
 		
 		

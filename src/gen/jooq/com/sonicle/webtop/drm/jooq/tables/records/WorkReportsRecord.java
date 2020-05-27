@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.records;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WorkReportsRecord extends org.jooq.impl.UpdatableRecordImpl<com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord> {
 
-	private static final long serialVersionUID = 547509814;
+	private static final long serialVersionUID = 667098537;
 
 	/**
 	 * Setter for <code>drm.work_reports.work_report_id</code>.
@@ -382,6 +382,34 @@ public class WorkReportsRecord extends org.jooq.impl.UpdatableRecordImpl<com.son
 		return (java.lang.Integer) getValue(25);
 	}
 
+	/**
+	 * Setter for <code>drm.work_reports.timetable_hours</code>.
+	 */
+	public void setTimetableHours(java.lang.Short value) {
+		setValue(26, value);
+	}
+
+	/**
+	 * Getter for <code>drm.work_reports.timetable_hours</code>.
+	 */
+	public java.lang.Short getTimetableHours() {
+		return (java.lang.Short) getValue(26);
+	}
+
+	/**
+	 * Setter for <code>drm.work_reports.domain_id</code>.
+	 */
+	public void setDomainId(java.lang.String value) {
+		setValue(27, value);
+	}
+
+	/**
+	 * Getter for <code>drm.work_reports.domain_id</code>.
+	 */
+	public java.lang.String getDomainId() {
+		return (java.lang.String) getValue(27);
+	}
+
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
@@ -408,7 +436,7 @@ public class WorkReportsRecord extends org.jooq.impl.UpdatableRecordImpl<com.son
 	/**
 	 * Create a detached, initialised WorkReportsRecord
 	 */
-	public WorkReportsRecord(java.lang.String workReportId, java.lang.Integer companyId, java.lang.String operatorId, java.lang.String revisionStatus, org.joda.time.DateTime revisionTimestamp, java.lang.Integer revisionSequence, java.lang.Integer docStatusId, java.lang.Integer contactId, java.lang.String customerId, java.lang.String customerStatId, org.joda.time.LocalDate fromDate, org.joda.time.LocalDate toDate, java.lang.String referenceNo, java.lang.Integer causalId, java.lang.String ddtNo, org.joda.time.LocalDate ddtDate, java.lang.String notes, java.lang.String description, java.lang.Boolean applySignature, java.lang.Boolean chargeTo, java.lang.Boolean freeSupport, java.lang.Integer businessTripId, java.lang.Short businessTripDays, java.lang.Integer number, java.lang.Integer year, java.lang.Integer eventId) {
+	public WorkReportsRecord(java.lang.String workReportId, java.lang.Integer companyId, java.lang.String operatorId, java.lang.String revisionStatus, org.joda.time.DateTime revisionTimestamp, java.lang.Integer revisionSequence, java.lang.Integer docStatusId, java.lang.Integer contactId, java.lang.String customerId, java.lang.String customerStatId, org.joda.time.LocalDate fromDate, org.joda.time.LocalDate toDate, java.lang.String referenceNo, java.lang.Integer causalId, java.lang.String ddtNo, org.joda.time.LocalDate ddtDate, java.lang.String notes, java.lang.String description, java.lang.Boolean applySignature, java.lang.Boolean chargeTo, java.lang.Boolean freeSupport, java.lang.Integer businessTripId, java.lang.Short businessTripDays, java.lang.Integer number, java.lang.Integer year, java.lang.Integer eventId, java.lang.Short timetableHours, java.lang.String domainId) {
 		super(com.sonicle.webtop.drm.jooq.tables.WorkReports.WORK_REPORTS);
 
 		setValue(0, workReportId);
@@ -437,5 +465,7 @@ public class WorkReportsRecord extends org.jooq.impl.UpdatableRecordImpl<com.son
 		setValue(23, number);
 		setValue(24, year);
 		setValue(25, eventId);
+		setValue(26, timetableHours);
+		setValue(27, domainId);
 	}
 }

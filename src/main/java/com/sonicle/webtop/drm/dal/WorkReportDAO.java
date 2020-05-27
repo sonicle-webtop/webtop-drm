@@ -35,12 +35,14 @@ package com.sonicle.webtop.drm.dal;
 import com.sonicle.webtop.core.dal.BaseDAO;
 import com.sonicle.webtop.core.dal.DAOException;
 import com.sonicle.webtop.drm.WorkReportQuery;
+import com.sonicle.webtop.drm.bol.OViewWorkReport;
 import com.sonicle.webtop.drm.bol.OWorkReport;
 import com.sonicle.webtop.drm.jooq.Sequences;
 import static com.sonicle.webtop.drm.jooq.Tables.PROFILES;
 import static com.sonicle.webtop.drm.jooq.Tables.PROFILES_MEMBERS;
 import static com.sonicle.webtop.drm.jooq.Tables.PROFILES_SUPERVISED_USERS;
 import static com.sonicle.webtop.drm.jooq.Tables.WORK_REPORTS;
+import static com.sonicle.webtop.drm.jooq.Tables.VW_WORK_REPORTS;
 import com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRecord;
 import java.sql.Connection;
 import java.util.List;
@@ -48,7 +50,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
@@ -77,28 +78,28 @@ public class WorkReportDAO extends BaseDAO {
 				.insertInto(WORK_REPORTS)
 				.set(record)
 				.execute();
-	}
-
-	public List<OWorkReport> selectWorkReports(Connection con, WorkReportQuery query, String domainId, String userId) throws DAOException {
+	}		
+	
+	public List<OViewWorkReport> selectViewWorkReports(Connection con, WorkReportQuery query, String domainId, String userId) throws DAOException {
 		DSLContext dsl = getDSL(con);
 
-		Condition searchCndt = ensureCondition(query, domainId, userId);
+		Condition searchCndt = ensureViewCondition(query, domainId, userId);
 
 		return dsl
 				.select()
-				.from(WORK_REPORTS)
+				.from(VW_WORK_REPORTS)
 				.where(
-						WORK_REPORTS.REVISION_STATUS.equal(OWorkReport.REV_STATUS_NEW)
-						.or(WORK_REPORTS.REVISION_STATUS.equal(OWorkReport.REV_STATUS_MODIFIED))
+						VW_WORK_REPORTS.REVISION_STATUS.equal(OViewWorkReport.REV_STATUS_NEW)
+						.or(VW_WORK_REPORTS.REVISION_STATUS.equal(OViewWorkReport.REV_STATUS_MODIFIED))
 						.and(searchCndt)
 				)
 				.orderBy(
-						WORK_REPORTS.YEAR,
-						WORK_REPORTS.NUMBER
+						VW_WORK_REPORTS.YEAR,
+						VW_WORK_REPORTS.NUMBER
 				)
-				.fetchInto(OWorkReport.class);
+				.fetchInto(OViewWorkReport.class);
 	}
-
+	
 	public OWorkReport selectById(Connection con, String workReportId) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		return dsl
@@ -140,6 +141,8 @@ public class WorkReportDAO extends BaseDAO {
 				.set(WORK_REPORTS.BUSINESS_TRIP_ID, item.getBusinessTripId())
 				.set(WORK_REPORTS.BUSINESS_TRIP_DAYS, item.getBusinessTripDays())
 				.set(WORK_REPORTS.EVENT_ID, item.getEventId())
+				.set(WORK_REPORTS.TIMETABLE_HOURS, item.getTimetableHours())
+				.set(WORK_REPORTS.DOMAIN_ID, item.getDomainId())
 				.where(
 						WORK_REPORTS.WORK_REPORT_ID.equal(item.getWorkReportId())
 				)
@@ -258,5 +261,147 @@ public class WorkReportDAO extends BaseDAO {
 		}
 
 		return searchCndt;
+	}
+	
+	private Condition ensureViewCondition(WorkReportQuery query, String domainId, String userId) {
+		
+		Condition searchCndt = null;
+		
+		if (query.operatorId != null){
+			searchCndt = VW_WORK_REPORTS.OPERATOR_ID.equal(query.operatorId);
+		} else {			
+			SelectConditionStep<Record1<String>> operators = (SelectConditionStep<Record1<String>>) DSL
+				.select(
+						PROFILES_SUPERVISED_USERS.USER_ID
+					)
+					.from(PROFILES)
+					.join(PROFILES_MEMBERS).on(
+						PROFILES.PROFILE_ID.equal(PROFILES_MEMBERS.PROFILE_ID)
+					)
+					.join(PROFILES_SUPERVISED_USERS).on(
+						PROFILES.PROFILE_ID.equal(PROFILES_SUPERVISED_USERS.PROFILE_ID)
+					)
+					.where(
+							PROFILES.DOMAIN_ID.equal(domainId)
+							.and(PROFILES_MEMBERS.USER_ID.equal(userId)
+					))
+					.union(DSL.select(DSL.inline(userId)));
+			
+			searchCndt = VW_WORK_REPORTS.OPERATOR_ID.in(operators);
+		}
+		
+		if (domainId != null) {
+			searchCndt = searchCndt.and(VW_WORK_REPORTS.DOMAIN_ID.equal(domainId));
+		}
+		
+		if (query.companyId != null) {
+			searchCndt = searchCndt.and(VW_WORK_REPORTS.COMPANY_ID.equal(query.companyId));
+		}
+		
+		if (!StringUtils.isEmpty(query.customerId)) {
+			searchCndt = searchCndt.and(VW_WORK_REPORTS.CUSTOMER_ID.equal(query.customerId));
+		}
+		
+		if (!StringUtils.isEmpty(query.customerStatId)) {
+			searchCndt = searchCndt.and(VW_WORK_REPORTS.CUSTOMER_STAT_ID.equal(query.customerStatId));
+		}
+		
+		if (query.fromDate != null) {
+			searchCndt = searchCndt.and(VW_WORK_REPORTS.FROM_DATE.greaterOrEqual(query.fromDate));
+		}
+
+		if (query.toDate != null) {
+			searchCndt = searchCndt.and(VW_WORK_REPORTS.TO_DATE.lessOrEqual(query.toDate));
+		}
+		
+		if (!StringUtils.isEmpty(query.referenceNo)) {
+			searchCndt = searchCndt.and(VW_WORK_REPORTS.REFERENCE_NO.like("%" + query.referenceNo + "%"));
+		}
+		
+		if (query.causalId != null) {
+			searchCndt = searchCndt.and(VW_WORK_REPORTS.CAUSAL_ID.equal(query.causalId));
+		}
+		
+		if (query.businessTripId != null) {
+			searchCndt = searchCndt.and(VW_WORK_REPORTS.BUSINESS_TRIP_ID.equal(query.businessTripId));
+		}
+		
+		if (!StringUtils.isEmpty(query.description)) {
+			searchCndt = searchCndt.and(VW_WORK_REPORTS.DESCRIPTION.like("%" + query.description + "%"));
+		}
+		
+		if (!StringUtils.isEmpty(query.notes)) {
+			searchCndt = searchCndt.and(VW_WORK_REPORTS.NOTES.like("%" + query.notes + "%"));
+		}
+		
+		if (query.docStatusId != null) {
+			searchCndt = searchCndt.and(VW_WORK_REPORTS.DOC_STATUS_ID.equal(query.docStatusId));
+		}
+		
+		if (query.chargeTo != null) {
+			searchCndt = searchCndt.and(VW_WORK_REPORTS.CHARGE_TO.equal(query.chargeTo));
+		}
+		
+		if (query.year != null) {
+			searchCndt = searchCndt.and(VW_WORK_REPORTS.YEAR.equal(query.year));
+		}
+		
+		if (query.number != null) {
+			searchCndt = searchCndt.and(VW_WORK_REPORTS.NUMBER.equal(query.number));
+		}
+
+		return searchCndt;
+	}
+	
+	public List<OWorkReport> selectWorkReports(Connection con, WorkReportQuery query, String domainId, String userId) throws DAOException {
+		DSLContext dsl = getDSL(con);
+
+		Condition searchCndt = ensureViewCondition(query, domainId, userId);
+
+		return dsl
+				.select()
+				.from(WORK_REPORTS)
+				.where(
+						WORK_REPORTS.REVISION_STATUS.equal(OWorkReport.REV_STATUS_NEW)
+						.or(WORK_REPORTS.REVISION_STATUS.equal(OWorkReport.REV_STATUS_MODIFIED))
+						.and(searchCndt)
+				)
+				.orderBy(
+						WORK_REPORTS.YEAR,
+						WORK_REPORTS.NUMBER
+				)
+				.fetchInto(OWorkReport.class);
+	}
+	
+	public List<OWorkReport> getWorkReportsByDomainUserDateRange(Connection con, String domainId, Integer companyId, String userId, Integer fromDay, Integer month, Integer year) {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.select(
+						WORK_REPORTS.DOMAIN_ID, 
+						WORK_REPORTS.COMPANY_ID,
+						WORK_REPORTS.OPERATOR_ID, 
+						WORK_REPORTS.FROM_DATE,
+						WORK_REPORTS.TIMETABLE_HOURS
+				)
+				.from(
+						WORK_REPORTS
+				)
+				.where(
+						WORK_REPORTS.DOMAIN_ID.equal(domainId)
+				)
+				.and(
+						WORK_REPORTS.OPERATOR_ID.equal(userId)
+				)
+				.and(
+						WORK_REPORTS.FROM_DATE.between(new DateTime().withYear(year).withMonthOfYear(month).withDayOfMonth(fromDay).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).toLocalDate(), new DateTime().withYear(year).withMonthOfYear(month).dayOfMonth().withMaximumValue().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toLocalDate())
+				)
+				.and(
+						WORK_REPORTS.COMPANY_ID.equal(companyId)
+				)
+				.orderBy(
+						WORK_REPORTS.OPERATOR_ID, 
+						WORK_REPORTS.FROM_DATE
+				)
+				.fetchInto(OWorkReport.class);
 	}
 }

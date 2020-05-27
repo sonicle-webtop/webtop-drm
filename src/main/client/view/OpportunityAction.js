@@ -51,6 +51,8 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 	fieldTitle: 'id',
 	modelName: 'Sonicle.webtop.drm.model.OpportunityAction',
 	
+	activeType: 'opportunities',
+	
 	constructor: function(cfg) {
 		var me = this;
 		
@@ -160,7 +162,7 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 												proxy: WTF.proxy(me.mys.ID, 'LookupDocStatuses')
 											},
 											tabIndex: 401,
-											fieldLabel: me.mys.res('opportunityAction.fld-status.lbl'),
+											fieldLabel: me.mys.res('opportunityAction.fld-status.lbl')
 										}), {
 											xtype: 'fieldcontainer',
 											fieldLabel: me.mys.res('opportunityAction.fld-startDate.lbl'),
@@ -232,7 +234,7 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 											width: '510px',
 											tabIndex: 405,
 											selectOnFocus: true
-										}, WTF.remoteCombo('id', 'desc', {
+										} /*, WTF.remoteCombo('id', 'desc', {
 											reference: 'activity',
 											bind: '{record.activityId}',
 											autoLoadOnValue: true,
@@ -244,6 +246,42 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 														profileId: WT.getVar('profileId')
 													}
 												}),
+												filters: [{
+													filterFn: function(rec) {
+														if(rec.get('readOnly')) {
+															if(rec.getId() !== me.lref('activity').getValue()) {
+																return null;
+															}
+														}
+														return rec;
+													}
+												}]
+											},
+											triggers: {
+												clear: WTF.clearTrigger()
+											},
+											fieldLabel: me.mys.res('opportunityAction.fld-activity.lbl'),
+											width: '510px',
+											tabIndex: 406
+										})*/ , WTF.localCombo('activityId', 'description', {
+											reference: 'activity',
+											bind: '{record.activityId}',
+											autoLoadOnValue: true,
+											store: {
+												autoLoad: true,
+												model: 'WTA.model.Simple',
+												proxy: WTF.proxy(me.mys.ID, 'LookupActivities', null, {
+													extraParams: {
+														type: null
+													}
+												}),
+												listeners: {
+													beforeload: function(s, op) {
+														WTU.applyExtraParams(op.getProxy(), {
+															type: me.activeType
+														});
+													}
+												},
 												filters: [{
 													filterFn: function(rec) {
 														if(rec.get('readOnly')) {

@@ -37,6 +37,8 @@ Ext.define('Sonicle.webtop.drm.model.UserOptions', {
 	proxy: WTF.optionsProxy('com.sonicle.webtop.drm'),
 	fields: [
 		WTF.field('kmCost', 'float', true),
-		WTF.field('defaultCurrency', 'string', true)
+		WTF.field('defaultCurrency', 'string', true),
+		WTF.field('ticketNotifyMail', 'boolean', true, {defaultValue: false}),
+		WTF.field('ticketAutomaticClose', 'boolean', true, {defaultValue: false})
 	]
 });

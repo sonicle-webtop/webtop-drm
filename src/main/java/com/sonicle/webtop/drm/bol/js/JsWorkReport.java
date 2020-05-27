@@ -70,7 +70,9 @@ public class JsWorkReport {
 	public Integer businessTripId;
 	public Integer businessTripDays;
 	public Integer eventId;
-
+	public Float timetableHours;
+	public String domainId;
+	
 	public List<JsGridWorkReportRow> details = new ArrayList();
 	public List<Attachment> attachments = new ArrayList();
 
@@ -100,7 +102,9 @@ public class JsWorkReport {
 		this.businessTripId = report.getBusinessTripId();
 		this.businessTripDays = report.getBusinessTripDays();
 		this.eventId = report.getEventId();
-
+		this.timetableHours = ((float)report.getTimetableHours() / 60);
+		this.domainId = report.getDomainId();
+		
 		for (WorkReportRow wrkDetail : report.getDetails()) {
 			this.details.add(new JsGridWorkReportRow(wrkDetail));
 		}
@@ -117,7 +121,7 @@ public class JsWorkReport {
 		this._profileId = ownerPid;
 	}
 
-	public static WorkReport createWorkReport(JsWorkReport js, DateTimeZone profileTz) {
+	public static WorkReport createWorkReport(JsWorkReport js, DateTimeZone profileTz, String domainId) {
 
 		WorkReport rw = new WorkReport();
 		rw.setWorkReportId(js.workReportId);
@@ -145,7 +149,9 @@ public class JsWorkReport {
 		rw.setBusinessTripId(js.businessTripId);
 		rw.setBusinessTripDays(js.businessTripDays);
 		rw.setEventId(js.eventId);
-
+		rw.setTimetableHours((int)(js.timetableHours * 60));
+		rw.setDomainId(domainId);
+		
 		for (JsGridWorkReportRow jsWrkDetail : js.details) {
 
 			rw.getDetails().add(JsGridWorkReportRow.createWorkReportRow(jsWrkDetail));

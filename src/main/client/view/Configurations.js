@@ -37,7 +37,8 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		'Sonicle.webtop.drm.model.GridDocStatuses',
 		'Sonicle.webtop.drm.model.GridCompany',
 		'Sonicle.webtop.drm.model.GridFolders',
-		'Sonicle.webtop.drm.model.GridLineManagers'
+		'Sonicle.webtop.drm.model.GridLineManagers',
+		'Sonicle.webtop.drm.model.GridActivities'
 	],
 	dockableConfig: {
 		title: '{config.tit}',
@@ -357,6 +358,80 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 					tabConfig: {
 						textAlign: 'left'
 					}
+				},
+				{
+					xtype: 'grid',
+					reference: 'gpActivities',
+					title: me.mys.res('config.activities.tit'),
+					iconCls: 'wtdrm-icon-configuration-activitiesconfiguration-xs',
+					tabConfig: {
+						textAlign: 'left'
+					},
+					store: {
+						autoLoad: true,
+						model: 'Sonicle.webtop.drm.model.GridActivities',
+						proxy: WTF.apiProxy(me.mys.ID, 'ManageGridActivities', 'data', {
+							writer: {
+								allowSingle: false
+							}
+						})
+					},
+					columns: [{
+							xtype: 'rownumberer'
+						}/*, {
+							header: me.mys.res('config.gpActivities.externalId.lbl'),
+							dataIndex: 'externalId',
+							flex: 1
+						}*/, {
+							header: me.mys.res('config.gpActivities.description.lbl'),
+							dataIndex: 'description',
+							flex: 2
+						}, {
+							header: me.mys.res('config.gpActivities.customer.lbl'),
+							dataIndex: 'customer',
+							xtype: 'checkcolumn',
+							disabled: true,
+							width: '20'						
+						}, {
+							header: me.mys.res('config.gpActivities.timetable.lbl'),
+							dataIndex: 'timetable',
+							xtype: 'checkcolumn',
+							disabled: true,
+							width: '20'						
+						}, {
+							header: me.mys.res('config.gpActivities.exportable.lbl'),
+							dataIndex: 'exportable',
+							xtype: 'checkcolumn',
+							disabled: true,
+							width: '20'						
+						}, {
+							header: me.mys.res('config.gpActivities.jobs.lbl'),
+							dataIndex: 'jobs',
+							xtype: 'checkcolumn',
+							disabled: true,
+							width: '20'						
+						}, {
+							header: me.mys.res('config.gpActivities.opportunities.lbl'),
+							dataIndex: 'opportunities',
+							xtype: 'checkcolumn',
+							disabled: true,
+							width: '22'						
+						}],
+					tbar: [
+						me.getAct('activity', 'add'),
+						me.getAct('activity', 'remove'),
+						'-',
+						me.getAct('activity', 'edit')
+					],
+					listeners: {
+						rowclick: function (s, rec) {
+							me.getAct('activity', 'remove').setDisabled(false);
+							me.getAct('activity', 'edit').setDisabled(false);
+						},
+						rowdblclick: function (s, rec) {
+							me.editActivityUI(rec);
+						}
+					}
 				}]
 		});
 	},
@@ -604,6 +679,44 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				}
 			}
 		});
+		me.addAct('activity', 'add', {
+			text: WT.res('act-add.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-add-xs',
+			handler: function () {
+				me.addActivity({
+					callback: function (success) {
+						if (success) {
+							me.gpActivity().getStore().load();
+						}
+					}
+				});
+			}
+		});
+		me.addAct('activity', 'remove', {
+			text: WT.res('act-remove.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-remove-xs',
+			disabled: true,
+			handler: function () {
+				var sel = me.getSelectedActivity();
+				if (sel) {
+					me.deleteActivityUI(sel);
+				}
+			}
+		});
+		me.addAct('activity', 'edit', {
+			text: WT.res('act-edit.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-edit-xs',
+			disabled: true,
+			handler: function () {
+				var sel = me.getSelectedActivity();
+				if (sel) {
+					me.editActivityUI(sel);
+				}
+			}
+		});
 	},
 	initCxm: function () {
 		var me = this;
@@ -691,6 +804,12 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 	},
 	getSelectedManager: function () {
 		return this.gpManager().getSelection()[0];
+	},
+	gpActivity: function () {
+		return this.lref('gpActivities');
+	},
+	getSelectedActivity: function () {
+		return this.gpActivity().getSelection()[0];
 	},
 	updateConfiguration: function (name, val) {
 		var me = this, pars = {};
@@ -1160,6 +1279,79 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				crud: 'delete',
 				domainId: domainId,
 				userId: userId
+			},
+			callback: function (success, json) {
+				Ext.callback(opts.callback, opts.scope || me, [success, json]);
+			}
+		});
+	},
+	addActivity: function (opts) {
+		opts = opts || {};
+
+		var me = this,
+			vw = WT.createView(me.mys.ID, 'view.Activity', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) { 
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vw.showView(function () {
+			vw.begin('new');
+		});
+	},
+	editActivityUI: function (rec) {
+		var me = this;
+		me.editActivity(rec.get('activityId'), {
+			callback: function (success, model) {
+				if (success) {
+					this.gpActivity().getStore().load();
+				} else {
+					alert('error');
+				}
+			}
+		});
+	},
+	editActivity: function (activityId, opts) {
+		opts = opts || {};
+
+		var me = this,
+			vw = WT.createView(me.mys.ID, 'view.Activity', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) { 
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vw.showView(function () {
+			vw.begin('edit', {
+				data: {
+					activityId: activityId
+				}
+			});
+		});
+	},
+	deleteActivityUI: function (rec) {
+		var me = this,
+			sto = me.gpActivity().getStore(),
+			msg;
+		if (rec) {
+			msg = me.mys.res('act.confirm.delete', Ext.String.ellipsis(rec.get('name'), 40));
+		} else {
+			alert('non cancellando');
+		}
+		WT.confirm(msg, function (bid) {
+			if (bid === 'yes') {
+				me.deleteDocStatus(rec.get('activityId'), {
+					callback: function (success) {
+						if (success)
+							sto.remove(rec);
+					}
+				});
+			}
+		});
+	},
+	deleteActivity: function (activityId, opts) {
+		opts = opts || {};
+		var me = this;
+		WT.ajaxReq(me.mys.ID, 'ManageActivity', {
+			params: {
+				crud: 'delete',
+				activityIds: WTU.arrayAsParam(activityId)
 			},
 			callback: function (success, json) {
 				Ext.callback(opts.callback, opts.scope || me, [success, json]);

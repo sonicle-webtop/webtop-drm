@@ -20,6 +20,8 @@
 .wtdrm-icon-timetable2-xs { background-image: url('timetable2_16.png') !important; }
 .wtdrm-icon-timetable3-xs { background-image: url('timetable3_16.png') !important; }
 .wtdrm-icon-timetable4-xs { background-image: url('timetable4_16.png') !important; }
+.wtdrm-icon-job-xs { background-image: url('job_16.png') !important; }
+.wtdrm-icon-ticket-xs { background-image: url('ticket_16.png') !important; }
 
 .wtdrm-icon-configuration-xs { background-image: url('configuration_16.png') !important; }
 .wtdrm-icon-configuration-generalconfiguration-xs { background-image: url('general_configurations_16.png') !important; }
@@ -31,6 +33,7 @@
 .wtdrm-icon-configuration-manager-xs { background-image: url('manager_configuration_16.png') !important; }
 .wtdrm-icon-configuration-employeeprofile-xs { background-image: url('employee_profile_16.png') !important; }
 .wtdrm-icon-configuration-ourprofile-xs { background-image: url('our_profile_16.png') !important; }
+.wtdrm-icon-configuration-activitiesconfiguration-xs { background-image: url('activity_configuration_16.png') !important; }
 
 .wtdrm-trash-trigger { background-image: url('trash-trigger.png') !important; }
 .wtdrm-add-trigger { background-image: url('add-trigger.png') !important; }

@@ -37,6 +37,7 @@ import com.sonicle.commons.LangUtils;
 import com.sonicle.commons.net.IPUtils;
 import com.sonicle.commons.time.DateTimeUtils;
 import com.sonicle.commons.web.Crud;
+import com.sonicle.commons.web.DispositionType;
 import com.sonicle.commons.web.ServletUtils;
 import com.sonicle.commons.web.ServletUtils.IntegerArray;
 import com.sonicle.commons.web.ServletUtils.StringArray;
@@ -82,8 +83,6 @@ import com.sonicle.webtop.drm.bol.OLeaveRequest;
 import com.sonicle.webtop.drm.bol.OLeaveRequestType;
 import com.sonicle.webtop.drm.bol.OOpportunityField;
 import com.sonicle.webtop.drm.bol.OTimetableReport;
-import com.sonicle.webtop.drm.bol.OTimetableStamp;
-import com.sonicle.webtop.drm.bol.OWorkReport;
 import com.sonicle.webtop.drm.bol.OWorkType;
 import com.sonicle.webtop.drm.bol.VOpportunityEntry;
 import com.sonicle.webtop.drm.bol.js.JsCompany;
@@ -181,21 +180,38 @@ import com.sonicle.webtop.calendar.model.Event;
 import com.sonicle.webtop.calendar.model.EventInstance;
 import com.sonicle.webtop.calendar.model.EventKey;
 import com.sonicle.webtop.calendar.model.UpdateEventTarget;
-import com.sonicle.webtop.contacts.model.ContactQuery;
+import com.sonicle.webtop.drm.bol.OActivity;
 import com.sonicle.webtop.contacts.model.ContactType;
+import com.sonicle.webtop.core.bol.js.JsWizardData;
 import com.sonicle.webtop.core.sdk.WTRuntimeException;
+import com.sonicle.webtop.core.util.LogEntries;
+import com.sonicle.webtop.core.util.LogEntry;
+import com.sonicle.webtop.core.util.MessageLogEntry;
 import com.sonicle.webtop.drm.bol.ODay;
 import com.sonicle.webtop.drm.bol.ODefaultCostType;
 import com.sonicle.webtop.drm.bol.OExpenseNote;
+import com.sonicle.webtop.drm.bol.OTicket;
+import com.sonicle.webtop.drm.bol.OTicketCategory;
+import com.sonicle.webtop.drm.bol.OViewJob;
+import com.sonicle.webtop.drm.bol.OViewTicket;
+import com.sonicle.webtop.drm.bol.OViewWorkReport;
+import com.sonicle.webtop.drm.bol.js.JsActivity;
 import com.sonicle.webtop.drm.bol.js.JsCostType;
 import com.sonicle.webtop.drm.bol.js.JsExpenseNote;
 import com.sonicle.webtop.drm.bol.js.JsExpenseNoteSetting;
 import com.sonicle.webtop.drm.bol.js.JsFilter;
+import com.sonicle.webtop.drm.bol.js.JsGridActivities;
 import com.sonicle.webtop.drm.bol.js.JsGridExpenseNote;
+import com.sonicle.webtop.drm.bol.js.JsGridJobs;
+import com.sonicle.webtop.drm.bol.js.JsGridTickets;
+import com.sonicle.webtop.drm.bol.js.JsJob;
+import com.sonicle.webtop.drm.bol.js.JsTicket;
+import com.sonicle.webtop.drm.bol.js.JsTicketSetting;
 import com.sonicle.webtop.drm.bol.model.RBExpenseNote;
 import com.sonicle.webtop.drm.bol.model.RBOpportunity;
 import com.sonicle.webtop.drm.bol.model.RBTimetableEncoReport;
 import com.sonicle.webtop.drm.bol.model.RBWorkReportSummary;
+import com.sonicle.webtop.drm.model.Activity;
 import com.sonicle.webtop.drm.model.CostType;
 import com.sonicle.webtop.drm.model.ExpenseNote;
 import com.sonicle.webtop.drm.model.ExpenseNoteDetailDocumentWithBytes;
@@ -203,6 +219,13 @@ import com.sonicle.webtop.drm.model.ExpenseNoteDocument;
 import com.sonicle.webtop.drm.model.ExpenseNoteDocumentWithBytes;
 import com.sonicle.webtop.drm.model.ExpenseNoteDocumentWithStream;
 import com.sonicle.webtop.drm.model.ExpenseNoteSetting;
+import com.sonicle.webtop.drm.model.Job;
+import com.sonicle.webtop.drm.model.JobAttachment;
+import com.sonicle.webtop.drm.model.JobAttachmentWithStream;
+import com.sonicle.webtop.drm.model.Ticket;
+import com.sonicle.webtop.drm.model.TicketAttachment;
+import com.sonicle.webtop.drm.model.TicketAttachmentWithStream;
+import com.sonicle.webtop.drm.model.TicketSetting;
 import com.sonicle.webtop.drm.model.WorkReportSummary;
 import com.sonicle.webtop.drm.rpt.RptExpenseNote;
 import com.sonicle.webtop.drm.rpt.RptOpportunity;
@@ -211,11 +234,9 @@ import java.awt.Image;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import javax.imageio.ImageIO;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -229,6 +250,7 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -239,6 +261,7 @@ import org.joda.time.format.DateTimeFormatter;
 public class Service extends BaseService {
 
 	public static final Logger logger = WT.getLogger(Service.class);
+	public static final String JOB_EXPORT_FILENAME = "jobs_{0}-{1}.{2}";
 
 	private DrmManager manager;
 	private DrmServiceSettings ss;
@@ -246,7 +269,9 @@ public class Service extends BaseService {
 	private LinkedHashMap<String, RootProgramNode> programs = new LinkedHashMap();
 
 	private LinkedHashMap<String, String> groupCategories = new LinkedHashMap();
-
+	
+	private CsvExportWizard csvWizard = null;
+	
 	@Override
 	public void initialize() throws Exception {
 
@@ -255,14 +280,11 @@ public class Service extends BaseService {
 		manager = (DrmManager) WT.getServiceManager(SERVICE_ID);
 		ss = new DrmServiceSettings(SERVICE_ID, pid.getDomainId());
 		us = new DrmUserSettings(SERVICE_ID, new UserProfileId(pid.getDomain(), pid.getUserId()));
-
+		
+		/*
 		RootProgramNode prog = null;
 		
-		if("".equals(ss.getOpportunityGeneralTitle()) || null == ss.getOpportunityGeneralTitle())
-			prog = new RootProgramNode(lookupResource(DrmTreeNode.OPPORTUNITY), "wtdrm-icon-opportunity-xs");
-		else
-			prog = new RootProgramNode(ss.getOpportunityGeneralTitle(), "wtdrm-icon-opportunity-xs");
-		
+		prog = new RootProgramNode(lookupResource(DrmTreeNode.OPPORTUNITY), "wtdrm-icon-opportunity-xs");
 		programs.put(prog.getId(), prog);
 
 		prog = new RootProgramNode(lookupResource(DrmTreeNode.WORK_REPORT), "wtdrm-icon-workreport-xs");
@@ -275,12 +297,16 @@ public class Service extends BaseService {
 		prog.addSubPrograms(lookupResource(DrmTreeNode.TIMETABLE_STAMP), "wtdrm-icon-timetable1-xs");
 		prog.addSubPrograms(lookupResource(DrmTreeNode.TIMETABLE_REQUEST), "wtdrm-icon-timetable2-xs");
 		prog.addSubPrograms(lookupResource(DrmTreeNode.TIMETABLE_REPORT), "wtdrm-icon-timetable3-xs");
-		//prog.addSubPrograms(lookupResource(DrmTreeNode.TIMETABLE_SUMMARY), "wtdrm-icon-timetable4-xs");
 		programs.put(prog.getId(), prog);		
 
+		prog = new RootProgramNode(lookupResource(DrmTreeNode.JOB), "wtdrm-icon-job-xs");
+		programs.put(prog.getId(), prog);
+		*/
+		
 		groupCategories.put(EnumUtils.toSerializedName(GroupCategory.IDENTITY), lookupResource("groupCategory.I"));
 		groupCategories.put(EnumUtils.toSerializedName(GroupCategory.STRUCTURE), lookupResource("groupCategory.S"));
 		groupCategories.put(EnumUtils.toSerializedName(GroupCategory.POLICY), lookupResource("groupCategory.P"));
+		
 	}
 
 	@Override
@@ -307,10 +333,15 @@ public class Service extends BaseService {
 		vs.put("workReportDefaultStatus", ss.getWorkReportDefaultDocStatusId());
 		vs.put("opportunityDefaultStatus", ss.getOpportunityDefaultDocStatusId());
 		vs.put("opportunityTitle", ss.getOpportunityGeneralTitle());
-		vs.put("opportunityEnablePrint", ss.getOpportunityGeneralEnablePrint());
+		vs.put("opportunityEnablePrint", ss.getOpportunityGeneralEnablePrint());		
 		vs.put("medicalVisitsAutomaticallyApproved", ss.getMedicalVisitsAutomaticallyApproved());
 		vs.put("workdayStart", hmf.print(us.getWorkdayStart()));
 		vs.put("workdayEnd", hmf.print(us.getWorkdayEnd()));
+		vs.put("ticketDefaultStatus", ss.getTicketDefaultDocStatusId());
+		vs.put("ticketDefaultPriority", ss.getTicketDefaultPriorityId());
+		vs.put("ticketDefaultCloseStatus", ss.getTicketDefaultCloseDocStatusId());
+		
+		vs.put("ticketNotifyMail", us.getTicketNotifyMail());
 		
 		try {
 			vs.put("opportunityRequiredFields", getOpportunityRequiredFields());
@@ -376,10 +407,10 @@ public class Service extends BaseService {
 			}
 			return (value == null) ? "1" : value;	
 		} catch (Exception ex) {
-			throw new WTException("Error in getExpenseNoteDefaultCurrency", ex);
+			throw new WTException("Error in getexpenseNoteKmCost", ex);
 		}
 	}
-
+	
 	public void processLookupUsers(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			List<JsSimple> jsUser = new ArrayList();
@@ -480,7 +511,7 @@ public class Service extends BaseService {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action LookupCompanies", ex);
 		}
-	}
+	}	
 	
 	public void processLookupHourProfiles(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
@@ -523,9 +554,8 @@ public class Service extends BaseService {
 			List<JsSimple> customers = new ArrayList();
 			
 			if(operator != null){
-				DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID, new UserProfileId(getEnv().getProfileId().getDomain(), operator));
-				
 				Map<String, MasterData> items = WT.getCoreManager().listMasterData(Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER), EnumUtils.toSerializedName(MasterData.Type.SUPPLIER)));
+				
 				for(MasterData customer : items.values()) {
 					customers.add(new JsSimple(customer.getMasterDataId(), customer.getDescription()));
 				}
@@ -541,19 +571,21 @@ public class Service extends BaseService {
 	public void processLookupRealCustomers(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			String operator = ServletUtils.getStringParameter(request, "operator", null);
+			String query = ServletUtils.getStringParameter(request, "query", null);
+			
 			List<String> idCustomers = new ArrayList();
 			List<JsSimple> customers = new ArrayList();
 			
 			if(operator != null){
 				DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID, new UserProfileId(getEnv().getProfileId().getDomain(), operator));
-
+				
 				idCustomers = manager.listCustomersByProfileUser();
 				
 				Map<String, MasterData> items = null;
 				if(idCustomers.size() > 0)
 					items = WT.getCoreManager().listMasterDataIn(idCustomers);
 				else
-					items = WT.getCoreManager().listMasterData(Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER)));
+					items = WT.getCoreManager().listMasterData(Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER)), ((query == null) ? null : "%" + query + "%"));
 				
 				for (MasterData customer : items.values()) {
 					customers.add(new JsSimple(customer.getMasterDataId(), customer.getDescription()));
@@ -631,7 +663,6 @@ public class Service extends BaseService {
 
 	public void processLookupDocStatuses(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
-
 			List<JsSimple> docStatuses = new ArrayList();
 
 			for (ODocStatus doc : manager.listDocStatuses()) {
@@ -642,6 +673,7 @@ public class Service extends BaseService {
 			ResultMeta meta = new LookupMeta().setSelected(selected);
 
 			new JsonResult(docStatuses, meta, docStatuses.size()).printTo(out);
+			
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action LookupDocStatuses", ex);
@@ -664,6 +696,7 @@ public class Service extends BaseService {
 			ResultMeta meta = new LookupMeta().setSelected(selected);
 				
 			new JsonResult(managers, meta, managers.size()).printTo(out);
+			
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action LookupManagers", ex);
@@ -821,23 +854,57 @@ public class Service extends BaseService {
 		}
 	}
 
+	private ExtTreeNode createTreeNode(String id, String type, String text, boolean leaf, String iconClass) {
+		ExtTreeNode node = new ExtTreeNode(id, text, leaf);
+		node.put("_type", type);
+		node.setIconClass(iconClass);
+		return node;
+	}
+	
 	public void processLoadEnabledProgramTree(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
-
-		String node = "";
-		List<ExtTreeNode> treeNode = new ArrayList<>();
-
+		String nodeId = "";
+		// List<ExtTreeNode> treeNode = new ArrayList<>();
+		ArrayList<ExtTreeNode> nodes = new ArrayList<ExtTreeNode>();
+		
 		try {
-			node = ServletUtils.getStringParameter(request, "node", true);
-			if (StringUtils.equals(node, "root")) {
-				for (RootProgramNode program : programs.values()) {
-					treeNode.add(new ExtTreeNode(program.getId(), program.getId(), program.getSubPrograms().isEmpty(), program.getIconClass()));
-				}
+			nodeId = ServletUtils.getStringParameter(request, "node", true);
+			UserProfileId pid = getEnv().getProfileId();
+			
+			ss = new DrmServiceSettings(SERVICE_ID, pid.getDomainId());
+			
+			if (nodeId.equals(DrmTreeNode.TREE_NODE_ROOT)) { // Nodi livello 1
+				// + OPPORTUNITY
+				if("".equals(ss.getOpportunityGeneralTitle()) || null == ss.getOpportunityGeneralTitle())
+					nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_OPPORTUNITY, null, lookupResource(DrmTreeNode.OPPORTUNITY), true, "wtdrm-icon-opportunity-xs"));
+				else
+					nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_OPPORTUNITY, null, ss.getOpportunityGeneralTitle(), true, "wtdrm-icon-opportunity-xs"));				
+				// + WORK REPORT
+				nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_WORKREPORT, null, lookupResource(DrmTreeNode.WORK_REPORT), true, "wtdrm-icon-workreport-xs"));
+				// + EXPENSE NOTE
+				nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_EXPENSENOTE, null, lookupResource(DrmTreeNode.EXPENSE_NOTE), true, "wtdrm-icon-expensenote-xs"));
+				// + TIMETABLE
+				nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE, null, lookupResource(DrmTreeNode.TIMETABLE), false, "wtdrm-icon-timetable-xs"));
+				// + TICKET
+				nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TICKET, null, lookupResource(DrmTreeNode.TICKET), true, "wtdrm-icon-ticket-xs"));
+				// + JOB
+				nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_JOB, null, lookupResource(DrmTreeNode.JOB), true, "wtdrm-icon-job-xs"));
 			} else {
-				for (ProgramNode subProg : programs.get(node).getSubPrograms()) {
-					treeNode.add(new ExtTreeNode(subProg.getId(), subProg.getId(), true, subProg.getIconClass()));
+				String tokens[] = StringUtils.split(nodeId, ".");
+				if(tokens.length == 1) {
+					if(tokens[0].equals(DrmTreeNode.TREE_NODE_TIMETABLE)) {
+						// + TIMETABLE STAMP
+						nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE_STAMP, null, lookupResource(DrmTreeNode.TIMETABLE_STAMP), true, "wtdrm-icon-timetable1-xs"));
+						// + TIMETABLE REQUEST
+						nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE_REQUEST, null, lookupResource(DrmTreeNode.TIMETABLE_REQUEST), true, "wtdrm-icon-timetable2-xs"));
+						// + TIMETABLE REPORT
+						nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE_REPORT, null, lookupResource(DrmTreeNode.TIMETABLE_REPORT), true, "wtdrm-icon-timetable3-xs"));
+						// + TIMETABLE SUMMARY
+						nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE_SUMMARY, null, lookupResource(DrmTreeNode.TIMETABLE_SUMMARY), true, "wtdrm-icon-timetable4-xs"));
+					}
 				}
-			}
-			new JsonResult(treeNode).printTo(out);
+			}			
+			
+			new JsonResult(nodes).printTo(out);
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in LoadEnabledProgramTree", ex);
@@ -1433,7 +1500,8 @@ public class Service extends BaseService {
 				
 				for (VOpportunityEntry o : manager.listOpportunitiesAndActions(oQuery)) {
 					item = new JsGridOpportunity(o);
-					item.additionalInfo = (o.getActionId() == 0) ? getGridOpportunityAdditionalInfo(fields, o) : (((o.getActivityId() != null) ? "[" + WT.getCoreManager().getActivity(o.getActivityId()).getDescription() + "] " : "") + ((o.getDescription() != null) ? o.getDescription() : ""));					
+					// item.additionalInfo = (o.getActionId() == 0) ? getGridOpportunityAdditionalInfo(fields, o) : (((o.getActivityId() != null) ? "[" + WT.getCoreManager().getActivity(o.getActivityId()).getDescription() + "] " : "") + ((o.getDescription() != null) ? o.getDescription() : ""));					
+					item.additionalInfo = (o.getActionId() == 0) ? getGridOpportunityAdditionalInfo(fields, o) : (((o.getActivityId() != null) ? "[" + manager.getActivity(o.getActivityId()).getDescription() + "] " : "") + ((o.getDescription() != null) ? o.getDescription() : ""));					
 					
 					if(o.getStatusId() != null){
 						if("C".equals(manager.getDocStatus(o.getStatusId()).getType())){
@@ -1551,6 +1619,7 @@ public class Service extends BaseService {
 	
 	public void processManageOpportunityAction(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		JsOpportunityAction item = null;
+		
 		try {
 			String crud = ServletUtils.getStringParameter(request, "crud", true);
 			if (crud.equals(Crud.READ)) {
@@ -1578,12 +1647,15 @@ public class Service extends BaseService {
 					doc.setMediaType(upFile.getMediaType());
 					oAct.getActionDocuments().add(doc);
 				}
-
-				Integer eventId = createOrUpdateOpportunityActionEventIntoOpportunityCalendar(oAct);
-				oAct.setEventId(eventId);
 				
-				manager.addOpportunityAction(oAct);
-
+				Integer opportunityId = manager.addOpportunityAction(oAct);
+				oAct = manager.getOpportunityAction(opportunityId);
+				
+				Integer eventId = createOrUpdateOpportunityActionEventIntoOpportunityCalendar(oAct);
+				oAct.setEventId(eventId);				
+				
+				manager.updateOpportunityAction(oAct);
+				
 				new JsonResult().printTo(out);
 
 			} else if (crud.equals(Crud.UPDATE)) {
@@ -1608,13 +1680,13 @@ public class Service extends BaseService {
 						doc.setSize(jsdoc.size);
 						oAct.getActionDocuments().add(doc);
 					}
-				}
-
+				}								
+								
 				Integer eventId = createOrUpdateOpportunityActionEventIntoOpportunityCalendar(oAct);
 				oAct.setEventId(eventId);
 				
 				manager.updateOpportunityAction(oAct);
-
+				
 				new JsonResult().printTo(out);
 
 			} else if (crud.equals(Crud.DELETE)) {
@@ -1645,10 +1717,14 @@ public class Service extends BaseService {
 			for (OpportunityAction act : oActs) {
 				if(statusId != null && !"null".equals(statusId)) act.setStatusId(Integer.parseInt(statusId));
 				
+				Integer oAId = manager.addOpportunityAction(act);
+				act = manager.getOpportunityAction(oAId);
+				
 				Integer eventId = createOrUpdateOpportunityActionEventIntoOpportunityCalendar(act);
 				act.setEventId(eventId);
-
-				manager.addOpportunityAction(act);
+				
+				manager.updateOpportunityAction(act);
+				
 			}
 
 			new JsonResult().printTo(out);
@@ -1776,7 +1852,7 @@ public class Service extends BaseService {
 				WorkReportQuery wrQuery = WorkReportQuery.fromJson(query);
 				List<JsGridWorkReports> jsGridWorkReports = new ArrayList();
 
-				for (OWorkReport wr : manager.listWorkReports(wrQuery)) {
+				for (OViewWorkReport wr : manager.listWorkReports(wrQuery)) {
 					jsGridWorkReports.add(new JsGridWorkReports(wr, ptz, ""));
 				}
 
@@ -1788,6 +1864,28 @@ public class Service extends BaseService {
 		}
 	}
 
+	public void processManageGridJob(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			DateTimeZone ptz = getEnv().getProfile().getTimeZone();
+			if (crud.equals(Crud.READ)) {
+
+				String query = ServletUtils.getStringParameter(request, "query", null);
+				JobQuery jbQuery = JobQuery.fromJson(query);
+				List<JsGridJobs> jsGridJobs = new ArrayList();
+
+				for (OViewJob jb : manager.listJobs(jbQuery)) {
+					jsGridJobs.add(new JsGridJobs(jb, ptz, ""));
+				}
+
+				new JsonResult(jsGridJobs).printTo(out);
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageGridJob", ex);
+		}
+	}
+	
 	public void processManageWorkReport(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		JsWorkReport item = null;
 		try {
@@ -1809,7 +1907,7 @@ public class Service extends BaseService {
 
 				Payload<MapItem, JsWorkReport> pl = ServletUtils.getPayload(request, JsWorkReport.class);
 
-				WorkReport wrkRpt = JsWorkReport.createWorkReport(pl.data, ptz);
+				WorkReport wrkRpt = JsWorkReport.createWorkReport(pl.data, ptz, getEnv().getProfileId().getDomainId());
 
 				for (JsWorkReport.Attachment jsatt : pl.data.attachments) {
 					UploadedFile upFile = getUploadedFileOrThrow(jsatt._uplId);
@@ -1835,7 +1933,7 @@ public class Service extends BaseService {
 
 				Payload<MapItem, JsWorkReport> pl = ServletUtils.getPayload(request, JsWorkReport.class);
 
-				WorkReport wrkRpt = JsWorkReport.createWorkReport(pl.data, ptz);
+				WorkReport wrkRpt = JsWorkReport.createWorkReport(pl.data, ptz, getEnv().getProfileId().getDomainId());
 
 				for (JsWorkReport.Attachment jsatt : pl.data.attachments) {
 					if(!StringUtils.isBlank(jsatt._uplId)){
@@ -1877,6 +1975,163 @@ public class Service extends BaseService {
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action ManageWorkReport", ex);
+		}
+	}
+	
+	public void processManageJob(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		JsJob item = null;
+		
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			
+			if (crud.equals(Crud.READ)) {
+				String id = ServletUtils.getStringParameter(request, "id", true);
+
+				Job job = manager.getJob(id);
+
+				String _profileId = "";
+
+				item = new JsJob(job, _profileId);
+
+				new JsonResult(item).printTo(out);
+
+			} else if (crud.equals(Crud.CREATE)) {
+				Payload<MapItem, JsJob> pl = ServletUtils.getPayload(request, JsJob.class);
+
+				Job job = JsJob.createJob(pl.data, getEnv().getProfileId().getDomainId());
+
+				for (JsJob.Attachment jsatt : pl.data.attachments) {
+					UploadedFile upFile = getUploadedFileOrThrow(jsatt._uplId);
+					JobAttachmentWithStream att = new JobAttachmentWithStream(upFile.getFile());
+					att.setJobAttachmentId(jsatt.id);
+					att.setFileName(upFile.getFilename());
+					att.setSize(upFile.getSize());
+					att.setMediaType(upFile.getMediaType());
+					job.getAttachments().add(att);
+				}
+				
+				String jobId = manager.addJob(job);
+				job = manager.getJob(jobId);
+				
+				Integer eventId = createOrUpdateJobEventIntoJobCalendar(job);
+				job.setEventId(eventId);
+				
+				manager.updateJob(job);
+				
+				new JsonResult().printTo(out);
+
+			} else if (crud.equals(Crud.UPDATE)) {
+				Payload<MapItem, JsJob> pl = ServletUtils.getPayload(request, JsJob.class);
+
+				Job job = JsJob.createJob(pl.data, getEnv().getProfileId().getDomainId());
+
+				for (JsJob.Attachment jsatt : pl.data.attachments) {
+					if(!StringUtils.isBlank(jsatt._uplId)){
+						UploadedFile upFile = getUploadedFileOrThrow(jsatt._uplId);
+						JobAttachmentWithStream att = new JobAttachmentWithStream(upFile.getFile());
+						att.setJobAttachmentId(jsatt.id);
+						att.setFileName(upFile.getFilename());
+						att.setSize(upFile.getSize());
+						att.setMediaType(upFile.getMediaType());
+						job.getAttachments().add(att);
+					}else{
+						JobAttachment att = new JobAttachment();
+						att.setJobAttachmentId(jsatt.id);
+						att.setFileName(jsatt.name);
+						att.setSize(jsatt.size);
+						job.getAttachments().add(att);
+					}
+				}
+
+				Integer eventId = createOrUpdateJobEventIntoJobCalendar(job);
+				job.setEventId(eventId);
+				
+				manager.updateJob(job);
+
+				new JsonResult().printTo(out);
+
+			} else if (crud.equals(Crud.DELETE)) {
+				StringArray ids = ServletUtils.getObjectParameter(request, "jobIds", StringArray.class, true);
+
+				Job job = manager.getJob(ids.get(0));
+				
+				deleteJobEvent(job);
+				
+				manager.deleteJob(ids.get(0));
+
+				new JsonResult().printTo(out);
+				
+			} else if (crud.equals("associate")) {
+				String ticketId = ServletUtils.getStringParameter(request, "ticketId", true);
+				String jobId = ServletUtils.getStringParameter(request, "jobId", true);
+				
+				manager.associateTicket(jobId, ticketId);
+				
+				new JsonResult().printTo(out);
+				
+			}
+			
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageJob", ex);
+		}
+	}
+	
+	public void processExportJobs(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		UserProfile up = getEnv().getProfile();
+		
+		try {
+			String op = ServletUtils.getStringParameter(request, "op", true);
+			if (op.equals("do")) {
+				String query = ServletUtils.getStringParameter(request, "query", null);
+				// JobQuery jbQuery = null;
+				JobQuery jbQuery = JobQuery.fromJson(query);
+				
+				csvWizard = new CsvExportWizard();
+				csvWizard.date = new DateTime();
+				
+				LogEntries log = new LogEntries();
+				File file = WT.createTempFile();
+				
+				try {
+					DateTimeFormatter ymd2 = DateTimeUtils.createFormatter("yyyyMMdd", up.getTimeZone());
+					DateTimeFormatter ymdhms = DateTimeUtils.createFormatter("yyyy-MM-dd HH:mm:ss", up.getTimeZone());
+					
+					try (FileOutputStream fos = new FileOutputStream(file)) {
+						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Started on {0}", ymdhms.print(new DateTime())));
+						manager.exportJobs(log, jbQuery, fos);
+						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Ended on {0}", ymdhms.print(new DateTime())));
+						csvWizard.file = file;
+						csvWizard.filename = MessageFormat.format(JOB_EXPORT_FILENAME, up.getDomainId(), ymd2.print(csvWizard.date), "csv");
+						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "File ready: {0}", csvWizard.filename));
+						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Operation completed succesfully"));
+						new JsonResult(new JsWizardData(log.print())).printTo(out);
+					}
+					
+				} catch(Throwable t) {
+					logger.error("Error generating export", t);
+					file.delete();
+					new JsonResult(new JsWizardData(log.print())).setSuccess(false).printTo(out);
+				}	
+			}
+		} catch(Exception ex) {
+			logger.error("Error in ExportJobs", ex);
+			new JsonResult(false, ex.getMessage()).printTo(out);
+		}
+	}
+	
+	public void processExportJobs(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			try(FileInputStream fis = new FileInputStream(csvWizard.file)) {
+				ServletUtils.setFileStreamHeaders(response, "application/octet-stream", DispositionType.ATTACHMENT, csvWizard.filename);
+				ServletUtils.setContentLengthHeader(response, csvWizard.file.length());
+				IOUtils.copy(fis, response.getOutputStream());
+			}
+			
+		} catch(Exception ex) {
+			logger.error("Error in ExportJobs", ex);
+		} finally {
+			csvWizard = null;
 		}
 	}
 	
@@ -2249,7 +2504,7 @@ public class Service extends BaseService {
 					
 					item.defaultStatus = ss.getOpportunityDefaultDocStatusId();
 					item.title = ss.getOpportunityGeneralTitle();
-					item.enablePrint = ss.getOpportunityGeneralEnablePrint();
+					item.enablePrint = ss.getOpportunityGeneralEnablePrint();					
 				} else {
 					item = new JsOpportunitySetting(new OpportunitySetting());
 				}
@@ -2777,9 +3032,9 @@ public class Service extends BaseService {
 
 				List<JsGridTimetableStamp> jsGridTS = new ArrayList();
 
-				for (OTimetableStamp oTS : manager.listTimetableStamp()) {
+				for (TimetableStamp ts:  manager.listTimetableStamp()) {
 
-					jsGridTS.add(new JsGridTimetableStamp(oTS));
+					jsGridTS.add(new JsGridTimetableStamp(ts));
 				}
 
 				new JsonResult(jsGridTS).printTo(out);
@@ -2801,9 +3056,9 @@ public class Service extends BaseService {
 				
 				List<JsGridTimetableStampList> jsGridTSL = new ArrayList();
 
-				for (OTimetableStamp oTS : manager.listTimetableStamps(tsQuery)) {
+				for (TimetableStamp ts : manager.listTimetableStamps(tsQuery)) {
 
-					jsGridTSL.add(new JsGridTimetableStampList(oTS));
+					jsGridTSL.add(new JsGridTimetableStampList(ts));
 				}
 
 				new JsonResult(jsGridTSL).printTo(out);
@@ -3003,7 +3258,7 @@ public class Service extends BaseService {
 			logger.error("Error in action ExportSummaryExcel", ex);
 		}
 	}
-
+	
 	public String getGridOpportunityAdditionalInfo(List<OOpportunityField> fields, VOpportunityEntry o) throws WTException{
 		String additionalInfo = "";
 		
@@ -3012,7 +3267,8 @@ public class Service extends BaseService {
 				switch(field.getFieldId()){
 					case "activity":		
 						if(o.getActivityId() != null)
-							additionalInfo += field.getLabel() + ": " + WT.getCoreManager().getActivity(o.getActivityId()).getDescription() + " / ";		
+							// additionalInfo += field.getLabel() + ": " + WT.getCoreManager().getActivity(o.getActivityId()).getDescription() + " / ";		
+							additionalInfo += field.getLabel() + ": " + manager.getActivity(o.getActivityId()).getDescription() + " / ";		
 						break;
 					case "causal":	
 						if(o.getCausalId() != null)
@@ -3141,11 +3397,51 @@ public class Service extends BaseService {
 		return eventId;
 	}
 	
+	private Integer createOrUpdateJobEventIntoJobCalendar(Job job) throws WTException {
+		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
+		Integer eventId = null;
+		Event ev = null;
+		
+		if (cm != null) {
+			Integer jobCalId = us.getJobCalendarId();
+			
+			if(jobCalId == null || !cm.existCalendar(jobCalId)){
+				jobCalId = createJobCalendar(cm, job);
+				us.setJobCalendarId(jobCalId);
+			}
+			
+			if(job.getEventId() != null){
+				ev = cm.getEvent(job.getEventId());
+				
+				if(ev != null){
+					eventId = updateJobEvent(cm, job, ev);
+				}else{
+					eventId = createJobEvent(cm, job, jobCalId);
+				}
+			}else{
+				eventId = createJobEvent(cm, job, jobCalId);
+			}			
+		}
+		
+		return eventId;
+	}
+	
 	private Integer createWorkReportCalendar(ICalendarManager cm, WorkReport wrkRpt) throws WTException{
 		Calendar cal = new Calendar();
 		cal.setName(lookupResource("workreport.calendar.name"));
 		cal.setColor("#FFAD46");
 		cal.setProfileId(new UserProfileId(getEnv().getProfileId().getDomainId(), wrkRpt.getOperatorId()));
+		
+		cal = cm.addCalendar(cal);
+		
+		return cal.getCalendarId();
+	}
+	
+	private Integer createJobCalendar(ICalendarManager cm, Job job) throws WTException{
+		Calendar cal = new Calendar();
+		cal.setName(lookupResource("job.calendar.name"));
+		cal.setColor("#FFAD46");
+		cal.setProfileId(new UserProfileId(getEnv().getProfileId().getDomainId(), job.getOperatorId()));
 		
 		cal = cm.addCalendar(cal);
 		
@@ -3190,6 +3486,42 @@ public class Service extends BaseService {
 		return ev.getEventId();
 	}
 	
+	private int createJobEvent(ICalendarManager cm, Job job, int wrCalId) throws WTException{
+		Event ev = new Event();
+		String title = "";
+		
+		ev.setCalendarId(wrCalId);
+		ev.setAllDay(false);
+		ev.setIsPrivate(true);
+		ev.setBusy(false);
+		ev.setReadOnly(true);
+
+		if(job.getStartDate() != null) 
+			ev.setStartDate(job.getStartDate());
+		if(job.getEndDate() != null)
+			ev.setEndDate(job.getEndDate());
+		if(job.getTimezone() != null)
+			ev.setTimezone(job.getTimezone());	
+		if(job.getActivityId() != null)
+			// ev.setActivityId(job.getActivityId());
+			title += "[" + manager.getActivity(job.getActivityId()).getDescription() + "] ";
+		if(job.getDescription() != null)
+			ev.setDescription(job.getDescription());
+		if(job.getCustomerId() != null)
+			ev.setMasterDataId(job.getCustomerId());
+		if(job.getCustomerStatId()!= null)
+			ev.setStatMasterDataId(job.getCustomerStatId());
+		if(job.getTitle() != null)
+			// ev.setTitle(job.getTitle());
+			title += job.getTitle();
+		
+		ev.setTitle(title);
+		
+		ev = cm.addEvent(ev, false);
+		
+		return ev.getEventId();
+	}
+	
 	private int updateWorkReportEvent(ICalendarManager cm, WorkReport wrkRpt, Event ev) throws WTException{
 		EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
 		DateTimeZone tz = getEnv().getProfile().getTimeZone();
@@ -3222,6 +3554,36 @@ public class Service extends BaseService {
 		return evI.getEventId();
 	}
 	
+	private int updateJobEvent(ICalendarManager cm, Job job, Event ev) throws WTException{
+		EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
+		String title = "";
+		
+		if(job.getStartDate() != null) 
+			evI.setStartDate(job.getStartDate());
+		if(job.getEndDate() != null)
+			evI.setEndDate(job.getEndDate());
+		if(job.getTimezone() != null)
+			evI.setTimezone(job.getTimezone());
+		if(job.getActivityId() != null)
+			// evI.setActivityId(job.getActivityId());
+			title += "[" + manager.getActivity(job.getActivityId()).getDescription() + "] ";
+		if(job.getDescription() != null)
+			evI.setDescription(job.getDescription());
+		if(job.getCustomerId() != null)
+			evI.setMasterDataId(job.getCustomerId());
+		if(job.getCustomerStatId()!= null)
+			evI.setStatMasterDataId(job.getCustomerStatId());
+		if(job.getTitle() != null)
+			// evI.setTitle(job.getTitle());
+			title += job.getTitle();
+		
+		evI.setTitle(title);
+		
+		cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false, false);
+		
+		return evI.getEventId();
+	}
+	
 	private void deleteWorkReportEvent(WorkReport wrkRpt) throws WTException{		
 		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
 		
@@ -3230,6 +3592,18 @@ public class Service extends BaseService {
 				Event ev = cm.getEvent(wrkRpt.getEventId());
 				if(ev != null)
 					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(wrkRpt.getEventId(), null), false);
+			}
+		}
+	}
+	
+	private void deleteJobEvent(Job job) throws WTException{		
+		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
+		
+		if (cm != null) {
+			if(job.getEventId() != null){
+				Event ev = cm.getEvent(job.getEventId());
+				if(ev != null)
+					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(job.getEventId(), null), false);
 			}
 		}
 	}
@@ -3301,9 +3675,11 @@ public class Service extends BaseService {
 			ev.setMasterDataId(o.getCustomerId());
 		if(o.getCustomerStatId() != null)
 			ev.setStatMasterDataId(o.getCustomerStatId());
+		/*
 		if(o.getActivityId() != null)
 			ev.setActivityId(o.getActivityId());
-
+		*/
+		
 		ev = cm.addEvent(ev, false);
 		
 		return ev.getEventId();
@@ -3333,9 +3709,11 @@ public class Service extends BaseService {
 			evI.setMasterDataId(o.getCustomerId());
 		if(o.getCustomerStatId() != null)
 			evI.setStatMasterDataId(o.getCustomerStatId());
+		/*
 		if(o.getActivityId() != null)
 			evI.setActivityId(o.getActivityId());
-
+		*/
+		
 		cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false, false);
 		
 		return evI.getEventId();
@@ -3402,17 +3780,21 @@ public class Service extends BaseService {
 		}
 		if(o.getDescription() != null)
 			title += o.getDescription() + " > ";
-		if(oAct.getActivityId() != null)
-			title += "[" + WT.getCoreManager().getActivity(oAct.getActivityId()).getDescription() + "] ";
+		if(oAct.getActivityId() != null) {
+			// title += "[" + WT.getCoreManager().getActivity(oAct.getActivityId()).getDescription() + "] ";
+			title += "[" + manager.getActivity(oAct.getActivityId()).getDescription() + "] ";
+		}
 		if(oAct.getDescription() != null)
 			title += oAct.getDescription();
 		if(oAct.getPlace() != null)
 			ev.setLocation(oAct.getPlace());
 		if(oAct.getSubsequentActions() != null)
 			ev.setDescription(oAct.getSubsequentActions());
+		/*
 		if(oAct.getActivityId() != null)
 			ev.setActivityId(oAct.getActivityId());
-
+		*/
+		
 		ev.setTitle(title);
 		
 		ev = cm.addEvent(ev, false);
@@ -3436,16 +3818,18 @@ public class Service extends BaseService {
 		if(o.getDescription() != null)
 			title += o.getDescription() + " > ";
 		if(oAct.getActivityId() != null)
-			title += "[" + WT.getCoreManager().getActivity(oAct.getActivityId()).getDescription() + "] ";
+			title += "[" + manager.getActivity(oAct.getActivityId()).getDescription() + "] ";
 		if(oAct.getDescription() != null)
 			title += oAct.getDescription();
 		if(oAct.getPlace() != null)
 			evI.setLocation(oAct.getPlace());
 		if(oAct.getSubsequentActions() != null)
 			evI.setDescription(oAct.getSubsequentActions());
+		/*
 		if(oAct.getActivityId() != null)
 			evI.setActivityId(oAct.getActivityId());
-
+		*/
+		
 		evI.setTitle(title);
 
 		cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false, false);
@@ -3488,8 +3872,8 @@ public class Service extends BaseService {
 		}
 	}
 	
- 	private Integer createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(final LeaveRequest lReq) throws WTException {
- 		TimetableSetting ts = manager.getTimetableSetting();
+	private Integer createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(LeaveRequest lReq) throws WTException {
+		TimetableSetting ts = manager.getTimetableSetting();
  		UserProfileId upi = null;
  		Integer activityId = null; 
 		boolean ownCalendar=true;
@@ -3990,4 +4374,347 @@ public class Service extends BaseService {
 			new JsonResult(ex).printTo(out);
 		}
 	}
+	
+	public void processManageTicketSetting(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		JsTicketSetting item = null;
+		
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+
+			if (crud.equals(Crud.READ)) {
+
+				TicketSetting tcktSetting = manager.getTicketSetting();
+
+				if (tcktSetting != null) {
+					item = new JsTicketSetting(tcktSetting);
+					
+					item.defaultStatus = ss.getTicketDefaultDocStatusId();
+					item.defaultPriority = ss.getTicketDefaultPriorityId();
+					item.defaultTicketCategory = ss.getTicketDefaultTicketCategoryId();
+					item.defaultCloseStatus = ss.getTicketDefaultCloseDocStatusId();
+				} else {
+					item = new JsTicketSetting(new TicketSetting());
+				}
+
+				new JsonResult(item).printTo(out);
+
+			} else if (crud.equals(Crud.UPDATE)) {
+
+				Payload<MapItem, JsTicketSetting> pl = ServletUtils.getPayload(request, JsTicketSetting.class);
+
+				TicketSetting tcktSetting = JsTicketSetting.createTicketSetting(pl.data);
+
+				if (pl.map.has("defaultStatus")) {
+					ss.setTicketDefaultDocStatusId(pl.data.defaultStatus);
+				}
+				if (pl.map.has("defaultPriority")) {
+					ss.setTicketDefaultPriorityId(pl.data.defaultPriority);
+				}
+				if (pl.map.has("defaultTicketCategory")) {
+					ss.setTicketDefaultTicketCategoryId(pl.data.defaultTicketCategory);
+				}
+				if (pl.map.has("defaultCloseStatus")) {
+					ss.setTicketDefaultCloseDocStatusId(pl.data.defaultCloseStatus);
+				}
+				
+				manager.updateTicketSetting(tcktSetting);
+
+				new JsonResult().printTo(out);
+
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageTicketSetting", ex);
+		}
+	}
+	
+	public void processLookupTicketCategories(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			List<JsSimple> tCats = new ArrayList();
+
+			for (OTicketCategory tCat : manager.listTicketCategories()) {
+				tCats.add(new JsSimple(tCat.getTicketCategoryId(), tCat.getDescription()));
+			}
+			Integer selected = tCats.isEmpty() ? null : (Integer) tCats.get(0).id;
+			ResultMeta meta = new LookupMeta().setSelected(selected);
+			
+			new JsonResult(tCats, meta, tCats.size()).printTo(out);
+			
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action TicketCategories", ex);
+		}
+	}
+	
+	public void processManageTicket(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		JsTicket item = null;
+		
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			Boolean close = ServletUtils.getBooleanParameter(request, "close", false);
+			
+			if (crud.equals(Crud.READ)) {
+				String id = ServletUtils.getStringParameter(request, "id", true);
+
+				Ticket tckt = manager.getTicket(id);
+
+				String _profileId = "";
+
+				item = new JsTicket(tckt, _profileId);
+
+				new JsonResult(item).printTo(out);
+				
+			} else if (crud.equals(Crud.CREATE)) {
+				Payload<MapItem, JsTicket> pl = ServletUtils.getPayload(request, JsTicket.class);
+
+				Ticket tckt = JsTicket.createTicket(pl.data, getEnv().getProfileId().getDomainId());
+
+				for (JsTicket.Attachment jsatt : pl.data.attachments) {
+					UploadedFile upFile = getUploadedFileOrThrow(jsatt._uplId);
+					TicketAttachmentWithStream att = new TicketAttachmentWithStream(upFile.getFile());
+					att.setTicketAttachmentId(jsatt.id);
+					att.setFileName(upFile.getFilename());
+					att.setSize(upFile.getSize());
+					att.setMediaType(upFile.getMediaType());
+					tckt.getAttachments().add(att);
+				}
+				
+				String tcktId = manager.addTicket(tckt, close);
+				tckt.setTicketId(tcktId);
+				
+				item = new JsTicket(tckt, null);
+				
+				new JsonResult(item).printTo(out);
+				
+			} else if (crud.equals(Crud.UPDATE)) {
+				Payload<MapItem, JsTicket> pl = ServletUtils.getPayload(request, JsTicket.class);
+
+				Ticket tckt = JsTicket.createTicket(pl.data, getEnv().getProfileId().getDomainId());
+
+				for (JsTicket.Attachment jsatt : pl.data.attachments) {
+					if(!StringUtils.isBlank(jsatt._uplId)){
+						UploadedFile upFile = getUploadedFileOrThrow(jsatt._uplId);
+						TicketAttachmentWithStream att = new TicketAttachmentWithStream(upFile.getFile());
+						att.setTicketAttachmentId(jsatt.id);
+						att.setFileName(upFile.getFilename());
+						att.setSize(upFile.getSize());
+						att.setMediaType(upFile.getMediaType());
+						tckt.getAttachments().add(att);
+					}else{
+						TicketAttachment att = new TicketAttachment();
+						att.setTicketAttachmentId(jsatt.id);
+						att.setFileName(jsatt.name);
+						att.setSize(jsatt.size);
+						tckt.getAttachments().add(att);
+					}
+				}
+				/*
+				Integer eventId = createOrUpdateJobEventIntoJobCalendar(job);
+				job.setEventId(eventId);
+				*/
+				manager.updateTicket(tckt, close);
+
+				new JsonResult().printTo(out);
+				
+			} else if (crud.equals(Crud.DELETE)) {
+				StringArray ids = ServletUtils.getObjectParameter(request, "ticketIds", StringArray.class, true);
+
+				// Ticket tckt = manager.getTicket(ids.get(0));
+				
+				// deleteTicketEvent(tckt);
+				
+				manager.deleteTicket(ids.get(0));
+
+				new JsonResult().printTo(out);
+				
+			} else if (crud.equals(Crud.END)) {
+				StringArray ids = ServletUtils.getObjectParameter(request, "ticketIds", StringArray.class, true);								
+				
+				manager.closeTicket(ids.get(0), ss.getTicketDefaultCloseDocStatusId());
+				
+				Ticket tckt = manager.getTicket(ids.get(0));
+				item = new JsTicket(tckt, "");
+				
+				new JsonResult(item).printTo(out);
+				
+			}
+			
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageTicket", ex);
+		}
+	}
+	
+	public void processManageGridTicket(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			DateTimeZone ptz = getEnv().getProfile().getTimeZone();
+			if (crud.equals(Crud.READ)) {
+				String query = ServletUtils.getStringParameter(request, "query", null);
+				TicketQuery tcktQuery = TicketQuery.fromJson(query);
+				List<JsGridTickets> jsGridTickets = new ArrayList();
+
+				for (OViewTicket tckt : manager.listTickets(tcktQuery)) {
+					jsGridTickets.add(new JsGridTickets(tckt, ptz, ""));
+				}
+
+				new JsonResult(jsGridTickets).printTo(out);
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageGridTicket", ex);
+		}
+	}
+	
+	public void processManageGridTicketJobs(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			DateTimeZone ptz = getEnv().getProfile().getTimeZone();
+			
+			if (crud.equals(Crud.READ)) {
+				String ticketId = ServletUtils.getStringParameter(request, "ticketId", null);
+				List<JsGridJobs> jsGridJobs = new ArrayList();
+
+				for (OViewJob job : manager.listJobsByTicketId(ticketId)) {
+					jsGridJobs.add(new JsGridJobs(job, ptz, ""));
+				}
+
+				new JsonResult(jsGridJobs).printTo(out);
+			}
+			
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageGridTicketJobs", ex);
+		}
+	}
+	
+	public void processLookupAllOperators(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			List<OUser> jsUser = null;
+			
+			jsUser = WT.getCoreManager().listUsers(true);
+			/*
+			for (String usr : manager.listOperators()) {
+				uD = WT.getUserData(new UserProfileId(getEnv().getProfileId().getDomain(), usr));
+				if(uD != null)
+					jsUser.add(new JsSimple(usr, uD.getDisplayName()));
+			}
+			*/
+			ResultMeta meta = new LookupMeta().setSelected(jsUser.get(0).getUserId());
+			
+			new JsonResult(jsUser, meta, jsUser.size()).printTo(out);
+			
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupAllOperators", ex);
+		}
+	}
+	
+	public void processManageActivity(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			
+			if (crud.equals(Crud.READ)) {
+				int id = ServletUtils.getIntParameter(request, "id", true);
+
+				Activity act = manager.getActivity(id);
+
+				new JsonResult(new JsActivity(act)).printTo(out);
+				
+			} else if (crud.equals(Crud.CREATE)) {
+				Payload<MapItem, JsActivity> pl = ServletUtils.getPayload(request, JsActivity.class);
+				manager.addActivity(JsActivity.createActivity(pl.data, getEnv().getProfileId().getDomainId()));
+
+				new JsonResult().printTo(out);
+				
+			} else if (crud.equals(Crud.UPDATE)) {
+				Payload<MapItem, JsActivity> pl = ServletUtils.getPayload(request, JsActivity.class);
+
+				manager.updateActivity(JsActivity.createActivity(pl.data, getEnv().getProfileId().getDomainId()));
+
+				new JsonResult().printTo(out);
+				
+			} else if (crud.equals(Crud.DELETE)) {
+				IntegerArray ids = ServletUtils.getObjectParameter(request, "activityIds", IntegerArray.class, true);
+
+				manager.deleteActivity(ids.get(0));
+
+				new JsonResult().printTo(out);
+				
+			}
+			
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageActivity", ex);
+		}
+	}
+	
+	public void processManageGridActivities(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			
+			if (crud.equals(Crud.READ)) {
+				List<JsGridActivities> jsGridActivities = new ArrayList();
+
+				for (OActivity oAct : manager.listActivities(null)) {
+					jsGridActivities.add(new JsGridActivities(oAct));
+				}
+
+				new JsonResult(jsGridActivities).printTo(out);
+
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageGridActivities", ex);
+		}
+	}
+	
+	public void processLookupActivities(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			ActivityType type = ServletUtils.getEnumParameter(request, "type", null, ActivityType.class);			
+			
+			List<JsGridActivities> actvts = new ArrayList();
+
+			for (OActivity oAct : manager.listActivities(type)) {
+				actvts.add(new JsGridActivities(oAct));
+			}
+			
+			Integer selected = actvts.isEmpty() ? null : (Integer) actvts.get(0).activityId;
+			ResultMeta meta = new LookupMeta().setSelected(selected);
+
+			new JsonResult(actvts, meta, actvts.size()).printTo(out);
+			
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupActivities", ex);
+		}
+	}	
+	
+	public void processLookupTickets(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String query = ServletUtils.getStringParameter(request, "query", null);
+			String customerId = ServletUtils.getStringParameter(request, "customerId", null);
+			
+			List<OTicket> oTckts = new ArrayList();
+
+			for (OTicket oTckt : manager.listTicketsByNumberCustomer(((query == null) ? null : "%" + query + "%"), customerId)) {
+				oTckts.add(oTckt);
+			}
+			
+			String selected = oTckts.isEmpty() ? null : oTckts.get(0).getTicketId();
+			ResultMeta meta = new LookupMeta().setSelected(selected);
+
+			new JsonResult(oTckts, meta, oTckts.size()).printTo(out);			
+			
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupTickets", ex);
+		}
+	}
+
+	private static class CsvExportWizard {
+		public DateTime date;
+		public File file;
+		public String filename;
+	}	
 }

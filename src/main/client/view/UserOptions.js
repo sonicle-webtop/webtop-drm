@@ -38,44 +38,91 @@ Ext.define('Sonicle.webtop.drm.view.UserOptions', {
 		var me = this;
 		me.callParent(arguments);
 		
-		me.add({
-			xtype: 'wtopttabsection',
-			title: WT.res(me.ID, 'opts.expensenote.tit'),
-			items: [
-				{
-					xtype: 'numberfield',
-					bind: '{record.kmCost}',
-					minValue: 0,
-					fieldLabel: WT.res(me.ID, 'opts.expensenote.fld-kmCost.lbl'),
-					width: 280,
-					listeners: {
-						blur: {
-							fn: me.onBlurAutoSave,
-							scope: me
+		me.add(
+			{
+				xtype: 'wtopttabsection',
+				title: WT.res(me.ID, 'opts.expensenote.tit'),
+				items: [
+					{
+						xtype: 'numberfield',
+						bind: '{record.kmCost}',
+						minValue: 0,
+						fieldLabel: WT.res(me.ID, 'opts.expensenote.fld-kmCost.lbl'),
+						width: 280,
+						listeners: {
+							blur: {
+								fn: me.onBlurAutoSave,
+								scope: me
+							}
+						},
+						triggers: {
+							clear: WTF.clearTrigger()
 						}
 					},
-					triggers: {
-						clear: WTF.clearTrigger()
-					}
-				},
-				WTF.localCombo('id', 'desc', {
-					bind: '{record.defaultCurrency}',
-					fieldLabel: WT.res(me.ID, 'opts.expensenote.fld-defaultCurrency.lbl'),
-					store: Ext.create('Sonicle.webtop.drm.store.Currency', {
-						autoLoad: true
-					}),
-					width: 280,
-					listeners: {
-						blur: {
-							fn: me.onBlurAutoSave,
-							scope: me
+					WTF.localCombo('id', 'desc', {
+						bind: '{record.defaultCurrency}',
+						fieldLabel: WT.res(me.ID, 'opts.expensenote.fld-defaultCurrency.lbl'),
+						store: Ext.create('Sonicle.webtop.drm.store.Currency', {
+							autoLoad: true
+						}),
+						width: 280,
+						listeners: {
+							blur: {
+								fn: me.onBlurAutoSave,
+								scope: me
+							}
+						},
+						triggers: {
+							clear: WTF.clearTrigger()
+						}
+					})
+				]
+			}, {
+				xtype: 'wtopttabsection',
+				title: WT.res(me.ID, 'opts.ticket.tit'),
+				items: [
+					{
+						xtype: 'checkbox',
+						reference: 'ticketNotifyMail',
+						bind: '{record.ticketNotifyMail}',
+						boxLabel: WT.res(me.ID, 'opts.ticket.fld-notifyMail.lbl'),
+						boxLabelAlign: 'before',
+						listeners: {
+							change: {
+								fn: function(s, n) {
+									me.lref('ticketAutomaticClose').setDisabled(!n);
+									if (n === false) {
+										me.lref('ticketAutomaticClose').setValue(false);
+									}
+									//TODO: workaround...il modello veniva salvato prima dell'aggionamento
+									Ext.defer(function() {
+										me.onBlurAutoSave(s);
+									}, 200);
+								},
+								scope: me
+							}
 						}
 					},
-					triggers: {
-						clear: WTF.clearTrigger()
+					{
+						xtype: 'checkbox',
+						reference: 'ticketAutomaticClose',
+						bind: '{record.ticketAutomaticClose}',
+						boxLabel: WT.res(me.ID, 'opts.ticket.fld-automaticClose.lbl'),
+						// boxLabelAlign: 'after',
+						listeners: {
+							change: {
+								fn: function(s) {
+									//TODO: workaround...il modello veniva salvato prima dell'aggionamento
+									Ext.defer(function() {
+										me.onBlurAutoSave(s);
+									}, 200);
+								},
+								scope: me
+							}
+						}
 					}
-				})
-			]
-		});
+				]
+			}
+		);
 	}
 });

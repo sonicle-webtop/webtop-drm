@@ -69,11 +69,11 @@ Ext.define('Sonicle.webtop.drm.view.Folder', {
 						bind: '{record.description}',
 						fieldLabel: me.mys.res('folder.fld-description.lbl')
 					},
-					 {
+					{
 					 xtype: 'checkbox',
 					 bind: '{record.expired}',
 					 boxLabel: me.mys.res('folder.fld-expired.lbl')
-					 }]
+					}]
 				},
 				{
 					xtype: 'wtdrmgroupgrid',

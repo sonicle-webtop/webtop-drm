@@ -55,7 +55,6 @@ public class JsExpenseNoteSetting {
 	public List<JsGridCostType> costsType = new ArrayList();
 
 	public JsExpenseNoteSetting(ExpenseNoteSetting setting) {
-
 		this.expenseNoteSettingId = setting.getExpenseNoteSettingId();
 		this.domainId = setting.getDomainId();
 		this.averageMaximum = setting.getAverageMaximum();
@@ -68,7 +67,6 @@ public class JsExpenseNoteSetting {
 	}
 
 	public static ExpenseNoteSetting createExpenseNoteSetting(JsExpenseNoteSetting js) {
-
 		ExpenseNoteSetting enS = new ExpenseNoteSetting();
 		enS.setExpenseNoteSettingId(js.expenseNoteSettingId);
 		enS.setDomainId(js.domainId);
@@ -77,7 +75,6 @@ public class JsExpenseNoteSetting {
 		enS.setDefaultCurrency(js.defaultCurrency);
 
 		for (JsGridCostType ct : js.costsType) {
-
 			enS.getCostTypes().add(JsGridCostType.createCostType(ct));
 
 		}

@@ -32,11 +32,31 @@
  */
 Ext.define('Sonicle.webtop.drm.model.Activity', {
 	extend: 'WTA.ux.data.BaseModel',
-	identifier: 'negative',
-	idProperty: 'id',
+	requires: [
+		'Sonicle.data.writer.Json',
+		'Sonicle.webtop.drm.model.GroupAssociation'
+	],
+	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageActivity', 'data',{
+		writer: {
+			type: 'sojson',
+			writeAssociations: true
+		}
+	}),
+	idProperty: 'activityId',
 	fields: [
-		WTF.field('id', 'int', true),
-		WTF.field('desc', 'string', true)
+		WTF.field('activityId', 'int', false), 
+		WTF.field('externalId', 'string', true),
+		WTF.field('description', 'string', false),
+		WTF.field('domainId', 'string', true),
+		WTF.field('customer', 'bool', true, {defaultValue: false}),
+		WTF.field('timetable', 'bool', true, {defaultValue: false}),
+		WTF.field('jobs', 'bool', true, {defaultValue: false}),
+		WTF.field('opportunities', 'bool', true, {defaultValue: false}),
+		WTF.field('exportable', 'bool', true, {defaultValue: true})
+	],
+	
+	hasMany: [
+		WTF.hasMany('associatedGroups', 'Sonicle.webtop.drm.model.GroupAssociation')
 	]
 });
 

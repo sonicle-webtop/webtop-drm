@@ -44,18 +44,26 @@ Ext.define('Sonicle.webtop.drm.ux.ActivityGrid', {
 	 * @cfg {String} sid
 	 * The service ID.
 	 */
-
+	activeType: 'opportunities',
+	
 	initComponent: function () {
 		var me = this;
 
 		me.lookupStore = Ext.create('Ext.data.Store', {
 			autoLoad: true,
-			model: 'WTA.model.ActivityLkp',
-			proxy: WTF.proxy(WT.ID, 'LookupActivities', null, {
+			model: 'WTA.model.Simple',
+			proxy: WTF.proxy(me.sid, 'LookupActivities', null, {
 				extraParams: {
-					profileId: WT.getVar('profileId')
+					type: null
 				}
 			}),
+			listeners: {
+				beforeload: function(s, op) {
+					WTU.applyExtraParams(op.getProxy(), {
+						type: me.activeType
+					});
+				}
+			}
 		});
 
 		me.selModel = {
@@ -73,9 +81,9 @@ Ext.define('Sonicle.webtop.drm.ux.ActivityGrid', {
 			me.hideHeaders = true;
 			me.columns = [{
 					xtype: 'solookupcolumn',
-					dataIndex: 'id',
+					dataIndex: 'activityId',
 					store: me.lookupStore,
-					displayField: 'desc',
+					displayField: 'description',
 					flex: 1
 				}];
 
@@ -141,8 +149,8 @@ Ext.define('Sonicle.webtop.drm.ux.ActivityGrid', {
 					store: me.lookupStore,
 					enableGrouping: false, 
 					valueField: 'id', 
-					displayField: 'desc',
-					searchField: 'desc',
+					displayField: 'description',
+					searchField: 'description',
 					emptyText: WT.res('grid.empty'),
 					searchText: WT.res(me.sid, 'groupactivity.picker.search'),
 					okText: WT.res('act-ok.lbl'),

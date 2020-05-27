@@ -43,6 +43,8 @@ public class JsUserOptions extends JsUserOptionsBase {
 	public String defaultCurrency;
 	public String workdayStart;
 	public String workdayEnd;
+	public String ticketNotifyMail;
+	public String ticketAutomaticClose;
 	
 	public JsUserOptions() {}
 	

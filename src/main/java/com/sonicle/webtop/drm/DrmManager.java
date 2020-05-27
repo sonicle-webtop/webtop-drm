@@ -50,8 +50,11 @@ import com.sonicle.webtop.core.sdk.BaseManager;
 import com.sonicle.webtop.core.sdk.UserProfile;
 import com.sonicle.webtop.core.sdk.UserProfileId;
 import com.sonicle.webtop.core.sdk.WTException;
+import com.sonicle.webtop.core.util.LogEntries;
 import static com.sonicle.webtop.drm.ManagerUtils.createCostType;
 import static com.sonicle.webtop.drm.Service.logger;
+import com.sonicle.webtop.drm.bol.OActivity;
+import com.sonicle.webtop.drm.bol.OActivityGroup;
 import com.sonicle.webtop.drm.bol.OBusinessTrip;
 import com.sonicle.webtop.drm.bol.OCompany;
 import com.sonicle.webtop.drm.bol.OCompanyPicture;
@@ -78,6 +81,8 @@ import com.sonicle.webtop.drm.bol.OExpenseNoteDocumentData;
 import com.sonicle.webtop.drm.bol.OExpenseNoteSetting;
 import com.sonicle.webtop.drm.bol.OHolidayDate;
 import com.sonicle.webtop.drm.bol.OHourProfile;
+import com.sonicle.webtop.drm.bol.OJob;
+import com.sonicle.webtop.drm.bol.OJobAttachment;
 import com.sonicle.webtop.drm.bol.OLeaveRequest;
 import com.sonicle.webtop.drm.bol.OLeaveRequestDocument;
 import com.sonicle.webtop.drm.bol.OLeaveRequestDocumentData;
@@ -94,10 +99,16 @@ import com.sonicle.webtop.drm.bol.OOpportunityInterlocutor;
 import com.sonicle.webtop.drm.bol.OProfileMasterdata;
 import com.sonicle.webtop.drm.bol.OProfileSupervisedUser;
 import com.sonicle.webtop.drm.bol.OProfileMember;
+import com.sonicle.webtop.drm.bol.OTicket;
+import com.sonicle.webtop.drm.bol.OTicketAttachment;
+import com.sonicle.webtop.drm.bol.OTicketCategory;
 import com.sonicle.webtop.drm.bol.OTimetableEvent;
 import com.sonicle.webtop.drm.bol.OTimetableReport;
 import com.sonicle.webtop.drm.bol.OTimetableSetting;
 import com.sonicle.webtop.drm.bol.OTimetableStamp;
+import com.sonicle.webtop.drm.bol.OViewJob;
+import com.sonicle.webtop.drm.bol.OViewTicket;
+import com.sonicle.webtop.drm.bol.OViewWorkReport;
 import com.sonicle.webtop.drm.bol.OWorkReport;
 import com.sonicle.webtop.drm.bol.OWorkReportAttachment;
 import com.sonicle.webtop.drm.bol.OWorkReportRow;
@@ -105,6 +116,8 @@ import com.sonicle.webtop.drm.bol.OWorkReportSetting;
 import com.sonicle.webtop.drm.bol.OWorkReportsAttachmentsData;
 import com.sonicle.webtop.drm.bol.OWorkType;
 import com.sonicle.webtop.drm.bol.VOpportunityEntry;
+import com.sonicle.webtop.drm.dal.ActivityDAO;
+import com.sonicle.webtop.drm.dal.ActivityGroupDAO;
 import com.sonicle.webtop.drm.dal.BusinessTripDao;
 import com.sonicle.webtop.drm.dal.CompanyDAO;
 import com.sonicle.webtop.drm.dal.CompanyPictureDAO;
@@ -128,6 +141,8 @@ import com.sonicle.webtop.drm.dal.ExpenseNoteDocumentDAO;
 import com.sonicle.webtop.drm.dal.ExpenseNoteSettingDAO;
 import com.sonicle.webtop.drm.dal.HolidayDateDAO;
 import com.sonicle.webtop.drm.dal.HourProfileDAO;
+import com.sonicle.webtop.drm.dal.JobAttachmentDAO;
+import com.sonicle.webtop.drm.dal.JobDAO;
 import com.sonicle.webtop.drm.dal.LeaveRequestDAO;
 import com.sonicle.webtop.drm.dal.LeaveRequestDocumentDAO;
 import com.sonicle.webtop.drm.dal.OpportunityActionDAO;
@@ -140,6 +155,9 @@ import com.sonicle.webtop.drm.dal.OpportunityInterlocutorDAO;
 import com.sonicle.webtop.drm.dal.ProfileMasterdataDAO;
 import com.sonicle.webtop.drm.dal.ProfileSupervisedUserDAO;
 import com.sonicle.webtop.drm.dal.ProfileMemberDAO;
+import com.sonicle.webtop.drm.dal.TicketAttachmentDAO;
+import com.sonicle.webtop.drm.dal.TicketCategoryDAO;
+import com.sonicle.webtop.drm.dal.TicketDAO;
 import com.sonicle.webtop.drm.dal.TimetableEventDAO;
 import com.sonicle.webtop.drm.dal.TimetableReportDAO;
 import com.sonicle.webtop.drm.dal.TimetableSettingDAO;
@@ -151,6 +169,8 @@ import com.sonicle.webtop.drm.dal.WorkReportRowDAO;
 import com.sonicle.webtop.drm.dal.WorkReportSettingDAO;
 import com.sonicle.webtop.drm.dal.WorkReportSummaryDAO;
 import com.sonicle.webtop.drm.dal.WorkTypeDAO;
+import com.sonicle.webtop.drm.model.Activity;
+import com.sonicle.webtop.drm.model.ActivityGroupAssociation;
 import com.sonicle.webtop.drm.model.BusinessTrip;
 import com.sonicle.webtop.drm.model.Company;
 import com.sonicle.webtop.drm.model.CompanyPicture;
@@ -175,6 +195,9 @@ import com.sonicle.webtop.drm.model.ExpenseNoteDocumentWithStream;
 import com.sonicle.webtop.drm.model.ExpenseNoteSetting;
 import com.sonicle.webtop.drm.model.HolidayDate;
 import com.sonicle.webtop.drm.model.HourProfile;
+import com.sonicle.webtop.drm.model.Job;
+import com.sonicle.webtop.drm.model.JobAttachment;
+import com.sonicle.webtop.drm.model.JobAttachmentWithStream;
 import com.sonicle.webtop.drm.model.LeaveRequest;
 import com.sonicle.webtop.drm.model.LeaveRequestDocument;
 import com.sonicle.webtop.drm.model.LeaveRequestDocumentWithBytes;
@@ -194,6 +217,11 @@ import com.sonicle.webtop.drm.model.OpportunitySetting;
 import com.sonicle.webtop.drm.model.ProfileMasterdata;
 import com.sonicle.webtop.drm.model.ProfileSupervisedUser;
 import com.sonicle.webtop.drm.model.ProfileMember;
+import com.sonicle.webtop.drm.model.Ticket;
+import com.sonicle.webtop.drm.model.TicketAttachment;
+import com.sonicle.webtop.drm.model.TicketAttachmentWithStream;
+import com.sonicle.webtop.drm.model.TicketCategory;
+import com.sonicle.webtop.drm.model.TicketSetting;
 import com.sonicle.webtop.drm.model.TimetableReport;
 import com.sonicle.webtop.drm.model.TimetableSetting;
 import com.sonicle.webtop.drm.model.TimetableStamp;
@@ -213,9 +241,12 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -230,8 +261,15 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.imgscalr.Scalr;
 import org.joda.time.LocalDate;
+import org.joda.time.Minutes;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.supercsv.io.ICsvMapWriter;
+import org.supercsv.cellprocessor.constraint.NotNull;
+import org.supercsv.cellprocessor.ift.CellProcessor;
+import org.supercsv.cellprocessor.joda.FmtDateTime;
+import org.supercsv.io.CsvMapWriter;
+import org.supercsv.prefs.CsvPreference;
 
 /**
  *
@@ -555,11 +593,12 @@ public class DrmManager extends BaseManager {
 		Connection con = null;
 		DocStatusDAO staDao = DocStatusDAO.getInstance();
 		List<ODocStatus> statuses = null;
+		
 		try {
 
 			con = WT.getConnection(SERVICE_ID);
 
-			statuses = staDao.selectStatuses(con);
+			statuses = staDao.select(con);
 
 			return statuses;
 
@@ -1500,15 +1539,32 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	public List<OWorkReport> listWorkReports(WorkReportQuery query) throws WTException {
+	public List<OViewWorkReport> listWorkReports(WorkReportQuery query) throws WTException {
 		Connection con = null;
 		WorkReportDAO wrkDao = WorkReportDAO.getInstance();
-		List<OWorkReport> workRpts = null;
+		List<OViewWorkReport> workRpts = null;
 		try {
 			con = WT.getConnection(SERVICE_ID);
-			workRpts = wrkDao.selectWorkReports(con, query, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
+			workRpts = wrkDao.selectViewWorkReports(con, query, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
 
 			return workRpts;
+			
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public List<OViewJob> listJobs(JobQuery query) throws WTException {
+		Connection con = null;
+		JobDAO jbDao = JobDAO.getInstance();
+		List<OViewJob> jobs = null;
+		try {
+			con = WT.getConnection(SERVICE_ID);
+			jobs = jbDao.selectViewJobs(con, query, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
+
+			return jobs;
 			
 		} catch (SQLException | DAOException ex) {
 			throw new WTException(ex, "DB error");
@@ -1838,7 +1894,7 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	public OOpportunityAction addOpportunityAction(OpportunityAction oAct) throws WTException {
+	public Integer addOpportunityAction(OpportunityAction oAct) throws WTException {
 		Connection con = null;
 		OpportunityActionDAO oActDao = OpportunityActionDAO.getInstance();
 		OpportunityActionInterlocutorDAO oActIntDao = OpportunityActionInterlocutorDAO.getInstance();
@@ -1872,7 +1928,8 @@ public class DrmManager extends BaseManager {
 
 			DbUtils.commitQuietly(con);
 
-			return newOOAct;
+			// return newOOAct;
+			return newOOAct.getId();
 
 		} catch (SQLException | DAOException ex) {
 			DbUtils.rollbackQuietly(con);
@@ -2029,6 +2086,30 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
+	public Job getJob(String jobId) throws WTException {
+		Connection con = null;
+		JobDAO jobDao = JobDAO.getInstance();
+		JobAttachmentDAO attDao = JobAttachmentDAO.getInstance();
+		Job job = null;
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			job = ManagerUtils.createJob(jobDao.selectById(con, jobId));
+
+			for (OJobAttachment oAtt : attDao.selectByJob(con, jobId)) {
+				job.getAttachments().add(ManagerUtils.createJobAttachment(oAtt));
+			}
+
+			return job;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
 	public WorkReport getWorkReport(String workReportId) throws WTException {
 		Connection con = null;
 		WorkReportDAO wrkDao = WorkReportDAO.getInstance();
@@ -2107,6 +2188,42 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
+	public String addJob(Job job) throws WTException {
+		Connection con = null;
+
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			JobDAO jobDao = JobDAO.getInstance();
+
+			OJob newJob = ManagerUtils.createOJob(job);
+			newJob.setJobId(IdentifierUtils.getUUID());
+			newJob.setNumber(MessageFormat.format("JB{0}{1}", String.valueOf(newJob.getStartDate().getYear()), String.format("%06d", jobDao.getSequence(con).intValue())));
+			
+			ArrayList<OJobAttachment> oAtts = new ArrayList<>();
+			
+			for (JobAttachment att : job.getAttachments()) {
+				if (!(att instanceof JobAttachmentWithStream)) throw new IOException("Attachment stream not available [" + att.getJobAttachmentId()+ "]");
+				oAtts.add(ManagerUtils.doJobAttachmentInsert(con, newJob.getJobId(), (JobAttachmentWithStream)att));
+			}
+
+			jobDao.insert(con, newJob);
+
+			DbUtils.commitQuietly(con);
+
+			return newJob.getJobId();
+			
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
 	public void updateWorkReport(WorkReport item) throws WTException {
 
 		Connection con = null;
@@ -2166,6 +2283,66 @@ public class DrmManager extends BaseManager {
 			throw new WTException(ex, "DB error");
 		} catch (IOException ex) {
 			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public void updateJob(Job item) throws WTException {
+		Connection con = null;
+		JobDAO jobDao = JobDAO.getInstance();
+		JobAttachmentDAO attDao = JobAttachmentDAO.getInstance();
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			OJob job = ManagerUtils.createOJob(item);
+
+			jobDao.update(con, job);
+
+			List<JobAttachment> oldAtts = ManagerUtils.createJobAttachmentList(attDao.selectByJob(con, item.getJobId()));
+			CollectionChangeSet<JobAttachment> changeSet = LangUtils.getCollectionChanges(oldAtts, item.getAttachments());
+
+			for (JobAttachment att : changeSet.inserted) {
+				if (!(att instanceof JobAttachmentWithStream)) throw new IOException("Attachment stream not available [" + att.getJobAttachmentId()+ "]");
+				ManagerUtils.doJobAttachmentInsert(con, job.getJobId(), (JobAttachmentWithStream)att);
+			}
+			for (JobAttachment att : changeSet.updated) {
+				if (!(att instanceof JobAttachmentWithStream)) continue;
+				ManagerUtils.doJobAttachmentUpdate(con, (JobAttachmentWithStream)att);
+			}
+			for (JobAttachment att : changeSet.deleted) {
+				attDao.deleteById(con, att.getJobAttachmentId());
+			}
+
+			DbUtils.commitQuietly(con);
+			
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} catch (IOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public void deleteJob(String jobId) throws WTException {
+
+		Connection con = null;
+		JobDAO jobDao = JobDAO.getInstance();
+
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			jobDao.deleteById(con, jobId);
+
+			DbUtils.commitQuietly(con);
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
 		} finally {
 			DbUtils.closeQuietly(con);
 		}
@@ -3786,17 +3963,21 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
-	public List<OTimetableStamp> listTimetableStamp() throws WTException {
+	public List<TimetableStamp> listTimetableStamp() throws WTException {
 		Connection con = null;
 		TimetableStampDAO tsDao = TimetableStampDAO.getInstance();
-		List<OTimetableStamp> tss = null;
+		List<TimetableStamp> tss = null;
 		
 		try {
 
 			con = WT.getConnection(SERVICE_ID);
 
-			tss = tsDao.getDailyStampsByDomainUserId(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
-
+			// tss = tsDao.getDailyStampsByDomainUserId(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
+			tss = new ArrayList<>();
+			for (OTimetableStamp ots : tsDao.getDailyStampsByDomainUserId(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId())) {
+				tss.add(ManagerUtils.fillTimetableStamp(new TimetableStamp(), ots));
+			}
+			
 			return tss;
 
 		} catch (SQLException | DAOException ex) {
@@ -3806,10 +3987,10 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
-	public List<OTimetableStamp> listTimetableStamps(TimetableStampQuery query) throws WTException {
+	public List<TimetableStamp> listTimetableStamps(TimetableStampQuery query) throws WTException {
 		Connection con = null;
 		TimetableStampDAO tsDao = TimetableStampDAO.getInstance();
-		List<OTimetableStamp> tss = null;
+		List<TimetableStamp> tss = null;
 		
 		try {
 
@@ -3819,7 +4000,11 @@ public class DrmManager extends BaseManager {
 			query.month = query.month == null ? new DateTime().getMonthOfYear() : query.month;
 			query.year = query.year == null ? new DateTime().getYear() : query.year;
 			
-			tss = tsDao.getStampsListByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.operatorId, query.month, query.year);
+			// tss = tsDao.getStampsListByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.operatorId, query.month, query.year);
+			tss = new ArrayList<>();
+			for (OTimetableStamp ots : tsDao.getStampsListByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.operatorId, query.month, query.year)) {
+				tss.add(ManagerUtils.fillTimetableStamp(new TimetableStamp(), ots));
+			}
 
 			return tss;
 
@@ -3921,6 +4106,7 @@ public class DrmManager extends BaseManager {
 		List<OTimetableReport> ttrs;
 		List<OTimetableReport> trsf = null;
 		List<OTimetableEvent> te = null;
+		List<OWorkReport> wr = null;
 		
 		try {
 			con = WT.getConnection(SERVICE_ID, false);
@@ -3936,6 +4122,7 @@ public class DrmManager extends BaseManager {
 				//trDao.restartTimetableReportTempSequence(con);
 
 				//Get Data - Calculate Working Hours and Extraordinary (If permits from settings)
+
 				if(query.targetUserId == null){
 					//Get Data for All Users for Company
 					List<OUser> users = listCompanyUsers(query.companyId);
@@ -3944,7 +4131,8 @@ public class DrmManager extends BaseManager {
 						
 						trsf = tstmpDao.getStampsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
 						te = teDao.getEventsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
-
+						// wr = wrDao.getWorkReportsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.userId, query.fromDay, query.month, query.year);
+						
 						ttrs.addAll(mergeStampByDate(trsf, con));
 						ttrs.addAll(ManagerUtils.mergeEventByDate(ManagerUtils.createOTimetableReport(te)));
 						
@@ -3954,13 +4142,21 @@ public class DrmManager extends BaseManager {
 						
 						trs.addAll(ttrs);
 					}
-				}else{
+				} else {					
+					//Empty Table for single user
+					trDao.deleteByDomainIdUserId(con, getTargetProfileId().getDomainId(), query.targetUserId);
+
+					//Reset Sequence
+					trDao.restartTimetableReportTempSequence(con);	
+					
 					//Get Data for Single User Selected
 					trsf = tstmpDao.getStampsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
 					te = teDao.getEventsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
+					// wr = wrDao.getWorkReportsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.userId, query.fromDay, query.month, query.year);
 
 					trs.addAll(mergeStampByDate(trsf, con));
 					trs.addAll(ManagerUtils.mergeEventByDate(ManagerUtils.createOTimetableReport(te)));
+					// aggiungere i work_report che hanno il campo timetable_hours > 0 e i jobs solo di alcune attività 
 					
 					trs = ManagerUtils.mergeStampAndEventByDate(trs);
 					
@@ -4230,5 +4426,605 @@ public class DrmManager extends BaseManager {
 	static String buildLeaveRequestReplyPublicUrl(String publicBaseUrl, String leaveRequestPublicId, String recipientEmail, String crud, String resp) {
 		String s = PublicService.PUBPATH_CONTEXT_LEAVE_REQUEST + "/" + leaveRequestPublicId + "/" + PublicService.LeaveRequestUrlPath.TOKEN_REPLY + "?aid=" + recipientEmail + "&crud=" + crud + "&resp=" + resp;
 		return PathUtils.concatPaths(publicBaseUrl, s);
+	}
+	
+	public TicketSetting getTicketSetting() throws WTException {
+		Connection con = null;
+		TicketCategoryDAO tcktCDao = TicketCategoryDAO.getInstance();
+
+		TicketSetting setting = null;
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			setting = new TicketSetting();
+			
+			if (setting != null) {
+				for (OTicketCategory oTcktC : tcktCDao.selectByDomain(con, getTargetProfileId().getDomainId())) {
+					setting.getCategories().add(ManagerUtils.createTicketCategory(oTcktC));
+				}
+			}
+			return setting;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public void updateTicketSetting(TicketSetting item) throws WTException {
+		Connection con = null;
+		TicketCategoryDAO tcktCDao = TicketCategoryDAO.getInstance();
+
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			TicketSetting oldTicketSetting = getTicketSetting();
+			
+			List<TicketCategory> categories = oldTicketSetting == null ? new ArrayList() : oldTicketSetting.getCategories();
+
+			CollectionChangeSet<TicketCategory> changesSet1 = getCollectionChanges(categories, item.getCategories());
+
+			for (TicketCategory category : changesSet1.inserted) {
+
+				OTicketCategory oTcktC = ManagerUtils.createOTicketCategory(category);
+
+				oTcktC.setTicketCategoryId(tcktCDao.getSequence(con).intValue());
+				oTcktC.setDomainId(getTargetProfileId().getDomainId());
+
+				tcktCDao.insert(con, oTcktC);
+			}
+
+			for (TicketCategory category : changesSet1.deleted) {
+				tcktCDao.deleteById(con, category.getTicketCategoryId());
+			}
+
+			for (TicketCategory category : changesSet1.updated) {
+
+				OTicketCategory oTcktC = ManagerUtils.createOTicketCategory(category);
+
+				tcktCDao.update(con, oTcktC);
+			}
+
+			DbUtils.commitQuietly(con);
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public List<OTicketCategory> listTicketCategories() throws WTException {
+		Connection con = null;
+		TicketCategoryDAO tCatDao = TicketCategoryDAO.getInstance();
+		List<OTicketCategory> tCats = null;
+		
+		try {
+			con = WT.getConnection(SERVICE_ID);
+
+			tCats = tCatDao.selectByDomain(con, getTargetProfileId().getDomainId());
+
+			return tCats;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public List<OViewTicket> listTickets(TicketQuery query) throws WTException {
+		Connection con = null;
+		TicketDAO tcktDao = TicketDAO.getInstance();
+		List<OViewTicket> tckts = null;
+		
+		try {
+			con = WT.getConnection(SERVICE_ID);
+			tckts = tcktDao.selectViewTickets(con, query, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
+
+			return tckts;
+			
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+		
+	public String addTicket(Ticket tckt, Boolean close) throws WTException {
+		Connection con = null;
+
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			TicketDAO tcktDao = TicketDAO.getInstance();
+
+			OTicket newTckt = ManagerUtils.createOTicket(tckt);
+			newTckt.setTicketId(IdentifierUtils.getUUID());
+			newTckt.setNumber(MessageFormat.format("TK{0}{1}", String.valueOf(newTckt.getDate().getYear()), String.format("%06d", tcktDao.getSequence(con).intValue())));
+			
+			ArrayList<OTicketAttachment> oAtts = new ArrayList<>();
+			
+			for (TicketAttachment att : tckt.getAttachments()) {
+				if (!(att instanceof TicketAttachmentWithStream)) throw new IOException("Attachment stream not available [" + att.getTicketAttachmentId()+ "]");
+				oAtts.add(ManagerUtils.doTicketAttachmentInsert(con, newTckt.getTicketId(), (TicketAttachmentWithStream)att));
+			}
+
+			tcktDao.insert(con, newTckt);
+			
+			DrmServiceSettings dss = new DrmServiceSettings(SERVICE_ID, newTckt.getDomainId());
+			
+			notifyTicket(tcktDao.selectViewById(con, newTckt.getTicketId()), dss.getTicketDefaultCloseDocStatusId(), close);
+			automaticCloseTicket(con, tcktDao.selectViewById(con, newTckt.getTicketId()), dss.getTicketDefaultCloseDocStatusId());
+			
+			DbUtils.commitQuietly(con);
+
+			return newTckt.getTicketId();
+			
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public Ticket getTicket(String tcktId) throws WTException {
+		Connection con = null;
+		TicketDAO tcktDao = TicketDAO.getInstance();
+		TicketAttachmentDAO attDao = TicketAttachmentDAO.getInstance();
+		Ticket tckt = null;
+		
+		try {
+			con = WT.getConnection(SERVICE_ID);
+
+			tckt = ManagerUtils.createTicket(tcktDao.selectById(con, tcktId));
+			
+			for (OTicketAttachment oAtt : attDao.selectByTicket(con, tcktId)) {
+				tckt.getAttachments().add(ManagerUtils.createTicketAttachment(oAtt));
+			}
+
+			return tckt;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public void updateTicket(Ticket item, Boolean close) throws WTException {
+		Connection con = null;
+		TicketDAO tcktDao = TicketDAO.getInstance();
+		TicketAttachmentDAO attDao = TicketAttachmentDAO.getInstance();		
+		
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			OTicket tckt = ManagerUtils.createOTicket(item);
+			
+			tcktDao.update(con, tckt);
+
+			List<TicketAttachment> oldAtts = ManagerUtils.createTicketAttachmentList(attDao.selectByTicket(con, item.getTicketId()));
+			CollectionChangeSet<TicketAttachment> changeSet = LangUtils.getCollectionChanges(oldAtts, item.getAttachments());
+
+			for (TicketAttachment att : changeSet.inserted) {
+				if (!(att instanceof TicketAttachmentWithStream)) throw new IOException("Attachment stream not available [" + att.getTicketAttachmentId()+ "]");
+				ManagerUtils.doTicketAttachmentInsert(con, tckt.getTicketId(), (TicketAttachmentWithStream)att);
+			}
+			for (TicketAttachment att : changeSet.updated) {
+				if (!(att instanceof TicketAttachmentWithStream)) continue;
+				ManagerUtils.doTicketAttachmentUpdate(con, (TicketAttachmentWithStream)att);
+			}
+			for (TicketAttachment att : changeSet.deleted) {
+				attDao.deleteById(con, att.getTicketAttachmentId());
+			}
+			
+			DrmServiceSettings dss = new DrmServiceSettings(SERVICE_ID, item.getDomainId());
+			
+			notifyTicket(tcktDao.selectViewById(con, tckt.getTicketId()), dss.getTicketDefaultCloseDocStatusId(), close);
+			automaticCloseTicket(con, tcktDao.selectViewById(con, tckt.getTicketId()), dss.getTicketDefaultCloseDocStatusId());
+			
+			DbUtils.commitQuietly(con);
+			
+		} catch (MessagingException | TemplateException | SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} catch (IOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public void deleteTicket(String tcktId) throws WTException {
+		Connection con = null;
+		TicketDAO tcktDao = TicketDAO.getInstance();
+
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			tcktDao.deleteById(con, tcktId);
+
+			DbUtils.commitQuietly(con);
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public List<OViewJob> listJobsByTicketId(String ticketId) throws WTException {
+		Connection con = null;
+		JobDAO jbDao = JobDAO.getInstance();
+		List<OViewJob> jobs = null;
+		
+		try {
+			con = WT.getConnection(SERVICE_ID);
+			jobs = jbDao.selectViewJobsByTicketId(con, ticketId, getTargetProfileId().getDomainId());
+
+			return jobs;
+			
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public void closeTicket(String tcktId, String defaultCloseStatusId) throws WTException {
+		Connection con = null;
+		TicketDAO tcktDao = TicketDAO.getInstance();
+
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			tcktDao.closeById(con, tcktId, defaultCloseStatusId);
+
+			DbUtils.commitQuietly(con);
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public Activity getActivity(int activityId) throws WTException {
+		Connection con = null;
+		ActivityDAO actDao = ActivityDAO.getInstance();
+		ActivityGroupDAO actGroupDao = ActivityGroupDAO.getInstance();
+		Activity act = null;
+		
+		try {
+			con = WT.getConnection(SERVICE_ID);
+
+			act = ManagerUtils.createActivity(actDao.selectById(con, activityId));
+
+			for (OActivityGroup oActGroup : actGroupDao.selectByActivity(con, activityId)) {
+				act.getAssociatedProfiles().add(ManagerUtils.createActivityGroup(oActGroup));
+			}
+
+			return act;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public OActivity addActivity(Activity act) throws WTException {
+		Connection con = null;
+
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			ActivityDAO actDao = ActivityDAO.getInstance();
+			ActivityGroupDAO actGroupDao = ActivityGroupDAO.getInstance();
+
+			OActivity newAct = ManagerUtils.createOActivity(act);
+			newAct.setActivityId(actDao.getSequence(con).intValue());
+
+			OActivityGroup newActGroup = null;
+			for (ActivityGroupAssociation actGroup : act.getAssociatedProfiles()) {
+
+				newActGroup = ManagerUtils.createOActivityGroup(actGroup);
+				newActGroup.setActivityId(newAct.getActivityId());
+				newActGroup.setAssociationId(actGroupDao.getSequence(con).intValue());
+
+				actGroupDao.insert(con, newActGroup);
+			}
+
+			actDao.insert(con, newAct);
+
+			DbUtils.commitQuietly(con);
+
+			return newAct;
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public OActivity updateActivity(Activity item) throws WTException {
+		Connection con = null;
+		ActivityDAO actDao = ActivityDAO.getInstance();
+		ActivityGroupDAO actGroupDao = ActivityGroupDAO.getInstance();
+		
+		try {
+			Activity oldAct = getActivity(item.getActivityId());
+
+			con = WT.getConnection(SERVICE_ID, false);
+
+			OActivity act = ManagerUtils.createOActivity(item);
+
+			actDao.update(con, act);
+
+			LangUtils.CollectionChangeSet<ActivityGroupAssociation> changesSet1 = LangUtils.getCollectionChanges(oldAct.getAssociatedProfiles(), item.getAssociatedProfiles());
+
+			for (ActivityGroupAssociation actGroup : changesSet1.inserted) {
+				OActivityGroup oActGroup = ManagerUtils.createOActivityGroup(actGroup);
+
+				oActGroup.setAssociationId(actGroupDao.getSequence(con).intValue());
+				oActGroup.setActivityId(item.getActivityId());
+
+				actGroupDao.insert(con, oActGroup);
+			}
+
+			for (ActivityGroupAssociation actGroup : changesSet1.deleted) {
+				actGroupDao.deleteById(con, actGroup.getAssociationId());
+			}
+
+			DbUtils.commitQuietly(con);
+
+			return act;
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public void deleteActivity(int activityId) throws WTException {
+		Connection con = null;
+		ActivityDAO actDao = ActivityDAO.getInstance();
+		ActivityGroupDAO actGroupDao = ActivityGroupDAO.getInstance();
+		
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			actDao.deleteById(con, activityId);
+			actGroupDao.deleteByActivity(con, activityId);
+
+			DbUtils.commitQuietly(con);
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public List<OActivity> listActivities(ActivityType type) throws WTException {
+		Connection con = null;
+		ActivityDAO actDao = ActivityDAO.getInstance();
+		List<OActivity> acts = null;
+		
+		try {
+			con = WT.getConnection(SERVICE_ID);
+
+			acts = actDao.selectByDomain(con, getTargetProfileId().getDomainId(), type);
+
+			return acts;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	private void notifyTicket(OViewTicket oVwTckt, String defaultCloseDocStatusId, Boolean close) throws IOException, TemplateException, MessagingException {	
+		UserProfile.Data udFrom = WT.getUserData(new UserProfileId(oVwTckt.getDomainId(), oVwTckt.getFromOperatorId()));
+		InternetAddress from = udFrom.getPersonalEmail();
+		UserProfile.Data udTo = WT.getUserData(new UserProfileId(oVwTckt.getDomainId(), oVwTckt.getToOperatorId()));
+		InternetAddress to = udTo.getPersonalEmail();
+		
+		Session session = getMailSession();
+
+		try {
+			DrmUserSettings dus = new DrmUserSettings(SERVICE_ID, new UserProfileId(oVwTckt.getDomainId(), oVwTckt.getToOperatorId()));
+				
+			if ((dus.getTicketNotifyMail().equals("true")) && (oVwTckt.getStatusId() != Integer.valueOf(defaultCloseDocStatusId)) && (!close)) {
+				String msgSubject = TplHelper.buildTicketNotificationSubject(udTo.getLocale(), oVwTckt);				
+				String msgBody = TplHelper.buildTicketNotificationBody(udTo.getLocale(), oVwTckt);
+				
+				WT.sendEmail(session, true, from, to, msgSubject, msgBody);
+			}			
+			
+		} catch (IOException ex) {
+			logger.error("Unable to notify recipient for ticket [{}]", ex, to.getAddress());
+		}
+	}
+	
+	public List<OViewTicket> listTicketsOpenedByToOperatorId(TicketQuery query, String domainId, String userId) throws WTException {
+		Connection con = null;
+		TicketDAO tcktDao = TicketDAO.getInstance();
+		List<OViewTicket> tckts = null;
+		
+		try {
+			con = WT.getConnection(SERVICE_ID);
+			tckts = tcktDao.selectViewTickets(con, query, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
+
+			return tckts;
+			
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	private void automaticCloseTicket(Connection con, OViewTicket oVwTckt, String defaultCloseDocStatusId) throws WTException {
+		DrmUserSettings dus = new DrmUserSettings(SERVICE_ID, new UserProfileId(oVwTckt.getDomainId(), oVwTckt.getToOperatorId()));		
+		TicketDAO tcktDao = TicketDAO.getInstance();
+		
+		if ((dus.getTicketAutomaticClose().equals("true"))) {
+			tcktDao.closeById(con, oVwTckt.getTicketId(), defaultCloseDocStatusId);
+			// closeTicket(oVwTckt.getTicketId(), dss.getTicketDefaultCloseDocStatusId());
+		}
+	}
+	
+	public List<OTicket> listTicketsByNumberCustomer(String query, String customerId) throws WTException {
+		Connection con = null;
+		TicketDAO tcktDao = TicketDAO.getInstance();
+		List<OTicket> tckts = null;
+		
+		try {
+			con = WT.getConnection(SERVICE_ID);
+			tckts = tcktDao.selectByNumberCustomer(con, query, getTargetProfileId().getDomainId(), customerId);
+
+			return tckts;
+			
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public void associateTicket(String jobId, String ticketId) throws WTException {
+		Connection con = null;
+		JobDAO jobDao = JobDAO.getInstance();
+
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			jobDao.associateTicket(con, jobId, ticketId);
+
+			DbUtils.commitQuietly(con);
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public void exportJobs(LogEntries log, JobQuery jq, OutputStream os) throws Exception {
+		Connection con = null;
+		ICsvMapWriter mapw = null;		
+		
+		try {
+			//TODO: Gestire campi visit_id e action_id provenienti dal servizio DRM
+			final String dateFmt = "yyyy-MM-dd";
+			final String timeFmt = "HH:mm:ss";
+			final String[] headers = new String[]{
+				"domainId",
+				"number", 
+				"companyId", "companyDescription",
+				"userId", "userDescription", 
+				"startDate", "startTime", "endDate", "endTime", 
+				"timezone", "duration", 
+				"title", "description", 
+				"activityId", "activityDescription", 
+				"causalId", "causalDescription", 				
+				"masterDataId", "masterDataDescription",
+				"statMasterDataId", "statMasterDataDescription"
+			};
+			final CellProcessor[] processors = new CellProcessor[]{
+				new NotNull(), 
+				new NotNull(), 
+				new NotNull(), null, 
+				new NotNull(), null, 
+				new FmtDateTime(dateFmt), new FmtDateTime(timeFmt), new FmtDateTime(dateFmt), new FmtDateTime(timeFmt), 
+				new NotNull(), new NotNull(),
+				null, null, 
+				null, null, 
+				null, null,
+				null, null, 
+				null, null
+			};
+			
+			CsvPreference pref = new CsvPreference.Builder('"', ';', "\n").build();
+			mapw = new CsvMapWriter(new OutputStreamWriter(os), pref);
+			mapw.writeHeader(headers);
+			
+			HashMap<String, Object> map = null;
+			for (OViewJob jb : listJobs(jq)) {
+				map = new HashMap<>();
+				map.put("domainId", jb.getDomainId());
+				map.put("number", jb.getNumber());
+				map.put("companyId", jb.getCompanyId());	
+				map.put("companyDescription", jb.getCompanyDescription());	
+				map.put("userId", jb.getOperatorId());	
+				map.put("userDescription", jb.getOperatorDescription());	
+				
+				DateTime startDt = jb.getStartDate().withZone(DateTimeZone.forID(jb.getTimezone()));
+				map.put("startDate", startDt);
+				map.put("startTime", startDt);
+				DateTime endDt = jb.getEndDate().withZone(DateTimeZone.forID(jb.getTimezone()));
+				map.put("endDate", endDt);
+				map.put("endTime", endDt);
+				map.put("timezone", jb.getTimezone());
+				map.put("duration", Minutes.minutesBetween(jb.getStartDate(), jb.getEndDate()).getMinutes());	
+
+				map.put("title", jb.getTitle());
+				map.put("description", jb.getDescription());
+				map.put("activityId", jb.getActivityId());
+				map.put("activityDescription", jb.getActivityDescription());
+				map.put("causalId", jb.getCausalId());
+				map.put("causalDescription", jb.getCausalDescription());
+				map.put("masterDataId", jb.getCustomerId());
+				map.put("masterDataDescription", jb.getCustomerDescription());
+				map.put("statMasterDataId", jb.getCustomerStatId());
+				map.put("statMasterDataDescription", jb.getCustomerStatDescription());
+				
+				mapw.write(map, headers, processors);
+			}
+			
+			mapw.flush();
+			
+		} catch(Exception ex) {
+			throw ex;
+		} finally {
+			DbUtils.closeQuietly(con);
+			try { if(mapw != null) mapw.close(); } catch(Exception ex) { /* Do nothing... */ }
+		}
 	}
 }

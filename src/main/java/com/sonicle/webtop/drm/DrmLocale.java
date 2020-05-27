@@ -53,4 +53,15 @@ public class DrmLocale {
 	public static final String TPL_EMAIL_REQUEST_APPROVE = "tpl.email.request.approve";
 	public static final String TPL_EMAIL_REQUEST_APPROVE_YES = "tpl.email.request.approve.yes";
 	public static final String TPL_EMAIL_REQUEST_APPROVE_NO = "tpl.email.request.approve.no";
+	
+	public static final String TPL_TICKET_NOTIFICATION_EMAIL_SUBJECT = "tpl.ticket.notification.email.subject";
+	public static final String TPL_TICKET_NOTIFICATION_EMAIL_BODY_LABEL_DATE = "tpl.ticket.notification.email.body.label.date";
+	public static final String TPL_TICKET_NOTIFICATION_EMAIL_BODY_LABEL_TIME = "tpl.ticket.notification.email.body.label.time";
+	public static final String TPL_TICKET_NOTIFICATION_EMAIL_BODY_LABEL_CUSTOMER = "tpl.ticket.notification.email.body.label.customer";
+	public static final String TPL_TICKET_NOTIFICATION_EMAIL_BODY_LABEL_STAT_CUSTOMER = "tpl.ticket.notification.email.body.label.statCustomer";
+	public static final String TPL_TICKET_NOTIFICATION_EMAIL_BODY_LABEL_TITLE = "tpl.ticket.notification.email.body.label.title";
+	public static final String TPL_TICKET_NOTIFICATION_EMAIL_BODY_LABEL_DESCRIPTION = "tpl.ticket.notification.email.body.label.description";
+	public static final String TPL_TICKET_NOTIFICATION_EMAIL_BODY_LABEL_DETAIL = "tpl.ticket.notification.email.body.label.detail";
+	public static final String TPL_TICKET_NOTIFICATION_EMAIL_BODY_LABEL_TELEPHONE = "tpl.ticket.notification.email.body.label.telephone";
+	public static final String TPL_TICKET_NOTIFICATION_EMAIL_BODY_LABEL_EMAIL = "tpl.ticket.notification.email.body.label.email";
 }

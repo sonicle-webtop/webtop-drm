@@ -32,15 +32,23 @@
  */
 package com.sonicle.webtop.drm;
 
+import com.sonicle.commons.time.DateTimeUtils;
 import com.sonicle.commons.web.json.MapItem;
+import com.sonicle.webtop.core.CoreManager;
 import com.sonicle.webtop.core.app.WT;
+import com.sonicle.webtop.core.model.MasterData;
 import com.sonicle.webtop.core.sdk.UserProfileId;
+import static com.sonicle.webtop.drm.Service.logger;
 import com.sonicle.webtop.drm.bol.OLeaveRequest;
+import com.sonicle.webtop.drm.bol.OTicket;
+import com.sonicle.webtop.drm.bol.OViewTicket;
 import freemarker.template.TemplateException;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Locale;
 import javax.mail.internet.AddressException;
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -113,4 +121,58 @@ public class TplHelper {
 
 		return WT.buildTemplate(SERVICE_ID, "tpl/email/leaveRequest-body.html", vars);
 	}
+	
+	public static String buildTicketNotificationSubject(Locale locale, OViewTicket oVwTckt) {
+		String subject = MessageFormat.format(WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_TICKET_NOTIFICATION_EMAIL_SUBJECT), oVwTckt.getNumber(), oVwTckt.getCustomerDescription());
+		
+		return subject;
+	}
+	
+	public static String buildTicketNotificationBody(Locale locale, OViewTicket oVwTckt) throws IOException, TemplateException {
+		DateTimeZone eventTz = DateTimeZone.forID(oVwTckt.getTimezone());
+		DateTimeFormatter hmsZoneFmt = DateTimeUtils.createFormatter("hh:mm:ss", eventTz);
+		DateTimeFormatter dmyZoneFmt = DateTimeUtils.createFormatter("dd/MM/yyyy", eventTz);
+		
+		try {
+		CoreManager coreMgr = WT.getCoreManager();
+		
+		MasterData md = coreMgr.getMasterData(oVwTckt.getCustomerId());
+		
+		MapItem label = new MapItem();
+		label.put("date", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_TICKET_NOTIFICATION_EMAIL_BODY_LABEL_DATE));
+		label.put("time", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_TICKET_NOTIFICATION_EMAIL_BODY_LABEL_TIME));
+		label.put("customer", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_TICKET_NOTIFICATION_EMAIL_BODY_LABEL_CUSTOMER));
+		label.put("statCustomer", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_TICKET_NOTIFICATION_EMAIL_BODY_LABEL_STAT_CUSTOMER));
+		label.put("title", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_TICKET_NOTIFICATION_EMAIL_BODY_LABEL_TITLE));
+		label.put("description", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_TICKET_NOTIFICATION_EMAIL_BODY_LABEL_DESCRIPTION));
+		label.put("detail", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_TICKET_NOTIFICATION_EMAIL_BODY_LABEL_DETAIL));
+		label.put("telephone", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_TICKET_NOTIFICATION_EMAIL_BODY_LABEL_TELEPHONE));
+		label.put("email", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_TICKET_NOTIFICATION_EMAIL_BODY_LABEL_EMAIL));
+
+		MapItem field = new MapItem();
+		field.put("date", dmyZoneFmt.print(oVwTckt.getDate()));
+		field.put("time", hmsZoneFmt.print(oVwTckt.getDate()));
+		field.put("customer", oVwTckt.getCustomerDescription());
+		field.put("statCustomer", oVwTckt.getCustomerStatDescription());
+		field.put("title", oVwTckt.getTitle());
+		field.put("description", (oVwTckt.getDescription() == null) ? "" : oVwTckt.getDescription());
+		field.put("address", (md.getAddress() == null) ? "" : md.getAddress());
+		field.put("postalCode", (md.getPostalCode() == null) ? "" : md.getPostalCode());
+		field.put("city", (md.getCity() == null) ? "" : md.getCity());
+		field.put("country", (md.getCountry() == null) ? "" : md.getCountry());
+		field.put("telephone", (md.getTelephone() == null) ? "" : md.getTelephone());
+		field.put("email", (md.getEmail() == null) ? "" : md.getEmail());
+
+		MapItem vars = new MapItem();
+		vars.put("label", label);
+		vars.put("field", field);
+
+		return WT.buildTemplate(SERVICE_ID, "tpl/email/notificationTicket.html", vars);
+		
+		} catch (Exception ex) {
+			logger.error("Problem build body Ticket Notify Email", ex);
+		}
+		return StringUtils.EMPTY;
+	}
+	
 }

@@ -32,6 +32,7 @@
  */
 package com.sonicle.webtop.drm.bol.js;
 
+import com.sonicle.webtop.drm.bol.OViewWorkReport;
 import com.sonicle.webtop.drm.bol.OWorkReport;
 import org.joda.time.DateTimeZone;
 
@@ -45,41 +46,55 @@ public class JsGridWorkReports {
 	public Integer number;
 	public Integer year;
 	public Integer companyId;
+	public String companyDescription;
 	public String operatorId;
+	public String operatorDescription;
 	public Integer docStatusId;
+	public String docStatusDescription;
 	public String customerId;
+	public String customerDescription;
 	public String customerStatId;
+	public String customerStatDescription;
 	public String fromDate;
 	public String toDate;
 	public String referenceNo;
 	public Integer causalId;
+	public String causalDescription;
 	public String notes;
 	public String description;
 	public Boolean chargeTo;
 	public Integer businessTripId;
+	public String businessTripDescription;
 	public Boolean freeSupport;
+	public Float totHours;
 
 	public String _profileId;
 
-	public JsGridWorkReports(OWorkReport report, DateTimeZone profileTz, String ownerPid) {
+	public JsGridWorkReports(OViewWorkReport report, DateTimeZone profileTz, String ownerPid) {
 		this.workReportId = report.getWorkReportId();
 		this.number = report.getNumber();
 		this.year = report.getYear();
 		this.companyId = report.getCompanyId();
+		this.companyDescription = report.getCompanyDescription();
 		this.operatorId = report.getOperatorId();
+		this.operatorDescription = report.getOperatorDescription();
 		this.customerId = report.getCustomerId();
+		this.customerDescription = report.getCustomerDescription();
 		this.customerStatId = report.getCustomerStatId();
+		this.customerStatDescription = report.getCustomerStatDescription();
 		this.docStatusId = report.getDocStatusId();
+		this.docStatusDescription = report.getDocStatusDescription();
 		this.fromDate = report.getFromDate().toString();
 		this.toDate = report.getToDate().toString();
 		this.referenceNo = report.getReferenceNo();
 		this.causalId = report.getCausalId();
-		this.notes = report.getNotes();
-		this.description = report.getDescription();
+		this.causalDescription = report.getCausalDescription();
 		this.chargeTo = report.getChargeTo();
 		this.businessTripId = report.getBusinessTripId();
+		this.businessTripDescription = report.getBusinessTripDescription();
 		this.freeSupport = report.getFreeSupport();
-
+		this.totHours = (report.getTotHours() != null && report.getTotHours() > 0) ? (float)(report.getTotHours() / 60) : 0;
+		
 		this._profileId = ownerPid;
 
 	}

@@ -17,6 +17,16 @@ package com.sonicle.webtop.drm.jooq;
 public class Sequences {
 
 	/**
+	 * The sequence <code>drm.seq_activities</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> SEQ_ACTIVITIES = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_activities", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
+	 * The sequence <code>drm.seq_activities_groups</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> SEQ_ACTIVITIES_GROUPS = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_activities_groups", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
 	 * The sequence <code>drm.seq_business_trips</code>
 	 */
 	public static final org.jooq.Sequence<java.lang.Long> SEQ_BUSINESS_TRIPS = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_business_trips", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
@@ -82,6 +92,11 @@ public class Sequences {
 	public static final org.jooq.Sequence<java.lang.Long> SEQ_HOUR_PROFILES = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_hour_profiles", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
+	 * The sequence <code>drm.seq_jobs</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> SEQ_JOBS = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_jobs", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
 	 * The sequence <code>drm.seq_leave_request_documents</code>
 	 */
 	public static final org.jooq.Sequence<java.lang.Long> SEQ_LEAVE_REQUEST_DOCUMENTS = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_leave_request_documents", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
@@ -135,6 +150,21 @@ public class Sequences {
 	 * The sequence <code>drm.seq_profiles_users</code>
 	 */
 	public static final org.jooq.Sequence<java.lang.Long> SEQ_PROFILES_USERS = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_profiles_users", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
+	 * The sequence <code>drm.seq_ticket_categories</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> SEQ_TICKET_CATEGORIES = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_ticket_categories", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
+	 * The sequence <code>drm.seq_tickets</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> SEQ_TICKETS = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_tickets", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
+	 * The sequence <code>drm.seq_tickets_settings</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> SEQ_TICKETS_SETTINGS = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_tickets_settings", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
 	 * The sequence <code>drm.seq_timetable_event</code>

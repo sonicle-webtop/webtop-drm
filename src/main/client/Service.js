@@ -31,7 +31,14 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		'Sonicle.webtop.drm.model.GridTimetableReport',
 		'Sonicle.webtop.drm.ux.TimetableStampSearch',
 		'Sonicle.webtop.drm.model.GridTimetableList',
-		'Sonicle.webtop.drm.view.TimetableStamp'
+		'Sonicle.webtop.drm.view.TimetableStamp',
+		'Sonicle.webtop.drm.model.GridJobs',
+		'Sonicle.webtop.drm.ux.JobSearch',
+		'Sonicle.webtop.drm.view.Job',		
+		'Sonicle.webtop.drm.model.GridTickets',
+		'Sonicle.webtop.drm.ux.TicketSearch',
+		'Sonicle.webtop.drm.view.Ticket',
+		'Sonicle.webtop.drm.ux.ChooseTicketConfirmBox'
 	],
 	needsReload: true,
 	opportunityRequiredFields: null,
@@ -41,7 +48,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		var me = this;
 		me.initAction();
 		me.initCxm();
-		
+
 		me.setToolbar(Ext.create({
 			xtype: 'toolbar',
 			referenceHolder: true,
@@ -71,8 +78,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					},
 					listeners: {
 						itemclick: function (s, rec, itm, i, e) {
-							me.getMainComponent().getLayout().setActiveItem(i + 1);
-							me.onActivate(i + 1);
+							me.getMainComponent().getLayout().setActiveItem(rec.data.id);
+							me.onActivate(rec.data.id);
 						}
 					}
 				}]
@@ -89,7 +96,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				},
 				{
 					xtype: 'container',
-					itemId: 'op',
+					itemId: 'oppo',
 					layout: 'border',
 					items: [
 						{
@@ -221,7 +228,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					]
 				},{
 					xtype: 'container',
-					itemId: 'wr',
+					itemId: 'wrkr',
 					layout: 'border',
 					items: [
 						{
@@ -264,7 +271,28 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									dataIndex: 'referenceNo',
 									header: me.res('gpWorkReport.reference.lbl'),
 									flex: 2
+								},{
+									dataIndex: 'companyDescription',
+									header: me.res('gpWorkReport.company.lbl'),
+									flex: 3
+								},{
+									dataIndex: 'operatorDescription',
+									header: me.res('gpWorkReport.user.lbl'),
+									flex: 3
+								},{
+									dataIndex: 'customerDescription',
+									header: me.res('gpWorkReport.realcustomer.lbl'),
+									flex: 3
+								},{
+									dataIndex: 'customerStatDescription',
+									header: me.res('gpWorkReport.statcustomer.lbl'),
+									flex: 3
+								},{
+									dataIndex: 'causalDescription',
+									header: me.res('gpWorkReport.causal.lbl'),
+									flex: 3
 								},
+								/*
 								{
 									xtype: 'solookupcolumn',
 									dataIndex: 'companyId',
@@ -338,6 +366,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									displayField: 'desc',
 									flex: 2
 								},
+								*/
 								{
 									dataIndex: 'fromDate',
 									header: me.res('gpWorkReport.from.lbl'),
@@ -351,7 +380,21 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									xtype: 'datecolumn',
 									format: WT.getShortDateFmt(),
 									flex: 2
+								},{
+									dataIndex: 'businessTripDescription',
+									header: me.res('gpWorkReport.trasfert.lbl'),
+									flex: 3,
+									hidden: true
+								},{
+									dataIndex: 'docStatusDescription',
+									header: me.res('gpWorkReport.docstatus.lbl'),
+									flex: 3
+								},{
+									dataIndex: 'totHours',
+									header: me.res('gpWorkReport.tothours.lbl'),
+									flex: 2
 								},
+								/*
 								{
 									xtype: 'solookupcolumn',
 									dataIndex: 'businessTripId',
@@ -377,6 +420,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									flex: 2,
 									hidden: true
 								},
+								*/
 								{
 									xtype: 'checkcolumn',
 									dataIndex: 'freeSupport',
@@ -416,7 +460,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					]
 				},{
 					xtype: 'container',
-					itemId: 'en',
+					itemId: 'expn',
 					layout: 'border',
 					items: [
 						{
@@ -510,10 +554,13 @@ Ext.define('Sonicle.webtop.drm.Service', {
 						}
 					]
 				},
-				{xtype: 'panel'},
+				{
+					xtype: 'panel',
+					itemId: 'tmtb'
+				},
 				{
 					xtype: 'tabpanel',
-					itemId: 'ttss',
+					itemId: 'tmtb.stmp',
 					tabPosition: 'bottom',
 					items: [
 						{
@@ -561,21 +608,32 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											},
 											iconSize: WTU.imgSizeToPx('xs'),
 											width: 30
-										},
-										{
+										}, {
 											header: me.res('gpTimetable.entrance.lbl'),
 											dataIndex: 'entrance',
 											flex: 1,
 											hideable: false,
 											align: 'center'
-										},
-										{
+										}, {
 											header: me.res('gpTimetable.exit.lbl'),
 											dataIndex: 'exit',
 											flex: 1,
 											hideable: false,
 											align: 'center'
-										}
+										}/*, {
+											xtype: 'solookupcolumn',
+											header: me.res('gpTimetable.activityId.lbl'),
+											dataIndex: 'activityId',
+											store: {
+												autoload: true,
+												model: 'WTA.model.ActivityLkp',
+												proxy: WTF.proxy(WT.ID, 'LookupActivities')
+											},
+											displayField: 'desc',
+											flex: 2,
+											hideable: false,
+											align: 'center'
+										}*/
 									],
 									tbar: [
 										{
@@ -666,28 +724,38 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											},
 											iconSize: WTU.imgSizeToPx('xs'),
 											width: 30
-										},
-										{
+										}, {
 											header: me.res('gpTimetable.date.lbl'),
 											dataIndex: 'date',
 											flex: 1,
 											hideable: false,
 											align: 'center'
-										},
-										{
+										}, {
 											header: me.res('gpTimetable.entrance.lbl'),
 											dataIndex: 'entrance',
 											flex: 1,
 											hideable: false,
 											align: 'center'
-										},
-										{
+										}, {
 											header: me.res('gpTimetable.exit.lbl'),
 											dataIndex: 'exit',
 											flex: 1,
 											hideable: false,
 											align: 'center'
-										}
+										}/*, {
+											xtype: 'solookupcolumn',
+											header: me.res('gpTimetable.activityId.lbl'),
+											dataIndex: 'activityId',
+											store: {
+												autoload: true,
+												model: 'WTA.model.ActivityLkp',
+												proxy: WTF.proxy(WT.ID, 'LookupActivities')
+											},
+											displayField: 'desc',
+											flex: 2,
+											hideable: false,
+											align: 'center'
+										}*/
 									],
 									tbar: [
 										me.getAct('timetableStamp', 'add'),
@@ -701,7 +769,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				},
 				{
 					xtype: 'container',
-					itemId: 'ttr',
+					itemId: 'tmtb.rqst',
 					layout: 'border',
 					items: [
 						{
@@ -878,7 +946,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				},
 				{
 					xtype: 'container',
-					itemId: 'ttrpt',
+					itemId: 'tmtb.rprt',
 					layout: 'border',
 					items: [
 						{
@@ -1070,10 +1138,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							]
 						}
 					]
-				},
-				{
+				},{
 					xtype: 'container',
-					itemId: 'ttsumexcel',
+					itemId: 'tmtb.sumx',
 					layout: 'border',
 					items: [
 						{
@@ -1099,6 +1166,204 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											}
 										});
 									}
+								}
+							}
+						}]
+				},{
+					xtype: 'container',
+					itemId: 'job',
+					layout: 'border',
+					items: [
+						{
+							region: 'north',
+							xtype: 'wtdrmjobsearch',
+							reference: 'filtersJob',
+							title: me.res('gpJob.tit.lbl'),
+							iconCls: 'wtdrm-icon-job-xs',
+							titleCollapse: true,
+							collapsible: true,
+							sid: me.ID,
+							useStatisticCustomer: me.getVar('useStatisticCustomer'),
+							listeners: {
+								search: function(s, query){
+									me.reloadJob(query);
+								}
+							}
+						},
+						{
+							region: 'center',
+							xtype: 'grid',
+							reference: 'gpJob',
+							store: {
+								autoLoad: false,
+								model: 'Sonicle.webtop.drm.model.GridJobs',
+								proxy: WTF.apiProxy(me.ID, 'ManageGridJob')
+							},
+							columns: [
+								{
+									dataIndex: 'companyDescription',
+									header: me.res('gpJob.company.lbl'),
+									flex: 3
+								},{
+									dataIndex: 'operatorDescription',
+									header: me.res('gpJob.user.lbl'),
+									flex: 3
+								},{
+									dataIndex: 'customerDescription',
+									header: me.res('gpJob.realcustomer.lbl'),
+									flex: 3
+								},{
+									dataIndex: 'customerStatDescription',
+									header: me.res('gpJob.statcustomer.lbl'),
+									flex: 3
+								},{
+									dataIndex: 'activityDescription',
+									header: me.res('gpJob.activity.lbl'),
+									flex: 3
+								},{
+									dataIndex: 'startDate',
+									header: me.res('gpJob.startdate.lbl'),
+									xtype: 'datecolumn',
+									format: WT.getShortDateFmt(),
+									flex: 2
+								},{
+									dataIndex: 'startDate',
+									header: me.res('gpJob.starttime.lbl'),
+									xtype: 'datecolumn',
+									format: WT.getShortTimeFmt(),
+									flex: 2
+								},{
+									dataIndex: 'endDate',
+									header: me.res('gpJob.endtime.lbl'),
+									xtype: 'datecolumn',
+									format: WT.getShortTimeFmt(),
+									flex: 2
+								},{
+									dataIndex: 'title',
+									header: me.res('gpJob.title.lbl'),
+									flex: 3
+								}
+							],
+							tbar: [								
+								me.getAct('job', 'add'),
+								'-',
+								me.getAct('job', 'edit'),
+								me.getAct('job', 'remove'),
+								'-',
+								me.getAct('job', 'associate'),
+								'-',
+								me.getAct('job', 'export')
+							],
+							listeners: {
+								rowclick: function (s, rec) {
+									me.getAct('job', 'edit').setDisabled(false);
+									me.getAct('job', 'remove').setDisabled(false);
+									me.getAct('job', 'associate').setDisabled(false);
+								},
+								rowdblclick: function (s, rec) {
+									me.editJobUI(rec);
+								}
+							}
+						}
+					]
+				},{
+					xtype: 'container',
+					itemId: 'tckt',
+					layout: 'border',
+					items: [
+						{
+							region: 'north',
+							xtype: 'wtdrmticketsearch',
+							reference: 'filtersTicket',
+							title: me.res('gpTicket.tit.lbl'),
+							iconCls: 'wtdrm-icon-ticket-xs',
+							titleCollapse: true,
+							collapsible: true,
+							sid: me.ID,
+							s: me,
+							useStatisticCustomer: me.getVar('useStatisticCustomer'),
+							listeners: {
+								search: function(s, query){
+									me.reloadTicket(query);
+								}
+							}
+						},
+						{
+							region: 'center',
+							xtype: 'grid',
+							reference: 'gpTicket',
+							store: {
+								autoLoad: false,
+								model: 'Sonicle.webtop.drm.model.GridTickets',
+								proxy: WTF.apiProxy(me.ID, 'ManageGridTicket')
+							},
+							columns: [
+								{
+									dataIndex: 'number',
+									header: me.res('gpTicket.number.lbl'),
+									// flex: 2
+									width: 130
+								},{
+									dataIndex: 'companyDescription',
+									header: me.res('gpTicket.company.lbl'),
+									flex: 2
+								},{
+									dataIndex: 'toOperatorDescription',
+									header: me.res('gpTicket.toOperator.lbl'),
+									flex: 3
+								},{
+									dataIndex: 'customerDescription',
+									header: me.res('gpTicket.realCustomer.lbl'),
+									flex: 3
+								},{
+									dataIndex: 'customerStatDescription',
+									header: me.res('gpTicket.statCustomer.lbl'),
+									flex: 3
+								},{
+									dataIndex: 'ticketCategoryDescription',
+									header: me.res('gpTicket.ticketCategory.lbl'),
+									flex: 3
+								},{
+									dataIndex: 'date',
+									header: me.res('gpTicket.date.lbl'),
+									xtype: 'datecolumn',
+									format: WT.getShortDateTimeFmt(),
+									flex: 3
+								},{
+									dataIndex: 'title',
+									header: me.res('gpTicket.title.lbl'),
+									flex: 2
+								},{
+									dataIndex: 'statusDescription',
+									header: me.res('gpTicket.status.lbl'),
+									flex: 2
+								} /*,{
+									xtype: 'solookupcolumn',
+									dataIndex: 'priorityId',
+									store: Ext.create('Sonicle.webtop.drm.store.PriorityType', {
+										autoLoad: true
+									}),
+									header: me.res('gpTicket.priority.lbl'),
+									displayField: 'desc',
+									flex: 1
+								}*/
+							],
+							tbar: [								
+								me.getAct('ticket', 'add'),
+								'-',
+								me.getAct('ticket', 'edit'),
+								me.getAct('ticket', 'remove'),
+								'-',
+								me.getAct('ticket', 'close')
+							],
+							listeners: {
+								rowclick: function (s, rec) {
+									me.getAct('ticket', 'edit').setDisabled(false);
+									me.getAct('ticket', 'remove').setDisabled(false);
+									me.getAct('ticket', 'close').setDisabled(rec.get('statusId') === parseInt(me.getVar('ticketDefaultCloseStatus')));
+								},
+								rowdblclick: function (s, rec) {
+									me.editTicketUI(rec);
 								}
 							}
 						}
@@ -1127,12 +1392,28 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		return this.getMainComponent().lookupReference('filtersWorkReport');
 	},
 	
+	filtersJob: function () {
+		return this.getMainComponent().lookupReference('filtersJob');
+	},
+
+	filtersTicket: function () {
+		return this.getMainComponent().lookupReference('filtersTicket');
+	},
+	
 	gpWorkReport: function () {
 		return this.getMainComponent().lookupReference('gpWorkReport');
 	},
 	
+	gpJob: function () {
+		return this.getMainComponent().lookupReference('gpJob');
+	},
+	
 	gpWorkReportSelected: function () {
 		return this.getMainComponent().lookupReference('gpWorkReport').getSelection()[0];
+	},
+	
+	gpJobSelected: function () {
+		return this.getMainComponent().lookupReference('gpJob').getSelection()[0];
 	},
 	
 	filtersExpenseNote: function () {
@@ -1157,6 +1438,14 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	
 	gpTimetableRequestSelected: function () {
 		return this.getMainComponent().lookupReference('gpTimetableRequest').getSelection()[0];
+	},
+	
+	gpTicket: function () {
+		return this.getMainComponent().lookupReference('gpTicket');
+	},
+	
+	gpTicketSelected: function () {
+		return this.getMainComponent().lookupReference('gpTicket').getSelection()[0];
 	},
 	
 	filtersTimetableReport: function () {
@@ -1248,6 +1537,16 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				iconCls: 'wt-icon-options-xs',
 				handler: function () {
 					me.timetableSetting();
+				}
+			});
+		}
+		if (WT.isPermitted(me.ID,'TICKET_SETTINGS','MANAGE')){
+			me.addAct('toolbox', 'tkSetting', {
+				text: me.res('toolbox.tk-settings.lbl'),
+				tooltip: null,
+				iconCls: 'wt-icon-options-xs',
+				handler: function () {
+					me.ticketSetting();
 				}
 			});
 		}
@@ -1355,6 +1654,40 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			iconCls: 'wt-icon-print',
 			handler: function () {
 				me.printWorkReportSummary();
+			}
+		});
+		me.addAct('job', 'add', {
+			text: WT.res('act-add.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-add-xs',
+			handler: function () {
+				me.addJob({
+					callback: function (success) {
+						if (success) {
+							me.filtersJob().extractData();
+						}
+					}
+				});
+			}
+		});
+		me.addAct('job', 'edit', {
+			text: WT.res('act-edit.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-edit-xs',
+			disabled: true,
+			handler: function () {
+				var sel = me.gpJobSelected();
+				me.editJobUI(sel);
+			}
+		});
+		me.addAct('job', 'remove', {
+			text: WT.res('act-remove.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-remove-xs',
+			disabled: true,
+			handler: function () {
+				var sel = me.gpJobSelected();
+				me.deleteJobUI(sel);
 			}
 		});
 		me.addAct('expenseNote', 'add', {
@@ -1525,6 +1858,70 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				me.deleteTimetableStampUI(sel);
 			}
 		});
+		me.addAct('ticket', 'add', {
+			text: WT.res('act-add.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-add-xs',
+			handler: function () {
+				me.addTicket({
+					callback: function (success, model, blnOpenJob) {
+						if (success) {
+							me.filtersTicket().extractData();
+							
+							if (blnOpenJob) me.closeTicket(model);
+						}
+					}
+				});
+			}
+		});
+		me.addAct('ticket', 'edit', {
+			text: WT.res('act-edit.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-edit-xs',
+			disabled: true,
+			handler: function () {
+				var sel = me.gpTicketSelected();
+				me.editTicketUI(sel);
+			}
+		});
+		me.addAct('ticket', 'remove', {
+			text: WT.res('act-remove.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-remove-xs',
+			disabled: true,
+			handler: function () {
+				var sel = me.gpTicketSelected();
+				me.deleteTicketUI(sel);
+			}
+		});
+		me.addAct('ticket', 'close', {
+			text: me.res('ticket.btn-closeTicket.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-lock-xs',
+			disabled: true,
+			handler: function () {
+				var sel = me.gpTicketSelected();
+				me.closeTicket(sel);
+			}
+		});
+		me.addAct('job', 'associate', {
+			text: me.res('job.btn-associateTicket.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-format-createlink-xs',
+			disabled: true,
+			handler: function () {
+				var sel = me.gpJobSelected();
+				me.associateTicket(sel);
+			}
+		});
+		me.addAct('job', 'export', {
+			text: me.res('job.btn-export.lbl'),
+			tooltip: null,
+			iconCls: 'wt-icon-file-download-xs',
+			handler: function () {
+				me.exportJobs();
+			}
+		});
 	},
 	
 	initCxm: function () {
@@ -1585,12 +1982,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
 		vw.showView(function () {
-					vw.begin('edit', {
-						data: {
-							id: id
-						}
-					});
-				});
+			vw.begin('edit', {
+				data: {
+					id: id
+				}
+			});
+		});
 	},
 	editOpportunityActionUI: function(rec) {
 		var me = this;
@@ -1752,7 +2149,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		vw.showView(function () {
 					vw.begin('edit', {
 						data: {
-							id: 'op'
+							id: 'oppo'
 						}
 					});
 				});
@@ -1800,12 +2197,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
 		vw.showView(function () {
-					vw.begin('edit', {
-						data: {
-							workReportId: workReportId
-						}
-					});
-				});
+			vw.begin('edit', {
+				data: {
+					workReportId: workReportId
+				}
+			});
+		});
 	},
 	deleteWorkReportUI: function (rec) {
 		var me = this,
@@ -1840,6 +2237,66 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			}
 		});
 	},
+	editJobUI: function (rec) {
+		var me = this;
+		me.editJob(rec.get('jobId'), {
+			callback: function (success, model) {
+				if (success) {
+					this.gpJob().getStore().load();
+				} else {
+					alert('error');
+				}
+			}
+		});
+	},
+	editJob: function (jobId, opts) {
+		opts = opts || {};
+		var me = this,
+				vw = WT.createView(me.ID, 'view.Job', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vw.showView(function () {
+			vw.begin('edit', {
+				data: {
+					jobId: jobId
+				}
+			});
+		});
+	},
+	deleteJobUI: function (rec) {
+		var me = this,
+				sto = me.gpJob().getStore(),
+				msg;
+		if (rec) {
+			msg = me.res('act.confirm.delete', Ext.String.ellipsis(rec.get('number'), 40));
+		} else {
+			msg = me.res('gpJob.confirm.delete.selection');
+		}
+		WT.confirm(msg, function (bid) {
+			if (bid === 'yes') {
+				me.deleteJob(rec.get('jobId'), {
+					callback: function (success) {
+						if (success)
+							sto.remove(rec);
+					}
+				});
+			}
+		});
+	},
+	deleteJob: function (jobId, opts) {
+		opts = opts || {};
+		var me = this;
+		WT.ajaxReq(me.ID, 'ManageJob', {
+			params: {
+				crud: 'delete',
+				jobIds: WTU.arrayAsParam(jobId)
+			},
+			callback: function (success, json) {
+				Ext.callback(opts.callback, opts.scope || me, [success, json]);
+			}
+		});
+	},
 	workReportSetting: function (opts) {
 		opts = opts || {};
 
@@ -1851,16 +2308,232 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		vw.showView(function () {
 					vw.begin('edit', {
 						data: {
-							id: 'wr'
+							id: 'wrkr'
 						}
 					});
 				});
 	},
+	ticketSetting: function (opts) {
+		opts = opts || {};
+
+		var me = this,
+				vw = WT.createView(me.ID, 'view.TicketSetting', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) { 
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vw.showView(function () {
+					vw.begin('edit', {
+						data: {
+							id: 'tckt'
+						}
+					});
+				});
+	},
+	addJob: function (opts) {
+		opts = opts || {};
+
+		var me = this,
+			fj = me.filtersJob(),
+			vw = WT.createView(me.ID, 'view.Job', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vw.showView(function () {
+				vw.begin('new', {
+					data: {
+						operatorId: fj.getOperatorId(),
+						startDate: new Date(),
+						endDate: new Date(),
+						timezone: WT.getVar('timezone')
+					}
+				});
+			});
+	},
+	addJobFromTicket: function (operatorId, customerId, customerStatId, companyId, title, timezone, ticketId, opts) {
+		opts = opts || {};
+
+		var me = this,
+			vw = WT.createView(me.ID, 'view.Job', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vw.showView(function () {
+				vw.begin('new', {
+					data: {
+						operatorId: operatorId,
+						customerId: customerId,
+						customerStatId: customerStatId,
+						companyId: companyId,
+						title: title,
+						ticketId: ticketId,
+						timezone: timezone,
+						startDate: new Date(),
+						endDate: new Date()
+					}
+				});
+			});
+	},
+	closeTicket: function(mo) {
+		var me = this,
+			ft = me.filtersTicket();
+				
+		// me.mys.wait();
+		WT.ajaxReq(me.ID, 'ManageTicket', {
+			params: {
+				crud: 'end',
+				ticketIds: WTU.arrayAsParam([mo.get('ticketId')])
+			},
+			callback: function(success) {
+				// me.mys.unwait();
+				if (success) {
+					me.gpTicket().getStore().load();						
+
+					me.addJobFromTicket(
+						mo.get('toOperatorId'), 
+						mo.get('customerId'), 
+						mo.get('customerStatId'), 
+						mo.get('companyId'), 
+						mo.get('title'), 
+						mo.get('timezone'), 
+						mo.get('ticketId')
+					);
+				}
+			}
+		});
+	},
+	associateTicket: function(mo) {
+		var me = this,
+			fj = me.filtersJob();
+		
+		var me = this;
+		WT.confirm(me.res('confirmBox.associateTicket.lbl'), function(bid, value) {
+			if (bid === 'ok') {
+				if (value !== null) {
+					WT.ajaxReq(me.ID, 'ManageJob', {
+						params: {
+							crud: 'associate',
+							ticketId: value,
+							jobId: mo.get('jobId')
+						},
+						callback: function(success) {
+							if (success) {
+								WT.info(me.res('confirmBox.associateTicket.ok.lbl'));
+							}
+						}
+					});		
+				}
+			}
+		}, me, {
+			buttons: Ext.Msg.OKCANCEL,
+			title: me.res('act-associateTicket.confirm.tit'),
+			instClass: 'Sonicle.webtop.drm.ux.ChooseTicketConfirmBox',
+			instConfig: {
+				sid: me.ID,
+				customerId: mo.get('customerId')
+			}
+		});
+	},
+	exportJobs: function () {
+		var me = this,
+			fj = me.filtersJob();	
+		
+		WT.ajaxReq(me.ID, 'ExportJobs', {
+			params: {
+				op: 'do',
+				query: Ext.JSON.encode(fj.getData())
+			},
+			callback: function(success) {
+				if (success) {
+					Sonicle.URLMgr.download(WTF.processBinUrl(me.ID, 'ExportJobs'));
+				}
+			}
+		});
+	},
+	addTicket: function (opts) {
+		opts = opts || {};
+		var me = this,
+			ft = me.filtersTicket(),
+			vw = WT.createView(me.ID, 'view.Ticket', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {			
+			Ext.callback(opts.callback, opts.scope || me, [success, model, s.blnOpenJob === true]);
+		});
+		vw.showView(function () {
+				vw.begin('new', {
+					data: {
+						fromOperatorId: WT.getVar('userId'),
+						date: new Date(),
+						timezone: WT.getVar('timezone')
+					}
+				});
+			});
+	},
+	editTicketUI: function (rec) {
+		var me = this;
+		me.editTicket(rec.get('ticketId'), {
+			callback: function (success, model, blnOpenJob) {
+				if (success) {
+					this.gpTicket().getStore().load();
+					
+					if (blnOpenJob) me.closeTicket(model);
+				} else {
+					alert('error');
+				}
+			}
+		});
+	},
+	editTicket: function (ticketId, opts) {
+		opts = opts || {};
+		var me = this,
+				vw = WT.createView(me.ID, 'view.Ticket', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
+			Ext.callback(opts.callback, opts.scope || me, [success, model, s.blnOpenJob === true]);
+		});
+		vw.showView(function () {
+			vw.begin('edit', {
+				data: {
+					ticketId: ticketId
+				}
+			});
+		});
+	},
+	deleteTicketUI: function (rec) {
+		var me = this,
+				sto = me.gpTicket().getStore(),
+				msg;
+		if (rec) {
+			msg = me.res('act.confirm.delete', Ext.String.ellipsis(rec.get('number'), 40));
+		} else {
+			msg = me.res('gpTicket.confirm.delete.selection');
+		}
+		WT.confirm(msg, function (bid) {
+			if (bid === 'yes') {
+				me.deleteTicket(rec.get('ticketId'), {
+					callback: function (success) {
+						if (success)
+							sto.remove(rec);
+					}
+				});
+			}
+		});
+	},
+	deleteTicket: function (ticketId, opts) {
+		opts = opts || {};
+		var me = this;
+		WT.ajaxReq(me.ID, 'ManageTicket', {
+			params: {
+				crud: 'delete',
+				ticketIds: WTU.arrayAsParam(ticketId)
+			},
+			callback: function (success, json) {
+				Ext.callback(opts.callback, opts.scope || me, [success, json]);
+			}
+		});
+	},	
 	reloadOpportunity: function (query) {
 		var me = this,
 				pars = {},
 				sto;
-		if (me.isActive() && me.itemActiveId() === 'op') {
+		if (me.isActive() && me.itemActiveId() === 'oppo') {
 			sto = me.gpOpportunity().getStore();
 			if (query !== undefined)
 				Ext.apply(pars, {query: Ext.JSON.encode(query)});
@@ -1873,7 +2546,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		var me = this,
 				pars = {},
 				sto;
-		if (me.isActive() && me.itemActiveId() === 'wr') {
+		if (me.isActive() && me.itemActiveId() === 'wrkr') {
 			sto = me.gpWorkReport().getStore();
 			if (query !== undefined)
 				Ext.apply(pars, {query: Ext.JSON.encode(query)});
@@ -1882,6 +2555,32 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			me.needsReload = true;
 		}
 	},
+	reloadJob: function (query) {
+		var me = this,
+				pars = {},
+				sto;
+		if (me.isActive() && me.itemActiveId() === 'job') {
+			sto = me.gpJob().getStore();
+			if (query !== undefined)
+				Ext.apply(pars, {query: Ext.JSON.encode(query)});
+			WTU.loadWithExtraParams(sto, pars);
+		} else {
+			me.needsReload = true;
+		}
+	},
+	reloadTicket: function (query) {
+		var me = this,
+				pars = {},
+				sto;
+		if (me.isActive() && me.itemActiveId() === 'tckt') {
+			sto = me.gpTicket().getStore();
+			if (query !== undefined)
+				Ext.apply(pars, {query: Ext.JSON.encode(query)});
+			WTU.loadWithExtraParams(sto, pars);
+		} else {
+			me.needsReload = true;
+		}
+	},	
 	printWorkReport: function(ids) {
 		var me = this, url;
 		url = WTF.processBinUrl(me.ID, 'PrintWorkReport', {ids: WTU.arrayAsParam(ids)});
@@ -1891,14 +2590,14 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		opts = opts || {};
 
 		var me = this,
-				vw = WT.createView(me.ID, 'view.WorkReportSummary', {
-					swapReturn: true,
-					viewCfg: {
-							dockableConfig: {
-								title: me.res('workReportSummary.tit')
-							}
+			vw = WT.createView(me.ID, 'view.WorkReportSummary', {
+				swapReturn: true,
+				viewCfg: {
+						dockableConfig: {
+							title: me.res('workReportSummary.tit')
 						}
-				});
+					}
+			});
 		vw.on('viewok', function(s, operatorId, companyId, from, to, docStatusId) {
 			var url = WTF.processBinUrl(me.ID, 'PrintWorkReportSummary', {
 				operatorId: operatorId,
@@ -1999,7 +2698,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		vw.showView(function () {
 					vw.begin('edit', {
 						data: {
-							id: 'en'
+							id: 'expn'
 						}
 					});
 				});
@@ -2008,7 +2707,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		var me = this,
 				pars = {},
 				sto;
-		if (me.isActive() && me.itemActiveId() === 'en') {
+		if (me.isActive() && me.itemActiveId() === 'expn') {
 			sto = me.gpExpenseNote().getStore();
 			if (query !== undefined)
 				Ext.apply(pars, {query: Ext.JSON.encode(query)});
@@ -2296,7 +2995,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		vw.showView(function () {
 					vw.begin('edit', {
 						data: {
-							id: 'tt'
+							id: 'tmtb'
 						}
 					});
 				});
@@ -2305,7 +3004,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		var me = this,
 				pars = {},
 				sto;
-		if (me.isActive() && me.itemActiveId() === 'ttr') {
+		if (me.isActive() && me.itemActiveId() === 'tmtb.rqst') {
 			sto = me.gpTimetableRequest().getStore();
 			if (query !== undefined)
 				Ext.apply(pars, {query: Ext.JSON.encode(query)});
@@ -2318,7 +3017,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		var me = this,
 				pars = {},
 				sto;
-		if (me.isActive() && me.itemActiveId() === 'ttrpt') {
+		if (me.isActive() && me.itemActiveId() === 'tmtb.rprt') {
 			sto = me.gpTimetableReport().getStore();
 			if (query !== undefined)
 				Ext.apply(pars, {query: Ext.JSON.encode(query)});
@@ -2388,7 +3087,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		var me = this,
 				pars = {},
 				sto;
-		if (me.isActive() && me.itemActiveId() === 'ttss') {
+		if (me.isActive() && me.itemActiveId() === 'tmtb.stmp') {
 			sto = me.gpTimetableStamp().getStore();
 			if (query !== undefined)
 				Ext.apply(pars, {query: Ext.JSON.encode(query)});
@@ -2456,34 +3155,39 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		vw.showView();
 	},
 	
-	onActivate: function (tabIndex) {
+	onActivate: function (id) {
 		var me = this;
 		
-		switch (tabIndex){
-			case 1:
+		switch (id){
+			case "oppo":
 				me.reloadOpportunity(me.filtersOpportunity().getData());
 				break;
-			case 2:
+			case 'wrkr':
 				me.reloadWorkReport(me.filtersWorkReport().getData());
 				break;
-			case 3:
+			case 'expn':
 				me.reloadExpenseNote(me.filtersExpenseNote().getData());
 				break;
-			case 4:
+			case 'tmtb':
 				break;
-			case 5:
+			case 'tmtb.stmp':
 				me.enablingStampButtons();
 				me.enablingManageStampsButtons();
 				me.getMainComponent().lookupReference('gpTimetable').getStore().reload();
 				me.reloadTimetableStamp(me.filtersTimetableStamp().getData());
 				break;
-			case 6:
+			case 'tmtb.rqst':
 				me.reloadTimetableRequest(me.filtersTimetableRequest().getData());
 				break;
-			case 7:
+			case 'tmtb.rprt':
 				me.reloadTimetableReport(null);
 				break;
+			case 'job':
+				me.reloadJob(me.filtersJob().getData());
+				break;
+			case 'tckt':				
+				me.reloadTicket(me.filtersTicket().getData());
+				break;			
 		}
 	}
 });
-

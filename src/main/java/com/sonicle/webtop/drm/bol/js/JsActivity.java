@@ -32,20 +32,58 @@
  */
 package com.sonicle.webtop.drm.bol.js;
 
-import com.sonicle.webtop.core.model.Activity;
+import com.sonicle.webtop.drm.model.Activity;
+import com.sonicle.webtop.drm.model.ActivityGroupAssociation;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
- * @author lssndrvs
+ * @author dnllr
  */
 public class JsActivity {
+
+	public Integer activityId;
+	public String externalId;
+	public String description;
+	public String domainId;
+	public Boolean customer;
+	public Boolean timetable;
+	public Boolean jobs;
+	public Boolean opportunities;
+	public Boolean exportable;
 	
-	public Integer id;
-	public String desc;
-	
+	public List<ActivityGroupAssociation> associatedGroups = new ArrayList();
+
 	public JsActivity(Activity act) {
-		this.id = act.getActivityId();
-		this.desc = act.getDescription();
+		this.activityId = act.getActivityId();
+		this.externalId = act.getExternalId();
+		this.description = act.getDescription();
+		this.domainId = act.getDomainId();
+		this.customer = act.getCustomer();
+		this.timetable = act.getTimetable();
+		this.jobs = act.getJobs();
+		this.opportunities = act.getOpportunities();
+		this.exportable = act.getExportable();
+		
+		this.associatedGroups = act.getAssociatedProfiles();
 	}
-	
+
+	public static Activity createActivity(JsActivity js, String domainId) {
+		Activity newAct = new Activity();
+
+		newAct.setActivityId(js.activityId);
+		newAct.setExternalId(js.externalId);
+		newAct.setDescription(js.description);
+		newAct.setDomainId(domainId);
+		newAct.setCustomer(js.customer);
+		newAct.setTimetable(js.timetable);
+		newAct.setJobs(js.jobs);
+		newAct.setOpportunities(js.opportunities);
+		newAct.setExportable(js.exportable);
+		
+		newAct.setAssociatedProfiles(js.associatedGroups);
+
+		return newAct;
+	}
 }

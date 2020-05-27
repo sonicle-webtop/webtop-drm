@@ -32,11 +32,7 @@
  */
 package com.sonicle.webtop.drm.bol.js;
 
-import com.sonicle.webtop.core.app.WT;
-import com.sonicle.webtop.core.sdk.UserProfileId;
-import com.sonicle.webtop.drm.bol.OEmployeeProfile;
-import com.sonicle.webtop.drm.bol.OTimetableStamp;
-import org.joda.time.DateTime;
+import com.sonicle.webtop.drm.model.TimetableStamp;
 
 /**
  *
@@ -52,7 +48,7 @@ public class JsGridTimetableStampList {
 	public String entrance;
 	public String exit;
 	
-	public JsGridTimetableStampList(OTimetableStamp ts){
+	public JsGridTimetableStampList(TimetableStamp ts){
 		this.id = ts.getId();
 		this.domainId = ts.getDomainId();
 		this.userId = ts.getUserId();
@@ -60,6 +56,6 @@ public class JsGridTimetableStampList {
 		this.date = (null != ts.getEntrance()) ? ((ts.getEntrance().getDayOfMonth()< 10 ? "0" + ts.getEntrance().getDayOfMonth() : ts.getEntrance().getDayOfMonth()) + "/" + (ts.getEntrance().getMonthOfYear() < 10 ? "0" + ts.getEntrance().getMonthOfYear() : ts.getEntrance().getMonthOfYear()) + "/" + (ts.getEntrance().getYear())) : ("");
 		this.entrance = (null != ts.getEntrance()) ? ((ts.getEntrance().getHourOfDay() < 10 ? "0" + ts.getEntrance().getHourOfDay() : ts.getEntrance().getHourOfDay()) + ":" + (ts.getEntrance().getMinuteOfHour() < 10 ? "0" + ts.getEntrance().getMinuteOfHour() : ts.getEntrance().getMinuteOfHour())) : ("");
 		this.exit = (null != ts.getExit()) ? ((ts.getExit().getHourOfDay() < 10 ? "0" + ts.getExit().getHourOfDay() : ts.getExit().getHourOfDay()) + ":" + (ts.getExit().getMinuteOfHour() < 10 ? "0" + ts.getExit().getMinuteOfHour() : ts.getExit().getMinuteOfHour())) : ("");
-		
+		// aggiungere actvityId
 	}
 }

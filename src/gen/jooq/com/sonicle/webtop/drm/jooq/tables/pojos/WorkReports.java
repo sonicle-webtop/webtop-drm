@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WorkReports implements java.io.Serializable {
 
-	private static final long serialVersionUID = 1017323941;
+	private static final long serialVersionUID = -164712073;
 
 	private java.lang.String        workReportId;
 	private java.lang.Integer       companyId;
@@ -44,6 +44,8 @@ public class WorkReports implements java.io.Serializable {
 	private java.lang.Integer       number;
 	private java.lang.Integer       year;
 	private java.lang.Integer       eventId;
+	private java.lang.Short         timetableHours;
+	private java.lang.String        domainId;
 
 	public WorkReports() {}
 
@@ -73,7 +75,9 @@ public class WorkReports implements java.io.Serializable {
 		java.lang.Short         businessTripDays,
 		java.lang.Integer       number,
 		java.lang.Integer       year,
-		java.lang.Integer       eventId
+		java.lang.Integer       eventId,
+		java.lang.Short         timetableHours,
+		java.lang.String        domainId
 	) {
 		this.workReportId = workReportId;
 		this.companyId = companyId;
@@ -101,6 +105,8 @@ public class WorkReports implements java.io.Serializable {
 		this.number = number;
 		this.year = year;
 		this.eventId = eventId;
+		this.timetableHours = timetableHours;
+		this.domainId = domainId;
 	}
 
 	public java.lang.String getWorkReportId() {
@@ -309,5 +315,21 @@ public class WorkReports implements java.io.Serializable {
 
 	public void setEventId(java.lang.Integer eventId) {
 		this.eventId = eventId;
+	}
+
+	public java.lang.Short getTimetableHours() {
+		return this.timetableHours;
+	}
+
+	public void setTimetableHours(java.lang.Short timetableHours) {
+		this.timetableHours = timetableHours;
+	}
+
+	public java.lang.String getDomainId() {
+		return this.domainId;
+	}
+
+	public void setDomainId(java.lang.String domainId) {
+		this.domainId = domainId;
 	}
 }

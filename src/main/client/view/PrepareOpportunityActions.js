@@ -185,7 +185,7 @@ Ext.define('Sonicle.webtop.drm.view.PrepareOpportunityActions', {
 											me.getModel().setEndTime(new Date());
 										}
 									}]
-								},
+								}
 							]
 						})
 					]
@@ -205,9 +205,10 @@ Ext.define('Sonicle.webtop.drm.view.PrepareOpportunityActions', {
 					listeners: {
 						pick: function (s, vals, recs) {
 							var mo = me.getModel();
+							console.log("pick: "+recs[0].getId());
 							mo.actionActivities().add({
-								id: recs[0].getId(),
-								desc: recs[0].get('desc')
+								activityId: recs[0].getId(),
+								description: recs[0].get('description')
 							});
 						}
 					}

@@ -443,7 +443,26 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 										proxy: WTF.proxy(me.mys.ID, 'LookupDocStatuses')
 									},
 									fieldLabel: me.mys.res('workReport.fld-status.lbl')
-								})
+								}),
+								{
+									xtype: 'numberfield',
+									reference: 'fldtimetablehours',
+									bind: '{record.timetableHours}',
+									minValue: 0,
+									fieldLabel: me.mys.res('workReport.fld-timetableHours.lbl'),
+									allowDecimals: true,
+									decimalSeparator: '.',
+									decimalPrecision: 1,
+									step: 0.5,
+									format: '0.0',
+									listeners: {
+										change: function(t,nv,ov) {
+											t.setValue(Math.round(nv / 0.5) * 0.5);
+											// console.log((Math.round(nv*0.5)/0.5).toFixed(1)); // log in console di chrome
+										}
+									}
+									
+								}
 							]
 						}
 					]

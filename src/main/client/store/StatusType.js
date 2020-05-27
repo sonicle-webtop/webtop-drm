@@ -46,5 +46,14 @@ Ext.define('Sonicle.webtop.drm.store.StatusType', {
 			row[1] = WT.res('com.sonicle.webtop.drm', 'store.status.'+row[0]);
 		});
 		me.callParent([cfg]);
-	}
+	},
+	
+	initComponent: function() {
+		this.callParent(arguments);
+		this.on('load', function(s) {
+			// s.insert(0, {id: '-', desc: WT.res('word.no')});
+			var meta = s.getProxy().getReader().metaData;
+		});
+	}	
+	
 });

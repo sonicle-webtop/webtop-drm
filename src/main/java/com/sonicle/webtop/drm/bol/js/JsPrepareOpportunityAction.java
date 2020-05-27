@@ -76,7 +76,7 @@ public class JsPrepareOpportunityAction {
 			oAct.setStartDate(formatter.parseDateTime(js.startDate));
 			oAct.setEndDate(formatter.parseDateTime(js.endDate));
 			
-			oAct.setActivityId(jsAct.id);
+			oAct.setActivityId(jsAct.activityId);
 			
 			oActs.add(oAct);
 		}

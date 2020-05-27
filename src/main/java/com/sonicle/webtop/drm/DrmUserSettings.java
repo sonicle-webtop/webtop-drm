@@ -61,11 +61,19 @@ public class DrmUserSettings extends BaseUserSettings {
 	public Integer getWorkReportCalendarId() {
 		return getInteger(WORK_REPORT_CALENDAR_ID, null); 
 	}
-
+	
+	public Integer getJobCalendarId() {
+		return getInteger(JOB_CALENDAR_ID, null); 
+	}
+	
 	public void setWorkReportCalendarId(int value) {
 		setInteger(WORK_REPORT_CALENDAR_ID, value); 
 	}
 
+	public void setJobCalendarId(int value) {
+		setInteger(JOB_CALENDAR_ID, value); 
+	}
+	
 	public Integer getLeaveRequestCalendarId() {
 		return getInteger(LEAVE_REQUEST_CALENDAR_ID, null); 
 	}
@@ -109,4 +117,20 @@ public class DrmUserSettings extends BaseUserSettings {
 	public boolean setWorkdayEnd(LocalTime value) {
 		return setTime(WORKDAY_END, value, "HH:mm");
 	}
+	
+	public String getTicketNotifyMail() {
+		return getString(TICKET_NOTIFY_MAIL, null); 
+	}
+
+	public void setTicketNotifyMail(String value) {
+		setString(TICKET_NOTIFY_MAIL, value);
+	}
+	
+	public String getTicketAutomaticClose() {
+		return getString(TICKET_AUTOMATIC_CLOSE, null); 
+	}
+
+	public void setTicketAutomaticClose(String value) {
+		setString(TICKET_AUTOMATIC_CLOSE, value);
+	}	
 }

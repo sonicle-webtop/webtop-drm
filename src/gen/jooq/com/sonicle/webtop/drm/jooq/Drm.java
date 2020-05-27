@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Drm extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = 2504811;
+	private static final long serialVersionUID = -1681052341;
 
 	/**
 	 * The reference instance of <code>drm</code>
@@ -39,6 +39,8 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 
 	private final java.util.List<org.jooq.Sequence<?>> getSequences0() {
 		return java.util.Arrays.<org.jooq.Sequence<?>>asList(
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_ACTIVITIES,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_ACTIVITIES_GROUPS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_BUSINESS_TRIPS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_COMPANIES,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_COMPANIES_USERS,
@@ -52,6 +54,7 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_FOLDERS_GROUPS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_GROUPS_USERS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_HOUR_PROFILES,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_JOBS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_LEAVE_REQUEST_DOCUMENTS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_LEAVE_REQUESTS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_LINE_HOURS,
@@ -63,6 +66,9 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_MEMBERS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_SUPERVISED_USERS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_PROFILES_USERS,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_TICKET_CATEGORIES,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_TICKETS,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_TICKETS_SETTINGS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_TIMETABLE_EVENT,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_TIMETABLE_REPORT_TEMP,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_TIMETABLE_SETTINGS,
@@ -83,6 +89,8 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 
 	private final java.util.List<org.jooq.Table<?>> getTables0() {
 		return java.util.Arrays.<org.jooq.Table<?>>asList(
+			com.sonicle.webtop.drm.jooq.tables.Activities.ACTIVITIES,
+			com.sonicle.webtop.drm.jooq.tables.ActivitiesGroups.ACTIVITIES_GROUPS,
 			com.sonicle.webtop.drm.jooq.tables.BusinessTrips.BUSINESS_TRIPS,
 			com.sonicle.webtop.drm.jooq.tables.Companies.COMPANIES,
 			com.sonicle.webtop.drm.jooq.tables.CompaniesPictures.COMPANIES_PICTURES,
@@ -105,6 +113,9 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.tables.GroupsUsers.GROUPS_USERS,
 			com.sonicle.webtop.drm.jooq.tables.HolidayDate.HOLIDAY_DATE,
 			com.sonicle.webtop.drm.jooq.tables.HourProfiles.HOUR_PROFILES,
+			com.sonicle.webtop.drm.jooq.tables.JobAttachments.JOB_ATTACHMENTS,
+			com.sonicle.webtop.drm.jooq.tables.JobAttachmentsData.JOB_ATTACHMENTS_DATA,
+			com.sonicle.webtop.drm.jooq.tables.Jobs.JOBS,
 			com.sonicle.webtop.drm.jooq.tables.LeaveRequestDocuments.LEAVE_REQUEST_DOCUMENTS,
 			com.sonicle.webtop.drm.jooq.tables.LeaveRequestDocumentsData.LEAVE_REQUEST_DOCUMENTS_DATA,
 			com.sonicle.webtop.drm.jooq.tables.LeaveRequests.LEAVE_REQUESTS,
@@ -124,10 +135,17 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.tables.ProfilesMasterdata.PROFILES_MASTERDATA,
 			com.sonicle.webtop.drm.jooq.tables.ProfilesMembers.PROFILES_MEMBERS,
 			com.sonicle.webtop.drm.jooq.tables.ProfilesSupervisedUsers.PROFILES_SUPERVISED_USERS,
+			com.sonicle.webtop.drm.jooq.tables.TicketAttachments.TICKET_ATTACHMENTS,
+			com.sonicle.webtop.drm.jooq.tables.TicketAttachmentsData.TICKET_ATTACHMENTS_DATA,
+			com.sonicle.webtop.drm.jooq.tables.TicketCategories.TICKET_CATEGORIES,
+			com.sonicle.webtop.drm.jooq.tables.Tickets.TICKETS,
 			com.sonicle.webtop.drm.jooq.tables.TimetableEvents.TIMETABLE_EVENTS,
 			com.sonicle.webtop.drm.jooq.tables.TimetableReportTemp.TIMETABLE_REPORT_TEMP,
 			com.sonicle.webtop.drm.jooq.tables.TimetableSettings.TIMETABLE_SETTINGS,
 			com.sonicle.webtop.drm.jooq.tables.TimetableStamp.TIMETABLE_STAMP,
+			com.sonicle.webtop.drm.jooq.tables.VwJobs.VW_JOBS,
+			com.sonicle.webtop.drm.jooq.tables.VwTickets.VW_TICKETS,
+			com.sonicle.webtop.drm.jooq.tables.VwWorkReports.VW_WORK_REPORTS,
 			com.sonicle.webtop.drm.jooq.tables.WorkReports.WORK_REPORTS,
 			com.sonicle.webtop.drm.jooq.tables.WorkReportsAttachments.WORK_REPORTS_ATTACHMENTS,
 			com.sonicle.webtop.drm.jooq.tables.WorkReportsAttachmentsData.WORK_REPORTS_ATTACHMENTS_DATA,

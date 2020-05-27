@@ -80,7 +80,21 @@ public class DrmSettings {
 	
 	public static final String LEAVE_REQUEST_MEDICAL_VISITS_AUTOMATICALLY_APPROVED = "leaverequest.medicalvisitsautomaticallyapproved";
 	
+	public static final String JOB_CALENDAR_ID = "job.calendar.id";
+	
 	public static final String WORKDAY_START = "workday.start";
 	
 	public static final String WORKDAY_END = "workday.end";
+	
+	public static final String TICKET_DEFAULT_DOC_STATUS_ID = "ticket.default.docstatusid";
+	
+	public static final String TICKET_DEFAULT_PRIORITY_ID = "ticket.default.priorityid";
+	
+	public static final String TICKET_DEFAULT_TICKET_CATEGORY_ID = "ticket.default.ticketCategoryid";
+	
+	public static final String TICKET_DEFAULT_CLOSE_DOC_STATUS_ID = "ticket.default.close.docstatusid";
+	
+	public static final String TICKET_NOTIFY_MAIL = "ticket.notifymail";
+	
+	public static final String TICKET_AUTOMATIC_CLOSE = "ticket.automaticclose";
 }

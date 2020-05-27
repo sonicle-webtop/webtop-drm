@@ -73,6 +73,8 @@ public class UserOptionsService extends BaseUserOptionsService {
 				jso.defaultCurrency = dus.getDefaultCurrency();
 				jso.workdayStart = hmf.print(dus.getWorkdayStart());
 				jso.workdayEnd = hmf.print(dus.getWorkdayEnd());
+				jso.ticketNotifyMail = dus.getTicketNotifyMail();
+				jso.ticketAutomaticClose = dus.getTicketAutomaticClose();
 				
 				new JsonResult(jso).printTo(out);
 				
@@ -82,6 +84,8 @@ public class UserOptionsService extends BaseUserOptionsService {
 				// Main
 				if (pl.map.has("kmCost")) dus.setKmCost(pl.data.kmCost);
 				if (pl.map.has("defaultCurrency")) dus.setDefaultCurrency(pl.data.defaultCurrency);
+				if (pl.map.has("ticketNotifyMail")) dus.setTicketNotifyMail(pl.data.ticketNotifyMail);
+				if (pl.map.has("ticketAutomaticClose")) dus.setTicketAutomaticClose(pl.data.ticketAutomaticClose);
 				
 				new JsonResult().printTo(out);
 			}

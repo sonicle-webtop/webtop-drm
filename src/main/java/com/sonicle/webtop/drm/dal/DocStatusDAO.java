@@ -70,7 +70,7 @@ public class DocStatusDAO extends BaseDAO{
 				.execute();
 	}
 
-	public List<ODocStatus> selectStatuses(Connection con) throws DAOException{
+	public List<ODocStatus> select(Connection con) throws DAOException{
 			DSLContext dsl = getDSL(con);
 		return dsl
 				.select()

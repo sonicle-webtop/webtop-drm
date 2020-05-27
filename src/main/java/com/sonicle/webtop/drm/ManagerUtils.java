@@ -38,6 +38,8 @@ import com.sonicle.commons.PathUtils;
 import com.sonicle.webtop.core.app.WT;
 import com.sonicle.webtop.core.dal.BaseDAO;
 import com.sonicle.webtop.core.dal.DAOException;
+import com.sonicle.webtop.drm.bol.OActivity;
+import com.sonicle.webtop.drm.bol.OActivityGroup;
 import com.sonicle.webtop.drm.bol.OBusinessTrip;
 import com.sonicle.webtop.drm.bol.OCompany;
 import com.sonicle.webtop.drm.bol.OCompanyPicture;
@@ -61,6 +63,8 @@ import com.sonicle.webtop.drm.bol.OExpenseNoteDocument;
 import com.sonicle.webtop.drm.bol.OExpenseNoteSetting;
 import com.sonicle.webtop.drm.bol.OHolidayDate;
 import com.sonicle.webtop.drm.bol.OHourProfile;
+import com.sonicle.webtop.drm.bol.OJob;
+import com.sonicle.webtop.drm.bol.OJobAttachment;
 import com.sonicle.webtop.drm.bol.OLeaveRequest;
 import com.sonicle.webtop.drm.bol.OLeaveRequestDocument;
 import com.sonicle.webtop.drm.bol.OLeaveRequestType;
@@ -75,6 +79,9 @@ import com.sonicle.webtop.drm.bol.OOpportunityInterlocutor;
 import com.sonicle.webtop.drm.bol.OProfileMasterdata;
 import com.sonicle.webtop.drm.bol.OProfileMember;
 import com.sonicle.webtop.drm.bol.OProfileSupervisedUser;
+import com.sonicle.webtop.drm.bol.OTicket;
+import com.sonicle.webtop.drm.bol.OTicketAttachment;
+import com.sonicle.webtop.drm.bol.OTicketCategory;
 import com.sonicle.webtop.drm.bol.OTimetableEvent;
 import com.sonicle.webtop.drm.bol.OTimetableReport;
 import com.sonicle.webtop.drm.bol.OTimetableSetting;
@@ -86,10 +93,14 @@ import com.sonicle.webtop.drm.bol.OWorkReportSetting;
 import com.sonicle.webtop.drm.bol.OWorkType;
 import com.sonicle.webtop.drm.dal.ExpenseNoteDetailDocumentDAO;
 import com.sonicle.webtop.drm.dal.ExpenseNoteDocumentDAO;
+import com.sonicle.webtop.drm.dal.JobAttachmentDAO;
 import com.sonicle.webtop.drm.dal.LeaveRequestDocumentDAO;
 import com.sonicle.webtop.drm.dal.OpportunityActionDocumentDAO;
 import com.sonicle.webtop.drm.dal.OpportunityDocumentDAO;
+import com.sonicle.webtop.drm.dal.TicketAttachmentDAO;
 import com.sonicle.webtop.drm.dal.WorkReportAttachmentDAO;
+import com.sonicle.webtop.drm.model.Activity;
+import com.sonicle.webtop.drm.model.ActivityGroupAssociation;
 import com.sonicle.webtop.drm.model.BusinessTrip;
 import com.sonicle.webtop.drm.model.Company;
 import com.sonicle.webtop.drm.model.CompanyPicture;
@@ -113,6 +124,9 @@ import com.sonicle.webtop.drm.model.ExpenseNoteDocumentWithStream;
 import com.sonicle.webtop.drm.model.ExpenseNoteSetting;
 import com.sonicle.webtop.drm.model.HolidayDate;
 import com.sonicle.webtop.drm.model.HourProfile;
+import com.sonicle.webtop.drm.model.Job;
+import com.sonicle.webtop.drm.model.JobAttachment;
+import com.sonicle.webtop.drm.model.JobAttachmentWithStream;
 import com.sonicle.webtop.drm.model.LeaveRequest;
 import com.sonicle.webtop.drm.model.LeaveRequestDocument;
 import com.sonicle.webtop.drm.model.LeaveRequestDocumentWithStream;
@@ -129,6 +143,10 @@ import com.sonicle.webtop.drm.model.OpportunityInterlocutor;
 import com.sonicle.webtop.drm.model.ProfileMasterdata;
 import com.sonicle.webtop.drm.model.ProfileMember;
 import com.sonicle.webtop.drm.model.ProfileSupervisedUser;
+import com.sonicle.webtop.drm.model.Ticket;
+import com.sonicle.webtop.drm.model.TicketAttachment;
+import com.sonicle.webtop.drm.model.TicketAttachmentWithStream;
+import com.sonicle.webtop.drm.model.TicketCategory;
 import com.sonicle.webtop.drm.model.TimetableReport;
 import com.sonicle.webtop.drm.model.TimetableSetting;
 import com.sonicle.webtop.drm.model.TimetableStamp;
@@ -163,6 +181,73 @@ public class ManagerUtils {
 		return WT.getPlatformName() + " DRM";
 	}
 	
+	static Job createJob(OJob oJob) {
+		if (oJob == null) {
+			return null;
+		}
+		Job job = new Job();
+		job.setJobId(oJob.getJobId());
+		job.setCompanyId(oJob.getCompanyId());
+		job.setOperatorId(oJob.getOperatorId());
+		job.setCustomerId(oJob.getCustomerId());
+		job.setCustomerStatId(oJob.getCustomerStatId());
+		job.setTimezone(oJob.getTimezone());
+		job.setStartDate(oJob.getStartDate());
+		job.setEndDate(oJob.getEndDate());
+		job.setActivityId(oJob.getActivityId());
+		job.setTitle(oJob.getTitle());
+		job.setDescription(oJob.getDescription());
+		job.setEventId(oJob.getEventId());		
+		job.setDomainId(oJob.getDomainId());
+		job.setTicketId(oJob.getTicketId());
+		job.setNumber(oJob.getNumber());
+		job.setCausalId(oJob.getCausalId());
+		
+		return job;
+	}
+	
+	static OJob createOJob(Job job) {
+		if (job == null) {
+			return null;
+		}
+		OJob oJob = new OJob();
+		oJob.setJobId(job.getJobId());
+		oJob.setCompanyId(job.getCompanyId());
+		oJob.setOperatorId(job.getOperatorId());
+		oJob.setCustomerId(job.getCustomerId());
+		oJob.setCustomerStatId(job.getCustomerStatId());
+		oJob.setStartDate(job.getStartDate());
+		oJob.setEndDate(job.getEndDate());
+		oJob.setTimezone(job.getTimezone());
+		oJob.setActivityId(job.getActivityId());
+		oJob.setTitle(job.getTitle());
+		oJob.setDescription(job.getDescription());
+		oJob.setEventId(job.getEventId());
+		oJob.setDomainId(job.getDomainId());
+		oJob.setTicketId(job.getTicketId());
+		oJob.setNumber(job.getNumber());
+		oJob.setCausalId(job.getCausalId());
+		
+		return oJob;
+	}
+	
+	static JobAttachment createJobAttachment(OJobAttachment src) {
+		if (src == null) return null;
+		return fillJobAttachment(new JobAttachment(), src);
+	}
+	
+	static <T extends JobAttachment> T fillJobAttachment(T tgt, OJobAttachment src) {
+		if ((tgt != null) && (src != null)) {
+			tgt.setJobAttachmentId(src.getJobAttachmentId());
+			tgt.setRevisionTimestamp(src.getRevisionTimestamp());
+			tgt.setRevisionSequence(src.getRevisionSequence());
+			tgt.setFileName(src.getFilename());
+			tgt.setSize(src.getSize());
+			tgt.setMediaType(src.getMediaType());
+		}
+		return tgt;
+	}
+	
 	static WorkReport createWorkReport(OWorkReport oWrkRpt) {
 		if (oWrkRpt == null) {
 			return null;
@@ -193,8 +278,10 @@ public class ManagerUtils {
 		wrkRpt.setFreeSupport(oWrkRpt.getFreeSupport());
 		wrkRpt.setBusinessTripId(oWrkRpt.getBusinessTripId());
 		wrkRpt.setBusinessTripDays(oWrkRpt.getBusinessTripDays().intValue());
-		wrkRpt.setEventId(oWrkRpt.getEventId());
-
+		wrkRpt.setEventId(oWrkRpt.getEventId());		
+		wrkRpt.setTimetableHours((null != oWrkRpt.getTimetableHours()) ? oWrkRpt.getTimetableHours().intValue() : 0);
+		wrkRpt.setDomainId(oWrkRpt.getDomainId());
+				
 		return wrkRpt;
 	}
 
@@ -229,7 +316,9 @@ public class ManagerUtils {
 		oWrkRpt.setBusinessTripId(wrkRpt.getBusinessTripId());
 		oWrkRpt.setBusinessTripDays(wrkRpt.getBusinessTripDays().shortValue());
 		oWrkRpt.setEventId(wrkRpt.getEventId());
-
+		oWrkRpt.setTimetableHours(wrkRpt.getTimetableHours().shortValue());
+		oWrkRpt.setDomainId(wrkRpt.getDomainId());
+		
 		return oWrkRpt;
 	}
 
@@ -285,6 +374,24 @@ public class ManagerUtils {
 		return oatt;
 	}
 	
+	static OJobAttachment doJobAttachmentInsert(Connection con, String wrId, JobAttachmentWithStream attachment) throws DAOException, IOException {
+		JobAttachmentDAO attDao = JobAttachmentDAO.getInstance();
+		
+		OJobAttachment oatt = createOJobAttachment(attachment);
+		oatt.setJobAttachmentId(IdentifierUtils.getUUIDTimeBased());
+		oatt.setJobId(wrId);
+		attDao.insert(con, oatt, BaseDAO.createRevisionTimestamp());
+		
+		InputStream is = attachment.getStream();
+		try {
+			attDao.insertBytes(con, oatt.getJobAttachmentId(), IOUtils.toByteArray(is));
+		} finally {
+			IOUtils.closeQuietly(is);
+		}
+		
+		return oatt;
+	}
+	
 	static OWorkReportAttachment createOWorkReportAttachment(WorkReportAttachment src) {
 		if (src == null) return null;
 		return fillOWorkReportAttachment(new OWorkReportAttachment(), src);
@@ -323,6 +430,46 @@ public class ManagerUtils {
 		ArrayList<WorkReportAttachment> list = new ArrayList<>(items.size());
 		for (OWorkReportAttachment item : items) {
 			list.add(createWorkReportAttachment(item));
+		}
+		return list;
+	}
+	
+	static boolean doJobAttachmentUpdate(Connection con, JobAttachmentWithStream attachment) throws DAOException, IOException {
+		JobAttachmentDAO attDao = JobAttachmentDAO.getInstance();
+		
+		OJobAttachment oatt = createOJobAttachment(attachment);
+		attDao.update(con, oatt, BaseDAO.createRevisionTimestamp());
+		
+		InputStream is = attachment.getStream();
+		try {
+			attDao.deleteBytesById(con, oatt.getJobAttachmentId());
+			return attDao.insertBytes(con, oatt.getJobAttachmentId(), IOUtils.toByteArray(is)) == 1;
+		} finally {
+			IOUtils.closeQuietly(is);
+		}
+	}
+	
+	static OJobAttachment createOJobAttachment(JobAttachment src) {
+		if (src == null) return null;
+		return fillOJobAttachment(new OJobAttachment(), src);
+	}
+	
+	static <T extends OJobAttachment> T fillOJobAttachment(T tgt, JobAttachment src) {
+		if ((tgt != null) && (src != null)) {
+			tgt.setJobAttachmentId(src.getJobAttachmentId());
+			tgt.setRevisionTimestamp(src.getRevisionTimestamp());
+			tgt.setRevisionSequence(src.getRevisionSequence());
+			tgt.setFilename(src.getFileName());
+			tgt.setSize(src.getSize());
+			tgt.setMediaType(src.getMediaType());
+		}
+		return tgt;
+	}	
+	
+	static List<JobAttachment> createJobAttachmentList(List<OJobAttachment> items) {
+		ArrayList<JobAttachment> list = new ArrayList<>(items.size());
+		for (OJobAttachment item : items) {
+			list.add(createJobAttachment(item));
 		}
 		return list;
 	}
@@ -916,8 +1063,22 @@ public class ManagerUtils {
 		stamp.setType(oTS.getType());
 		stamp.setEntrance(oTS.getEntrance());
 		stamp.setExit(oTS.getExit());
+		stamp.setActivityId(oTS.getActivityId());
 
 		return stamp;
+	}
+	
+	static TimetableStamp fillTimetableStamp(TimetableStamp tgt, OTimetableStamp src) {
+		if ((tgt != null) && (src != null)) {
+			tgt.setId(src.getId());
+			tgt.setDomainId(src.getDomainId());
+			tgt.setUserId(src.getUserId());
+			tgt.setType(src.getType());
+			tgt.setEntrance(src.getEntrance());
+			tgt.setExit(src.getExit());
+			tgt.setActivityId(src.getActivityId());
+		}
+		return tgt;
 	}
 
 	static OTimetableStamp createOTimetableStamp(TimetableStamp stamp) {
@@ -2148,5 +2309,234 @@ public class ManagerUtils {
 		} finally {
 			IOUtils.closeQuietly(is);
 		}
+	}
+	
+	static TicketCategory createTicketCategory(OTicketCategory oTcktCategory) {
+
+		if (oTcktCategory == null) {
+			return null;
+		}
+
+		TicketCategory tcktCategory = new TicketCategory();
+		tcktCategory.setTicketCategoryId(oTcktCategory.getTicketCategoryId());
+		tcktCategory.setDomainId(oTcktCategory.getDomainId());
+		tcktCategory
+				.setRevisionStatus(EnumUtils.forSerializedName(oTcktCategory.getRevisionStatus(), TicketCategory.RevisionStatus.class
+				));
+		tcktCategory.setExternalId(oTcktCategory.getExternalId());
+		tcktCategory.setDescription(oTcktCategory.getDescription());
+
+		return tcktCategory;
+	}
+
+	static OTicketCategory createOTicketCategory(TicketCategory tcktCategory) {
+
+		if (tcktCategory == null) {
+			return null;
+		}
+
+		OTicketCategory oTcktCategory = new OTicketCategory();
+		oTcktCategory.setTicketCategoryId(tcktCategory.getTicketCategoryId());
+		oTcktCategory.setDomainId(tcktCategory.getDomainId());
+		oTcktCategory.setRevisionStatus(EnumUtils.toSerializedName(tcktCategory.getRevisionStatus()));
+		oTcktCategory.setExternalId(tcktCategory.getExternalId());
+		oTcktCategory.setDescription(tcktCategory.getDescription());
+
+		return oTcktCategory;
+	}
+	
+	static Ticket createTicket(OTicket oTckt) {
+		if (oTckt == null) {
+			return null;
+		}
+		Ticket tckt = new Ticket();
+		tckt.setTicketId(oTckt.getTicketId());
+		tckt.setCompanyId(oTckt.getCompanyId());
+		tckt.setFromOperatorId(oTckt.getFromOperatorId());
+		tckt.setToOperatorId(oTckt.getToOperatorId());
+		tckt.setCustomerId(oTckt.getCustomerId());
+		tckt.setCustomerStatId(oTckt.getCustomerStatId());
+		tckt.setTimezone(oTckt.getTimezone());
+		tckt.setDate(oTckt.getDate());
+		tckt.setTicketCategoryId(oTckt.getTicketCategoryId());
+		tckt.setPriorityId(oTckt.getPriorityId());
+		tckt.setStatusId(oTckt.getStatusId());
+		tckt.setTitle(oTckt.getTitle());
+		tckt.setDescription(oTckt.getDescription());
+		tckt.setRelease(oTckt.getRelease());
+		tckt.setEnvironment(oTckt.getEnvironment());
+		tckt.setSuggestion(oTckt.getSuggestion());
+		tckt.setSimulation(oTckt.getSimulation());
+		tckt.setEventId(oTckt.getEventId());		
+		tckt.setDomainId(oTckt.getDomainId());
+		tckt.setNumber(oTckt.getNumber());
+		
+		return tckt;
+	}
+	
+	static OTicket createOTicket(Ticket tckt) {
+		if (tckt == null) {
+			return null;
+		}
+		OTicket oTckt = new OTicket();
+		oTckt.setTicketId(tckt.getTicketId());
+		oTckt.setCompanyId(tckt.getCompanyId());
+		oTckt.setFromOperatorId(tckt.getFromOperatorId());
+		oTckt.setToOperatorId(tckt.getToOperatorId());
+		oTckt.setCustomerId(tckt.getCustomerId());
+		oTckt.setCustomerStatId(tckt.getCustomerStatId());
+		oTckt.setDate(tckt.getDate());
+		oTckt.setTimezone(tckt.getTimezone());
+		oTckt.setTicketCategoryId(tckt.getTicketCategoryId());
+		oTckt.setPriorityId(tckt.getPriorityId());
+		oTckt.setStatusId(tckt.getStatusId());
+		oTckt.setTitle(tckt.getTitle());
+		oTckt.setDescription(tckt.getDescription());
+		oTckt.setRelease(tckt.getRelease());
+		oTckt.setEnvironment(tckt.getEnvironment());
+		oTckt.setSimulation(tckt.getSimulation());
+		oTckt.setSuggestion(tckt.getSuggestion());
+		oTckt.setEventId(tckt.getEventId());
+		oTckt.setDomainId(tckt.getDomainId());
+		oTckt.setNumber(tckt.getNumber());
+		
+		return oTckt;
+	}
+	
+	static TicketAttachment createTicketAttachment(OTicketAttachment src) {
+		if (src == null) return null;
+		return fillTicketAttachment(new TicketAttachment(), src);
+	}
+	
+	static <T extends TicketAttachment> T fillTicketAttachment(T tgt, OTicketAttachment src) {
+		if ((tgt != null) && (src != null)) {
+			tgt.setTicketAttachmentId(src.getTicketAttachmentId());
+			tgt.setRevisionTimestamp(src.getRevisionTimestamp());
+			tgt.setRevisionSequence(src.getRevisionSequence());
+			tgt.setFileName(src.getFilename());
+			tgt.setSize(src.getSize());
+			tgt.setMediaType(src.getMediaType());
+		}
+		return tgt;
+	}
+	
+	static OTicketAttachment doTicketAttachmentInsert(Connection con, String wrId, TicketAttachmentWithStream attachment) throws DAOException, IOException {
+		TicketAttachmentDAO attDao = TicketAttachmentDAO.getInstance();
+		
+		OTicketAttachment oatt = createOTicketAttachment(attachment);
+		oatt.setTicketAttachmentId(IdentifierUtils.getUUIDTimeBased());
+		oatt.setTicketId(wrId);
+		attDao.insert(con, oatt, BaseDAO.createRevisionTimestamp());
+		
+		InputStream is = attachment.getStream();
+		try {
+			attDao.insertBytes(con, oatt.getTicketAttachmentId(), IOUtils.toByteArray(is));
+		} finally {
+			IOUtils.closeQuietly(is);
+		}
+		
+		return oatt;
+	}
+	
+	static OTicketAttachment createOTicketAttachment(TicketAttachment src) {
+		if (src == null) return null;
+		return fillOTicketAttachment(new OTicketAttachment(), src);
+	}
+	
+	static <T extends OTicketAttachment> T fillOTicketAttachment(T tgt, TicketAttachment src) {
+		if ((tgt != null) && (src != null)) {
+			tgt.setTicketAttachmentId(src.getTicketAttachmentId());
+			tgt.setRevisionTimestamp(src.getRevisionTimestamp());
+			tgt.setRevisionSequence(src.getRevisionSequence());
+			tgt.setFilename(src.getFileName());
+			tgt.setSize(src.getSize());
+			tgt.setMediaType(src.getMediaType());
+		}
+		return tgt;
+	}
+	
+	static List<TicketAttachment> createTicketAttachmentList(List<OTicketAttachment> items) {
+		ArrayList<TicketAttachment> list = new ArrayList<>(items.size());
+		for (OTicketAttachment item : items) {
+			list.add(createTicketAttachment(item));
+		}
+		return list;
+	}
+	
+	static boolean doTicketAttachmentUpdate(Connection con, TicketAttachmentWithStream attachment) throws DAOException, IOException {
+		TicketAttachmentDAO attDao = TicketAttachmentDAO.getInstance();
+		
+		OTicketAttachment oatt = createOTicketAttachment(attachment);
+		attDao.update(con, oatt, BaseDAO.createRevisionTimestamp());
+		
+		InputStream is = attachment.getStream();
+		try {
+			attDao.deleteBytesById(con, oatt.getTicketAttachmentId());
+			return attDao.insertBytes(con, oatt.getTicketAttachmentId(), IOUtils.toByteArray(is)) == 1;
+		} finally {
+			IOUtils.closeQuietly(is);
+		}
+	}
+	
+	static OActivity createOActivity(Activity act) {
+		if (act == null) {
+			return null;
+		}
+		OActivity oAct = new OActivity();
+		oAct.setActivityId(act.getActivityId());
+		oAct.setExternalId(act.getExternalId());
+		oAct.setDescription(act.getDescription());
+		oAct.setDomainId(act.getDomainId());
+		oAct.setCustomer(act.getCustomer());
+		oAct.setTimetable(act.getTimetable());
+		oAct.setJobs(act.getJobs());
+		oAct.setOpportunities(act.getOpportunities());
+		oAct.setExportable(act.getExportable());
+
+		return oAct;
+	}
+
+	static Activity createActivity(OActivity oAct) {
+		if (oAct == null) {
+			return null;
+		}
+		Activity act = new Activity();
+		act.setActivityId(oAct.getActivityId());
+		act.setExternalId(oAct.getExternalId());
+		act.setDescription(oAct.getDescription());
+		act.setDomainId(oAct.getDomainId());
+		act.setCustomer(oAct.getCustomer());
+		act.setTimetable(oAct.getTimetable());
+		act.setJobs(oAct.getJobs());
+		act.setOpportunities(oAct.getOpportunities());
+		act.setExportable(oAct.getExportable());
+
+		return act;
+	}
+
+	static ActivityGroupAssociation createActivityGroup(OActivityGroup oActGroup) {
+		if (oActGroup == null) {
+			return null;
+		}
+
+		ActivityGroupAssociation actGroup = new ActivityGroupAssociation();
+		actGroup.setAssociationId(oActGroup.getAssociationId());
+		actGroup.setActivityId(oActGroup.getActivityId());
+		actGroup.setGroupId(oActGroup.getGroupId());
+
+		return actGroup;
+	}
+
+	static OActivityGroup createOActivityGroup(ActivityGroupAssociation actGroup) {
+		if (actGroup == null) {
+			return null;
+		}
+
+		OActivityGroup oActGroup = new OActivityGroup();
+		oActGroup.setAssociationId(actGroup.getAssociationId());
+		oActGroup.setActivityId(actGroup.getActivityId());
+		oActGroup.setGroupId(actGroup.getGroupId());
+
+		return oActGroup;
 	}
 }
