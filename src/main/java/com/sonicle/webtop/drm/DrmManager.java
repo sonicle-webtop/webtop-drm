@@ -251,6 +251,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -4122,11 +4124,13 @@ public class DrmManager extends BaseManager {
 				//trDao.restartTimetableReportTempSequence(con);
 
 				//Get Data - Calculate Working Hours and Extraordinary (If permits from settings)
-
+				Set<String> validUserIds = new HashSet(listOperators());
 				if(query.targetUserId == null){
 					//Get Data for All Users for Company
+					//TODO: edit this ugly/speedy fix allowing filtering by usersId list directly on db
 					List<OUser> users = listCompanyUsers(query.companyId);
 					for (OUser usr : users) {
+						if (!validUserIds.contains(usr.getUserId())) continue;
 						ttrs = new ArrayList();
 						
 						trsf = tstmpDao.getStampsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
@@ -4142,7 +4146,9 @@ public class DrmManager extends BaseManager {
 						
 						trs.addAll(ttrs);
 					}
-				} else {					
+				} else {
+					if (!validUserIds.contains(query.targetUserId)) throw new WTException("You do not have right to generate for '{}'", query.targetUserId);
+					
 					//Empty Table for single user
 					trDao.deleteByDomainIdUserId(con, getTargetProfileId().getDomainId(), query.targetUserId);
 
