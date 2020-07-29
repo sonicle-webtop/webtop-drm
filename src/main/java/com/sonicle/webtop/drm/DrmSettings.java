@@ -97,4 +97,6 @@ public class DrmSettings {
 	public static final String TICKET_NOTIFY_MAIL = "ticket.notifymail";
 	
 	public static final String TICKET_AUTOMATIC_CLOSE = "ticket.automaticclose";
+	
+	public static final String LEAVE_REQUEST_SICKNESS_AUTOMATICALLY_APPROVED = "leaverequest.sicknessautomaticallyapproved";
 }

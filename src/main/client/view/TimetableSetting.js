@@ -40,7 +40,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 		title: '{timetable.config.tit}',
 		iconCls: 'wtdrm-icon-configuration-generalconfiguration-xs',
 		width: 650,
-		height: 550
+		height: 670
 	},
 	modelName: 'Sonicle.webtop.drm.model.TimetableSetting',
 	initComponent: function () {
@@ -202,6 +202,16 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSetting', {
 							xtype: 'checkbox',
 							bind: '{record.medicalVisitsAutomaticallyApproved}',
 							boxLabel: me.mys.res('timetable.settings.fld-medicalVisitsAutomaticallyApproved.lbl')
+						},
+						{
+							xtype: 'checkbox',
+							bind: '{record.requestsSickness}',
+							boxLabel: me.mys.res('timetable.settings.fld-requestssickness.lbl')
+						},
+						{
+							xtype: 'checkbox',
+							bind: '{record.sicknessAutomaticallyApproved}',
+							boxLabel: me.mys.res('timetable.settings.fld-sicknessAutomaticallyApproved.lbl')
 						}
 					]
 				},

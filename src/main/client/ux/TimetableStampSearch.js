@@ -76,6 +76,9 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableStampSearch', {
 									var meta = s.getProxy().getReader().metaData;
 									if(meta.selected) {
 										me.getViewModel().set('operatorId', meta.selected);
+									}			
+									if (s.getTotalCount() === 1) {
+										me.lookupReference('flduser').setReadOnly(true);
 									}
 								}
 							}

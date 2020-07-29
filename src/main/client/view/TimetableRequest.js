@@ -48,6 +48,9 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 	fieldTitle: 'leaveRequestId',
 	modelName: 'Sonicle.webtop.drm.model.TimetableRequest',
 	
+	leaveRequestHoliday: 'H',
+	leaveRequestSickness: 'S',
+	
 	constructor: function(cfg) {
 		var me = this;
 		me.callParent([cfg]);
@@ -214,7 +217,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 									},
 									listeners: {
 										change: function (t, n, o, e) {
-											if(n === 'H'){
+											if(n === me.leaveRequestHoliday || n === me.leaveRequestSickness){
 												me.lref('fldfromhour').setValue(null);
 												me.lref('fldtohour').setValue(null);
 												me.lref('hours').setHidden(true);

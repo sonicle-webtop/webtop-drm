@@ -38,6 +38,7 @@ import com.sonicle.webtop.drm.JobQuery;
 import com.sonicle.webtop.drm.bol.OJob;
 import com.sonicle.webtop.drm.bol.OViewJob;
 import com.sonicle.webtop.drm.jooq.Sequences;
+import static com.sonicle.webtop.drm.jooq.Tables.ACTIVITIES;
 import static com.sonicle.webtop.drm.jooq.Tables.PROFILES;
 import static com.sonicle.webtop.drm.jooq.Tables.PROFILES_MEMBERS;
 import static com.sonicle.webtop.drm.jooq.Tables.PROFILES_SUPERVISED_USERS;
@@ -53,6 +54,9 @@ import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
+import org.jooq.Field;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 /**
  *
@@ -231,6 +235,48 @@ public class JobDAO extends BaseDAO {
 				JOBS.JOB_ID.equal(jobId)
 			)
 			.execute();
+	}
+	
+	public List<OJob> getJobsByDomainUserDateRange(Connection con, String domainId, Integer companyId, String userId, Integer fromDay, Integer month, Integer year) {
+		DSLContext dsl = getDSL(con);
+		
+		Field<Integer> jobHours = DSL.field("((DATE_PART('day', {0} - {1}) * 24 + DATE_PART('hour', {0} - {1})) * 60 + DATE_PART('minute', {0} - {1}))", Integer.class, JOBS.END_DATE, JOBS.START_DATE);
+		
+		return dsl
+			.select(
+				JOBS.DOMAIN_ID, 
+				JOBS.COMPANY_ID,
+				JOBS.OPERATOR_ID, 
+				JOBS.START_DATE,
+				jobHours.as("job_hours")
+			)
+			.from(
+					JOBS
+			).join(
+					ACTIVITIES
+			).on(
+					ACTIVITIES.DOMAIN_ID.equal(JOBS.DOMAIN_ID).and(ACTIVITIES.ACTIVITY_ID.eq(JOBS.ACTIVITY_ID))
+			)
+			.where(
+					JOBS.DOMAIN_ID.equal(domainId)
+			)
+			.and(
+					JOBS.OPERATOR_ID.equal(userId)
+			)
+			.and(
+					JOBS.START_DATE.between(new DateTime().withYear(year).withMonthOfYear(month).withDayOfMonth(fromDay).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).toDateTime(), new DateTime().withYear(year).withMonthOfYear(month).dayOfMonth().withMaximumValue().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toDateTime())
+			)
+			.and(
+					JOBS.COMPANY_ID.equal(companyId)
+			)
+			.and(
+					ACTIVITIES.TIMETABLE.eq(Boolean.TRUE)
+			)
+			.orderBy(
+					JOBS.OPERATOR_ID, 
+					JOBS.START_DATE
+			)
+			.fetchInto(OJob.class);
 	}
 	
 }

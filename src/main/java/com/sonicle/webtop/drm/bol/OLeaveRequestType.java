@@ -44,5 +44,6 @@ public enum OLeaveRequestType {
 	@SerializedName("U") UNPAID_LEAVE,
 	@SerializedName("M") MEDICAL_VISIT,
 	@SerializedName("C") CONTRACTUAL,
-	@SerializedName("O") OVERTIME;
+	@SerializedName("O") OVERTIME,
+	@SerializedName("S") SICKNESS;
 }

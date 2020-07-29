@@ -93,8 +93,10 @@ import com.sonicle.webtop.drm.bol.OWorkReportSetting;
 import com.sonicle.webtop.drm.bol.OWorkType;
 import com.sonicle.webtop.drm.dal.ExpenseNoteDetailDocumentDAO;
 import com.sonicle.webtop.drm.dal.ExpenseNoteDocumentDAO;
+import com.sonicle.webtop.drm.dal.HolidayDateDAO;
 import com.sonicle.webtop.drm.dal.JobAttachmentDAO;
 import com.sonicle.webtop.drm.dal.LeaveRequestDocumentDAO;
+import com.sonicle.webtop.drm.dal.LineHourDAO;
 import com.sonicle.webtop.drm.dal.OpportunityActionDocumentDAO;
 import com.sonicle.webtop.drm.dal.OpportunityDocumentDAO;
 import com.sonicle.webtop.drm.dal.TicketAttachmentDAO;
@@ -279,7 +281,7 @@ public class ManagerUtils {
 		wrkRpt.setBusinessTripId(oWrkRpt.getBusinessTripId());
 		wrkRpt.setBusinessTripDays(oWrkRpt.getBusinessTripDays().intValue());
 		wrkRpt.setEventId(oWrkRpt.getEventId());		
-		wrkRpt.setTimetableHours((null != oWrkRpt.getTimetableHours()) ? oWrkRpt.getTimetableHours().intValue() : 0);
+		wrkRpt.setTimetableHours((null != oWrkRpt.getTimetableHours()) ? oWrkRpt.getTimetableHours() : 0);
 		wrkRpt.setDomainId(oWrkRpt.getDomainId());
 				
 		return wrkRpt;
@@ -316,7 +318,7 @@ public class ManagerUtils {
 		oWrkRpt.setBusinessTripId(wrkRpt.getBusinessTripId());
 		oWrkRpt.setBusinessTripDays(wrkRpt.getBusinessTripDays().shortValue());
 		oWrkRpt.setEventId(wrkRpt.getEventId());
-		oWrkRpt.setTimetableHours(wrkRpt.getTimetableHours().shortValue());
+		oWrkRpt.setTimetableHours(wrkRpt.getTimetableHours());
 		oWrkRpt.setDomainId(wrkRpt.getDomainId());
 		
 		return oWrkRpt;
@@ -1063,7 +1065,7 @@ public class ManagerUtils {
 		stamp.setType(oTS.getType());
 		stamp.setEntrance(oTS.getEntrance());
 		stamp.setExit(oTS.getExit());
-		stamp.setActivityId(oTS.getActivityId());
+		// stamp.setActivityId(oTS.getActivityId());
 
 		return stamp;
 	}
@@ -1076,7 +1078,7 @@ public class ManagerUtils {
 			tgt.setType(src.getType());
 			tgt.setEntrance(src.getEntrance());
 			tgt.setExit(src.getExit());
-			tgt.setActivityId(src.getActivityId());
+			// tgt.setActivityId(src.getActivityId());
 		}
 		return tgt;
 	}
@@ -1248,7 +1250,10 @@ public class ManagerUtils {
 			Interval interval = new Interval(startDate.getTime(), endDate.getTime());
 			Period period = interval.toPeriod();
 			
-			return period.getHours()+ "." + period.getMinutes();
+			// return String.format("%02d:%02d", period.getHours(), period.getMinutes());
+			return String.valueOf((period.getHours() * 60) + period.getMinutes());
+			// return period.getHours() + "." + period.getMinutes();
+			
 		}else{
 			return null;
 		}
@@ -1659,7 +1664,9 @@ public class ManagerUtils {
 		oSetting.setMedicalVisitsAutomaticallyApproved(tSetting.getMedicalVisitsAutomaticallyApproved());
 		oSetting.setCalendarUserId(tSetting.getCalendarUserId());
 		oSetting.setDefaultEventActivityId(tSetting.getDefaultEventActivityId());
-
+		oSetting.setRequestsSickness(tSetting.getRequestsSickness());
+		oSetting.setSicknessAutomaticallyApproved(tSetting.getSicknessAutomaticallyApproved());
+		
 		return oSetting;
 	}
 
@@ -1687,7 +1694,9 @@ public class ManagerUtils {
 		tSetting.setMedicalVisitsAutomaticallyApproved(oTSetting.getMedicalVisitsAutomaticallyApproved());
 		tSetting.setCalendarUserId(oTSetting.getCalendarUserId());
 		tSetting.setDefaultEventActivityId(oTSetting.getDefaultEventActivityId());
-
+		tSetting.setRequestsSickness(oTSetting.getRequestsSickness());
+		tSetting.setSicknessAutomaticallyApproved(oTSetting.getSicknessAutomaticallyApproved());
+		
 		return tSetting;
 	}
 	
@@ -1941,16 +1950,59 @@ public class ManagerUtils {
 					hashTr.get(otr.getDate().toLocalDate()).setMedicalVisit(otr.getMedicalVisit());
 				if(hashTr.get(otr.getDate().toLocalDate()).getContractual() == null)
 					hashTr.get(otr.getDate().toLocalDate()).setContractual(otr.getContractual());
+				if(hashTr.get(otr.getDate().toLocalDate()).getSickness() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setSickness(otr.getSickness());
 			}
 		}
 		
 		return new ArrayList(hashTr.values());
 	}
 	
-	static List<OTimetableReport> mergeStampAndEventByDate(List<OTimetableReport> trsf){
+	static List<OTimetableReport> mergeWorkReportByDate(List<OTimetableReport> trsf){
 		
 		HashMap<LocalDate, OTimetableReport> hashTr = new HashMap();
 	
+		for(OTimetableReport otr : trsf){
+			if(hashTr.get(otr.getDate().toLocalDate()) == null){
+				hashTr.put(otr.getDate().toLocalDate(), otr);
+			}else{
+				if(hashTr.get(otr.getDate().toLocalDate()).getWorkReportHours() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setWorkReportHours(otr.getWorkReportHours());				
+			}
+		}
+		
+		return new ArrayList(hashTr.values());
+	}
+	
+	static List<OTimetableReport> mergeJobByDate(List<OTimetableReport> trsf){
+		
+		HashMap<LocalDate, OTimetableReport> hashTr = new HashMap();
+	
+		for(OTimetableReport otr : trsf){
+			if(hashTr.get(otr.getDate().toLocalDate()) == null){
+				hashTr.put(otr.getDate().toLocalDate(), otr);
+			}else{
+				if(hashTr.get(otr.getDate().toLocalDate()).getWorkReportHours() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setWorkReportHours(otr.getWorkReportHours());				
+			}
+		}
+		
+		return new ArrayList(hashTr.values());
+	}
+	
+	static List<OTimetableReport> mergeStampAndEventByDate(Connection con, List<OTimetableReport> trsf, Integer hourProfileId){
+		Integer calculateWorkingHours = 0;
+		Integer calculateOvertimeHours = 0;
+		Integer calculateLeaveHours = 0;
+		Integer workingHours = 0;
+		Integer paidLeaveHours = 0;
+		Integer unpaidLeaveHours = 0;
+		Integer medicalVisitHours = 0;
+		Integer overtimeHours = 0;
+		LineHourDAO lhDAO = LineHourDAO.getInstance();
+		HashMap<LocalDate, OTimetableReport> hashTr = new HashMap();
+		HolidayDateDAO hdDAO = HolidayDateDAO.getInstance();
+		
 		for(OTimetableReport otr : trsf){
 			if(hashTr.get(otr.getDate().toLocalDate()) == null){
 				hashTr.put(otr.getDate().toLocalDate(), otr);
@@ -1977,6 +2029,12 @@ public class ManagerUtils {
 					hashTr.get(otr.getDate().toLocalDate()).setMedicalVisit(otr.getMedicalVisit());
 				if(hashTr.get(otr.getDate().toLocalDate()).getContractual() == null)
 					hashTr.get(otr.getDate().toLocalDate()).setContractual(otr.getContractual());
+				if(hashTr.get(otr.getDate().toLocalDate()).getWorkReportHours() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setWorkReportHours(otr.getWorkReportHours());	
+				if(hashTr.get(otr.getDate().toLocalDate()).getJobHours() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setJobHours(otr.getJobHours());	
+				if(hashTr.get(otr.getDate().toLocalDate()).getSickness() == null)
+					hashTr.get(otr.getDate().toLocalDate()).setSickness(otr.getSickness());
 			}
 		}
 		
@@ -1988,15 +2046,132 @@ public class ManagerUtils {
 			}
 
 			for(DateTime dt : dates){
+				OHolidayDate oHD = hdDAO.selectByDomainDateWithoutYear(con, trsf.get(0).getDomainId(), dt);
+				
 				if(hashTr.get(dt.toLocalDate()) == null){
 					OTimetableReport temp = new OTimetableReport();
 					temp.setDomainId(trsf.get(0).getDomainId());
 					temp.setCompanyId(trsf.get(0).getCompanyId());
 					temp.setUserId(trsf.get(0).getUserId());
-					temp.setDate(dt);
+					temp.setDate(dt);																						
 					
 					hashTr.put(dt.toLocalDate(), temp);
+					
+					if (oHD != null)
+						hashTr.get(dt.toLocalDate()).setNote((oHD.getDescription() == null) ? "" : oHD.getDescription());
+						
+				} else {										
+					String[] hourMin = null;
+					int hour = 0;
+					int mins = 0;
+					workingHours = 0;
+					paidLeaveHours = 0;
+					overtimeHours = 0;
+					medicalVisitHours = 0;
+					unpaidLeaveHours = 0;
+					
+					if (hashTr.get(dt.toLocalDate()).getWorkingHours() != null) {
+						hourMin = hashTr.get(dt.toLocalDate()).getWorkingHours().split("\\.");
+						hour = Integer.parseInt(hourMin[0]);
+						mins = (hourMin.length > 1) ? Integer.parseInt(hourMin[1]) : 0;
+						workingHours = (hour * 60) + mins;
+					}
+					if (hashTr.get(dt.toLocalDate()).getWorkReportHours() != null) {
+						hourMin = hashTr.get(dt.toLocalDate()).getWorkReportHours().split("\\.");
+						hour = Integer.parseInt(hourMin[0]);
+						mins = (hourMin.length > 1) ? Integer.parseInt(hourMin[1]) : 0;
+						workingHours += (hour * 60) + mins;
+					}
+					if (hashTr.get(dt.toLocalDate()).getJobHours() != null) {
+						hourMin = hashTr.get(dt.toLocalDate()).getJobHours().split("\\.");
+						hour = Integer.parseInt(hourMin[0]);
+						mins = (hourMin.length > 1) ? Integer.parseInt(hourMin[1]) : 0;
+						workingHours += (hour * 60) + mins;
+					}					
+					if (hashTr.get(dt.toLocalDate()).getPaidLeave()!= null) {
+						hourMin = hashTr.get(dt.toLocalDate()).getPaidLeave().split("\\.");
+						hour = Integer.parseInt(hourMin[0]);
+						mins = (hourMin.length > 1) ? Integer.parseInt(hourMin[1]) : 0;
+						paidLeaveHours = (hour * 60) + mins;
+					}
+					if (hashTr.get(dt.toLocalDate()).getOvertime()!= null) {
+						hourMin = hashTr.get(dt.toLocalDate()).getOvertime().split("\\.");
+						hour = Integer.parseInt(hourMin[0]);
+						mins = (hourMin.length > 1) ? Integer.parseInt(hourMin[1]) : 0;
+						overtimeHours = (hour * 60) + mins;
+					}	
+					if (hashTr.get(dt.toLocalDate()).getMedicalVisit()!= null) {
+						hourMin = hashTr.get(dt.toLocalDate()).getMedicalVisit().split("\\.");
+						hour = Integer.parseInt(hourMin[0]);
+						mins = (hourMin.length > 1) ? Integer.parseInt(hourMin[1]) : 0;
+						medicalVisitHours = (hour * 60) + mins;
+					}	
+					if (hashTr.get(dt.toLocalDate()).getUnpaidLeave()!= null) {
+						hourMin = hashTr.get(dt.toLocalDate()).getUnpaidLeave().split("\\.");
+						hour = Integer.parseInt(hourMin[0]);
+						mins = (hourMin.length > 1) ? Integer.parseInt(hourMin[1]) : 0;
+						unpaidLeaveHours = (hour * 60) + mins;
+					}	
+					
+					// qui dovrei prendermi se ha un profilo le ore di lavoro del giorno, se non ha profilo al momento non faccio nulla
+					String profileHour = lhDAO.selectSumLineHourByHourProfileIdDayOfWeek(con, hourProfileId, hashTr.get(dt.toLocalDate()).getDate().toLocalDate().dayOfWeek().get());
+					// ora devo calcolarmi il calculateWorkingHours - profileHour
+					int profileHours = (profileHour != null) ? Integer.valueOf(profileHour) : 0;
+						
+					calculateWorkingHours = 0;
+					calculateOvertimeHours = 0;
+					calculateLeaveHours = 0;
+
+					if (profileHours <= workingHours) {
+						calculateWorkingHours = profileHours;
+						calculateOvertimeHours = (workingHours - (profileHours + overtimeHours)) + overtimeHours;
+						calculateLeaveHours = 0 + paidLeaveHours;
+					} else if (workingHours != 0) {
+						calculateWorkingHours = workingHours;
+						calculateOvertimeHours = 0 + overtimeHours;
+						if ((workingHours + paidLeaveHours + unpaidLeaveHours + medicalVisitHours) >= profileHours){
+							calculateLeaveHours = paidLeaveHours;
+						} else {
+							calculateLeaveHours = (profileHours - (workingHours + paidLeaveHours + unpaidLeaveHours + medicalVisitHours)) + paidLeaveHours;
+						}
+					} else {
+						calculateWorkingHours = 0;
+						calculateOvertimeHours = overtimeHours;
+						calculateLeaveHours = paidLeaveHours;
+					}																	
+
+					if (oHD != null) {							
+						calculateOvertimeHours += calculateWorkingHours;
+						calculateWorkingHours = 0;
+						hashTr.get(dt.toLocalDate()).setWorkingHours(null);
+						calculateLeaveHours = 0;
+						hashTr.get(dt.toLocalDate()).setPaidLeave(null);
+						hashTr.get(dt.toLocalDate()).setNote((oHD.getDescription() == null) ? "" : oHD.getDescription());
+					}						
+					if (calculateWorkingHours > 0) {
+						int h = calculateWorkingHours / 60;
+						int m = calculateWorkingHours % 60;
+						hashTr.get(dt.toLocalDate()).setWorkingHours(String.format("%d.%02d", h, m));
+					} else {
+						hashTr.get(dt.toLocalDate()).setWorkingHours(null);
+					}
+					if (calculateLeaveHours > 0) {
+						int h = calculateLeaveHours / 60;
+						int m = calculateLeaveHours % 60;
+						hashTr.get(dt.toLocalDate()).setPaidLeave(String.format("%d.%02d", h, m));	
+					} else {
+						hashTr.get(dt.toLocalDate()).setPaidLeave(null);
+					}
+					if (calculateOvertimeHours > 0) {
+						int h = calculateOvertimeHours / 60;
+						int m = calculateOvertimeHours % 60;
+						hashTr.get(dt.toLocalDate()).setOvertime(String.format("%d.%02d", h, m));	
+					} else {
+						hashTr.get(dt.toLocalDate()).setOvertime(null);
+					}
+					
 				}
+				
 			}
 		}
 		
@@ -2013,6 +2188,7 @@ public class ManagerUtils {
 	static List<OTimetableReport> createOTimetableReport(List<OTimetableEvent> tel){
 		List<OTimetableReport> trl = new ArrayList();
 		OTimetableReport tr = null;
+		String[] hourMin = null;
 		
 		for(OTimetableEvent te : tel){
 			tr = new OTimetableReport();
@@ -2024,19 +2200,65 @@ public class ManagerUtils {
 			
 			OLeaveRequestType requestType = EnumUtils.forSerializedName(te.getType(), OLeaveRequestType.class);
 			
+			hourMin = te.getHour().split("\\.");
+			int h = Integer.parseInt(hourMin[0]);
+			int m = (hourMin.length > 1) ? Integer.parseInt(hourMin[1]) : 0;
+			
 			if(OLeaveRequestType.HOLIDAY.equals(requestType)){
-				tr.setHoliday(te.getHour());
+				tr.setHoliday(String.format("%d.%02d", h, m));
 			}else if(OLeaveRequestType.PAID_LEAVE.equals(requestType)){
-				tr.setPaidLeave(te.getHour());
+				tr.setPaidLeave(String.format("%d.%02d", h, m));
 			}else if(OLeaveRequestType.UNPAID_LEAVE.equals(requestType)){
-				tr.setUnpaidLeave(te.getHour());
+				tr.setUnpaidLeave(String.format("%d.%02d", h, m));
 			}else if(OLeaveRequestType.CONTRACTUAL.equals(requestType)){
-				tr.setContractual(te.getHour());
+				tr.setContractual(String.format("%d.%02d", h, m));
 			}else if(OLeaveRequestType.MEDICAL_VISIT.equals(requestType)){
-				tr.setMedicalVisit(te.getHour());
+				tr.setMedicalVisit(String.format("%d.%02d", h, m));
 			}else if(OLeaveRequestType.OVERTIME.equals(requestType)){
-				tr.setOvertime(te.getHour());
+				tr.setOvertime(String.format("%d.%02d", h, m));
+			}else if(OLeaveRequestType.SICKNESS.equals(requestType)){
+				tr.setSickness(String.format("%d.%02d", h, m));
 			}
+			
+			trl.add(tr);
+		}
+		
+		return trl;
+	}
+	
+	static List<OTimetableReport> createOTimetableReportByWorkReport(List<OWorkReport> tel){
+		List<OTimetableReport> trl = new ArrayList();
+		OTimetableReport tr = null;
+		
+		for(OWorkReport te : tel){
+			tr = new OTimetableReport();
+			
+			tr.setDomainId(te.getDomainId());
+			tr.setCompanyId(te.getCompanyId());
+			tr.setUserId(te.getOperatorId());
+			tr.setDate(te.getFromDate().toDateTimeAtStartOfDay());
+			
+			tr.setWorkReportHours(String.format("%d.%02d", (te.getTimetableHours() / 60), (te.getTimetableHours() % 60)));
+			
+			trl.add(tr);
+		}
+		
+		return trl;
+	}
+	
+	static List<OTimetableReport> createOTimetableReportByJob(List<OJob> tel){
+		List<OTimetableReport> trl = new ArrayList();
+		OTimetableReport tr = null;
+			
+		for(OJob te : tel){
+			tr = new OTimetableReport();
+			
+			tr.setDomainId(te.getDomainId());
+			tr.setCompanyId(te.getCompanyId());
+			tr.setUserId(te.getOperatorId());
+			tr.setDate(te.getStartDate().toLocalDate().toDateTimeAtStartOfDay());
+			
+			tr.setJobHours(String.format("%d.%02d", (te.getJobHours() / 60), (te.getJobHours() % 60)));
 			
 			trl.add(tr);
 		}
@@ -2061,7 +2283,8 @@ public class ManagerUtils {
 		oTr.setHour(tr.getHour());
 		oTr.setDetail(tr.getDetail());
 		oTr.setNote(tr.getNote());
-
+		oTr.setSickness(tr.getSickness());
+		
 		return oTr;
 	}
 	

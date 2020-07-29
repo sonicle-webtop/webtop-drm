@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableStamp extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.TimetableStampRecord> {
 
-	private static final long serialVersionUID = -225406996;
+	private static final long serialVersionUID = -1155994815;
 
 	/**
 	 * The reference instance of <code>drm.timetable_stamp</code>
@@ -60,16 +60,6 @@ public class TimetableStamp extends org.jooq.impl.TableImpl<com.sonicle.webtop.d
 	 * The column <code>drm.timetable_stamp.exit</code>.
 	 */
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableStampRecord, org.joda.time.DateTime> EXIT = createField("exit", org.jooq.impl.SQLDataType.TIMESTAMP, this, "", new com.sonicle.webtop.core.jooq.DateTimeConverter());
-
-	/**
-	 * The column <code>drm.timetable_stamp.activity_id</code>.
-	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableStampRecord, java.lang.Integer> ACTIVITY_ID = createField("activity_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
-
-	/**
-	 * The column <code>drm.timetable_stamp.event_id</code>.
-	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableStampRecord, java.lang.Integer> EVENT_ID = createField("event_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
 	 * Create a <code>drm.timetable_stamp</code> table reference

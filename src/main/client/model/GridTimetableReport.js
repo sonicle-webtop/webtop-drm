@@ -50,6 +50,45 @@ Ext.define('Sonicle.webtop.drm.model.GridTimetableReport', {
 		WTF.field('hour', 'string', true),
 		WTF.field('detail', 'string', true),
 		WTF.field('note', 'string', true),
-		WTF.field('targetUser', 'string', false)
-	]
+		WTF.field('targetUser', 'string', false),
+		WTF.field('jobHours', 'string', true),
+		WTF.field('workReportHours', 'string', true),
+		WTF.calcField('totHours', 'string', ['workingHours', 'overtime'], function(v, rec) {
+			return Sonicle.webtop.drm.model.GridTimetableReport.calcTotHours(
+					rec.get('workingHours'),
+					rec.get('overtime')
+			);
+		}),
+		WTF.field('sickness', 'string', true)
+	],
+	
+	statics: {
+		calcTotHours: function(workingHours, overtime) {
+			var wh = 0;
+			var oh = 0;
+			
+			if (workingHours !== null) {
+				var h = workingHours.split('.');
+				var wh = (+h[0]) * 60 + (+h[1]);				
+			}
+			if (overtime !== null) {
+				var h = overtime.split('.');
+				var oh = (+h[0]) * 60 + (+h[1]);				
+			}
+			if (wh !== 0 || oh !== 0) {
+				var th = wh + oh;
+				var hours = Math.floor(th / 60);
+				var minutes = th % 60;
+				return Sonicle.webtop.drm.model.GridTimetableReport.pad(hours, 2) + "." + Sonicle.webtop.drm.model.GridTimetableReport.pad(minutes, 2);				
+			} else {
+				return null;
+			}		
+		},
+		
+		pad: function (num, size) {
+			var s = num + "";
+			while (s.length < size) s = "0" + s;
+			return s;
+		}
+	}
 });

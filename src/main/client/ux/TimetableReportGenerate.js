@@ -60,6 +60,9 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableReportGenerate', {
 				WTF.localCombo('id', 'desc', {
 					reference: 'flduser',
 					bind: '{targetUserId}',
+					editable: false,
+					typeAhead: false,
+					selectOnFocus: false,
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -73,6 +76,9 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableReportGenerate', {
 										WTU.loadWithExtraParams(me.lookupReference('fldcompany').getStore(), {
 											operator: meta.selected
 										});
+									}
+									if (s.getTotalCount() === 1) {
+										me.lookupReference('flduser').setReadOnly(true);
 									}
 								}
 							}

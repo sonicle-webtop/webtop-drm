@@ -65,7 +65,11 @@ public class RBTimetableReport {
 	public String note;
 	public String targetUserId;
 	public String targetUserDescription;
-		
+	public Float jobHours;
+	public Float workReportHours;
+	public Float totHours;
+	public Float sickness;
+	
 	public RBTimetableReport(CoreManager coreMgr, DrmManager drmMgr, OTimetableReport otr) throws WTException, IOException {		
 		this.id = otr.getId();
 		this.companyId = otr.getCompanyId();
@@ -86,6 +90,11 @@ public class RBTimetableReport {
 		this.note = otr.getNote();
 		this.targetUserId = otr.getTargetUserId();
 		this.targetUserDescription = WT.getUserData(new UserProfileId(otr.getDomainId(), otr.getTargetUserId())).getDisplayName();
+		this.workReportHours = convertInMinutes(otr.getWorkReportHours());
+		this.jobHours = convertInMinutes(otr.getJobHours());
+		this.totHours = ((this.workingHours == null) ? 0 : this.workingHours) + ((this.overtime == null) ? 0 : this.overtime);
+		this.totHours = (this.totHours == 0) ? null : this.totHours;
+		this.sickness = convertInMinutes(otr.getSickness());
 	}
 
 	private Float convertInMinutes(String hour){
@@ -276,5 +285,37 @@ public class RBTimetableReport {
 
 	public void setTargetUserDescription(String targetUserDescription) {
 		this.targetUserDescription = targetUserDescription;
+	}
+	
+	public Float getWorkReportHours() {
+		return workReportHours;
+	}
+
+	public void setWorkReportHours(Float workReportHours) {
+		this.workReportHours = workReportHours;
+	}
+
+	public Float getJobHours() {
+		return jobHours;
+	}
+
+	public void setJobHours(Float jobHours) {
+		this.jobHours = jobHours;
+	}
+
+	public Float getTotHours() {
+		return totHours;
+	}
+
+	public void setTotHours(Float totHours) {
+		this.totHours = totHours;
+	}	
+	
+	public Float getSickness() {
+		return sickness;
+	}
+
+	public void setSickness(Float sickness) {
+		this.sickness = sickness;
 	}
 }

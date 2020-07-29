@@ -108,6 +108,8 @@ public class TimetableSettingDAO extends BaseDAO {
 				.set(TIMETABLE_SETTINGS.MEDICAL_VISITS_AUTOMATICALLY_APPROVED, item.getMedicalVisitsAutomaticallyApproved())
 				.set(TIMETABLE_SETTINGS.CALENDAR_USER_ID, item.getCalendarUserId())
 				.set(TIMETABLE_SETTINGS.DEFAULT_EVENT_ACTIVITY_ID, item.getDefaultEventActivityId())
+				.set(TIMETABLE_SETTINGS.REQUESTS_SICKNESS, item.getRequestsSickness())
+				.set(TIMETABLE_SETTINGS.SICKNESS_AUTOMATICALLY_APPROVED, item.getSicknessAutomaticallyApproved())
 				.where(
 						TIMETABLE_SETTINGS.TIMETABLE_SETTING_ID.equal(item.getTimetableSettingId())
 				)

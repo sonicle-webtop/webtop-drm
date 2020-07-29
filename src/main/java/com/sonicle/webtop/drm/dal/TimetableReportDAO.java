@@ -79,6 +79,7 @@ public class TimetableReportDAO extends BaseDAO{
 				.set(TIMETABLE_REPORT_TEMP.HOUR, item.getHour())
 				.set(TIMETABLE_REPORT_TEMP.DETAIL, item.getDetail())
 				.set(TIMETABLE_REPORT_TEMP.NOTE, item.getNote())
+				.set(TIMETABLE_REPORT_TEMP.SICKNESS, item.getSickness())
 				.where(
 						TIMETABLE_REPORT_TEMP.ID.equal(item.getId())
 				)

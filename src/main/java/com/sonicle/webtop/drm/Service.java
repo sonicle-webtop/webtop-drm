@@ -340,7 +340,7 @@ public class Service extends BaseService {
 		vs.put("ticketDefaultStatus", ss.getTicketDefaultDocStatusId());
 		vs.put("ticketDefaultPriority", ss.getTicketDefaultPriorityId());
 		vs.put("ticketDefaultCloseStatus", ss.getTicketDefaultCloseDocStatusId());
-		
+		vs.put("sicknessAutomaticallyApproved", ss.getSicknessAutomaticallyApproved());
 		vs.put("ticketNotifyMail", us.getTicketNotifyMail());
 		
 		try {
@@ -723,6 +723,7 @@ public class Service extends BaseService {
 				if(ts.getRequestsPermitsNotRemunered())types.add(createLeaveRequestJsSimple(OLeaveRequestType.UNPAID_LEAVE));
 				if(ts.getRequestsPermitsMedicalVisits())types.add(createLeaveRequestJsSimple(OLeaveRequestType.MEDICAL_VISIT));
 				if(ts.getRequestsPermitsContractuals())types.add(createLeaveRequestJsSimple(OLeaveRequestType.CONTRACTUAL));
+				if(ts.getRequestsSickness())types.add(createLeaveRequestJsSimple(OLeaveRequestType.SICKNESS));
 			}
 			
 			String selected = types.isEmpty() ? null : (String) types.get(0).id;
@@ -2168,7 +2169,7 @@ public class Service extends BaseService {
 				Integer eventId = createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
 				lr.setEventId(eventId);
 				
-				manager.addLeaveRequest(lr, ss.getMedicalVisitsAutomaticallyApproved());
+				manager.addLeaveRequest(lr, ss.getMedicalVisitsAutomaticallyApproved(), ss.getSicknessAutomaticallyApproved());
 
 				new JsonResult().printTo(out);
 
@@ -2679,9 +2680,10 @@ public class Service extends BaseService {
 			} else if (crud.equals(Crud.UPDATE)) {
 				Payload<MapItem, JsTimetableSetting> pl = ServletUtils.getPayload(request, JsTimetableSetting.class);
 
-				if (pl.map.has("medicalVisitsAutomaticallyApproved")) {
+				if (pl.map.has("medicalVisitsAutomaticallyApproved")) 
 					ss.setMedicalVisitsAutomaticallyApproved(pl.data.medicalVisitsAutomaticallyApproved);
-				}
+				if (pl.map.has("sicknessAutomaticallyApproved")) 
+					ss.setSicknessAutomaticallyApproved(pl.data.sicknessAutomaticallyApproved);
 				
 				TimetableSetting tSetting = JsTimetableSetting.createTimetableSetting(pl.data);
 
@@ -3096,6 +3098,7 @@ public class Service extends BaseService {
 	public void processManageGridTimetableReport(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			
 			if (crud.equals(Crud.READ)) {
 				String query = ServletUtils.getStringParameter(request, "query", null);
 				
@@ -3109,6 +3112,7 @@ public class Service extends BaseService {
 				}
 				
 				new JsonResult(jsGridTR).printTo(out);
+				
 			}else if(crud.equals(Crud.UPDATE)){
 				Payload<MapItem, JsGridTimetableReport> pl = ServletUtils.getPayload(request, JsGridTimetableReport.class);
 				
@@ -3117,6 +3121,7 @@ public class Service extends BaseService {
 				manager.updateTimetableReport(tr);
 
 				new JsonResult().printTo(out);
+				
 			}
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);

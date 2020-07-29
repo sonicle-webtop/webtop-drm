@@ -39,8 +39,17 @@ import com.sonicle.webtop.drm.jooq.tables.pojos.Jobs;
  * @author dnllr
  */
 public class OJob extends Jobs {
-
+	public Integer jobHours;
+	
 	public OJob() {
+		super();
 	}
 		
+	public Integer getJobHours() {
+		return jobHours;
+	}
+
+	public void setJobHours(Integer jobHours) {
+		this.jobHours = jobHours;
+	}	
 }

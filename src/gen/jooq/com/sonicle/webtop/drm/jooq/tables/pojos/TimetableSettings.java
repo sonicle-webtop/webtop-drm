@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableSettings implements java.io.Serializable {
 
-	private static final long serialVersionUID = 359870311;
+	private static final long serialVersionUID = -1221750801;
 
 	private java.lang.Integer timetableSettingId;
 	private java.lang.String  domainId;
@@ -37,6 +37,8 @@ public class TimetableSettings implements java.io.Serializable {
 	private java.lang.Boolean medicalVisitsAutomaticallyApproved;
 	private java.lang.String  calendarUserId;
 	private java.lang.Integer defaultEventActivityId;
+	private java.lang.Boolean requestsSickness;
+	private java.lang.Boolean sicknessAutomaticallyApproved;
 
 	public TimetableSettings() {}
 
@@ -59,7 +61,9 @@ public class TimetableSettings implements java.io.Serializable {
 		java.lang.Boolean manageStamp,
 		java.lang.Boolean medicalVisitsAutomaticallyApproved,
 		java.lang.String  calendarUserId,
-		java.lang.Integer defaultEventActivityId
+		java.lang.Integer defaultEventActivityId,
+		java.lang.Boolean requestsSickness,
+		java.lang.Boolean sicknessAutomaticallyApproved
 	) {
 		this.timetableSettingId = timetableSettingId;
 		this.domainId = domainId;
@@ -80,6 +84,8 @@ public class TimetableSettings implements java.io.Serializable {
 		this.medicalVisitsAutomaticallyApproved = medicalVisitsAutomaticallyApproved;
 		this.calendarUserId = calendarUserId;
 		this.defaultEventActivityId = defaultEventActivityId;
+		this.requestsSickness = requestsSickness;
+		this.sicknessAutomaticallyApproved = sicknessAutomaticallyApproved;
 	}
 
 	public java.lang.Integer getTimetableSettingId() {
@@ -232,5 +238,21 @@ public class TimetableSettings implements java.io.Serializable {
 
 	public void setDefaultEventActivityId(java.lang.Integer defaultEventActivityId) {
 		this.defaultEventActivityId = defaultEventActivityId;
+	}
+
+	public java.lang.Boolean getRequestsSickness() {
+		return this.requestsSickness;
+	}
+
+	public void setRequestsSickness(java.lang.Boolean requestsSickness) {
+		this.requestsSickness = requestsSickness;
+	}
+
+	public java.lang.Boolean getSicknessAutomaticallyApproved() {
+		return this.sicknessAutomaticallyApproved;
+	}
+
+	public void setSicknessAutomaticallyApproved(java.lang.Boolean sicknessAutomaticallyApproved) {
+		this.sicknessAutomaticallyApproved = sicknessAutomaticallyApproved;
 	}
 }

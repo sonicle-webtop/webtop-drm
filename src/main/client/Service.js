@@ -837,6 +837,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											case 'O':
 												return me.res('gpTimetableRequest.type.O.lbl');
 												break;
+											case 'S':
+												return me.res('gpTimetableRequest.type.S.lbl');
+												break;
 											default:
 												return '';
 												break;
@@ -984,19 +987,28 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								autoLoad: true,
 								autoSync: true,
 								model: 'Sonicle.webtop.drm.model.GridTimetableReport',
-								proxy: WTF.apiProxy(me.ID, 'ManageGridTimetableReport')
+								proxy: WTF.apiProxy(me.ID, 'ManageGridTimetableReport'),
+								groupField: 'targetUser'
 							},
+							features: [{
+								// id: 'group',
+								ftype: 'grouping',
+								groupHeaderTpl: '{name}'
+								// hideGroupedHeader: true,
+								// enableGroupingMenu: false
+							}],
 							columns: [
+								/*
 								{
 									header: me.res('gpTimetableReport.operator.lbl'),
 									dataIndex: 'targetUser',
 									editable: false,
 									flex: 1
-								}, {
+								}, */{
 									header: me.res('gpTimetableReport.date.lbl'),
 									dataIndex: 'date',
 									editable: false,
-									flex: 1
+									flex: 2
 								}, {
 									header: me.res('gpTimetableReport.workingHours.lbl'),
 									dataIndex: 'workingHours',
@@ -1082,6 +1094,36 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									})),
 									flex: 1
 								}, {
+									header: me.res('gpTimetableReport.sickness.lbl'),
+									dataIndex: 'sickness',
+									editable: true,
+									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
+										allowBlank: true,
+										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
+											autoLoad: true
+										}),
+										triggers: {
+											clear: WTF.clearTrigger()
+										}
+									})),
+									flex: 1
+								}, {
+									header: me.res('gpTimetableReport.workReportHours.lbl'),
+									dataIndex: 'workReportHours',
+									editable: false,									
+									flex: 1
+								}, {
+									header: me.res('gpTimetableReport.jobHours.lbl'),
+									dataIndex: 'jobHours',
+									editable: false,									
+									flex: 1
+								}, {
+									header: me.res('gpTimetableReport.totHours.lbl'),
+									dataIndex: 'totHours',
+									editable: false,									
+									flex: 1
+								}
+								/*, {
 									header: me.res('gpTimetableReport.contractual.lbl'),
 									dataIndex: 'contractual',
 									editable: true,
@@ -1115,7 +1157,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 										}
 									})),
 									flex: 1
-								}, {
+								}*/
+								, {
 									header: me.res('gpTimetableReport.detail.lbl'),
 									dataIndex: 'detail',
 									editable: true,
@@ -1133,7 +1176,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 //								me.getAct('timetableReport', 'save'),
 //								'-',
 								me.getAct('timetableReport', 'print')
-//								me.getAct('timetableReport', 'encoPrint'),
 //								me.getAct('timetableReport', 'export')
 							]
 						}
@@ -1816,15 +1858,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			handler: function () {
 				me.printTimetableReport();
 			}
-		});
-		me.addAct('timetableReport', 'encoPrint', {
-			text: WT.res('act-print.lbl'),
-			tooltip: null,
-			iconCls: 'wt-icon-print',
-			handler: function () {
-				me.printTimetableEncoReport();
-			}
-		});
+		});		
 		me.addAct('timetableReport', 'export', {
 			text: me.res('act-export.lbl'),
 			tooltip: null,

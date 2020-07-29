@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableReportTemp extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord> {
 
-	private static final long serialVersionUID = -1761547227;
+	private static final long serialVersionUID = 565338953;
 
 	/**
 	 * The reference instance of <code>drm.timetable_report_temp</code>
@@ -115,6 +115,21 @@ public class TimetableReportTemp extends org.jooq.impl.TableImpl<com.sonicle.web
 	 * The column <code>drm.timetable_report_temp.target_user_id</code>.
 	 */
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord, java.lang.String> TARGET_USER_ID = createField("target_user_id", org.jooq.impl.SQLDataType.VARCHAR.length(36).nullable(false), this, "");
+
+	/**
+	 * The column <code>drm.timetable_report_temp.work_report_hours</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord, java.lang.String> WORK_REPORT_HOURS = createField("work_report_hours", org.jooq.impl.SQLDataType.VARCHAR.length(5), this, "");
+
+	/**
+	 * The column <code>drm.timetable_report_temp.job_hours</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord, java.lang.String> JOB_HOURS = createField("job_hours", org.jooq.impl.SQLDataType.VARCHAR.length(5), this, "");
+
+	/**
+	 * The column <code>drm.timetable_report_temp.sickness</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord, java.lang.String> SICKNESS = createField("sickness", org.jooq.impl.SQLDataType.VARCHAR.length(5), this, "");
 
 	/**
 	 * Create a <code>drm.timetable_report_temp</code> table reference

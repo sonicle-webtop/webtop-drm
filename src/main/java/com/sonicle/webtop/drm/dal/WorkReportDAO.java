@@ -375,6 +375,7 @@ public class WorkReportDAO extends BaseDAO {
 	
 	public List<OWorkReport> getWorkReportsByDomainUserDateRange(Connection con, String domainId, Integer companyId, String userId, Integer fromDay, Integer month, Integer year) {
 		DSLContext dsl = getDSL(con);
+		
 		return dsl
 				.select(
 						WORK_REPORTS.DOMAIN_ID, 
@@ -397,6 +398,9 @@ public class WorkReportDAO extends BaseDAO {
 				)
 				.and(
 						WORK_REPORTS.COMPANY_ID.equal(companyId)
+				)
+				.and(
+						WORK_REPORTS.TIMETABLE_HOURS.greaterThan(0)
 				)
 				.orderBy(
 						WORK_REPORTS.OPERATOR_ID, 

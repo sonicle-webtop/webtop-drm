@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableStamp implements java.io.Serializable {
 
-	private static final long serialVersionUID = -40796547;
+	private static final long serialVersionUID = 427371533;
 
 	private java.lang.Integer      id;
 	private java.lang.String       domainId;
@@ -24,8 +24,6 @@ public class TimetableStamp implements java.io.Serializable {
 	private java.lang.String       type;
 	private org.joda.time.DateTime entrance;
 	private org.joda.time.DateTime exit;
-	private java.lang.Integer      activityId;
-	private java.lang.Integer      eventId;
 
 	public TimetableStamp() {}
 
@@ -35,9 +33,7 @@ public class TimetableStamp implements java.io.Serializable {
 		java.lang.String       userId,
 		java.lang.String       type,
 		org.joda.time.DateTime entrance,
-		org.joda.time.DateTime exit,
-		java.lang.Integer      activityId,
-		java.lang.Integer      eventId
+		org.joda.time.DateTime exit
 	) {
 		this.id = id;
 		this.domainId = domainId;
@@ -45,8 +41,6 @@ public class TimetableStamp implements java.io.Serializable {
 		this.type = type;
 		this.entrance = entrance;
 		this.exit = exit;
-		this.activityId = activityId;
-		this.eventId = eventId;
 	}
 
 	public java.lang.Integer getId() {
@@ -95,21 +89,5 @@ public class TimetableStamp implements java.io.Serializable {
 
 	public void setExit(org.joda.time.DateTime exit) {
 		this.exit = exit;
-	}
-
-	public java.lang.Integer getActivityId() {
-		return this.activityId;
-	}
-
-	public void setActivityId(java.lang.Integer activityId) {
-		this.activityId = activityId;
-	}
-
-	public java.lang.Integer getEventId() {
-		return this.eventId;
-	}
-
-	public void setEventId(java.lang.Integer eventId) {
-		this.eventId = eventId;
 	}
 }

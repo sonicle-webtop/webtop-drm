@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableReportTemp implements java.io.Serializable {
 
-	private static final long serialVersionUID = 238764070;
+	private static final long serialVersionUID = 1385040470;
 
 	private java.lang.Integer      id;
 	private java.lang.String       domainId;
@@ -35,6 +35,9 @@ public class TimetableReportTemp implements java.io.Serializable {
 	private java.lang.String       detail;
 	private java.lang.String       note;
 	private java.lang.String       targetUserId;
+	private java.lang.String       workReportHours;
+	private java.lang.String       jobHours;
+	private java.lang.String       sickness;
 
 	public TimetableReportTemp() {}
 
@@ -55,7 +58,10 @@ public class TimetableReportTemp implements java.io.Serializable {
 		java.lang.String       hour,
 		java.lang.String       detail,
 		java.lang.String       note,
-		java.lang.String       targetUserId
+		java.lang.String       targetUserId,
+		java.lang.String       workReportHours,
+		java.lang.String       jobHours,
+		java.lang.String       sickness
 	) {
 		this.id = id;
 		this.domainId = domainId;
@@ -74,6 +80,9 @@ public class TimetableReportTemp implements java.io.Serializable {
 		this.detail = detail;
 		this.note = note;
 		this.targetUserId = targetUserId;
+		this.workReportHours = workReportHours;
+		this.jobHours = jobHours;
+		this.sickness = sickness;
 	}
 
 	public java.lang.Integer getId() {
@@ -210,5 +219,29 @@ public class TimetableReportTemp implements java.io.Serializable {
 
 	public void setTargetUserId(java.lang.String targetUserId) {
 		this.targetUserId = targetUserId;
+	}
+
+	public java.lang.String getWorkReportHours() {
+		return this.workReportHours;
+	}
+
+	public void setWorkReportHours(java.lang.String workReportHours) {
+		this.workReportHours = workReportHours;
+	}
+
+	public java.lang.String getJobHours() {
+		return this.jobHours;
+	}
+
+	public void setJobHours(java.lang.String jobHours) {
+		this.jobHours = jobHours;
+	}
+
+	public java.lang.String getSickness() {
+		return this.sickness;
+	}
+
+	public void setSickness(java.lang.String sickness) {
+		this.sickness = sickness;
 	}
 }

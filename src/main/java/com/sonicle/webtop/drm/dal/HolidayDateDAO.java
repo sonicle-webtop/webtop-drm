@@ -42,9 +42,13 @@ import com.sonicle.webtop.drm.jooq.tables.records.HolidayDateRecord;
 import com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRowsRecord;
 import com.sonicle.webtop.drm.jooq.tables.records.WorkTypesRecord;
 import java.sql.Connection;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 
 /**
  *
@@ -70,6 +74,20 @@ public class HolidayDateDAO extends BaseDAO {
 				.fetchInto(OHolidayDate.class);
 	}
 	
+	/*
+	public Map<LocalDate, List<OHolidayDate>> selectByDomainMap(Connection con, String domainId) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.select()
+				.from(HOLIDAY_DATE)
+				.where(
+						HOLIDAY_DATE.DOMAIN_ID.equal(domainId)
+				)
+				.orderBy(HOLIDAY_DATE.DATE.asc())
+				.fetchGroups(HOLIDAY_DATE.DATE, OHolidayDate.class);
+	}
+	*/
+	
 	public OHolidayDate selectByDomainDate(Connection con, String domainId, DateTime date) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		return dsl
@@ -82,7 +100,23 @@ public class HolidayDateDAO extends BaseDAO {
 				)
 				.fetchOneInto(OHolidayDate.class);
 	}
-
+	
+	public OHolidayDate selectByDomainDateWithoutYear(Connection con, String domainId, DateTime date) throws DAOException {
+		String pattern = "MM-dd";
+		SimpleDateFormat sdf = new SimpleDateFormat(pattern);		
+		
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.select()
+				.from(HOLIDAY_DATE)
+				.where(
+						HOLIDAY_DATE.DOMAIN_ID.equal(domainId)
+				).and(
+						DSL.field("SUBSTRING(CAST({0} AS VARCHAR), 6)", String.class, HOLIDAY_DATE.DATE).eq(sdf.format(date.toDate()))
+				)
+				.fetchOneInto(OHolidayDate.class);
+	}	
+	
 	public int insert(Connection con, OHolidayDate item) throws DAOException {
 		DSLContext dsl = getDSL(con);
 

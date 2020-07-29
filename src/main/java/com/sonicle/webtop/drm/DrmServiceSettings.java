@@ -214,4 +214,12 @@ public class DrmServiceSettings extends BaseServiceSettings {
 	public void setTicketDefaultCloseDocStatusId(String value) {
 		setString(TICKET_DEFAULT_CLOSE_DOC_STATUS_ID, value); 
 	}
+	
+	public boolean getSicknessAutomaticallyApproved() {
+		return getBoolean(LEAVE_REQUEST_SICKNESS_AUTOMATICALLY_APPROVED, Boolean.FALSE); 
+	}
+
+	public void setSicknessAutomaticallyApproved(boolean value) {
+		setBoolean(LEAVE_REQUEST_SICKNESS_AUTOMATICALLY_APPROVED, value); 
+	}
 }
