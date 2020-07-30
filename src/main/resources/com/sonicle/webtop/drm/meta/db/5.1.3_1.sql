@@ -213,7 +213,7 @@ LEFT JOIN core.users us ON jb.operator_id = us.user_id AND jb.domain_id = us.dom
 LEFT JOIN core.causals ca ON jb.causal_id = ca.causal_id AND jb.domain_id = ca.domain_id;
 
 ALTER TABLE "drm"."work_reports"
-ALTER COLUMN "timetable_hours" int4;
+ALTER COLUMN "timetable_hours" TYPE int4;
 
 ALTER TABLE "drm"."timetable_report_temp"
 ADD COLUMN "work_report_hours" varchar(5);
@@ -235,7 +235,7 @@ ALTER TABLE "drm"."timetable_settings"
 ADD COLUMN "requests_sickness" bool,
 ADD COLUMN "sickness_automatically_approved" bool;
 
-UPDATE "drm"."timetable_settings" SET sickness_automatically_approved = false, requests_sickness = false
+UPDATE "drm"."timetable_settings" SET sickness_automatically_approved = false, requests_sickness = false;
 
 ALTER TABLE "drm"."timetable_report_temp"
 ADD COLUMN "sickness" varchar(5);
