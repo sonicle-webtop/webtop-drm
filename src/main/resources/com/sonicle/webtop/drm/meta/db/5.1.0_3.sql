@@ -1,3 +1,6 @@
+@DataSource[default@com.sonicle.webtop.drm]
+
+
 -- Eseguire una Truncate a mano delle tabelle: 
 -- opportunities 
 -- opportunity_actions

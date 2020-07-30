@@ -1,28 +1,7 @@
+@DataSource[default@com.sonicle.webtop.drm]
 
 ALTER TABLE "drm"."work_reports"
 ADD COLUMN "timetable_hours" int2;
-
-DROP VIEW  "drm"."vw_work_reports";
-
-CREATE OR REPLACE VIEW "drm"."vw_work_reports" AS 
-SELECT 
-wr.work_report_id, wr.number, wr.year, wr.reference_no, wr.operator_id, us.display_name AS operator_description, wr.customer_id, rmd.description AS customer_description, 
-wr.customer_stat_id, smd.description AS customer_stat_description, wr.causal_id, ca.description AS causal_description, wr.from_date, wr.to_date, wr.business_trip_id, 
-bt.description AS business_trip_description, wr.revision_status, wr.charge_to, wr.free_support, wr.company_id, co.name AS company_description, wr.doc_status_id, 
-ds.description AS doc_status_description, wr.description, wr.notes, sum(wrr.duration) AS tot_hours
-FROM 
-drm.work_reports AS wr 
-LEFT JOIN drm.companies AS co ON wr.company_id = co.company_id
-LEFT JOIN core.master_data AS rmd ON wr.customer_id = rmd.master_data_id AND co.domain_id = rmd.domain_id
-LEFT JOIN core.master_data AS smd ON wr.customer_stat_id = smd.master_data_id AND co.domain_id = rmd.domain_id
-LEFT JOIN drm.doc_statuses AS ds ON wr.doc_status_id = ds.doc_status_id
-LEFT JOIN core.causals AS ca ON wr.causal_id = ca.causal_id AND co.domain_id = ca.domain_id
-LEFT JOIN drm.business_trips AS bt ON wr.business_trip_id = bt.business_trip_id AND co.domain_id = bt.domain_id
-LEFT JOIN drm.work_reports_rows AS wrr ON wr.work_report_id = wrr.work_report_id
-LEFT JOIN core.users AS us ON wr.operator_id = us.user_id AND co.domain_id = us.domain_id
-GROUP BY wr.work_report_id, wr.number, wr.year, wr.reference_no, wr.operator_id, us.display_name, wr.customer_id, rmd.description, wr.customer_stat_id, 
-smd.description, wr.causal_id, ca.description, wr.from_date, wr.to_date, wr.business_trip_id, 
-bt.description, wr.revision_status, wr.charge_to, wr.free_support, wr.company_id, co.name, wr.doc_status_id, ds.description;
 
 CREATE TABLE "drm"."jobs" (
 "job_id" varchar(36) NOT NULL,
@@ -65,11 +44,6 @@ CONSTRAINT "job_attachments_data_job_attachment_id_fkey" FOREIGN KEY ("job_attac
 
 ALTER TABLE "drm"."work_reports"
 ADD COLUMN "domain_id" varchar(20);
-
-DROP VIEW  "drm"."vw_work_reports";
-
-CREATE OR REPLACE VIEW "drm"."vw_work_reports" AS 
-SELECT wr.work_report_id, wr.domain_id, wr.number, wr.year, wr.reference_no, wr.operator_id, us.display_name AS operator_description, wr.customer_id, rmd.description AS customer_description, wr.customer_stat_id, smd.description AS customer_stat_description, wr.causal_id, ca.description AS causal_description, wr.from_date, wr.to_date, wr.business_trip_id, bt.description AS business_trip_description, wr.revision_status, wr.charge_to, wr.free_support, wr.company_id, co.name AS company_description, wr.doc_status_id, ds.description AS doc_status_description, wr.description, wr.notes, sum(wrr.duration) AS tot_hours FROM ((((((((drm.work_reports wr LEFT JOIN drm.companies co ON ((wr.company_id = co.company_id))) LEFT JOIN core.master_data rmd ON ((((wr.customer_id)::text = (rmd.master_data_id)::text) AND ((co.domain_id)::text = (rmd.domain_id)::text)))) LEFT JOIN core.master_data smd ON ((((wr.customer_stat_id)::text = (smd.master_data_id)::text) AND ((co.domain_id)::text = (rmd.domain_id)::text)))) LEFT JOIN drm.doc_statuses ds ON ((wr.doc_status_id = ds.doc_status_id))) LEFT JOIN core.causals ca ON (((wr.causal_id = ca.causal_id) AND ((co.domain_id)::text = (ca.domain_id)::text)))) LEFT JOIN drm.business_trips bt ON (((wr.business_trip_id = bt.business_trip_id) AND ((co.domain_id)::text = (bt.domain_id)::text)))) LEFT JOIN drm.work_reports_rows wrr ON (((wr.work_report_id)::text = (wrr.work_report_id)::text))) LEFT JOIN core.users us ON ((((wr.operator_id)::text = (us.user_id)::text) AND ((co.domain_id)::text = (us.domain_id)::text)))) GROUP BY wr.work_report_id, wr.number, wr.year, wr.reference_no, wr.operator_id, us.display_name, wr.customer_id, rmd.description, wr.customer_stat_id, smd.description, wr.causal_id, ca.description, wr.from_date, wr.to_date, wr.business_trip_id, bt.description, wr.revision_status, wr.charge_to, wr.free_support, wr.company_id, co.name, wr.doc_status_id, ds.description;
 
 CREATE SEQUENCE "drm"."seq_ticket_categories";
 
@@ -137,7 +111,7 @@ CONSTRAINT "ticket_attachments_data_ticket_attachment_id_fkey" FOREIGN KEY ("tic
 CREATE SEQUENCE "drm"."seq_tickets";
 
 ALTER TABLE "drm"."tickets"
-ADD COLUMN "number" TYPE varchar(12);
+ADD COLUMN "number" varchar(12);
 
 CREATE SEQUENCE "drm"."seq_activities";
 
@@ -239,7 +213,7 @@ LEFT JOIN core.users us ON jb.operator_id = us.user_id AND jb.domain_id = us.dom
 LEFT JOIN core.causals ca ON jb.causal_id = ca.causal_id AND jb.domain_id = ca.domain_id;
 
 ALTER TABLE "drm"."work_reports"
-ALTER COLUMN "timetable_hours" TYPE int4;
+ALTER COLUMN "timetable_hours" int4;
 
 ALTER TABLE "drm"."timetable_report_temp"
 ADD COLUMN "work_report_hours" varchar(5);
@@ -247,7 +221,7 @@ ADD COLUMN "work_report_hours" varchar(5);
 ALTER TABLE "drm"."timetable_report_temp"
 ADD COLUMN "job_hours" varchar(5);
 
-UPDATE line_hours
+UPDATE "drm"."line_hours"
 SET 
 "1_h" = (date_part('minute', to_timestamp("1_u",'HH24:MI'))+date_part('hour', to_timestamp("1_u",'HH24:MI'))*60)-(date_part('minute', to_timestamp("1_e",'HH24:MI'))+date_part('hour', to_timestamp("1_e",'HH24:MI'))*60),
 "2_h" = (date_part('minute', to_timestamp("2_u",'HH24:MI'))+date_part('hour', to_timestamp("2_u",'HH24:MI'))*60)-(date_part('minute', to_timestamp("2_e",'HH24:MI'))+date_part('hour', to_timestamp("2_e",'HH24:MI'))*60),
@@ -255,13 +229,36 @@ SET
 "4_h" = (date_part('minute', to_timestamp("4_u",'HH24:MI'))+date_part('hour', to_timestamp("4_u",'HH24:MI'))*60)-(date_part('minute', to_timestamp("4_e",'HH24:MI'))+date_part('hour', to_timestamp("4_e",'HH24:MI'))*60),
 "5_h" = (date_part('minute', to_timestamp("5_u",'HH24:MI'))+date_part('hour', to_timestamp("5_u",'HH24:MI'))*60)-(date_part('minute', to_timestamp("5_e",'HH24:MI'))+date_part('hour', to_timestamp("5_e",'HH24:MI'))*60),
 "6_h" = (date_part('minute', to_timestamp("6_u",'HH24:MI'))+date_part('hour', to_timestamp("6_u",'HH24:MI'))*60)-(date_part('minute', to_timestamp("6_e",'HH24:MI'))+date_part('hour', to_timestamp("6_e",'HH24:MI'))*60),
-"7_h" = (date_part('minute', to_timestamp("7_u",'HH24:MI'))+date_part('hour', to_timestamp("7_u",'HH24:MI'))*60)-(date_part('minute', to_timestamp("7_e",'HH24:MI'))+date_part('hour', to_timestamp("7_e",'HH24:MI'))*60)
+"7_h" = (date_part('minute', to_timestamp("7_u",'HH24:MI'))+date_part('hour', to_timestamp("7_u",'HH24:MI'))*60)-(date_part('minute', to_timestamp("7_e",'HH24:MI'))+date_part('hour', to_timestamp("7_e",'HH24:MI'))*60);
 
 ALTER TABLE "drm"."timetable_settings"
 ADD COLUMN "requests_sickness" bool,
 ADD COLUMN "sickness_automatically_approved" bool;
 
-UPDATE timetable_settings SET sickness_automatically_approved = false, requests_sickness = false;
+UPDATE "drm"."timetable_settings" SET sickness_automatically_approved = false, requests_sickness = false
 
 ALTER TABLE "drm"."timetable_report_temp"
 ADD COLUMN "sickness" varchar(5);
+
+DROP VIEW IF EXISTS "drm"."vw_work_reports";
+
+CREATE OR REPLACE VIEW "drm"."vw_work_reports" AS 
+SELECT wr.work_report_id, wr.domain_id, wr.number, wr.year, wr.reference_no, wr.operator_id, 
+us.display_name AS operator_description, wr.customer_id, rmd.description AS customer_description, wr.customer_stat_id, smd.description AS customer_stat_description, 
+wr.causal_id, ca.description AS causal_description, wr.from_date, wr.to_date, wr.business_trip_id, bt.description AS business_trip_description, wr.revision_status, 
+wr.charge_to, wr.free_support, wr.company_id, co.name AS company_description, wr.doc_status_id, ds.description AS doc_status_description, wr.description, wr.notes, 
+sum(wrr.duration) AS tot_hours 
+FROM drm.work_reports wr 
+LEFT JOIN drm.companies co ON wr.company_id = co.company_id
+LEFT JOIN core.master_data rmd ON wr.customer_id = rmd.master_data_id AND co.domain_id = rmd.domain_id
+LEFT JOIN core.master_data smd ON wr.customer_stat_id = smd.master_data_id AND co.domain_id = rmd.domain_id
+LEFT JOIN drm.doc_statuses ds ON wr.doc_status_id = ds.doc_status_id
+LEFT JOIN core.causals ca ON wr.causal_id = ca.causal_id AND co.domain_id = ca.domain_id
+LEFT JOIN drm.business_trips bt ON wr.business_trip_id = bt.business_trip_id AND co.domain_id = bt.domain_id
+LEFT JOIN drm.work_reports_rows wrr ON wr.work_report_id = wrr.work_report_id
+LEFT JOIN core.users us ON wr.operator_id = us.user_id AND co.domain_id = us.domain_id
+GROUP BY wr.work_report_id, wr.domain_id, wr.number, wr.year, wr.reference_no, wr.operator_id, 
+us.display_name, wr.customer_id, rmd.description, wr.customer_stat_id, smd.description, 
+wr.causal_id, ca.description, wr.from_date, wr.to_date, wr.business_trip_id, bt.description, wr.revision_status, 
+wr.charge_to, wr.free_support, wr.company_id, co.name, wr.doc_status_id, ds.description, wr.description, wr.notes;
+
