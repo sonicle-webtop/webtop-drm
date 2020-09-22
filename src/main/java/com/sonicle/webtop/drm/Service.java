@@ -900,7 +900,7 @@ public class Service extends BaseService {
 						// + TIMETABLE REPORT
 						nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE_REPORT, null, lookupResource(DrmTreeNode.TIMETABLE_REPORT), true, "wtdrm-icon-timetable3-xs"));
 						// + TIMETABLE SUMMARY
-						nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE_SUMMARY, null, lookupResource(DrmTreeNode.TIMETABLE_SUMMARY), true, "wtdrm-icon-timetable4-xs"));
+						//nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE_SUMMARY, null, lookupResource(DrmTreeNode.TIMETABLE_SUMMARY), true, "wtdrm-icon-timetable4-xs"));
 					}
 				}
 			}			
@@ -3942,7 +3942,7 @@ public class Service extends BaseService {
 					DrmUserSettings rus=new DrmUserSettings(SERVICE_ID,lReqPid);
 					Integer lrCalId = rus.getLeaveRequestCalendarId();
 					try {
-						cm.getCalendar(lrCalId);
+						if (lrCalId!=null) cm.getCalendar(lrCalId);
 					} catch(WTRuntimeException exc) {
 						lrCalId=null;
 					}
