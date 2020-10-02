@@ -33,14 +33,12 @@
 package com.sonicle.webtop.drm;
 
 import com.sonicle.commons.web.ServletUtils;
-import com.sonicle.commons.web.json.JsonResult;
 import com.sonicle.webtop.core.app.WT;
 import com.sonicle.webtop.core.app.WebTopSession;
 import com.sonicle.webtop.core.bol.js.JsWTSPublic;
 import com.sonicle.webtop.core.sdk.BasePublicService;
 import com.sonicle.webtop.core.sdk.UserProfileId;
 import com.sonicle.webtop.core.sdk.WTException;
-import com.sonicle.webtop.core.app.servlet.ServletHelper;
 import static com.sonicle.webtop.drm.Service.logger;
 import com.sonicle.webtop.drm.model.LeaveRequest;
 import freemarker.template.TemplateException;
@@ -77,14 +75,14 @@ public class PublicService extends BasePublicService {
 	
 	@Override
 	public void processDefaultAction(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		BasePublicService.PublicPath path = new BasePublicService.PublicPath(request.getPathInfo());
 		WebTopSession wts = getEnv().getWebTopSession();
 		
 		try {
+			BasePublicService.PublicPath path = new BasePublicService.PublicPath(request.getPathInfo());
+			String domainId = WT.findDomainIdByPublicName(path.getDomainPublicName());
+			if (domainId == null) throw new WTException("Invalid domain public name [{}]", path.getDomainPublicName());
+			
 			try {
-				String domainId = WT.findDomainIdByPublicName(path.getDomainPublicName());
-				if (domainId == null) throw new WTException("Invalid domain public name [{0}]", path.getDomainPublicName());
-				
 				if (path.getContext().equals(PUBPATH_CONTEXT_LEAVE_REQUEST)) {
 					LeaveRequestUrlPath lrUrlPath = new LeaveRequestUrlPath(path.getRemainingPath());
 					DrmManager adminDrmMgr = getAdminManager(domainId);
@@ -110,22 +108,22 @@ public class PublicService extends BasePublicService {
 									throw new WTException("Invalid crud [{0}]", crud);
 								}	
 
-								writeLeaveRequestPage(request, response, wts, resp);
+								writeLeaveRequestPage(request, response, domainId, wts, resp);
 							} else {
 								logger.trace("Invalid id [{}]", lrUrlPath.getPublicUid());
-								writeLeaveRequestPage(request, response, wts, "notfound");
+								writeLeaveRequestPage(request, response, domainId, wts, "notfound");
 							}
 						}
 					}					
 
 				} else {
 					logger.error("Invalid context [{}]", path.getContext());
-					writeErrorPage(request, response, wts, "badrequest");
+					writeErrorPage(request, response, domainId, wts, "badrequest");
 				}
 				
 			} catch(Exception ex) {
 				logger.error("Error", ex);
-				writeErrorPage(request, response, wts, "badrequest");
+				writeErrorPage(request, response, domainId, wts, "badrequest");
 			}
 		} catch(Throwable t) {
 			logger.error("Unexpected error", t);
@@ -142,18 +140,18 @@ public class PublicService extends BasePublicService {
 		}
 	}
 	
-	private void writeErrorPage(HttpServletRequest request, HttpServletResponse response, WebTopSession wts, String reskey) throws IOException, TemplateException {
+	private void writeErrorPage(HttpServletRequest request, HttpServletResponse response, String domainId, WebTopSession wts, String reskey) throws IOException, TemplateException {
 		JsWTSPublic.Vars vars = new JsWTSPublic.Vars();
 		vars.put("view", "Error");
 		vars.put("reskey", reskey);
-		writePage(response, wts, vars, ServletHelper.getBaseUrl(request));
+		writePage(response, wts, vars, WT.getPublicContextPath(domainId));
 	}
 	
-	private void writeLeaveRequestPage(HttpServletRequest request, HttpServletResponse response, WebTopSession wts, String reskey) throws IOException, TemplateException {
+	private void writeLeaveRequestPage(HttpServletRequest request, HttpServletResponse response, String domainId, WebTopSession wts, String reskey) throws IOException, TemplateException {
 		JsWTSPublic.Vars vars = new JsWTSPublic.Vars();
 		vars.put("view", "LeaveRequest");
 		vars.put("reskey", reskey);
-		writePage(response, wts, vars, ServletHelper.getBaseUrl(request));
+		writePage(response, wts, vars, WT.getPublicContextPath(domainId));
 	}
 	
 	public static class LeaveRequestUrlPath extends BasePublicService.UrlPathTokens {
