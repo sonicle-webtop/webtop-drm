@@ -1862,7 +1862,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('timetableReport', 'export', {
 			text: me.res('act-export.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-file-download-xs',
+			iconCls: 'wt-icon-file-download',
 			handler: function () {
 				
 			}
@@ -1951,7 +1951,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('job', 'export', {
 			text: me.res('job.btn-export.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-file-download-xs',
+			iconCls: 'wt-icon-file-download',
 			handler: function () {
 				me.exportJobs();
 			}
