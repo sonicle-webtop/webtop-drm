@@ -934,7 +934,6 @@ public class ManagerUtils {
 	}
 
 	static OEmployeeProfile createOEmployeeProfile(EmployeeProfile eProfile) {
-
 		if (eProfile == null) {
 			return null;
 		}
@@ -1237,7 +1236,7 @@ public class ManagerUtils {
 	}
 	
 	static String getDiffHours(String e, String u){
-		if(null != e && null != u){
+		if(null != e && null != u && !e.isEmpty() && !u.isEmpty()){
 			java.util.Date startDate = new java.util.Date();
 			java.util.Date endDate = new java.util.Date();
 			startDate.setHours(Integer.parseInt(e.split(":")[0]));
@@ -1801,12 +1800,13 @@ public class ManagerUtils {
 	}
 	
 	static HolidayDate createHolidayDate(OHolidayDate oHd) {
-
 		if (oHd == null) {
 			return null;
 		}
 
 		HolidayDate hd = new HolidayDate();
+        
+        hd.setHolidayDateId(oHd.getHolidayDateId());
 		hd.setDomainId(oHd.getDomainId());
 		hd.setDate(oHd.getDate());
 		hd.setDescription(oHd.getDescription());
@@ -1815,12 +1815,13 @@ public class ManagerUtils {
 	}
 
 	static OHolidayDate createOHolidayDate(HolidayDate hd) {
-
 		if (hd == null) {
 			return null;
 		}
 
 		OHolidayDate oHd = new OHolidayDate();
+        
+        oHd.setHolidayDateId(hd.getHolidayDateId());
 		oHd.setDomainId(hd.getDomainId());
 		oHd.setDate(hd.getDate());
 		oHd.setDescription(hd.getDescription());
@@ -1999,6 +2000,8 @@ public class ManagerUtils {
 		Integer unpaidLeaveHours = 0;
 		Integer medicalVisitHours = 0;
 		Integer overtimeHours = 0;
+        Integer holidayHours = 0;
+        Integer sicknessHours = 0;
 		LineHourDAO lhDAO = LineHourDAO.getInstance();
 		HashMap<LocalDate, OTimetableReport> hashTr = new HashMap();
 		HolidayDateDAO hdDAO = HolidayDateDAO.getInstance();
@@ -2046,7 +2049,7 @@ public class ManagerUtils {
 			}
 
 			for(DateTime dt : dates){
-				OHolidayDate oHD = hdDAO.selectByDomainDateWithoutYear(con, trsf.get(0).getDomainId(), dt);
+				OHolidayDate oHD = hdDAO.selectByDomainDate(con, trsf.get(0).getDomainId(), dt);
 				
 				if(hashTr.get(dt.toLocalDate()) == null){
 					OTimetableReport temp = new OTimetableReport();
@@ -2069,7 +2072,9 @@ public class ManagerUtils {
 					overtimeHours = 0;
 					medicalVisitHours = 0;
 					unpaidLeaveHours = 0;
-					
+                    holidayHours = 0;
+                    sicknessHours = 0;
+                    
 					if (hashTr.get(dt.toLocalDate()).getWorkingHours() != null) {
 						hourMin = hashTr.get(dt.toLocalDate()).getWorkingHours().split("\\.");
 						hour = Integer.parseInt(hourMin[0]);
@@ -2112,7 +2117,19 @@ public class ManagerUtils {
 						mins = (hourMin.length > 1) ? Integer.parseInt(hourMin[1]) : 0;
 						unpaidLeaveHours = (hour * 60) + mins;
 					}	
-					
+					if (hashTr.get(dt.toLocalDate()).getHoliday()!= null) {
+						hourMin = hashTr.get(dt.toLocalDate()).getHoliday().split("\\.");
+						hour = Integer.parseInt(hourMin[0]);
+						mins = (hourMin.length > 1) ? Integer.parseInt(hourMin[1]) : 0;
+						holidayHours = (hour * 60) + mins;
+					}	
+					if (hashTr.get(dt.toLocalDate()).getSickness()!= null) {
+						hourMin = hashTr.get(dt.toLocalDate()).getSickness().split("\\.");
+						hour = Integer.parseInt(hourMin[0]);
+						mins = (hourMin.length > 1) ? Integer.parseInt(hourMin[1]) : 0;
+						sicknessHours = (hour * 60) + mins;
+					}
+                    
 					// qui dovrei prendermi se ha un profilo le ore di lavoro del giorno, se non ha profilo al momento non faccio nulla
 					String profileHour = lhDAO.selectSumLineHourByHourProfileIdDayOfWeek(con, hourProfileId, hashTr.get(dt.toLocalDate()).getDate().toLocalDate().dayOfWeek().get());
 					// ora devo calcolarmi il calculateWorkingHours - profileHour
@@ -2121,7 +2138,8 @@ public class ManagerUtils {
 					calculateWorkingHours = 0;
 					calculateOvertimeHours = 0;
 					calculateLeaveHours = 0;
-
+                    
+                    /*
 					if (profileHours <= workingHours) {
 						calculateWorkingHours = profileHours;
 						calculateOvertimeHours = (workingHours - (profileHours + overtimeHours)) + overtimeHours;
@@ -2139,7 +2157,21 @@ public class ManagerUtils {
 						calculateOvertimeHours = overtimeHours;
 						calculateLeaveHours = paidLeaveHours;
 					}																	
-
+                    */
+ 					if (profileHours <= workingHours) {
+						calculateWorkingHours = profileHours;
+						calculateOvertimeHours = (workingHours - (profileHours + overtimeHours)) + overtimeHours;
+						calculateLeaveHours = 0 + paidLeaveHours;
+					} else {
+						calculateWorkingHours = workingHours;
+						calculateOvertimeHours = 0 + overtimeHours;
+						if ((workingHours + paidLeaveHours + unpaidLeaveHours + medicalVisitHours + holidayHours + sicknessHours) >= profileHours){
+							calculateLeaveHours = paidLeaveHours;
+						} else {
+							calculateLeaveHours = (profileHours - (workingHours + paidLeaveHours + unpaidLeaveHours + medicalVisitHours + holidayHours + sicknessHours)) + paidLeaveHours;
+						}
+					}	
+                    
 					if (oHD != null) {							
 						calculateOvertimeHours += calculateWorkingHours;
 						calculateWorkingHours = 0;

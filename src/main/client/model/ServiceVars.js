@@ -24,6 +24,8 @@ Ext.define('Sonicle.webtop.drm.model.ServiceVars', {
 		WTF.field('expenseNoteDefaultCurrency', 'string', true),
 		WTF.field('expenseNoteKmCost', 'float', true),
 		WTF.field('ticketDefaultStatus', 'string', true),
-		WTF.field('ticketDefaultPriority', 'string', true)
+		WTF.field('ticketDefaultPriority', 'string', true),
+        WTF.field('ticketDefaultTicketCategory', 'int', true),
+        WTF.field('ticketDefaultCloseStatus', 'int', true)
 	]
 });

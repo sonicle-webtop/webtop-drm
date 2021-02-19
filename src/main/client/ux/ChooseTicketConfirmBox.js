@@ -43,7 +43,7 @@ Ext.define('Sonicle.webtop.drm.ux.ChooseTicketConfirmBox', {
 		return {
 			xtype: 'combo',
 			queryMode: 'remote',
-			minChars: 8,
+			minChars: 6,
 			forceSelection: true,
 			selectOnFocus: true,
 			triggerAction: 'query',
@@ -57,12 +57,13 @@ Ext.define('Sonicle.webtop.drm.ux.ChooseTicketConfirmBox', {
 						customerId: null
 					}
 				}),
-				listeners: {
+				listeners: {                    
 					beforeload: function(s, op) {
 						WTU.applyExtraParams(op.getProxy(), {customerId: me.customerId});
 					}
 				}
-			}
+			},
+            emptyText:'TKYYYY000000'
 		};
 	},
 	

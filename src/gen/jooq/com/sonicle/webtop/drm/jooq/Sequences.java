@@ -87,6 +87,11 @@ public class Sequences {
 	public static final org.jooq.Sequence<java.lang.Long> SEQ_GROUPS_USERS = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_groups_users", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
+	 * The sequence <code>drm.seq_holiday_dates</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> SEQ_HOLIDAY_DATES = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_holiday_dates", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
 	 * The sequence <code>drm.seq_hour_profiles</code>
 	 */
 	public static final org.jooq.Sequence<java.lang.Long> SEQ_HOUR_PROFILES = new org.jooq.impl.SequenceImpl<java.lang.Long>("seq_hour_profiles", com.sonicle.webtop.drm.jooq.Drm.DRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));

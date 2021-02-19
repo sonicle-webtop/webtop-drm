@@ -234,7 +234,7 @@
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font size="8" isBold="true"/>
 					</textElement>
-					<text><![CDATA[Ore Lavori]]></text>
+					<text><![CDATA[Ore (Lav)]]></text>
 				</staticText>
 				<staticText>
 					<reportElement x="450" y="16" width="45" height="12" uuid="f894756e-9cdf-465b-ba92-576dd2f888c8">
@@ -245,7 +245,7 @@
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font size="8" isBold="true"/>
 					</textElement>
-					<text><![CDATA[Ore Rapp.]]></text>
+					<text><![CDATA[Ore (Rap)]]></text>
 				</staticText>
 				<staticText>
 					<reportElement x="495" y="16" width="45" height="12" uuid="d0a5180e-c343-4ed3-b58b-b18eb13b3f74">

@@ -40,7 +40,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReportSummary', {
 	dockableConfig: {
 		iconCls: 'wt-icon-print',
 		width: 280,
-		height: 210,
+		height: 230,
 		modal: true,
 		minimizable: false,
 		maximizable: false

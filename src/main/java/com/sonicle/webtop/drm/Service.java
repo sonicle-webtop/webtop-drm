@@ -182,6 +182,7 @@ import com.sonicle.webtop.calendar.model.EventKey;
 import com.sonicle.webtop.calendar.model.UpdateEventTarget;
 import com.sonicle.webtop.drm.bol.OActivity;
 import com.sonicle.webtop.contacts.model.ContactType;
+import com.sonicle.webtop.core.app.RunContext;
 import com.sonicle.webtop.core.bol.js.JsWizardData;
 import com.sonicle.webtop.core.sdk.WTRuntimeException;
 import com.sonicle.webtop.core.util.LogEntries;
@@ -190,6 +191,7 @@ import com.sonicle.webtop.core.util.MessageLogEntry;
 import com.sonicle.webtop.drm.bol.ODay;
 import com.sonicle.webtop.drm.bol.ODefaultCostType;
 import com.sonicle.webtop.drm.bol.OExpenseNote;
+import com.sonicle.webtop.drm.bol.OHolidayDate;
 import com.sonicle.webtop.drm.bol.OTicket;
 import com.sonicle.webtop.drm.bol.OTicketCategory;
 import com.sonicle.webtop.drm.bol.OViewJob;
@@ -202,8 +204,10 @@ import com.sonicle.webtop.drm.bol.js.JsExpenseNoteSetting;
 import com.sonicle.webtop.drm.bol.js.JsFilter;
 import com.sonicle.webtop.drm.bol.js.JsGridActivities;
 import com.sonicle.webtop.drm.bol.js.JsGridExpenseNote;
+import com.sonicle.webtop.drm.bol.js.JsGridHolidayDate;
 import com.sonicle.webtop.drm.bol.js.JsGridJobs;
 import com.sonicle.webtop.drm.bol.js.JsGridTickets;
+import com.sonicle.webtop.drm.bol.js.JsHolidayDate;
 import com.sonicle.webtop.drm.bol.js.JsJob;
 import com.sonicle.webtop.drm.bol.js.JsTicket;
 import com.sonicle.webtop.drm.bol.js.JsTicketSetting;
@@ -219,6 +223,7 @@ import com.sonicle.webtop.drm.model.ExpenseNoteDocument;
 import com.sonicle.webtop.drm.model.ExpenseNoteDocumentWithBytes;
 import com.sonicle.webtop.drm.model.ExpenseNoteDocumentWithStream;
 import com.sonicle.webtop.drm.model.ExpenseNoteSetting;
+import com.sonicle.webtop.drm.model.HolidayDate;
 import com.sonicle.webtop.drm.model.Job;
 import com.sonicle.webtop.drm.model.JobAttachment;
 import com.sonicle.webtop.drm.model.JobAttachmentWithStream;
@@ -342,6 +347,7 @@ public class Service extends BaseService {
 		vs.put("ticketDefaultCloseStatus", ss.getTicketDefaultCloseDocStatusId());
 		vs.put("sicknessAutomaticallyApproved", ss.getSicknessAutomaticallyApproved());
 		vs.put("ticketNotifyMail", us.getTicketNotifyMail());
+        vs.put("ticketDefaultTicketCategory", ss.getTicketDefaultTicketCategoryId());
 		
 		try {
 			vs.put("opportunityRequiredFields", getOpportunityRequiredFields());
@@ -886,9 +892,11 @@ public class Service extends BaseService {
 				// + TIMETABLE
 				nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE, null, lookupResource(DrmTreeNode.TIMETABLE), false, "wtdrm-icon-timetable-xs"));
 				// + TICKET
-				nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TICKET, null, lookupResource(DrmTreeNode.TICKET), true, "wtdrm-icon-ticket-xs"));
+                if (RunContext.isPermitted(true, pid, SERVICE_ID, "TICKET", "ACCESS"))
+                    nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TICKET, null, lookupResource(DrmTreeNode.TICKET), true, "wtdrm-icon-ticket-xs"));
 				// + JOB
-				nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_JOB, null, lookupResource(DrmTreeNode.JOB), true, "wtdrm-icon-job-xs"));
+                if (RunContext.isPermitted(true, pid, SERVICE_ID, "JOB", "ACCESS"))
+                    nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_JOB, null, lookupResource(DrmTreeNode.JOB), true, "wtdrm-icon-job-xs"));
 			} else {
 				String tokens[] = StringUtils.split(nodeId, ".");
 				if(tokens.length == 1) {
@@ -1223,6 +1231,49 @@ public class Service extends BaseService {
 		}
 	}
 	
+    public void processManageHolidayDate(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+            
+			if (crud.equals(Crud.READ)) {
+				String id = ServletUtils.getStringParameter(request, "id", false);
+                
+				if(id != null){
+					HolidayDate hd = manager.getHolidayDate(Integer.parseInt(id));
+                    
+					new JsonResult(new JsHolidayDate(hd)).printTo(out);
+				}
+			} else if (crud.equals(Crud.CREATE)) {
+				Payload<MapItem, JsHolidayDate> pl = ServletUtils.getPayload(request, JsHolidayDate.class);
+				manager.addHolidayDate(JsHolidayDate.createHolidayDate(pl.data));
+
+				new JsonResult().printTo(out);
+			} else if (crud.equals(Crud.UPDATE)) {
+				Payload<MapItem, JsHolidayDate> pl = ServletUtils.getPayload(request, JsHolidayDate.class);
+
+				manager.updateHolidayDate(JsHolidayDate.createHolidayDate(pl.data));
+
+				new JsonResult().printTo(out);
+			} else if (crud.equals(Crud.DELETE)) {
+				StringArray id = ServletUtils.getObjectParameter(request, "holidayDateId", StringArray.class, true);
+                
+				manager.deleteHolidayDate(Integer.parseInt(id.get(0)));
+
+				new JsonResult().printTo(out);
+			} else if (crud.equals("clone")) {
+				String fromYear = ServletUtils.getStringParameter(request, "fromYear", null);
+                String toYear = ServletUtils.getStringParameter(request, "toYear", null);
+                
+				manager.cloneHolidayDates(Integer.parseInt(fromYear), Integer.parseInt(toYear));
+
+				new JsonResult().printTo(out);
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageHolidayDate", ex);
+		}
+	}
+    
 	public void processManageHourProfile(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			String crud = ServletUtils.getStringParameter(request, "crud", true);
@@ -1285,6 +1336,28 @@ public class Service extends BaseService {
 		}
 	}
 	
+	public void processManageGridHolidayDate(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			JsGridHolidayDate jsGHD;
+			
+			if (crud.equals(Crud.READ)) {
+				List<JsGridHolidayDate> jsGridHD = new ArrayList();
+
+				for (OHolidayDate oHD : manager.listHolidayDates()) {
+					jsGHD = new JsGridHolidayDate(oHD);
+					jsGridHD.add(jsGHD);
+				}
+
+				new JsonResult(jsGridHD).printTo(out);
+
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageGridHolidayDate", ex);
+		}
+	}
+    
 	public void processManageGridHourProfile(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			String crud = ServletUtils.getStringParameter(request, "crud", true);
@@ -2882,7 +2955,7 @@ public class Service extends BaseService {
 			trs = manager.getTimetableReport();
 			
 			for(OTimetableReport otr : trs) {
-				items.add(new RBTimetableReport(WT.getCoreManager(), manager, otr));
+				items.add(new RBTimetableReport(WT.getCoreManager(), manager, otr, getEnv().getProfile().getLocale()));
 			}
 			
 			ReportConfig.Builder builder = reportConfigBuilder();
@@ -3571,7 +3644,7 @@ public class Service extends BaseService {
 			evI.setTimezone(job.getTimezone());
 		if(job.getActivityId() != null)
 			// evI.setActivityId(job.getActivityId());
-			title += "[" + manager.getActivity(job.getActivityId()).getDescription() + "] ";
+			title = "[" + manager.getActivity(job.getActivityId()).getDescription() + "] ";
 		if(job.getDescription() != null)
 			evI.setDescription(job.getDescription());
 		if(job.getCustomerId() != null)
@@ -4542,7 +4615,19 @@ public class Service extends BaseService {
 				
 				new JsonResult(item).printTo(out);
 				
-			}
+			} else if (crud.equals("jobTicket")) {
+                String query = ServletUtils.getStringParameter(request, "query", null);
+                
+                DateTimeZone ptz = getEnv().getProfile().getTimeZone();
+                TicketQuery tcktQuery = TicketQuery.fromJson(query);
+				List<JsGridTickets> jsGridTickets = new ArrayList();
+
+				for (OViewTicket tckt : manager.listTickets(tcktQuery)) {
+					jsGridTickets.add(new JsGridTickets(tckt, ptz, ""));
+				}
+
+				new JsonResult(jsGridTickets).printTo(out);
+            }
 			
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);

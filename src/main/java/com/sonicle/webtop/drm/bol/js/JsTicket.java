@@ -69,7 +69,7 @@ public class JsTicket {
 	public String simulation;
 	public String number;
 	
-	public List<Attachment> attachments = new ArrayList();
+    public List<Attachment> attachments = new ArrayList();
 
 	public String _profileId;
 

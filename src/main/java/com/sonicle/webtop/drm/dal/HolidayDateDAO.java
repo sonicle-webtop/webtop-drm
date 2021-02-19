@@ -37,6 +37,7 @@ import com.sonicle.webtop.core.dal.DAOException;
 import com.sonicle.webtop.drm.bol.OHolidayDate;
 import com.sonicle.webtop.drm.bol.OWorkReportRow;
 import com.sonicle.webtop.drm.bol.OWorkType;
+import com.sonicle.webtop.drm.jooq.Sequences;
 import static com.sonicle.webtop.drm.jooq.Tables.HOLIDAY_DATE;
 import com.sonicle.webtop.drm.jooq.tables.records.HolidayDateRecord;
 import com.sonicle.webtop.drm.jooq.tables.records.WorkReportsRowsRecord;
@@ -64,14 +65,15 @@ public class HolidayDateDAO extends BaseDAO {
 
 	public List<OHolidayDate> selectByDomain(Connection con, String domainId) throws DAOException {
 		DSLContext dsl = getDSL(con);
+        
 		return dsl
-				.select()
-				.from(HOLIDAY_DATE)
-				.where(
-						HOLIDAY_DATE.DOMAIN_ID.equal(domainId)
-				)
-				.orderBy(HOLIDAY_DATE.DATE.asc())
-				.fetchInto(OHolidayDate.class);
+            .select()
+            .from(HOLIDAY_DATE)
+            .where(
+                    HOLIDAY_DATE.DOMAIN_ID.equal(domainId)
+            )
+            .orderBy(HOLIDAY_DATE.DATE.asc())
+            .fetchInto(OHolidayDate.class);
 	}
 	
 	/*
@@ -90,67 +92,73 @@ public class HolidayDateDAO extends BaseDAO {
 	
 	public OHolidayDate selectByDomainDate(Connection con, String domainId, DateTime date) throws DAOException {
 		DSLContext dsl = getDSL(con);
+        
 		return dsl
-				.select()
-				.from(HOLIDAY_DATE)
-				.where(
-						HOLIDAY_DATE.DOMAIN_ID.equal(domainId)
-				).and(
-						HOLIDAY_DATE.DATE.eq(date.toLocalDate())
-				)
-				.fetchOneInto(OHolidayDate.class);
+            .select()
+            .from(HOLIDAY_DATE)
+            .where(
+                    HOLIDAY_DATE.DOMAIN_ID.equal(domainId)
+            ).and(
+                    HOLIDAY_DATE.DATE.eq(date.toLocalDate())
+            )
+            .fetchOneInto(OHolidayDate.class);
 	}
 	
+    /*
 	public OHolidayDate selectByDomainDateWithoutYear(Connection con, String domainId, DateTime date) throws DAOException {
 		String pattern = "MM-dd";
 		SimpleDateFormat sdf = new SimpleDateFormat(pattern);		
 		
 		DSLContext dsl = getDSL(con);
+        
 		return dsl
-				.select()
-				.from(HOLIDAY_DATE)
-				.where(
-						HOLIDAY_DATE.DOMAIN_ID.equal(domainId)
-				).and(
-						DSL.field("SUBSTRING(CAST({0} AS VARCHAR), 6)", String.class, HOLIDAY_DATE.DATE).eq(sdf.format(date.toDate()))
-				)
-				.fetchOneInto(OHolidayDate.class);
+            .select()
+            .from(HOLIDAY_DATE)
+            .where(
+                    HOLIDAY_DATE.DOMAIN_ID.equal(domainId)
+            ).and(
+                    DSL.field("SUBSTRING(CAST({0} AS VARCHAR), 6)", String.class, HOLIDAY_DATE.DATE).eq(sdf.format(date.toDate()))
+            )
+            .fetchOneInto(OHolidayDate.class);
 	}	
-	
+	*/
+    
 	public int insert(Connection con, OHolidayDate item) throws DAOException {
 		DSLContext dsl = getDSL(con);
 
 		HolidayDateRecord record = dsl.newRecord(HOLIDAY_DATE, item);
 
 		return dsl
-				.insertInto(HOLIDAY_DATE)
-				.set(record)
-				.execute();
+            .insertInto(HOLIDAY_DATE)
+            .set(record)
+            .execute();
 	}
 
 	public int updateByDomainId(Connection con, OHolidayDate item) throws DAOException {
 		DSLContext dsl = getDSL(con);
+        
 		return dsl
-				.update(HOLIDAY_DATE)
-				.set(HOLIDAY_DATE.DATE, item.getDate())
-				.set(HOLIDAY_DATE.DESCRIPTION, item.getDescription())
-				.where(
-						HOLIDAY_DATE.DOMAIN_ID.equal(item.getDomainId())
-				)
-				.execute();
+            .update(HOLIDAY_DATE)
+            .set(HOLIDAY_DATE.DATE, item.getDate())
+            .set(HOLIDAY_DATE.DESCRIPTION, item.getDescription())
+            .where(
+                    HOLIDAY_DATE.DOMAIN_ID.equal(item.getDomainId())
+            )
+            .execute();
 	}
 	
 	public int updateByDomainIdDate(Connection con, OHolidayDate item) throws DAOException {
 		DSLContext dsl = getDSL(con);
+        
 		return dsl
-				.update(HOLIDAY_DATE)
-				.set(HOLIDAY_DATE.DESCRIPTION, item.getDescription())
-				.where(
-						HOLIDAY_DATE.DOMAIN_ID.equal(item.getDomainId())
-				).and(
-						HOLIDAY_DATE.DATE.eq(item.getDate())
-				)
-				.execute();
+            .update(HOLIDAY_DATE)
+            .set(HOLIDAY_DATE.DESCRIPTION, item.getDescription())
+            .where(
+                    HOLIDAY_DATE.DOMAIN_ID.equal(item.getDomainId())
+            ).and(
+                    HOLIDAY_DATE.DATE.eq(item.getDate())
+            )
+            .execute();
 	}
 
 	public int deleteByDomainId(Connection con, String domainId) {
@@ -168,12 +176,90 @@ public class HolidayDateDAO extends BaseDAO {
 		DSLContext dsl = getDSL(con);
 
 		return dsl
-				.delete(HOLIDAY_DATE)
-				.where(
-						HOLIDAY_DATE.DOMAIN_ID.equal(domainId)
-				).and(
-						HOLIDAY_DATE.DATE.eq(date.toLocalDate())
-				)
-				.execute();
+            .delete(HOLIDAY_DATE)
+            .where(
+                    HOLIDAY_DATE.DOMAIN_ID.equal(domainId)
+            ).and(
+                    HOLIDAY_DATE.DATE.eq(date.toLocalDate())
+            )
+            .execute();
+	}
+    
+    public Long getSequence(Connection con) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		Long nextID = dsl.nextval(Sequences.SEQ_HOLIDAY_DATES);
+        
+		return nextID;
+	}
+    
+    public int update(Connection con, OHolidayDate item) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+            .update(HOLIDAY_DATE)
+            .set(HOLIDAY_DATE.DATE, item.getDate())
+            .set(HOLIDAY_DATE.DESCRIPTION, item.getDescription())
+            .where(
+                    HOLIDAY_DATE.HOLIDAY_DATE_ID.equal(item.getHolidayDateId())
+            )
+            .execute();
+	}
+    
+    public int deleteById(Connection con, Integer id) {
+		DSLContext dsl = getDSL(con);
+		return dsl
+			.delete(HOLIDAY_DATE)
+			.where(
+					HOLIDAY_DATE.HOLIDAY_DATE_ID.equal(id)
+			)
+			.execute();
+	}
+    
+    public OHolidayDate selectHolidayDateById(Connection con, Integer id) throws DAOException {
+		DSLContext dsl = getDSL(con);
+        
+		return dsl
+            .select()
+            .from(HOLIDAY_DATE)
+            .where(
+                    HOLIDAY_DATE.HOLIDAY_DATE_ID.equal(id)
+            )
+            .fetchOneInto(OHolidayDate.class);
+	}
+    
+    public int cloneByYear(Connection con, Integer fromYear, Integer toYear, String domainId) {
+		DSLContext dsl = getDSL(con);
+        Integer i = null;
+        List<OHolidayDate> items = null;
+        
+		i = dsl
+            .delete(HOLIDAY_DATE)
+            .where(
+                HOLIDAY_DATE.DOMAIN_ID.equal(domainId)
+            ).and(
+                HOLIDAY_DATE.DATE.between(new LocalDate(toYear, 1, 1), new LocalDate(toYear, 12, 31))
+            )
+            .execute();
+        
+        items = dsl
+            .select()
+            .from(HOLIDAY_DATE)
+            .where(
+                HOLIDAY_DATE.DOMAIN_ID.equal(domainId)
+            ).and(  
+                HOLIDAY_DATE.DATE.between(new LocalDate(fromYear, 1, 1), new LocalDate(fromYear, 12, 31))   
+            )
+            .orderBy(HOLIDAY_DATE.DATE.asc())
+            .fetchInto(OHolidayDate.class);
+        
+        for (OHolidayDate item : items) {
+            item.setHolidayDateId(getSequence(con).intValue());
+            item.setDate(item.getDate().withYear(toYear));
+            
+            HolidayDateRecord record = dsl.newRecord(HOLIDAY_DATE, item);
+            
+            i = dsl.insertInto(HOLIDAY_DATE).set(record).execute();
+        }           
+        
+        return i;
 	}
 }

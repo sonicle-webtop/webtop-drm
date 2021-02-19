@@ -32,6 +32,7 @@
  */
 package com.sonicle.webtop.drm.bol.model;
 
+import com.sonicle.commons.time.DateTimeUtils;
 import com.sonicle.webtop.core.CoreManager;
 import com.sonicle.webtop.core.app.WT;
 import com.sonicle.webtop.core.sdk.UserProfileId;
@@ -39,6 +40,10 @@ import com.sonicle.webtop.core.sdk.WTException;
 import com.sonicle.webtop.drm.DrmManager;
 import com.sonicle.webtop.drm.bol.OTimetableReport;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  *
@@ -70,13 +75,13 @@ public class RBTimetableReport {
 	public Float totHours;
 	public Float sickness;
 	
-	public RBTimetableReport(CoreManager coreMgr, DrmManager drmMgr, OTimetableReport otr) throws WTException, IOException {		
+	public RBTimetableReport(CoreManager coreMgr, DrmManager drmMgr, OTimetableReport otr, Locale lcl) throws WTException, IOException {		
 		this.id = otr.getId();
 		this.companyId = otr.getCompanyId();
 		this.companyDescription = drmMgr.getCompany(otr.getCompanyId()).getName();
 		this.userId = otr.getUserId();
 		this.userDescription = WT.getUserData(new UserProfileId(otr.getDomainId(), otr.getUserId())).getDisplayName();
-		this.date = concatDate(otr);
+		this.date = concatDate(otr.getDate(), lcl);
 		this.workingHours = convertInMinutes(otr.getWorkingHours());
 		this.overtime = convertInMinutes(otr.getOvertime());
 		this.paidLeave = convertInMinutes(otr.getPaidLeave());
@@ -114,25 +119,33 @@ public class RBTimetableReport {
 		}
 	}
 	
-	private String concatDate(OTimetableReport otr){		
-		switch(otr.getDate().getDayOfWeek()){
+	private String concatDate(DateTime dtDate, Locale lcl){		
+		// SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MMM/yyyy EEE", lcl);
+        
+        DateTimeFormatter dtFm = DateTimeUtils.createFormatter("dd/MM/yyyy EEE").withLocale(lcl);
+        
+        return dtFm.print(dtDate);
+		
+		/*
+		switch(dtDate.getDayOfWeek()){
 			case 1:
-				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " Lunedì";
+				return dtDate.getDayOfMonth() + "/" + dtDate.getMonthOfYear() + "/" + dtDate.getYear() + " Lunedì";
 			case 2: 
-				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " Martedì";
+				return dtDate.getDayOfMonth() + "/" + dtDate.getMonthOfYear() + "/" + dtDate.getYear() + " Martedì";
 			case 3: 
-				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " Mercoledì";
+				return dtDate.getDayOfMonth() + "/" + dtDate.getMonthOfYear() + "/" + dtDate.getYear() + " Mercoledì";
 			case 4: 
-				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " Giovedì";
+				return dtDate.getDayOfMonth() + "/" + dtDate.getMonthOfYear() + "/" + dtDate.getYear() + " Giovedì";
 			case 5: 
-				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " Venerdì";
+				return dtDate.getDayOfMonth() + "/" + dtDate.getMonthOfYear() + "/" + dtDate.getYear() + " Venerdì";
 			case 6: 
-				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " Sabato";
+				return dtDate.getDayOfMonth() + "/" + dtDate.getMonthOfYear() + "/" + dtDate.getYear() + " Sabato";
 			case 7: 
-				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " Domenica";
+				return dtDate.getDayOfMonth() + "/" + dtDate.getMonthOfYear() + "/" + dtDate.getYear() + " Domenica";
 			default: 
-				return otr.getDate().getDayOfMonth() + "/" + otr.getDate().getMonthOfYear() + "/" + otr.getDate().getYear() + " ";
+				return dtDate.getDayOfMonth() + "/" + dtDate.getMonthOfYear() + "/" + dtDate.getYear() + " ";
 		}
+		*/
 	}
 
 	public Integer getId() {

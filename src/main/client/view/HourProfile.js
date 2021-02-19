@@ -88,315 +88,175 @@ Ext.define('Sonicle.webtop.drm.view.HourProfile', {
 							dataIndex: 'lineId',
 							width: '25',
 							header: me.mys.res('gpLineHours.lineId.lbl')
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'e_1',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: true,
-								editable: true,
-								forceSelection: false,
-								queryMode: 'local',
-								triggerAction: 'all',
-								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
-								regexText: me.mys.res('gpLineHours.column.format.lbl'),
+						},{
+                            dataIndex: 'e_1',
+                            editor: WTF.localCombo('id', 'desc', {
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
+								}),
+                                regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),    
+                                forceSelection: false
+                            }),   
 							header: me.mys.res('gpLineHours.1_e.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'u_1',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: true,
-								editable: true,
-								forceSelection: false,
-								queryMode: 'local',
-								triggerAction: 'all',
-								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
-								regexText: me.mys.res('gpLineHours.column.format.lbl'),
+							flex: 2                    
+                        },{
+                            dataIndex: 'u_1',
+                            editor: WTF.localCombo('id', 'desc', {
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
+								}),
+                                regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),    
+                                forceSelection: false
+                            }),   
 							header: me.mys.res('gpLineHours.1_u.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'e_2',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: true,
-								editable: true,
-								forceSelection: false,
-								queryMode: 'local',
-								triggerAction: 'all',
-								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
-								regexText: me.mys.res('gpLineHours.column.format.lbl'),
+							flex: 2                    
+                        },{
+                            dataIndex: 'e_2',
+                            editor: WTF.localCombo('id', 'desc', {
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
+								}),
+                                regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),    
+                                forceSelection: false
+                            }),   
 							header: me.mys.res('gpLineHours.2_e.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'u_2',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: true,
-								editable: true,
-								forceSelection: false,
-								queryMode: 'local',
-								triggerAction: 'all',
-								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
-								regexText: me.mys.res('gpLineHours.column.format.lbl'),
+							flex: 2                    
+                        },{
+                            dataIndex: 'u_2',
+                            editor: WTF.localCombo('id', 'desc', {
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
+								}),
+                                regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),    
+                                forceSelection: false
+                            }),   
 							header: me.mys.res('gpLineHours.2_u.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'e_3',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: true,
-								editable: true,
-								forceSelection: false,
-								queryMode: 'local',
-								triggerAction: 'all',
-								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
-								regexText: me.mys.res('gpLineHours.column.format.lbl'),
+							flex: 2                    
+                        },{
+                            dataIndex: 'e_3',
+                            editor: WTF.localCombo('id', 'desc', {
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
+								}),
+                                regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),    
+                                forceSelection: false
+                            }),   
 							header: me.mys.res('gpLineHours.3_e.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'u_3',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: true,
-								editable: true,
-								forceSelection: false,
-								queryMode: 'local',
-								triggerAction: 'all',
-								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
-								regexText: me.mys.res('gpLineHours.column.format.lbl'),
+							flex: 2                    
+                        },{
+                            dataIndex: 'u_3',
+                            editor: WTF.localCombo('id', 'desc', {
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
+								}),
+                                regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),    
+                                forceSelection: false
+                            }),   
 							header: me.mys.res('gpLineHours.3_u.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'e_4',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: true,
-								editable: true,
-								forceSelection: false,
-								queryMode: 'local',
-								triggerAction: 'all',
-								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
-								regexText: me.mys.res('gpLineHours.column.format.lbl'),
+							flex: 2                    
+                        },{
+                            dataIndex: 'e_4',
+                            editor: WTF.localCombo('id', 'desc', {
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
+								}),
+                                regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),    
+                                forceSelection: false
+                            }),   
 							header: me.mys.res('gpLineHours.4_e.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'u_4',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: true,
-								editable: true,
-								forceSelection: false,
-								queryMode: 'local',
-								triggerAction: 'all',
-								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
-								regexText: me.mys.res('gpLineHours.column.format.lbl'),
+							flex: 2                    
+                        },{
+                            dataIndex: 'u_4',
+                            editor: WTF.localCombo('id', 'desc', {
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
+								}),
+                                regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),    
+                                forceSelection: false
+                            }),   
 							header: me.mys.res('gpLineHours.4_u.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'e_5',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: true,
-								editable: true,
-								forceSelection: false,
-								queryMode: 'local',
-								triggerAction: 'all',
-								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
-								regexText: me.mys.res('gpLineHours.column.format.lbl'),
+							flex: 2                    
+                        },{
+                            dataIndex: 'e_5',
+                            editor: WTF.localCombo('id', 'desc', {
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
+								}),
+                                regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),    
+                                forceSelection: false
+                            }),   
 							header: me.mys.res('gpLineHours.5_e.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'u_5',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: true,
-								editable: true,
-								forceSelection: false,
-								queryMode: 'local',
-								triggerAction: 'all',
-								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
-								regexText: me.mys.res('gpLineHours.column.format.lbl'),
+							flex: 2                    
+                        },{
+                            dataIndex: 'u_5',
+                            editor: WTF.localCombo('id', 'desc', {
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
+								}),
+                                regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),    
+                                forceSelection: false
+                            }),   
 							header: me.mys.res('gpLineHours.5_u.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'e_6',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: true,
-								editable: true,
-								forceSelection: false,
-								queryMode: 'local',
-								triggerAction: 'all',
-								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
-								regexText: me.mys.res('gpLineHours.column.format.lbl'),
+							flex: 2                    
+                        },{
+                            dataIndex: 'e_6',
+                            editor: WTF.localCombo('id', 'desc', {
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
+								}),
+                                regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),    
+                                forceSelection: false
+                            }),   
 							header: me.mys.res('gpLineHours.6_e.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'u_6',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: true,
-								editable: true,
-								forceSelection: false,
-								queryMode: 'local',
-								triggerAction: 'all',
-								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
-								regexText: me.mys.res('gpLineHours.column.format.lbl'),
+							flex: 2                    
+                        },{
+                            dataIndex: 'u_6',
+                            editor: WTF.localCombo('id', 'desc', {
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
+								}),
+                                regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),    
+                                forceSelection: false
+                            }),   
 							header: me.mys.res('gpLineHours.6_u.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'e_7',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: true,
-								editable: true,
-								forceSelection: false,
-								queryMode: 'local',
-								triggerAction: 'all',
-								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
-								regexText: me.mys.res('gpLineHours.column.format.lbl'),
+							flex: 2                    
+                        },{
+                            dataIndex: 'e_7',
+                            editor: WTF.localCombo('id', 'desc', {
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
+								}),
+                                regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),    
+                                forceSelection: false
+                            }),   
 							header: me.mys.res('gpLineHours.7_e.lbl'),
-							flex: 2
-						},
-						{
-							xtype: 'solookupcolumn',
-							dataIndex: 'u_7',
-							store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
-								autoLoad: true
-							}),
-							editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-								allowBlank: true,
-								editable: true,
-								forceSelection: false,
-								queryMode: 'local',
-								triggerAction: 'all',
-								regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
-								regexText: me.mys.res('gpLineHours.column.format.lbl'),
+							flex: 2                    
+                        },{
+                            dataIndex: 'u_7',
+                            editor: WTF.localCombo('id', 'desc', {
 								store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
 									autoLoad: true
-								})
-							})),
-							displayField: 'desc',
+								}),
+                                regex: new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+								regexText: me.mys.res('gpLineHours.column.format.lbl'),    
+                                forceSelection: false
+                            }),   
 							header: me.mys.res('gpLineHours.7_u.lbl'),
-							flex: 2
-						}
+							flex: 2                    
+                        }
 					],
 					tbar: [
 						me.addAct('add', {
@@ -439,9 +299,8 @@ Ext.define('Sonicle.webtop.drm.view.HourProfile', {
 	addLineHour: function () {
 		var me = this;
 		var gp = me.lref('gpLineHours'),
-				sto = gp.getStore(),
-				cep = gp.findPlugin('cellediting');
-
+            sto = gp.getStore(),
+            cep = gp.findPlugin('cellediting');
 
 		cep.cancelEdit();
 
@@ -451,11 +310,12 @@ Ext.define('Sonicle.webtop.drm.view.HourProfile', {
 
 		cep.startEditByPosition({row: sto.getCount(), column: 0});
 	},
+    
 	deleteLineHour: function (rec) {
 		var me = this,
-				grid = me.lref('gpLineHours'),
-				sto = grid.getStore(),
-				cellediting = grid.findPlugin('cellediting');
+            grid = me.lref('gpLineHours'),
+            sto = grid.getStore(),
+            cellediting = grid.findPlugin('cellediting');
 
 		WT.confirm(WT.res('confirm.delete'), function (bid) {
 			if (bid === 'yes') {

@@ -72,3 +72,9 @@
 .wtdrm-icon-mail-xs { background-image: url('mail_16.png') !important; }
 
 .wtdrm-icon-saveAdd-xs { background-image: url('saveAdd_16.png') !important; }
+
+.wtdrm-grid .header .x-column-header-text {font-size: 12px; font-weight: bold; }
+.wtdrm-grid .rows { font-size: 10px !important; }
+
+.wtdrm-icon-clone-xs { background-image: url('clone_16.png') !important; }
+.wtdrm-icon-configuration-holidaydate-xs { background-image: url('holiday_date_16.png') !important; }

@@ -30,20 +30,20 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
+Ext.define('Sonicle.webtop.drm.view.HolidayDate', {
 	extend: 'WTA.sdk.ModelView',
 	requires: [
-		'Sonicle.webtop.drm.model.EmployeeProfile'
+		'Sonicle.webtop.drm.model.HolidayDate'
 	],
 	dockableConfig: {
-		title: '{EmployeeProfile.tit}',
-		iconCls: 'wtdrm-icon-configuration-employeeprofile-xs',
+		title: '{holidayDate.tit}',
+		iconCls: 'wtdrm-icon-configuration-holidaydate-xs',
 		width: 400,
-		height: 280,
+		height: 150,
 		modal: true
 	},
 	fieldTitle: 'description',
-	modelName: 'Sonicle.webtop.drm.model.EmployeeProfile',
+	modelName: 'Sonicle.webtop.drm.model.HolidayDate',
     
 	constructor: function (cfg) {
 		var me = this;
@@ -63,64 +63,26 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 			items: [
 				{
 					xtype: 'wtform',
-					reference: 'employeeProfileform',
+					reference: 'holidayDateform',
 					modelValidation: true,
 					items: [
-						WTF.localCombo('id', 'desc', {
-							bind: '{record.userId}',
-							reference: 'flduser',
-							anyMatch: true,
-							allowBlank: false,
-							store: {
-								autoLoad: true,
-								model: 'WTA.model.Simple',
-								proxy: WTF.proxy(me.mys.ID, 'LookupUsers')
-							},
-							fieldLabel: me.mys.res('EmployeeProfile.fld-employee.lbl'),
-                            width: 380
-						}),
+                        {
+                            xtype: 'datefield',
+                            bind: '{record.date}',
+                            startDay: WT.getStartDay(),
+                            allowBlank: false,
+                            selectOnFocus: true,
+							format: WT.getShortDateFmt(),
+							fieldLabel: me.mys.res('holidayDate.fld-date.lbl'),
+                            width: 220
+						},
 						{
 							xtype: 'textfield',
-							bind: '{record.number}',
+							bind: '{record.description}',
 							allowBlank: false,
-							fieldLabel: me.mys.res('EmployeeProfile.fld-number.lbl'),
+							fieldLabel: me.mys.res('holidayDate.fld-description.lbl'),
 							selectOnFocus: true,
-                            width: 260
-						},
-						{
-							xtype: 'numberfield',
-							bind: '{record.tolerance}',
-							allowDecimals: false,
-							allowBlank: true,
-							editable: true,
-							selectOnFocus: true,
-							minValue: 1,
-							maxValue: 1000,
-							fieldLabel: me.mys.res('EmployeeProfile.fld-tolerance.lbl'),
-                            width: 180
-						},
-						WTF.localCombo('id', 'desc', {
-							bind: '{record.hourProfileId}',
-							reference: 'fldhourprofile',
-							anyMatch: true,
-							allowBlank: true,
-							store: {
-								autoLoad: true,
-								model: 'WTA.model.Simple',
-								proxy: WTF.proxy(me.mys.ID, 'LookupHourProfiles')
-							},
-							fieldLabel: me.mys.res('EmployeeProfile.fld-hourProfiles.lbl'),
                             width: 380
-						}),
-						{
-							xtype: 'checkbox',
-							bind: '{record.extraordinary}',
-							boxLabel: me.mys.res('EmployeeProfile.fld-extraordinary.lbl')
-						},
-						{
-							xtype: 'checkbox',
-							bind: '{record.onlyPresence}',
-							boxLabel: me.mys.res('EmployeeProfile.fld-onlyPresence.lbl')
 						}
 					]
 				}
@@ -132,7 +94,6 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 	
 	onViewInvalid: function (s, mo, errs) {
 		var me = this;
-		WTU.updateFieldsErrors(me.lref('employeeProfileform'), errs);
+		WTU.updateFieldsErrors(me.lref('holidayDateform'), errs);
 	}
 });
-

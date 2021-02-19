@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Drm extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = -1681052341;
+	private static final long serialVersionUID = -64942157;
 
 	/**
 	 * The reference instance of <code>drm</code>
@@ -53,6 +53,7 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_EXPENSE_NOTES,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_FOLDERS_GROUPS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_GROUPS_USERS,
+			com.sonicle.webtop.drm.jooq.Sequences.SEQ_HOLIDAY_DATES,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_HOUR_PROFILES,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_JOBS,
 			com.sonicle.webtop.drm.jooq.Sequences.SEQ_LEAVE_REQUEST_DOCUMENTS,
@@ -146,6 +147,8 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.tables.VwJobs.VW_JOBS,
 			com.sonicle.webtop.drm.jooq.tables.VwTickets.VW_TICKETS,
 			com.sonicle.webtop.drm.jooq.tables.VwWorkReports.VW_WORK_REPORTS,
+			com.sonicle.webtop.drm.jooq.tables.VwWorkReports_2.VW_WORK_REPORTS_2,
+			com.sonicle.webtop.drm.jooq.tables.VwWorkReports_3.VW_WORK_REPORTS_3,
 			com.sonicle.webtop.drm.jooq.tables.WorkReports.WORK_REPORTS,
 			com.sonicle.webtop.drm.jooq.tables.WorkReportsAttachments.WORK_REPORTS_ATTACHMENTS,
 			com.sonicle.webtop.drm.jooq.tables.WorkReportsAttachmentsData.WORK_REPORTS_ATTACHMENTS_DATA,

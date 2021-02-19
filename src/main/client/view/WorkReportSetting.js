@@ -60,7 +60,8 @@ Ext.define('Sonicle.webtop.drm.view.WorkReportSetting', {
 						{
 							xtype: 'textareafield',
 							bind: '{record.warranty}',
-							fieldLabel: me.mys.res('workReport.settings.fld-warranty.lbl')
+							fieldLabel: me.mys.res('workReport.settings.fld-warranty.lbl'),
+                            width: 500
 						},
 						{
 							xtype: 'checkbox',
@@ -86,7 +87,8 @@ Ext.define('Sonicle.webtop.drm.view.WorkReportSetting', {
 								clear: WTF.clearTrigger()
 							},
 							emptyText: WT.res('word.none.male'),
-							fieldLabel: me.mys.res('workReport.settings.fld-rounding.lbl')
+							fieldLabel: me.mys.res('workReport.settings.fld-rounding.lbl'),
+                            width: 80
 						}),
 						{
 							xtype: 'checkbox',
@@ -123,7 +125,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReportSetting', {
 								allowBlank: true
 							},
 							header: me.mys.res('gpworktype.externalId.lbl'),
-							flex: 1
+							width: 100
 						},
 						{
 							dataIndex: 'description',
@@ -179,7 +181,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReportSetting', {
 								allowBlank: true
 							},
 							header: me.mys.res('gpbusinesstrip.externalId.lbl'),
-							flex: 2
+							width: 150
 						},
 						{
 							dataIndex: 'description',

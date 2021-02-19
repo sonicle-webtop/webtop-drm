@@ -32,39 +32,34 @@
  */
 package com.sonicle.webtop.drm.bol.js;
 
-import com.sonicle.webtop.drm.bol.OHolidayDate;
 import com.sonicle.webtop.drm.model.HolidayDate;
 import org.joda.time.DateTime;
 
 /**
  *
- * @author lssndrvs
+ * @author dnllr
  */
-public class JsGridHolidayDate {
-
-	public String domainId;
-	public String date;
-	public String description;
-    public Integer year;
+public class JsHolidayDate {
     public Integer holidayDateId;
-    
-	public JsGridHolidayDate(OHolidayDate hd) {
+	public String domainId;
+	public String description;
+	public String date;
+
+	public JsHolidayDate(HolidayDate hd) {
+		this.holidayDateId = hd.getHolidayDateId();
 		this.domainId = hd.getDomainId();
 		this.date = hd.getDate().toString();
 		this.description = hd.getDescription();
-        this.year = hd.getDate().getYear();
-        this.holidayDateId = hd.getHolidayDateId();
 	}
-    
-    /*
-	public static HolidayDate createHolidayDate(JsGridHolidayDate js) {
-		HolidayDate hd = new HolidayDate();
-        
-		hd.setDomainId(js.domainId);
-		hd.setDate(DateTime.parse(js.date).toLocalDate());
-		hd.setDescription(js.description);
 
-        return hd;
+	public static HolidayDate createHolidayDate(JsHolidayDate js) {
+		HolidayDate newHD = new HolidayDate();
+
+		newHD.setHolidayDateId(js.holidayDateId);
+		newHD.setDomainId(js.domainId);
+		newHD.setDate(DateTime.parse(js.date).toLocalDate());
+		newHD.setDescription(js.description);
+
+		return newHD;
 	}
-    */
 }

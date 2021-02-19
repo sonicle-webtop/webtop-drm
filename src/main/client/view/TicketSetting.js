@@ -134,7 +134,8 @@ Ext.define('Sonicle.webtop.drm.view.TicketSetting', {
 								model: 'WTA.model.Simple',
 								proxy: WTF.proxy(me.mys.ID, 'LookupTicketCategories')
 							},
-							fieldLabel: me.mys.res('ticket.config.fld-defaultTicketCategory.lbl')
+							fieldLabel: me.mys.res('ticket.config.fld-defaultTicketCategory.lbl'),
+                            width: 350
 						}),
 						WTF.localCombo('id', 'desc', {
 							bind: '{record.defaultCloseStatus}',
