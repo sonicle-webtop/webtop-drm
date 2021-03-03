@@ -30,11 +30,11 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.TimetableSetting', {
+Ext.define('Sonicle.webtop.drm.model.TimetableSettingGeneral', {
 	extend: 'WTA.ux.data.BaseModel',
 	requires: [
-		'Sonicle.data.writer.Json',
-		'Sonicle.webtop.drm.model.HolidayDate'
+		'Sonicle.data.writer.Json'
+		// 'Sonicle.webtop.drm.model.HolidayDate'
 	],
 	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageTimetableSetting', 'data', {
 		writer: {
@@ -42,7 +42,7 @@ Ext.define('Sonicle.webtop.drm.model.TimetableSetting', {
 			writeAssociations: true
 		}
 	}),
-	identifier: 'negative',
+	identifier: 'negativestring',
 	idProperty: 'id',
 	fields: [
 		WTF.field('id', 'string', true),
@@ -67,8 +67,10 @@ Ext.define('Sonicle.webtop.drm.model.TimetableSetting', {
 		WTF.field('medicalVisitsAutomaticallyApproved', 'bool', true, {defaultValue: false}),
 		WTF.field('requestsSickness', 'bool', true, {defaultValue: false}),
 		WTF.field('sicknessAutomaticallyApproved', 'bool', true, {defaultValue: false})
-	],
+	]
+    /*,
 	hasMany: [
 		WTF.hasMany('holidayDates', 'Sonicle.webtop.drm.model.HolidayDate')
 	]
+    */
 });

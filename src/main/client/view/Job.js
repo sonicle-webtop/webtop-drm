@@ -43,7 +43,7 @@ Ext.define('Sonicle.webtop.drm.view.Job', {
 		title: '{job.tit}',
 		iconCls: 'wtdrm-icon-job-xs',
 		width: 700,
-		height: 522
+		height: 600
 	},
 	fieldTitle: 'number',
 	modelName: 'Sonicle.webtop.drm.model.Job',
@@ -443,19 +443,63 @@ Ext.define('Sonicle.webtop.drm.view.Job', {
 			defaults: {
 				labelWidth: 110
 			},
-			items: [{
-				xtype: 'textareafield',
-				reference: 'flddescription',
-				bind: '{record.description}',
-				fieldLabel: me.mys.res('job.fld-description.lbl'),
-				height: 130,
-				anchor: '100%',
-				tabIndex: 210
-			}, {
-				xtype: 'displayfield',
-				reference: 'fldticket',
-				fieldLabel: me.mys.res('job.fld-ticket.lbl')
-			}]
+			items: [
+                {
+                    xtype: 'textareafield',
+                    reference: 'flddescription',
+                    bind: '{record.description}',
+                    fieldLabel: me.mys.res('job.fld-description.lbl'),
+                    height: 130,
+                    anchor: '100%',
+                    tabIndex: 210
+                }, {
+                    xtype: 'grid',
+                    reference: 'gpJobTicket',
+                    title: me.mys.res('job.fld-ticket.lbl'),
+                    cls: 'wtdrm-grid',
+                    modelValidation: true,
+                        viewConfig: {
+                            getRowClass: function(r, rowIndex, rp, ds) {
+                                return 'rows';
+                        } 
+                    },
+                    store: {
+                        autoLoad: false,
+                        model: 'Sonicle.webtop.drm.model.GridTickets',
+                        proxy: WTF.apiProxy(me.mys.ID, 'ManageGridTicket')
+                    },
+                    columns: [
+                        {
+                            dataIndex: 'number',
+                            header: me.res('gpTicket.number.lbl'),
+                            width: 100
+                        },{
+                            dataIndex: 'customerDescription',
+                            header: me.res('gpTicket.realCustomer.lbl'),
+                            flex: 3
+                        },{
+                            dataIndex: 'ticketCategoryDescription',
+                            header: me.res('gpTicket.ticketCategory.lbl'),
+                            flex: 3
+                        },{
+                            dataIndex: 'date',
+                            header: me.res('gpTicket.date.lbl'),
+                            xtype: 'datecolumn',
+                            format: WT.getShortDateTimeFmt(),
+                            width: 120
+                        },{
+                            dataIndex: 'statusDescription',
+                            header: me.res('gpTicket.status.lbl'),
+                            flex: 2
+                        }
+                    ],
+                    listeners: {
+                        rowdblclick: function (s, rec) {
+                            me.mys.editTicketUI(rec);
+                        }
+                    }
+                }
+            ]
 		};
 		
 		attachs = {
@@ -524,18 +568,33 @@ Ext.define('Sonicle.webtop.drm.view.Job', {
 	onTicketIdChanged: function() {
 		var me = this,
 			mo = me.getModel();
+        
 		if (mo.get('ticketId') !== null) {
+            var query = {
+                ticketId: mo.get('ticketId')
+            };
+            
+            var sto = me.lref('gpJobTicket').getStore();
+            var pars = {};
+            
+			if (query !== undefined)
+				Ext.apply(pars, {query: Ext.JSON.encode(query)});
+			WTU.loadWithExtraParams(sto, pars);
+            
+            /*
 			WT.ajaxReq(me.mys.ID, 'ManageTicket', {
 				params: {
-					crud: 'read',
-					id: mo.get('ticketId')
+					crud: 'jobTicket',
+					query: query
 				},
 				callback: function(success, model) {
 					if (success) {
-						me.lref('fldticket').setValue(model.data.number);
+						me.lref('tcktNumber').setValue(model.data.number);
+                        me.lref('tcktDate').setValue(model.data.date);
 					}
 				}
 			});
+            */
 		}
 	},
 	

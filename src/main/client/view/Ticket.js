@@ -581,7 +581,12 @@ Ext.define('Sonicle.webtop.drm.view.Ticket', {
 					header: me.res('gpJob.activity.lbl'),
 					flex: 3
 				}
-			]		
+			],
+            listeners: {
+                rowdblclick: function (s, rec) {
+                    me.mys.editJobUI(rec);
+                }
+            }		
 		};
 		
 		me.add({

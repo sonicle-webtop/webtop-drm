@@ -30,20 +30,15 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.HolidayDate', {
+
+Ext.define('Sonicle.webtop.drm.model.GridHolidayDates', {
 	extend: 'WTA.ux.data.BaseModel',
-	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageHolidayDate', 'data', {
-		writer: {
-			type: 'sojson',
-			writeAssociations: true
-		}
-	}),
-	identifier: 'negative',
-	idProperty: 'holidayDateId',
+	
 	fields: [
-        WTF.field('holidayDateId', 'int', false),
-		WTF.field('date', 'date', false, {dateFormat: 'Y-m-d', defaultValue: new Date()}),
-		WTF.field('description', 'string', false)
+        WTF.roField('holidayDateId', 'int'),
+		WTF.roField('domainId', 'string'),
+        WTF.roField('date', 'date', {dateFormat: 'Y-m-d'}),
+		WTF.roField('description', 'string'),
+        WTF.roField('year', 'int')
 	]
 });
-

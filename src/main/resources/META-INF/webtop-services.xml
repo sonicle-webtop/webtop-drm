@@ -93,12 +93,10 @@
 			<permission group="EXPENSE_NOTE_SETTINGS" actions="MANAGE" />
 			<permission group="TIMETABLE" actions="READ,DELETE,UPDATE" />
 			<permission group="TIMETABLE_SETTINGS" actions="MANAGE" />
-			<permission group="JOB" actions="READ,DELETE,UPDATE" />
+			<permission group="JOB" actions="ACCESS" />
 			<permission group="JOB_SETTINGS" actions="MANAGE" />
-			<permission group="TICKET" actions="READ,DELETE,UPDATE" />
+			<permission group="TICKET" actions="ACCESS" />
 			<permission group="TICKET_SETTINGS" actions="MANAGE" />			
 		</permissions>
-		
-		
 	</service>
 </services>

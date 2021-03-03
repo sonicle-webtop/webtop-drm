@@ -42,8 +42,7 @@ import java.util.List;
  * @author lssndrvs
  */
 public class JsTimetableSetting {
-
-	public String id = "tt";
+	public String id = "tmtb";
 	public Integer timetableSettingId;
 	public String domainId;
 	public String allowedAddresses;
@@ -66,10 +65,9 @@ public class JsTimetableSetting {
 	public Boolean sicknessAutomaticallyApproved;
 	public Boolean requestsSickness;
 	
-	public List<JsGridHolidayDate> holidayDates = new ArrayList();
+	// public List<JsGridHolidayDate> holidayDates = new ArrayList();
 
 	public JsTimetableSetting(TimetableSetting setting) {
-
 		this.timetableSettingId = setting.getTimetableSettingId();
 		this.domainId = setting.getDomainId();
 		this.allowedAddresses = setting.getAllowedAddresses();
@@ -92,9 +90,11 @@ public class JsTimetableSetting {
 		this.requestsSickness = setting.getRequestsSickness();
 		this.sicknessAutomaticallyApproved = setting.getSicknessAutomaticallyApproved();
 		
+        /*
 		for (HolidayDate hd : setting.getHolidayDates()) {
 			this.holidayDates.add(new JsGridHolidayDate(hd));
 		}
+        */
 	}
 
 	public static TimetableSetting createTimetableSetting(JsTimetableSetting js) {
@@ -122,15 +122,16 @@ public class JsTimetableSetting {
 		tt.setRequestsSickness(js.requestsSickness);
 		tt.setSicknessAutomaticallyApproved(js.sicknessAutomaticallyApproved);
 		
+        /*
 		for (JsGridHolidayDate hd : js.holidayDates) {
-
 			tt.getHolidayDates().add(JsGridHolidayDate.createHolidayDate(hd));
-
 		}
-
+        */
+        
 		return tt;
 	}
-
+    
+    /*
 	public static HolidayDate createHolidayDate(JsGridHolidayDate jsHolidayDate) {
 		if (jsHolidayDate == null) {
 			return null;
@@ -150,4 +151,5 @@ public class JsTimetableSetting {
 		}
 		return list;
 	}
+    */
 }

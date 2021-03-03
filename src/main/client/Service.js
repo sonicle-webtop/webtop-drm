@@ -44,8 +44,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	opportunityRequiredFields: null,
 	
 	init: function () {
-
 		var me = this;
+        
 		me.initAction();
 		me.initCxm();
 
@@ -79,7 +79,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					listeners: {
 						itemclick: function (s, rec, itm, i, e) {
 							me.getMainComponent().getLayout().setActiveItem(rec.data.id);
-							me.onActivate(rec.data.id);
+							me.onActivateTab(rec.data.id);
 						}
 					}
 				}]
@@ -974,7 +974,13 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							region: 'center',
 							xtype: 'grid',
 							reference: 'gpTimetableReport',
+                            cls: 'wtdrm-grid',
 							modelValidation: true,
+                                viewConfig: {
+                                    getRowClass: function(r, rowIndex, rp, ds) {
+                                        return 'rows';
+								} 
+							},
 							plugins: [
 								Ext.create('Ext.grid.plugin.CellEditing', {
 									clicksToEdit: 1
@@ -993,9 +999,10 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							features: [{
 								// id: 'group',
 								ftype: 'grouping',
-								groupHeaderTpl: '{name}'
+								// groupHeaderTpl: '{name}'
+                                groupHeaderTpl: '{name}',
 								// hideGroupedHeader: true,
-								// enableGroupingMenu: false
+								enableGroupingMenu: false
 							}],
 							columns: [
 								/*
@@ -1008,7 +1015,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									header: me.res('gpTimetableReport.date.lbl'),
 									dataIndex: 'date',
 									editable: false,
-									flex: 2
+									// flex: 2,
+                                    cls: 'header',
+                                    width: 110
 								}, {
 									header: me.res('gpTimetableReport.workingHours.lbl'),
 									dataIndex: 'workingHours',
@@ -1022,7 +1031,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											clear: WTF.clearTrigger()
 										}
 									})),
-									flex: 1
+									// flex: 1,
+                                    width: 70,
+                                    cls: 'header'
 								}, {
 									header: me.res('gpTimetableReport.overtime.lbl'),
 									dataIndex: 'overtime',
@@ -1036,7 +1047,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											clear: WTF.clearTrigger()
 										}
 									})),
-									flex: 1
+									// flex: 1,
+                                    width: 70,
+                                    cls: 'header'
 								}, {
 									header: me.res('gpTimetableReport.paidLeave.lbl'),
 									dataIndex: 'paidLeave',
@@ -1050,13 +1063,15 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											clear: WTF.clearTrigger()
 										}
 									})),
-									flex: 1
+									// flex: 1,
+                                    width: 80,
+                                    cls: 'header'
 								}, {
 									header: me.res('gpTimetableReport.unpaidLeave.lbl'),
 									dataIndex: 'unpaidLeave',
 									editable: true,
 									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-										allowBlank: true,
+                                        allowBlank: true,
 										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
 											autoLoad: true
 										}),
@@ -1064,7 +1079,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											clear: WTF.clearTrigger()
 										}
 									})),
-									flex: 1
+									// flex: 1,
+                                    width: 85,
+                                    cls: 'header'
 								}, {
 									header: me.res('gpTimetableReport.holiday.lbl'),
 									dataIndex: 'holiday',
@@ -1078,7 +1095,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											clear: WTF.clearTrigger()
 										}
 									})),
-									flex: 1
+									// flex: 1,
+                                    width: 70,
+                                    cls: 'header'
 								}, {
 									header: me.res('gpTimetableReport.medicalVisit.lbl'),
 									dataIndex: 'medicalVisit',
@@ -1092,7 +1111,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											clear: WTF.clearTrigger()
 										}
 									})),
-									flex: 1
+									// flex: 1,
+                                    width: 90,
+                                    cls: 'header'
 								}, {
 									header: me.res('gpTimetableReport.sickness.lbl'),
 									dataIndex: 'sickness',
@@ -1106,22 +1127,30 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											clear: WTF.clearTrigger()
 										}
 									})),
-									flex: 1
+									// flex: 1,
+                                    width: 80,
+                                    cls: 'header'
 								}, {
 									header: me.res('gpTimetableReport.workReportHours.lbl'),
 									dataIndex: 'workReportHours',
 									editable: false,									
-									flex: 1
+									// flex: 1,
+                                    width: 80,
+                                    cls: 'header'
 								}, {
 									header: me.res('gpTimetableReport.jobHours.lbl'),
 									dataIndex: 'jobHours',
 									editable: false,									
-									flex: 1
+									// flex: 1,
+                                    width: 80,
+                                    cls: 'header'
 								}, {
 									header: me.res('gpTimetableReport.totHours.lbl'),
 									dataIndex: 'totHours',
 									editable: false,									
-									flex: 1
+									// flex: 1,
+                                    width: 70,
+                                    cls: 'header'
 								}
 								/*, {
 									header: me.res('gpTimetableReport.contractual.lbl'),
@@ -1163,13 +1192,15 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									dataIndex: 'detail',
 									editable: true,
 									editor: 'textfield',
-									flex: 1
+									flex: 2,
+                                    cls: 'header'
 								}, {
 									header: me.res('gpTimetableReport.note.lbl'),
 									dataIndex: 'note',
 									editable: true,
 									editor: 'textfield',
-									flex: 1
+									flex: 2,
+                                    cls: 'header'
 								}
 							],
 							tbar: [
@@ -1546,7 +1577,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			me.addAct('toolbox', 'opSetting', {
 				text: me.res('toolbox.op-settings.lbl'),
 				tooltip: null,
-				iconCls: 'wt-icon-options-xs',
+				iconCls: 'wt-icon-options',
 				handler: function () {
 					me.opportunitySetting();
 				}
@@ -1556,7 +1587,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			me.addAct('toolbox', 'wrSetting', {
 				text: me.res('toolbox.wr-settings.lbl'),
 				tooltip: null,
-				iconCls: 'wt-icon-options-xs',
+				iconCls: 'wt-icon-options',
 				handler: function () {
 					me.workReportSetting();
 				}
@@ -1566,7 +1597,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			me.addAct('toolbox', 'enSetting', {
 				text: me.res('toolbox.en-settings.lbl'),
 				tooltip: null,
-				iconCls: 'wt-icon-options-xs',
+				iconCls: 'wt-icon-options',
 				handler: function () {
 					me.expenseNoteSetting();
 				}
@@ -1574,19 +1605,55 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		}
 		if (WT.isPermitted(me.ID,'TIMETABLE_SETTINGS','MANAGE')){
 			me.addAct('toolbox', 'ttSetting', {
-				text: me.res('toolbox.tt-settings.lbl'),
-				tooltip: null,
-				iconCls: 'wt-icon-options-xs',
-				handler: function () {
-					me.timetableSetting();
-				}
-			});
+                xtype: 'splitbutton',
+                text: me.res('toolbox.tt-settings.lbl'),
+				iconCls: 'wt-icon-options',
+                handler: function () {
+					// do nothing()
+				},
+                menu: {
+                    items: [
+                       {
+                            text: me.res('toolbox.tt-settings-general.lbl'),
+                            tooltip: null,
+                            iconCls: 'wt-icon-options',
+                            handler: function () {
+                                me.timetableSettingGeneral();
+                            }
+                        },
+                        {
+                            text: me.res('toolbox.tt-settings-holidays.lbl'),
+                            tooltip: null,
+                            iconCls: 'wt-icon-options',
+                            handler: function () {
+                                me.timetableSettingHolidays();
+                            }
+                        },
+                        {
+                            text: me.res('toolbox.tt-settings-employeeprofiles.lbl'),
+                            tooltip: null,
+                            iconCls: 'wt-icon-options',
+                            handler: function () {
+                                me.timetableSettingEmployeeProfiles();
+                            }
+                        },
+                        {
+                            text: me.res('toolbox.tt-settings-hourprofiles.lbl'),
+                            tooltip: null,
+                            iconCls: 'wt-icon-options',
+                            handler: function () {
+                                me.timetableSettingHourProfiles();
+                            }
+                        }
+                    ]
+                }
+            });
 		}
 		if (WT.isPermitted(me.ID,'TICKET_SETTINGS','MANAGE')){
 			me.addAct('toolbox', 'tkSetting', {
 				text: me.res('toolbox.tk-settings.lbl'),
 				tooltip: null,
-				iconCls: 'wt-icon-options-xs',
+				iconCls: 'wt-icon-options',
 				handler: function () {
 					me.ticketSetting();
 				}
@@ -1968,22 +2035,23 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		var me = this,
 			fop = me.filtersOpportunity(),
 			vw = WT.createView(me.ID, 'view.Opportunity', {
-							swapReturn: true, 
-							viewCfg: {
-								dockableConfig: {
-									title: (me.getVar('opportunityTitle') == null  || me.getVar('opportunityTitle') == '') ? me.res('opportunity.tit') : me.getVar('opportunityTitle')
-								}
-							}});
+                swapReturn: true, 
+                viewCfg: {
+                    dockableConfig: {
+                        title: (me.getVar('opportunityTitle') == null  || me.getVar('opportunityTitle') == '') ? me.res('opportunity.tit') : me.getVar('opportunityTitle')
+                    }
+                }
+            });
 		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
 		vw.showView(function () {
-				vw.begin('new', {
-					data: {
-						operatorId: fop.getOperatorId()
-					}
-				});
-			});
+            vw.begin('new', {
+                data: {
+                    operatorId: fop.getOperatorId()
+                }
+            });
+        });
 	},
 	editUI: function (rec) {
 		var me = this;
@@ -2006,12 +2074,13 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	editOpportunity: function (id, opts) {
 		opts = opts || {};
 		var me = this,
-				vw = WT.createView(me.ID, 'view.Opportunity', {
-								swapReturn: true, viewCfg: {
-									dockableConfig: {
-										title: (me.getVar('opportunityTitle') == null  || me.getVar('opportunityTitle') == '') ? me.res('opportunity.tit') : me.getVar('opportunityTitle')
-									}
-								}});
+            vw = WT.createView(me.ID, 'view.Opportunity', {
+                swapReturn: true, viewCfg: {
+                    dockableConfig: {
+                        title: (me.getVar('opportunityTitle') == null  || me.getVar('opportunityTitle') == '') ? me.res('opportunity.tit') : me.getVar('opportunityTitle')
+                    }
+                }
+            });
 		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
@@ -2181,12 +2250,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
 		vw.showView(function () {
-					vw.begin('edit', {
-						data: {
-							id: 'oppo'
-						}
-					});
-				});
+            vw.begin('edit', {
+                data: {
+                    id: 'oppo'
+                }
+            });
+        });
 	},
 	printOpportunity: function(ids) {
 		var me = this, url;
@@ -2204,12 +2273,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
 		vw.showView(function () {
-				vw.begin('new', {
-					data: {
-						operatorId: fwr.getOperatorId()
-					}
-				});
-			});
+            vw.begin('new', {
+                data: {
+                    operatorId: fwr.getOperatorId()
+                }
+            });
+        });
 	},
 	editWorkReportUI: function (rec) {
 		var me = this;
@@ -2286,7 +2355,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	editJob: function (jobId, opts) {
 		opts = opts || {};
 		var me = this,
-				vw = WT.createView(me.ID, 'view.Job', {swapReturn: true});
+            vw = WT.createView(me.ID, 'view.Job', {swapReturn: true});
 		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
@@ -2436,10 +2505,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		});
 	},
 	associateTicket: function(mo) {
-		var me = this,
-			fj = me.filtersJob();
-		
 		var me = this;
+        
 		WT.confirm(me.res('confirmBox.associateTicket.lbl'), function(bid, value) {
 			if (bid === 'ok') {
 				if (value !== null) {
@@ -3018,22 +3085,44 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			}
 		});
 	},
-	timetableSetting: function (opts) {
+	timetableSettingGeneral: function (opts) {
 		opts = opts || {};
 
 		var me = this,
-				vw = WT.createView(me.ID, 'view.TimetableSetting', {swapReturn: true});
+				vw = WT.createView(me.ID, 'view.TimetableSettingGeneral', {swapReturn: true});
 		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
 		vw.showView(function () {
-					vw.begin('edit', {
-						data: {
-							id: 'tmtb'
-						}
-					});
-				});
+            vw.begin('edit', {
+                data: {
+                    id: 'tmtb'
+                }
+            });
+        });
 	},
+    timetableSettingHolidays: function (opts) {
+		opts = opts || {};
+
+		var me = this,
+            vw = WT.createView(me.ID, 'view.TimetableSettingHolidays', {swapReturn: true});
+		vw.showView();
+	},
+    timetableSettingEmployeeProfiles: function (opts) {
+		opts = opts || {};
+
+		var me = this,
+            vw = WT.createView(me.ID, 'view.TimetableSettingEmployeeProfiles', {swapReturn: true});
+		vw.showView();
+	},
+    timetableSettingHourProfiles: function (opts) {
+		opts = opts || {};
+
+		var me = this,
+            vw = WT.createView(me.ID, 'view.TimetableSettingHourProfiles', {swapReturn: true});
+		vw.showView();
+	},
+    
 	reloadTimetableRequest: function (query) {
 		var me = this,
 				pars = {},
@@ -3112,11 +3201,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		url = WTF.processBinUrl(me.ID, 'PrintTimetableReport', {});
 		Sonicle.URLMgr.openFile(url, {filename: 'timetablereport', newWindow: true});
 	},
-	printTimetableEncoReport: function() {
-		var me = this, url;
-		url = WTF.processBinUrl(me.ID, 'PrintTimetableEncoReport', {});
-		Sonicle.URLMgr.openFile(url, {filename: 'timetableencoreport', newWindow: true});
-	},
 	reloadTimetableStamp: function (query) {
 		var me = this,
 				pars = {},
@@ -3141,13 +3225,13 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
 		});
 		vw.showView(function () {
-					vw.begin('new', {
-						data: {
-							userId: fts.getOperatorId(),
-							date: fts.getRefDate()
-						}
-					});
-				});
+            vw.begin('new', {
+                data: {
+                    userId: fts.getOperatorId(),
+                    date: fts.getRefDate()
+                }
+            });
+        });
 	},
 
 	deleteTimetableStampUI: function (rec) {
@@ -3189,11 +3273,11 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		vw.showView();
 	},
 	
-	onActivate: function (id) {
+	onActivateTab: function (id) {
 		var me = this;
 		
 		switch (id){
-			case "oppo":
+			case 'oppo':
 				me.reloadOpportunity(me.filtersOpportunity().getData());
 				break;
 			case 'wrkr':

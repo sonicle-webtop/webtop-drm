@@ -597,6 +597,25 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
+    public List<OHolidayDate> listHolidayDates() throws WTException {
+		Connection con = null;
+		HolidayDateDAO hdDao = HolidayDateDAO.getInstance();
+		List<OHolidayDate> ohd = null;
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			ohd = hdDao.selectByDomain(con, getTargetProfileId().getDomainId());
+
+			return ohd;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
 	public List<OHourProfile> listHourProfiles() throws WTException {
 		Connection con = null;
 		HourProfileDAO hpDao = HourProfileDAO.getInstance();
@@ -962,6 +981,7 @@ public class DrmManager extends BaseManager {
 		Connection con = null;
 		DrmProfileDAO pflDao = DrmProfileDAO.getInstance();
 		List<ODrmProfile> profiles = null;
+        
 		try {
 
 			con = WT.getConnection(SERVICE_ID);
@@ -981,6 +1001,7 @@ public class DrmManager extends BaseManager {
 		Connection con = null;
 		ProfileMemberDAO pmDao = ProfileMemberDAO.getInstance();
 		ArrayList<OProfileMember> apf= null;
+        
 		try {
 			con = WT.getConnection(SERVICE_ID);
 			
@@ -1030,7 +1051,6 @@ public class DrmManager extends BaseManager {
 	}
 	
 	public OEmployeeProfile addEmployeeProfile(EmployeeProfile eProfile) throws WTException {
-
 		Connection con = null;
 
 		try {
@@ -1059,8 +1079,36 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
-	public OEmployeeProfile updateEmployeeProfile(EmployeeProfile item) throws WTException {
+    public OHolidayDate addHolidayDate(HolidayDate hDate) throws WTException {
+		Connection con = null;
 
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			HolidayDateDAO hdDao = HolidayDateDAO.getInstance();
+
+			OHolidayDate oHD = ManagerUtils.createOHolidayDate(hDate);
+			oHD.setHolidayDateId(hdDao.getSequence(con).intValue());
+			oHD.setDomainId(getTargetProfileId().getDomainId());
+
+			hdDao.insert(con, oHD);
+
+			DbUtils.commitQuietly(con);
+
+			return oHD;
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+    
+	public OEmployeeProfile updateEmployeeProfile(EmployeeProfile item) throws WTException {
 		Connection con = null;
 	
 		try {
@@ -1086,8 +1134,33 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
-	public void deleteEmployeeProfile(Integer id) throws WTException {
+    public OHolidayDate updateHolidayDate(HolidayDate item) throws WTException {
+		Connection con = null;
+	
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			HolidayDateDAO hdDao = HolidayDateDAO.getInstance();
+			OHolidayDate hDate = ManagerUtils.createOHolidayDate(item);
 
+			hdDao.update(con, hDate);
+
+			DbUtils.commitQuietly(con);
+
+			return hDate;
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+    
+	public void deleteEmployeeProfile(Integer id) throws WTException {
 		Connection con = null;
 	
 		try {
@@ -1110,6 +1183,52 @@ public class DrmManager extends BaseManager {
 		}
 	}
 
+    public void deleteHolidayDate(Integer holidayDateId) throws WTException {
+		Connection con = null;
+	
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			HolidayDateDAO hdDao = HolidayDateDAO.getInstance();
+
+			hdDao.deleteById(con, holidayDateId);
+
+			DbUtils.commitQuietly(con);
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+    
+    public void cloneHolidayDates(Integer fromYear, Integer toYear) throws WTException {
+		Connection con = null;
+	
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			HolidayDateDAO hdDao = HolidayDateDAO.getInstance();
+            
+			hdDao.cloneByYear(con, fromYear, toYear, getTargetProfileId().getDomainId());
+
+			DbUtils.commitQuietly(con);
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+    
 	public OHourProfile addHourProfile(HourProfile hProfile) throws WTException {
 
 		Connection con = null;
@@ -2613,6 +2732,8 @@ public class DrmManager extends BaseManager {
 		EmployeeProfileDAO epDao = EmployeeProfileDAO.getInstance();
 		HourProfileDAO hpDao = HourProfileDAO.getInstance();
 		LineHourDAO lhDao = LineHourDAO.getInstance();
+        HolidayDateDAO hdDAO = HolidayDateDAO.getInstance();
+        
 		try {
 			con = WT.getConnection(SERVICE_ID, false);
 
@@ -2648,7 +2769,7 @@ public class DrmManager extends BaseManager {
 				//Insert in TimetableEvents
 				List<LocalDate> dts = ManagerUtils.getDateRange(newLr.getFromDate(), newLr.getToDate());
 
-				for(LocalDate ld : dts){
+				for(LocalDate ld : dts) {
 					OTimetableEvent oTe = new OTimetableEvent();
 					oTe.setTimetableEventId(teDao.getSequence(con).intValue());
 					oTe.setDomainId(newLr.getDomainId());
@@ -2659,33 +2780,43 @@ public class DrmManager extends BaseManager {
 					oTe.setLeaveRequestId(newLr.getLeaveRequestId());
 
 					String hRange = null;
+                    
+                    OHolidayDate oHD = hdDAO.selectByDomainDate(con, newLr.getDomainId(), ld.toDateTimeAtStartOfDay());
+                    
+                    if (oHD == null) {
+                        if(newLr.getFromHour() == null || newLr.getToHour() == null) {
+                            //Get Hours from Template
+                            OEmployeeProfile ep = epDao.selectEmployeeProfileByDomainUser(con, newLr.getDomainId(), newLr.getUserId());
 
-					if(newLr.getFromHour() == null || newLr.getToHour() == null){
-						//Get Hours from Template
-						OEmployeeProfile ep = epDao.selectEmployeeProfileByDomainUser(con, newLr.getDomainId(), newLr.getUserId());
+                            if(ep != null) {
+                                OHourProfile hp = hpDao.selectHourProfileById(con, ep.getHourProfileId());
 
-						if(ep != null){
-							OHourProfile hp = hpDao.selectHourProfileById(con, ep.getHourProfileId());
+                                if(hp != null) {
+                                    hRange = lhDao.selectSumLineHourByHourProfileIdDayOfWeek(con, hp.getId(), ld.getDayOfWeek());
+                                    // i have to convert minutes of hourprofile (recently update) in hour format
+                                    if (hRange != null) {
+                                        if (!hRange.isEmpty() || !hRange.equals("0")) {
+                                            int h = Integer.parseInt(hRange) / 60;
+                                            int m = Integer.parseInt(hRange) % 60;
+                                            hRange = String.format("%d.%02d", h, m);
+                                        }
+                                    }
+                                } else {
+                                    hRange = "8";
+                                }
+                            }
+                        } else {
+                            hRange = ManagerUtils.getHourRange(newLr.getFromHour(), newLr.getToHour());
+                        }
+                    }
 
-							if(hp != null){
-								hRange = lhDao.selectSumLineHourByHourProfileIdDayOfWeek(con, hp.getId(), ld.getDayOfWeek());
-								// i have to convert minutes of hourprofile (recently update) in hour format
-								int h = Integer.parseInt(hRange) / 60;
-								int m = Integer.parseInt(hRange) % 60;
-								hRange = String.format("%d.%02d", h, m);
-							}
-						}
-					}else{
-						hRange = ManagerUtils.getHourRange(newLr.getFromHour(), newLr.getToHour());
-					}
-
-					if(hRange == null) hRange = "8";
-
-					oTe.setHour(hRange);
-
-					teDao.insert(con, oTe);
-					}
-			}else{
+					// if(hRange == null) hRange = "8";
+                    if (hRange != null) {
+                        oTe.setHour(hRange);
+                        teDao.insert(con, oTe);
+                    }
+                }
+			} else {
 				notifyLeaveRequest(newLr);
 			}
 			
@@ -2710,7 +2841,8 @@ public class DrmManager extends BaseManager {
 		EmployeeProfileDAO epDao = EmployeeProfileDAO.getInstance();
 		HourProfileDAO hpDao = HourProfileDAO.getInstance();
 		LineHourDAO lhDao = LineHourDAO.getInstance();
-		
+		HolidayDateDAO hdDAO = HolidayDateDAO.getInstance();
+        
 		try {
 			DateTime revisionTimestamp = createRevisionTimestamp();
 
@@ -2741,33 +2873,44 @@ public class DrmManager extends BaseManager {
 
 						String hRange = null;
 						
-						if(lr.getFromHour() == null || lr.getToHour() == null){
-							//Get Hours from Template
-							OEmployeeProfile ep = epDao.selectEmployeeProfileByDomainUser(con, lr.getDomainId(), lr.getUserId());
-							
-							if(ep != null){
-								OHourProfile hp = hpDao.selectHourProfileById(con, ep.getHourProfileId());
+                        OHolidayDate oHD = hdDAO.selectByDomainDate(con, lr.getDomainId(), ld.toDateTimeAtStartOfDay());
+                        
+                        if (oHD == null) {
+                            if (lr.getFromHour() == null || lr.getToHour() == null) {
+                                //Get Hours from Template
+                                OEmployeeProfile ep = epDao.selectEmployeeProfileByDomainUser(con, lr.getDomainId(), lr.getUserId());
 
-								if(hp != null){
-									hRange = lhDao.selectSumLineHourByHourProfileIdDayOfWeek(con, hp.getId(), ld.getDayOfWeek());
-									// i have to convert minutes of hourprofile (recently update) in hour format
-									int h = Integer.parseInt(hRange) / 60;
-									int m = Integer.parseInt(hRange) % 60;
-									hRange = String.format("%d.%02d", h, m);
-								}
-							}
-						}else{
-							hRange = ManagerUtils.getHourRange(lr.getFromHour(), lr.getToHour());
-						}
-						
-						if(hRange == null) hRange = "8";
-						
-						oTe.setHour(hRange);
-						
-						teDao.insert(con, oTe);
+                                if (ep != null) {
+                                    OHourProfile hp = hpDao.selectHourProfileById(con, ep.getHourProfileId());
+
+                                    if (hp != null) {
+                                        hRange = lhDao.selectSumLineHourByHourProfileIdDayOfWeek(con, hp.getId(), ld.getDayOfWeek());
+                                        if (hRange != null) {
+                                            if (!hRange.isEmpty() || !hRange.equals("0")) {                                    
+                                                // i have to convert minutes of hourprofile (recently update) in hour format
+                                                int h = Integer.parseInt(hRange) / 60;
+                                                int m = Integer.parseInt(hRange) % 60;
+                                                hRange = String.format("%d.%02d", h, m);
+                                            }
+                                        }
+                                    } else {
+                                        hRange = "8";
+                                    }
+                                }
+                            } else {
+                                hRange = ManagerUtils.getHourRange(lr.getFromHour(), lr.getToHour());
+                            }
+                        }
+                        
+						// if(hRange == null) hRange = "8";
+						if (hRange != null) {
+                            oTe.setHour(hRange);						
+                            teDao.insert(con, oTe);
+                        }
 					}
 				}
 			}
+            
 			if(lr.getCancResult() != null){
 				lr.setManagerCancRespTimetamp(revisionTimestamp);
 				if(lr.getCancResult() == true){
@@ -3031,10 +3174,9 @@ public class DrmManager extends BaseManager {
 	}
 	
 	public void updateTimetableSetting(TimetableSetting item) throws WTException {
-
 		Connection con = null;
 		TimetableSettingDAO tDao = TimetableSettingDAO.getInstance();
-		HolidayDateDAO hdDao = HolidayDateDAO.getInstance();
+		// HolidayDateDAO hdDao = HolidayDateDAO.getInstance();
 
 		try {
 			con = WT.getConnection(SERVICE_ID, false);
@@ -3053,7 +3195,8 @@ public class DrmManager extends BaseManager {
 			} else {
 				tDao.update(con, setting);
 			}
-
+            
+            /*
 			List<HolidayDate> hds = oldTimetableSetting == null ? new ArrayList() : oldTimetableSetting.getHolidayDates();
 			
 			CollectionChangeSet<HolidayDate> changesSet1 = getCollectionChanges(hds, item.getHolidayDates());
@@ -3079,7 +3222,8 @@ public class DrmManager extends BaseManager {
 				if(newOHd != null) hdDao.updateByDomainIdDate(con, oHd);
 				else hdDao.updateByDomainId(con, oHd);
 			}
-
+            */
+            
 			DbUtils.commitQuietly(con);
 
 		} catch (SQLException | DAOException ex) {
@@ -3872,6 +4016,26 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
+    public HolidayDate getHolidayDate(Integer id) throws WTException {
+		Connection con = null;
+		HolidayDateDAO hdDAO = HolidayDateDAO.getInstance();
+
+		HolidayDate hd = null; 
+        
+		try {
+			con = WT.getConnection(SERVICE_ID);
+
+			hd = ManagerUtils.createHolidayDate(hdDAO.selectHolidayDateById(con, id));
+
+			return hd;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+    
 	public HourProfile getHourProfile(Integer id) throws WTException {
 		Connection con = null;
 		HourProfileDAO hpDao = HourProfileDAO.getInstance();
@@ -4633,7 +4797,7 @@ public class DrmManager extends BaseManager {
 			DbUtils.closeQuietly(con);
 		}
 	}
-	
+        
 	public void updateTicket(Ticket item, Boolean close) throws WTException {
 		Connection con = null;
 		TicketDAO tcktDao = TicketDAO.getInstance();

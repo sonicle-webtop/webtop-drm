@@ -42,7 +42,7 @@ Ext.define('Sonicle.webtop.drm.model.Job', {
 			writeAssociations: true
 		}
 	}),
-	identifier: 'negative',
+	identifier: 'negativestring',
 	idProperty: 'jobId',
 	fields: [
 		WTF.field('jobId', 'string', true),

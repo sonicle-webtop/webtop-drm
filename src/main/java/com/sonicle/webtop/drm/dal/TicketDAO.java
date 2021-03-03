@@ -83,7 +83,7 @@ public class TicketDAO extends BaseDAO {
 				)
 				.fetchInto(OViewTicket.class);
 	}
-	
+    
 	private Condition ensureViewCondition(TicketQuery query, String domainId, String userId) {		
 		Condition searchCndt = null;
 		
@@ -135,6 +135,10 @@ public class TicketDAO extends BaseDAO {
 			searchCndt = searchCndt.and(VW_TICKETS.TO_OPERATOR_ID.in(operators));
 		}
 		
+        if (query.ticketId != null) {
+            searchCndt = searchCndt.and(VW_TICKETS.TICKET_ID.equal(query.ticketId));
+        }
+        
 		if (domainId != null) {
 			searchCndt = searchCndt.and(VW_TICKETS.DOMAIN_ID.equal(domainId));
 		}
@@ -286,7 +290,9 @@ public class TicketDAO extends BaseDAO {
 				TICKETS.DOMAIN_ID.equal(domainId)				
 				.and(TICKETS.NUMBER.likeIgnoreCase(number))
 				.and(searchCndt)
-			)
+			).orderBy(
+                TICKETS.NUMBER.desc()
+            )
 			.fetchInto(OTicket.class);
 	}
 	

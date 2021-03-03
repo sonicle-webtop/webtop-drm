@@ -78,6 +78,7 @@ public class EmployeeProfileDAO extends BaseDAO {
 				.where(
 						EMPLOYEE_PROFILES.DOMAIN_ID.equal(domainId)
 				)
+                .orderBy(EMPLOYEE_PROFILES.USER_ID.asc())
 				.fetchInto(OEmployeeProfile.class);
 	}
 	

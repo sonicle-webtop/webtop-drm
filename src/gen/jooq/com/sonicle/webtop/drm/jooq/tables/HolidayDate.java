@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class HolidayDate extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.HolidayDateRecord> {
 
-	private static final long serialVersionUID = 1345508251;
+	private static final long serialVersionUID = -124096442;
 
 	/**
 	 * The reference instance of <code>drm.holiday_date</code>
@@ -45,6 +45,11 @@ public class HolidayDate extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.
 	 * The column <code>drm.holiday_date.description</code>.
 	 */
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.HolidayDateRecord, java.lang.String> DESCRIPTION = createField("description", org.jooq.impl.SQLDataType.VARCHAR.length(50).nullable(false), this, "");
+
+	/**
+	 * The column <code>drm.holiday_date.holiday_date_id</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.HolidayDateRecord, java.lang.Integer> HOLIDAY_DATE_ID = createField("holiday_date_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
 	 * Create a <code>drm.holiday_date</code> table reference

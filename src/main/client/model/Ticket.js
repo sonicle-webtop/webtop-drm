@@ -45,7 +45,7 @@ Ext.define('Sonicle.webtop.drm.model.Ticket', {
 			close: false
 		}
 	}),
-	identifier: 'negative',
+	identifier: 'negativestring',
 	idProperty: 'ticketId',
 	
 	fields: [

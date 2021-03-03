@@ -78,6 +78,7 @@ public class HourProfileDAO extends BaseDAO {
 				.where(
 						HOUR_PROFILES.DOMAIN_ID.equal(domainId)
 				)
+                .orderBy(HOUR_PROFILES.DESCRIPTION.asc())
 				.fetchInto(OHourProfile.class);
 	}
 

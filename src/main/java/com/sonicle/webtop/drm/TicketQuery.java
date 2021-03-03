@@ -53,7 +53,8 @@ public class TicketQuery {
 	public Integer statusId;
 	public String priorityId;
 	public Boolean opened;
-	
+	public String ticketId;
+    
 	public TicketQuery() {
 	}
 

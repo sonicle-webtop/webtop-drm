@@ -130,7 +130,7 @@ public class TplHelper {
 	
 	public static String buildTicketNotificationBody(Locale locale, OViewTicket oVwTckt) throws IOException, TemplateException {
 		DateTimeZone eventTz = DateTimeZone.forID(oVwTckt.getTimezone());
-		DateTimeFormatter hmsZoneFmt = DateTimeUtils.createFormatter("hh:mm:ss", eventTz);
+		DateTimeFormatter hmsZoneFmt = DateTimeUtils.createFormatter("HH:mm:ss", eventTz);
 		DateTimeFormatter dmyZoneFmt = DateTimeUtils.createFormatter("dd/MM/yyyy", eventTz);
 		
 		try {

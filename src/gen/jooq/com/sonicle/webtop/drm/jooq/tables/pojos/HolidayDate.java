@@ -16,22 +16,25 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class HolidayDate implements java.io.Serializable {
 
-	private static final long serialVersionUID = 1630090971;
+	private static final long serialVersionUID = 758812049;
 
 	private java.lang.String        domainId;
 	private org.joda.time.LocalDate date;
 	private java.lang.String        description;
+	private java.lang.Integer       holidayDateId;
 
 	public HolidayDate() {}
 
 	public HolidayDate(
 		java.lang.String        domainId,
 		org.joda.time.LocalDate date,
-		java.lang.String        description
+		java.lang.String        description,
+		java.lang.Integer       holidayDateId
 	) {
 		this.domainId = domainId;
 		this.date = date;
 		this.description = description;
+		this.holidayDateId = holidayDateId;
 	}
 
 	public java.lang.String getDomainId() {
@@ -56,5 +59,13 @@ public class HolidayDate implements java.io.Serializable {
 
 	public void setDescription(java.lang.String description) {
 		this.description = description;
+	}
+
+	public java.lang.Integer getHolidayDateId() {
+		return this.holidayDateId;
+	}
+
+	public void setHolidayDateId(java.lang.Integer holidayDateId) {
+		this.holidayDateId = holidayDateId;
 	}
 }

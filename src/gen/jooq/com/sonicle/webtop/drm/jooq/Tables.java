@@ -302,6 +302,16 @@ public class Tables {
 	public static final com.sonicle.webtop.drm.jooq.tables.VwWorkReports VW_WORK_REPORTS = com.sonicle.webtop.drm.jooq.tables.VwWorkReports.VW_WORK_REPORTS;
 
 	/**
+	 * The table drm.vw_work_reports_2
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.VwWorkReports_2 VW_WORK_REPORTS_2 = com.sonicle.webtop.drm.jooq.tables.VwWorkReports_2.VW_WORK_REPORTS_2;
+
+	/**
+	 * The table drm.vw_work_reports_3
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.VwWorkReports_3 VW_WORK_REPORTS_3 = com.sonicle.webtop.drm.jooq.tables.VwWorkReports_3.VW_WORK_REPORTS_3;
+
+	/**
 	 * The table drm.work_reports
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.WorkReports WORK_REPORTS = com.sonicle.webtop.drm.jooq.tables.WorkReports.WORK_REPORTS;

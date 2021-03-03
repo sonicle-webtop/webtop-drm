@@ -44,7 +44,7 @@ import java.util.List;
  */
 public class JsWorkReportSetting {
 
-	public String id = "wr";
+	public String id = "wrkr";
 	public Integer workReportSettingId;
 	public String domainId;
 	public Integer workReportSequence;

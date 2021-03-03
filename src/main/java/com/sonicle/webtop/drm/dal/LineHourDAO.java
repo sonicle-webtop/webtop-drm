@@ -159,8 +159,7 @@ public class LineHourDAO extends BaseDAO {
 			.execute();
 	}
 	
-	private Field<String> getDayFieldByDayOfWeek(int dayOfWeek){
-		
+	private Field<String> getDayFieldByDayOfWeek(int dayOfWeek){		
 		switch(dayOfWeek){
 			case 1:
 				return LINE_HOURS._1_H;
