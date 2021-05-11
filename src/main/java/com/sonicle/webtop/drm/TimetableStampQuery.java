@@ -53,7 +53,7 @@ public class TimetableStampQuery {
 			return null;
 		}
 
-		return JsonResult.GSON.fromJson(value, TimetableStampQuery.class);
+		return JsonResult.gson().fromJson(value, TimetableStampQuery.class);
 	}
 
 	public static String toJson(TimetableStampQuery value) {
@@ -61,6 +61,6 @@ public class TimetableStampQuery {
 			return null;
 		}
 
-		return JsonResult.GSON.toJson(value, TimetableStampQuery.class);
+		return JsonResult.gson().toJson(value, TimetableStampQuery.class);
 	}
 }

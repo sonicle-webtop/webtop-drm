@@ -58,7 +58,7 @@ public class JobQuery {
 			return null;
 		}
 
-		return JsonResult.GSON.fromJson(value, JobQuery.class);
+		return JsonResult.gson().fromJson(value, JobQuery.class);
 	}
 
 	public static String toJson(JobQuery value) {
@@ -66,6 +66,6 @@ public class JobQuery {
 			return null;
 		}
 
-		return JsonResult.GSON.toJson(value, JobQuery.class);
+		return JsonResult.gson().toJson(value, JobQuery.class);
 	}
 }

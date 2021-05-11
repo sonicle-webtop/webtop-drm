@@ -65,7 +65,7 @@ public class WorkReportQuery {
 			return null;
 		}
 
-		return JsonResult.GSON.fromJson(value, WorkReportQuery.class);
+		return JsonResult.gson().fromJson(value, WorkReportQuery.class);
 	}
 
 	public static String toJson(WorkReportQuery value) {
@@ -73,6 +73,6 @@ public class WorkReportQuery {
 			return null;
 		}
 
-		return JsonResult.GSON.toJson(value, WorkReportQuery.class);
+		return JsonResult.gson().toJson(value, WorkReportQuery.class);
 	}
 }

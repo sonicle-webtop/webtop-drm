@@ -54,7 +54,7 @@ public class TimetableSummaryExcelQuery {
 			return null;
 		}
 
-		return JsonResult.GSON.fromJson(value, TimetableSummaryExcelQuery.class);
+		return JsonResult.gson().fromJson(value, TimetableSummaryExcelQuery.class);
 	}
 
 	public static String toJson(TimetableSummaryExcelQuery value) {
@@ -62,6 +62,6 @@ public class TimetableSummaryExcelQuery {
 			return null;
 		}
 
-		return JsonResult.GSON.toJson(value, TimetableSummaryExcelQuery.class);
+		return JsonResult.gson().toJson(value, TimetableSummaryExcelQuery.class);
 	}
 }

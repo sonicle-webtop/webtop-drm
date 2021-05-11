@@ -55,7 +55,7 @@ public class ExpenseNoteQuery {
 			return null;
 		}
 
-		return JsonResult.GSON.fromJson(value, ExpenseNoteQuery.class);
+		return JsonResult.gson().fromJson(value, ExpenseNoteQuery.class);
 	}
 
 	public static String toJson(ExpenseNoteQuery value) {
@@ -63,6 +63,6 @@ public class ExpenseNoteQuery {
 			return null;
 		}
 
-		return JsonResult.GSON.toJson(value, ExpenseNoteQuery.class);
+		return JsonResult.gson().toJson(value, ExpenseNoteQuery.class);
 	}
 }

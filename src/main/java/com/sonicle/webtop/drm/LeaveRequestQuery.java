@@ -57,7 +57,7 @@ public class LeaveRequestQuery {
 			return null;
 		}
 
-		return JsonResult.GSON.fromJson(value, LeaveRequestQuery.class);
+		return JsonResult.gson().fromJson(value, LeaveRequestQuery.class);
 	}
 
 	public static String toJson(LeaveRequestQuery value) {
@@ -65,6 +65,6 @@ public class LeaveRequestQuery {
 			return null;
 		}
 
-		return JsonResult.GSON.toJson(value, LeaveRequestQuery.class);
+		return JsonResult.gson().toJson(value, LeaveRequestQuery.class);
 	}
 }

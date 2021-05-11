@@ -63,7 +63,7 @@ public class TicketQuery {
 			return null;
 		}
 
-		return JsonResult.GSON.fromJson(value, TicketQuery.class);
+		return JsonResult.gson().fromJson(value, TicketQuery.class);
 	}
 
 	public static String toJson(TicketQuery value) {
@@ -71,6 +71,6 @@ public class TicketQuery {
 			return null;
 		}
 
-		return JsonResult.GSON.toJson(value, TicketQuery.class);
+		return JsonResult.gson().toJson(value, TicketQuery.class);
 	}
 }

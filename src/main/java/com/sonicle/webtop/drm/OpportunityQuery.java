@@ -72,7 +72,7 @@ public class OpportunityQuery {
 			return null;
 		}
 
-		return JsonResult.GSON.fromJson(value, OpportunityQuery.class);
+		return JsonResult.gson().fromJson(value, OpportunityQuery.class);
 	}
 
 	public static String toJson(OpportunityQuery value) {
@@ -80,6 +80,6 @@ public class OpportunityQuery {
 			return null;
 		}
 
-		return JsonResult.GSON.toJson(value, OpportunityQuery.class);
+		return JsonResult.gson().toJson(value, OpportunityQuery.class);
 	}
 }
