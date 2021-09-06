@@ -1,0 +1,115 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "version" : "v1",
+    "title" : "WebTop DRM",
+    "contact" : {
+      "email" : "dev-team@sonicle.com"
+    }
+  },
+  "security" : [ {
+    "Basic authentication" : [ ]
+  } ],
+  "paths" : {
+    "/timetable" : {
+      "post" : {
+        "tags" : [ "timetable" ],
+        "summary" : "Adds new timetable entries",
+        "description" : "Add an array of timetable entries",
+        "operationId" : "addTimetableEntries",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/definitions/TimetableEntry"
+            }
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "Success",
+            "schema" : {
+              "type" : "object",
+              "properties" : { }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "summary" : "",
+        "description" : "Delete a range of timetable entries",
+        "operationId" : "deleteTimetableEntries",
+        "parameters" : [ {
+          "name" : "fromDate",
+          "in" : "query",
+          "description" : "From entrance/exit date/time (ISO date/time YYYYMMDD'T'HHMMSS'Z')",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "toDate",
+          "in" : "query",
+          "description" : "To entrance/exit date/time (ISO date/time YYYYMMDD'T'HHMMSS'Z')   ",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "employeeIds",
+          "in" : "query",
+          "description" : "Employee id (null or empty array for all employees)",
+          "required" : false,
+          "type" : "array"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Success"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions" : {
+    "Basic authentication" : {
+      "type" : "basic"
+    }
+  },
+  "definitions" : {
+    "TimetableEntry" : {
+      "type" : "object",
+      "required" : [ "employeeId", "entrance", "exit" ],
+      "properties" : {
+        "employeeId" : {
+          "type" : "string",
+          "description" : "Employee id"
+        },
+        "entrance" : {
+          "type" : "string",
+          "description" : "Entrance date/time (ISO date/time YYYYMMDD'T'HHMMSS'Z')"
+        },
+        "exit" : {
+          "type" : "string",
+          "description" : "Exit date/time (ISO date/time YYYYMMDD'T'HHMMSS'Z')"
+        }
+      },
+      "title" : "TimetableEntry"
+    },
+    "ApiError" : {
+      "type" : "object",
+      "required" : [ "code" ],
+      "properties" : {
+        "code" : {
+          "type" : "integer"
+        },
+        "description" : {
+          "type" : "string"
+        }
+      },
+      "title" : "ApiError",
+      "description" : "This general detailed error structure is used throughout this API."
+    }
+  }
+}

@@ -83,6 +83,10 @@
 			<modelJsClassName>model.UserOptions</modelJsClassName>
 		</userOptions>	
 		
+		<restApis>
+			<restApi oasFile="openapi-v1.json" />
+		</restApis>
+
 		<permissions>
 			<permission group="CONFIGURATIONS" actions="MANAGE" />
 			<permission group="OPPORTUNITY" actions="READ,DELETE,UPDATE" />

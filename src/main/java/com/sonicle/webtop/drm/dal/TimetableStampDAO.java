@@ -215,4 +215,34 @@ public class TimetableStampDAO extends BaseDAO{
 			)
 			.execute();
 	}
+	
+	public int deleteRangeByUserIds(Connection con, String domainId, List<String> userIds, DateTime fromDate, DateTime toDate) {
+		DSLContext dsl = getDSL(con);
+		return dsl
+			.delete(TIMETABLE_STAMP)
+			.where(
+				TIMETABLE_STAMP.DOMAIN_ID.eq(domainId).and(
+					TIMETABLE_STAMP.USER_ID.in(userIds)
+				).and(
+					TIMETABLE_STAMP.ENTRANCE.between(fromDate, toDate).or(
+						TIMETABLE_STAMP.EXIT.between(fromDate, toDate)
+					)
+				)
+			)
+			.execute();
+	}
+	
+	public int deleteRange(Connection con, String domainId, DateTime fromDate, DateTime toDate) {
+		DSLContext dsl = getDSL(con);
+		return dsl
+			.delete(TIMETABLE_STAMP)
+			.where(
+				TIMETABLE_STAMP.DOMAIN_ID.eq(domainId).and(
+					TIMETABLE_STAMP.ENTRANCE.between(fromDate, toDate).or(
+						TIMETABLE_STAMP.EXIT.between(fromDate, toDate)
+					)
+				)
+			)
+			.execute();
+	}
 }

@@ -13,6 +13,13 @@
 		<version>7</version>
 	</parent>
 	
+    <properties>
+		<!-- WEBTOP SERVICE CONFIGURATION -->
+		<webtop.service.package>com.sonicle.webtop.drm</webtop.service.package>
+		<webtop.service.jsPackage>Sonicle.webtop.drm</webtop.service.jsPackage>
+		<webtop.service.restApi.oas>openapi-v1.json</webtop.service.restApi.oas>
+    </properties>
+	
     <dependencies>
 		<!-- This WebTop Service's API project -->
         <dependency>
@@ -47,9 +54,4 @@
             <type>jar</type>
         </dependency>
     </dependencies>
-    <properties>
-		<!-- WEBTOP SERVICE CONFIGURATION -->
-		<webtop.service.package>com.sonicle.webtop.drm</webtop.service.package>
-		<webtop.service.jsPackage>Sonicle.webtop.drm</webtop.service.jsPackage>
-    </properties>
 </project>

@@ -107,6 +107,28 @@ public class EmployeeProfileDAO extends BaseDAO {
 				.fetchOneInto(OEmployeeProfile.class);
 	}
 
+	public OEmployeeProfile selectEmployeeProfileByNumber(Connection con, String number) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.select()
+				.from(EMPLOYEE_PROFILES)
+				.where(
+						EMPLOYEE_PROFILES.NUMBER.equal(number)
+				)
+				.fetchOneInto(OEmployeeProfile.class);
+	}
+	
+	public List<OEmployeeProfile> selectEmployeeProfilesByNumbers(Connection con, List<String> numbers) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.select()
+				.from(EMPLOYEE_PROFILES)
+				.where(
+						EMPLOYEE_PROFILES.NUMBER.in(numbers)
+				)
+				.fetchInto(OEmployeeProfile.class);
+	}
+	
 	public int update(Connection con, OEmployeeProfile item) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		return dsl

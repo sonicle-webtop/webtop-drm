@@ -4016,6 +4016,64 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
+	public EmployeeProfile getEmployeeProfile(String number) throws WTException {
+		Connection con = null;
+		EmployeeProfileDAO epDao =EmployeeProfileDAO.getInstance();
+		LineHourDAO ehDao = LineHourDAO.getInstance();
+
+		EmployeeProfile employeeProfile = null;
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			employeeProfile = ManagerUtils.createEmployeeProfile(epDao.selectEmployeeProfileByNumber(con, number));
+
+			return employeeProfile;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public String getEmployeeUserId(String number) throws WTException {
+		Connection con = null;
+		EmployeeProfileDAO epDao =EmployeeProfileDAO.getInstance();
+
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			return epDao.selectEmployeeProfileByNumber(con, number).getUserId();
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public List<String> getEmployeeUserIds(List<String> numbers) throws WTException {
+		Connection con = null;
+		EmployeeProfileDAO epDao =EmployeeProfileDAO.getInstance();
+		
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			List<OEmployeeProfile> eps = epDao.selectEmployeeProfilesByNumbers(con, numbers);
+			List<String> userIds = new ArrayList<>();
+			for (OEmployeeProfile ep: eps) userIds.add(ep.getUserId());
+			return userIds;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
     public HolidayDate getHolidayDate(Integer id) throws WTException {
 		Connection con = null;
 		HolidayDateDAO hdDAO = HolidayDateDAO.getInstance();
@@ -4256,6 +4314,32 @@ public class DrmManager extends BaseManager {
 			con = WT.getConnection(SERVICE_ID, false);
 
 			tsDao.deleteById(con, id);
+
+			DbUtils.commitQuietly(con);
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public void deleteTimetableStamp(List<String> userIds, DateTime fromDate, DateTime toDate) throws WTException {
+
+		Connection con = null;
+		TimetableStampDAO tsDao = TimetableStampDAO.getInstance();
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			String domainId = getTargetProfileId().getDomainId();
+			if (userIds == null || userIds.size()==0)
+				tsDao.deleteRange(con, domainId, fromDate, toDate);
+			else
+				tsDao.deleteRangeByUserIds(con, domainId, userIds, fromDate, toDate);
 
 			DbUtils.commitQuietly(con);
 
