@@ -60,7 +60,7 @@ Ext.define('Sonicle.webtop.drm.model.Ticket', {
 		WTF.field('timezone', 'string', false),
 		WTF.field('title', 'string', false),
 		WTF.field('statusId', 'int', false),
-		WTF.field('priorityId', 'string', false,),		
+		WTF.field('priorityId', 'string', false),		
 		WTF.field('description', 'string', true),
 		WTF.field('release', 'string', true),
 		WTF.field('environment', 'string', true),
