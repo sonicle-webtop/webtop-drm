@@ -46,7 +46,7 @@ Ext.define('Sonicle.webtop.drm.model.GridTickets', {
 		WTF.roField('customerDescription', 'string'),
 		WTF.roField('customerStatId', 'string'),
 		WTF.roField('customerStatDescription', 'string'),
-		WTF.roField('date', 'string',),
+		WTF.roField('date', 'string'),
 		WTF.roField('title', 'string'),
 		WTF.roField('categoryTicketId', 'int'),
 		WTF.roField('categoryTicketDescription', 'string'),
