@@ -132,5 +132,5 @@ public class DrmUserSettings extends BaseUserSettings {
 
 	public void setTicketAutomaticClose(String value) {
 		setString(TICKET_AUTOMATIC_CLOSE, value);
-	}	
+	}
 }

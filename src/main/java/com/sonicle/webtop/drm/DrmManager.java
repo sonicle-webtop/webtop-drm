@@ -56,6 +56,7 @@ import static com.sonicle.webtop.drm.Service.logger;
 import com.sonicle.webtop.drm.bol.OActivity;
 import com.sonicle.webtop.drm.bol.OActivityGroup;
 import com.sonicle.webtop.drm.bol.OBusinessTrip;
+import com.sonicle.webtop.drm.bol.OCausal;
 import com.sonicle.webtop.drm.bol.OCompany;
 import com.sonicle.webtop.drm.bol.OCompanyPicture;
 import com.sonicle.webtop.drm.bol.OCompanyUser;
@@ -119,6 +120,7 @@ import com.sonicle.webtop.drm.bol.VOpportunityEntry;
 import com.sonicle.webtop.drm.dal.ActivityDAO;
 import com.sonicle.webtop.drm.dal.ActivityGroupDAO;
 import com.sonicle.webtop.drm.dal.BusinessTripDao;
+import com.sonicle.webtop.drm.dal.CausalDAO;
 import com.sonicle.webtop.drm.dal.CompanyDAO;
 import com.sonicle.webtop.drm.dal.CompanyPictureDAO;
 import com.sonicle.webtop.drm.dal.CompanyUserDAO;
@@ -172,6 +174,7 @@ import com.sonicle.webtop.drm.dal.WorkTypeDAO;
 import com.sonicle.webtop.drm.model.Activity;
 import com.sonicle.webtop.drm.model.ActivityGroupAssociation;
 import com.sonicle.webtop.drm.model.BusinessTrip;
+import com.sonicle.webtop.drm.model.Causal;
 import com.sonicle.webtop.drm.model.Company;
 import com.sonicle.webtop.drm.model.CompanyPicture;
 import com.sonicle.webtop.drm.model.CompanyUserAssociation;
@@ -256,6 +259,8 @@ import javax.imageio.ImageIO;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Session;
 import jakarta.mail.internet.InternetAddress;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -608,6 +613,33 @@ public class DrmManager extends BaseManager {
 			ohd = hdDao.selectByDomain(con, getTargetProfileId().getDomainId());
 
 			return ohd;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public List<OCausal> listCausals(boolean filter) throws WTException {
+		Connection con = null;
+		CausalDAO cDao = CausalDAO.getInstance();
+		
+		List<OCausal> oC = null;
+		TimetableSetting tts = null;
+		
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+			
+			if(filter){
+				tts = getTimetableSetting();
+				oC = cDao.selectByTimetableSetting(con, tts);
+			}else{
+				oC = cDao.selectAll(con, tts);
+			}
+
+			return oC;
 
 		} catch (SQLException | DAOException ex) {
 			throw new WTException(ex, "DB error");
@@ -1107,6 +1139,33 @@ public class DrmManager extends BaseManager {
 			DbUtils.closeQuietly(con);
 		}
 	}
+	
+	public OCausal addCausal(Causal c) throws WTException {
+		Connection con = null;
+
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			CausalDAO cDao = CausalDAO.getInstance();
+
+			OCausal oC = ManagerUtils.createOCausal(c);
+
+			cDao.insert(con, oC);
+
+			DbUtils.commitQuietly(con);
+
+			return oC;
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
     
 	public OEmployeeProfile updateEmployeeProfile(EmployeeProfile item) throws WTException {
 		Connection con = null;
@@ -1159,6 +1218,32 @@ public class DrmManager extends BaseManager {
 			DbUtils.closeQuietly(con);
 		}
 	}
+	
+	public OCausal updateCausal(Causal item) throws WTException {
+		Connection con = null;
+	
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			CausalDAO cDao = CausalDAO.getInstance();
+			OCausal c = ManagerUtils.createOCausal(item);
+
+			cDao.updateById(con, c);
+
+			DbUtils.commitQuietly(con);
+
+			return c;
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
     
 	public void deleteEmployeeProfile(Integer id) throws WTException {
 		Connection con = null;
@@ -1192,6 +1277,29 @@ public class DrmManager extends BaseManager {
 			HolidayDateDAO hdDao = HolidayDateDAO.getInstance();
 
 			hdDao.deleteById(con, holidayDateId);
+
+			DbUtils.commitQuietly(con);
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public void deleteCausal(String id) throws WTException {
+		Connection con = null;
+	
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			CausalDAO cDao = CausalDAO.getInstance();
+
+			cDao.deleteById(con, id);
 
 			DbUtils.commitQuietly(con);
 
@@ -3176,7 +3284,6 @@ public class DrmManager extends BaseManager {
 	public void updateTimetableSetting(TimetableSetting item) throws WTException {
 		Connection con = null;
 		TimetableSettingDAO tDao = TimetableSettingDAO.getInstance();
-		// HolidayDateDAO hdDao = HolidayDateDAO.getInstance();
 
 		try {
 			con = WT.getConnection(SERVICE_ID, false);
@@ -3195,34 +3302,6 @@ public class DrmManager extends BaseManager {
 			} else {
 				tDao.update(con, setting);
 			}
-            
-            /*
-			List<HolidayDate> hds = oldTimetableSetting == null ? new ArrayList() : oldTimetableSetting.getHolidayDates();
-			
-			CollectionChangeSet<HolidayDate> changesSet1 = getCollectionChanges(hds, item.getHolidayDates());
-			for (HolidayDate hd : changesSet1.inserted) {
-
-				OHolidayDate oHd = ManagerUtils.createOHolidayDate(hd);
-				oHd.setDomainId(getTargetProfileId().getDomainId());
-
-				hdDao.insert(con, oHd);
-			}
-
-			for (HolidayDate hd : changesSet1.deleted) {
-				hdDao.deleteByDomainIdDate(con, hd.getDomainId(), hd.getDate().toDateTimeAtStartOfDay());
-			}
-
-			for (HolidayDate hd : changesSet1.updated) {
-
-				OHolidayDate oHd = ManagerUtils.createOHolidayDate(hd);
-				OHolidayDate newOHd = null;
-				
-				newOHd = hdDao.selectByDomainDate(con, oHd.getDomainId(), DateTime.parse(oHd.getDate().toString()));
-
-				if(newOHd != null) hdDao.updateByDomainIdDate(con, oHd);
-				else hdDao.updateByDomainId(con, oHd);
-			}
-            */
             
 			DbUtils.commitQuietly(con);
 
@@ -4093,6 +4172,26 @@ public class DrmManager extends BaseManager {
 			DbUtils.closeQuietly(con);
 		}
 	}
+	
+	public Causal getCausal(String id) throws WTException {
+		Connection con = null;
+		CausalDAO cDAO = CausalDAO.getInstance();
+
+		Causal c = null; 
+        
+		try {
+			con = WT.getConnection(SERVICE_ID);
+
+			c = ManagerUtils.createCausal(cDAO.selectById(con, id));
+
+			return c;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
     
 	public HourProfile getHourProfile(Integer id) throws WTException {
 		Connection con = null;
@@ -4392,6 +4491,9 @@ public class DrmManager extends BaseManager {
 		List<OTimetableEvent> te = null;
 		List<OWorkReport> wr = null;
 		List<OJob> jb = null;
+		HashMap<String, HashMap<String, String>> hashTrs = new HashMap();
+		HashMap<String, String> vals = null;
+		HashMap<String, String> val = null;
 		
 		try {
 			con = WT.getConnection(SERVICE_ID, false);
@@ -4404,6 +4506,16 @@ public class DrmManager extends BaseManager {
 			
 			if(query != null) {
 				//Empty Table for single user
+				
+				//Save "Other", "Causal", "Note" for re-set in new generation rows
+				for(OTimetableReport itm : trDAO.selectByDomainIdUserId(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId())){
+					vals = new HashMap();
+					vals.put("other", itm.getOther());
+					vals.put("causalId", itm.getCausalId());
+					vals.put("note", itm.getNote());
+					hashTrs.put(itm.getDomainId() + "|" + itm.getUserId() + "|" + itm.getDate(),  vals);
+				}
+						
 				trDAO.deleteByDomainIdUserId(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
 				
 				if(query.targetUserId == null) {
@@ -4451,6 +4563,15 @@ public class DrmManager extends BaseManager {
 				for(OTimetableReport otr : trs){
 					otr.setId(trDAO.getTimetableReportTempSequence(con).intValue());
 					otr.setUserId(getTargetProfileId().getUserId());
+					
+					//Set if present other, causal, note from old generation
+					val = hashTrs.getOrDefault(otr.getDomainId() + "|" + otr.getUserId() + "|" + otr.getDate(), null);
+					if(val != null){
+						otr.setOther(val.getOrDefault("other", null));
+						otr.setCausalId(val.getOrDefault("causalId", null));
+						otr.setNote(val.getOrDefault("note", null));
+					}
+					
 					trDAO.insert(con, otr);
 				}
 			}
@@ -5309,6 +5430,265 @@ public class DrmManager extends BaseManager {
 		} finally {
 			DbUtils.closeQuietly(con);
 			try { if(mapw != null) mapw.close(); } catch(Exception ex) { /* Do nothing... */ }
+		}
+	}
+	
+	public void exportTimetableReportGis(LogEntries log, OutputStream os) throws Exception {
+		Connection con = null;
+		OutputStreamWriter osWriter = null;		
+		DrmServiceSettings dss = null;
+		SimpleDateFormat sdf = null;
+		DecimalFormat df = null;
+		EmployeeProfileDAO ePDao = null;
+		OEmployeeProfile oEP = null;
+		HourProfileDAO hPDao = null;
+		OHourProfile oHP = null;
+		LineHourDAO lHDao = null;
+		TimetableSettingDAO ttsDao = null;
+		OTimetableSetting oTts = null;
+		CausalDAO cDao = null;
+		OCausal oC = null;
+		
+		try {		
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			ePDao = EmployeeProfileDAO.getInstance();
+			hPDao = HourProfileDAO.getInstance();
+			lHDao = LineHourDAO.getInstance();
+			ttsDao = TimetableSettingDAO.getInstance();	
+			cDao = CausalDAO.getInstance();
+		
+			dss = new DrmServiceSettings(SERVICE_ID, getTargetProfileId().getDomainId());
+			oTts = ttsDao.selectByDomainId(con, getTargetProfileId().getDomainId());
+			
+			sdf = new SimpleDateFormat("dd/MM/yyyy");
+			df = new DecimalFormat("0.00");
+			
+			osWriter = new OutputStreamWriter(os);
+			
+			for (OTimetableReport oTR : generateTimetableReport(null)) {
+				
+				//Calculate Theoretical Hours
+				oEP = ePDao.selectEmployeeProfileByDomainUser(con, oTR.getDomainId(), oTR.getUserId());
+				oHP = hPDao.selectHourProfileById(con, oEP.getHourProfileId());
+				String theoreticalMinutes = lHDao.selectSumLineHourByHourProfileIdDayOfWeek(con, oHP.getId(),  oTR.getDate().getDayOfWeek());
+				String stringTheoreticalHours = "";
+				if(theoreticalMinutes != null && !"".equals(theoreticalMinutes)){
+					Float theoreticalHours = Float.parseFloat(theoreticalMinutes) / 60;
+					stringTheoreticalHours = df.format(theoreticalHours);
+					stringTheoreticalHours = stringTheoreticalHours.replaceAll(",", "");
+				}
+				stringTheoreticalHours = StringUtils.repeat("0", 4 - stringTheoreticalHours.length()) + stringTheoreticalHours;
+				
+				String empty = "000";
+				String companyCode = StringUtils.repeat("0", 6 - dss.getGisCompanyCode().length()) + dss.getGisCompanyCode();
+				String headquartersCod = StringUtils.repeat("0", 4 - dss.getGisHeadquartersCode().length()) + dss.getGisHeadquartersCode();
+				String employee = StringUtils.repeat("0", 6 - oEP.getNumber().length()) + oEP.getNumber();
+				String date = sdf.format(oTR.getDate().toDate());
+				String unitOfMeasure = "H";
+				String rate = "0000000000";
+				String result = "0000000000";
+				String movementType = "G";
+				
+				//Working Hours
+				if(oTR.getWorkingHours() != null && !"".equals(oTR.getWorkingHours())){
+					oC = cDao.selectById(con, oTts.getDefaultCausalWorkingHours());
+					String causalExternalCode = oC.getExternalCode() + StringUtils.repeat(" ", 5 - oC.getExternalCode().length());
+					
+					//Convert sexagesimal minutes to centesimal minutes
+					String hour = oTR.getWorkingHours();
+					if(hour.contains(".")){
+						String sexagesimalMinutes = hour.split("\\.")[1];
+						Integer centesimalMinutes = (Integer.parseInt(sexagesimalMinutes) * 100)/60;
+						hour = hour.split("\\.")[0] + centesimalMinutes.toString() + StringUtils.repeat("0", 2 - centesimalMinutes.toString().length());
+						hour = StringUtils.repeat("0", 10 - hour.length()) + hour;
+					}else{
+						hour = StringUtils.repeat("0", 10 - hour.length()) + hour;
+					}
+							
+					osWriter.write(empty); //1 Vuoto
+					osWriter.write(companyCode); //2 Codice Azienda
+					osWriter.write(headquartersCod); //3 Codice Sede
+					osWriter.write(employee); //4 Dipendente
+					osWriter.write(causalExternalCode);//5 Causale per ogni colonna del oTR (causale associata a working hours)
+					osWriter.write(date); //6 Data
+					osWriter.write(unitOfMeasure); //7 UnitÃ  di misura
+					osWriter.write(rate); //8 Tariffa
+					osWriter.write(hour); //9 QuantitÃ 
+					osWriter.write(result); //10 Risultato
+					osWriter.write(stringTheoreticalHours); //11 Ore teoriche
+					osWriter.write(movementType); //12 Tipo movimento
+					osWriter.write(" "); //13 Inizio evento (da capire come valorizzarlo)
+					
+					osWriter.write("\n"); //End of row, go to head
+				}
+				//Overtime
+				if(oTR.getOvertime() != null && !"".equals(oTR.getOvertime())){
+					oC = cDao.selectById(con, oTts.getDefaultCausalOvertime());
+					String causalExternalCode = oC.getExternalCode() + StringUtils.repeat(" ", 5 - oC.getExternalCode().length());
+					
+					//Convert sexagesimal minutes to centesimal minutes
+					String hour = oTR.getOvertime();
+					if(hour.contains(".")){
+						String sexagesimalMinutes = hour.split("\\.")[1];
+						Integer centesimalMinutes = (Integer.parseInt(sexagesimalMinutes) * 100)/60;
+						hour = hour.split("\\.")[0] + centesimalMinutes.toString() + StringUtils.repeat("0", 2 - centesimalMinutes.toString().length());
+						hour = StringUtils.repeat("0", 10 - hour.length()) + hour;
+					}else{
+						hour = StringUtils.repeat("0", 10 - hour.length()) + hour;
+					}
+							
+					osWriter.write(empty); //1 Vuoto
+					osWriter.write(companyCode); //2 Codice Azienda
+					osWriter.write(headquartersCod); //3 Codice Sede
+					osWriter.write(employee); //4 Dipendente
+					osWriter.write(causalExternalCode);//5 Causale per ogni colonna del oTR (causale associata a overtime)
+					osWriter.write(date); //6 Data
+					osWriter.write(unitOfMeasure); //7 UnitÃ  di misura
+					osWriter.write(rate); //8 Tariffa
+					osWriter.write(hour); //9 QuantitÃ 
+					osWriter.write(result); //10 Risultato
+					osWriter.write(stringTheoreticalHours); //11 Ore teoriche
+					osWriter.write(movementType); //12 Tipo movimento
+					osWriter.write(" "); //13 Inizio evento (da capire come valorizzarlo)
+					
+					osWriter.write("\n"); //End of row, go to head
+				}
+				//Permits
+				if(oTR.getPaidLeave() != null && !"".equals(oTR.getPaidLeave())){
+					oC = cDao.selectById(con, oTts.getDefaultCausalPermits());
+					String causalExternalCode = oC.getExternalCode() + StringUtils.repeat(" ", 5 - oC.getExternalCode().length());
+					
+					//Convert sexagesimal minutes to centesimal minutes
+					String hour = oTR.getPaidLeave();
+					if(hour.contains(".")){
+						String sexagesimalMinutes = hour.split("\\.")[1];
+						Integer centesimalMinutes = (Integer.parseInt(sexagesimalMinutes) * 100)/60;
+						hour = hour.split("\\.")[0] + centesimalMinutes.toString() + StringUtils.repeat("0", 2 - centesimalMinutes.toString().length());
+						hour = StringUtils.repeat("0", 10 - hour.length()) + hour;
+					}else{
+						hour = StringUtils.repeat("0", 10 - hour.length()) + hour;
+					}
+							
+					osWriter.write(empty); //1 Vuoto
+					osWriter.write(companyCode); //2 Codice Azienda
+					osWriter.write(headquartersCod); //3 Codice Sede
+					osWriter.write(employee); //4 Dipendente
+					osWriter.write(causalExternalCode);//5 Causale per ogni colonna del oTR (causale associata a permits)
+					osWriter.write(date); //6 Data
+					osWriter.write(unitOfMeasure); //7 UnitÃ  di misura
+					osWriter.write(rate); //8 Tariffa
+					osWriter.write(hour); //9 QuantitÃ 
+					osWriter.write(result); //10 Risultato
+					osWriter.write(stringTheoreticalHours); //11 Ore teoriche
+					osWriter.write(movementType); //12 Tipo movimento
+					osWriter.write(" "); //13 Inizio evento (da capire come valorizzarlo)
+					
+					osWriter.write("\n"); //End of row, go to head
+				}
+				//Holidays
+				if(oTR.getHoliday() != null && !"".equals(oTR.getHoliday())){
+					oC = cDao.selectById(con, oTts.getDefaultCausalHolidays());
+					String causalExternalCode = oC.getExternalCode() + StringUtils.repeat(" ", 5 - oC.getExternalCode().length());
+					
+					//Convert sexagesimal minutes to centesimal minutes
+					String hour = oTR.getHoliday();
+					if(hour.contains(".")){
+						String sexagesimalMinutes = hour.split("\\.")[1];
+						Integer centesimalMinutes = (Integer.parseInt(sexagesimalMinutes) * 100)/60;
+						hour = hour.split("\\.")[0] + centesimalMinutes.toString() + StringUtils.repeat("0", 2 - centesimalMinutes.toString().length());
+						hour = StringUtils.repeat("0", 10 - hour.length()) + hour;
+					}else{
+						hour = StringUtils.repeat("0", 10 - hour.length()) + hour;
+					}
+							
+					osWriter.write(empty); //1 Vuoto
+					osWriter.write(companyCode); //2 Codice Azienda
+					osWriter.write(headquartersCod); //3 Codice Sede
+					osWriter.write(employee); //4 Dipendente
+					osWriter.write(causalExternalCode);//5 Causale per ogni colonna del oTR (causale associata a holidays)
+					osWriter.write(date); //6 Data
+					osWriter.write(unitOfMeasure); //7 UnitÃ  di misura
+					osWriter.write(rate); //8 Tariffa
+					osWriter.write(hour); //9 QuantitÃ 
+					osWriter.write(result); //10 Risultato
+					osWriter.write(stringTheoreticalHours); //11 Ore teoriche
+					osWriter.write(movementType); //12 Tipo movimento
+					osWriter.write(" "); //13 Inizio evento (da capire come valorizzarlo)
+					
+					osWriter.write("\n"); //End of row, go to head
+				}
+				//Sickness
+				if(oTR.getSickness() != null && !"".equals(oTR.getSickness())){
+					oC = cDao.selectById(con, oTts.getDefaultCausalSickness());
+					String causalExternalCode = oC.getExternalCode() + StringUtils.repeat(" ", 5 - oC.getExternalCode().length());
+					
+					//Convert sexagesimal minutes to centesimal minutes
+					String hour = oTR.getSickness();
+					if(hour.contains(".")){
+						String sexagesimalMinutes = hour.split("\\.")[1];
+						Integer centesimalMinutes = (Integer.parseInt(sexagesimalMinutes) * 100)/60;
+						hour = hour.split("\\.")[0] + centesimalMinutes.toString() + StringUtils.repeat("0", 2 - centesimalMinutes.toString().length());
+						hour = StringUtils.repeat("0", 10 - hour.length()) + hour;
+					}else{
+						hour = StringUtils.repeat("0", 10 - hour.length()) + hour;
+					}
+							
+					osWriter.write(empty); //1 Vuoto
+					osWriter.write(companyCode); //2 Codice Azienda
+					osWriter.write(headquartersCod); //3 Codice Sede
+					osWriter.write(employee); //4 Dipendente
+					osWriter.write(causalExternalCode);//5 Causale per ogni colonna del oTR (causale associata a sickness)
+					osWriter.write(date); //6 Data
+					osWriter.write(unitOfMeasure); //7 UnitÃ  di misura
+					osWriter.write(rate); //8 Tariffa
+					osWriter.write(hour); //9 QuantitÃ 
+					osWriter.write(result); //10 Risultato
+					osWriter.write(stringTheoreticalHours); //11 Ore teoriche
+					osWriter.write(movementType); //12 Tipo movimento
+					osWriter.write(" "); //13 Inizio evento (da capire come valorizzarlo)
+					
+					osWriter.write("\n"); //End of row, go to head
+				}
+				//Other
+				if(oTR.getOther() != null && !"".equals(oTR.getOther())){
+					oC = cDao.selectById(con, oTR.getCausalId());
+					String causalExternalCode = oC.getExternalCode() + StringUtils.repeat(" ", 5 - oC.getExternalCode().length());
+					
+					//Convert sexagesimal minutes to centesimal minutes
+					String hour = oTR.getOther();
+					if(hour.contains(".")){
+						String sexagesimalMinutes = hour.split("\\.")[1];
+						Integer centesimalMinutes = (Integer.parseInt(sexagesimalMinutes) * 100)/60;
+						hour = hour.split("\\.")[0] + centesimalMinutes.toString() + StringUtils.repeat("0", 2 - centesimalMinutes.toString().length());
+						hour = StringUtils.repeat("0", 10 - hour.length()) + hour;
+					}else{
+						hour = StringUtils.repeat("0", 10 - hour.length()) + hour;
+					}
+							
+					osWriter.write(empty); //1 Vuoto
+					osWriter.write(companyCode); //2 Codice Azienda
+					osWriter.write(headquartersCod); //3 Codice Sede
+					osWriter.write(employee); //4 Dipendente
+					osWriter.write(causalExternalCode);//5 Causale per ogni colonna del oTR (causale associata a other)
+					osWriter.write(date); //6 Data
+					osWriter.write(unitOfMeasure); //7 UnitÃ  di misura
+					osWriter.write(rate); //8 Tariffa
+					osWriter.write(hour); //9 QuantitÃ 
+					osWriter.write(result); //10 Risultato
+					osWriter.write(stringTheoreticalHours); //11 Ore teoriche
+					osWriter.write(movementType); //12 Tipo movimento
+					osWriter.write(" "); //13 Inizio evento (da capire come valorizzarlo)
+					
+					osWriter.write("\n"); //End of row, go to head
+				}
+			}
+			
+		} catch(Exception ex) {
+			throw new WTException(ex, "Error in creating file");
+		} finally {
+			DbUtils.closeQuietly(con);
+			try { if(osWriter != null) osWriter.close(); } catch(Exception ex) { /* Do nothing... */ }
 		}
 	}
 }

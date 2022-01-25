@@ -32,6 +32,11 @@ public class Tables {
 	public static final com.sonicle.webtop.drm.jooq.tables.BusinessTrips BUSINESS_TRIPS = com.sonicle.webtop.drm.jooq.tables.BusinessTrips.BUSINESS_TRIPS;
 
 	/**
+	 * The table drm.causals
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.Causals CAUSALS = com.sonicle.webtop.drm.jooq.tables.Causals.CAUSALS;
+
+	/**
 	 * The table drm.companies
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.Companies COMPANIES = com.sonicle.webtop.drm.jooq.tables.Companies.COMPANIES;
@@ -267,6 +272,11 @@ public class Tables {
 	public static final com.sonicle.webtop.drm.jooq.tables.Tickets TICKETS = com.sonicle.webtop.drm.jooq.tables.Tickets.TICKETS;
 
 	/**
+	 * The table drm.tickets_settings
+	 */
+	public static final com.sonicle.webtop.drm.jooq.tables.TicketsSettings TICKETS_SETTINGS = com.sonicle.webtop.drm.jooq.tables.TicketsSettings.TICKETS_SETTINGS;
+
+	/**
 	 * The table drm.timetable_events
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.TimetableEvents TIMETABLE_EVENTS = com.sonicle.webtop.drm.jooq.tables.TimetableEvents.TIMETABLE_EVENTS;
@@ -300,16 +310,6 @@ public class Tables {
 	 * The table drm.vw_work_reports
 	 */
 	public static final com.sonicle.webtop.drm.jooq.tables.VwWorkReports VW_WORK_REPORTS = com.sonicle.webtop.drm.jooq.tables.VwWorkReports.VW_WORK_REPORTS;
-
-	/**
-	 * The table drm.vw_work_reports_2
-	 */
-	public static final com.sonicle.webtop.drm.jooq.tables.VwWorkReports_2 VW_WORK_REPORTS_2 = com.sonicle.webtop.drm.jooq.tables.VwWorkReports_2.VW_WORK_REPORTS_2;
-
-	/**
-	 * The table drm.vw_work_reports_3
-	 */
-	public static final com.sonicle.webtop.drm.jooq.tables.VwWorkReports_3 VW_WORK_REPORTS_3 = com.sonicle.webtop.drm.jooq.tables.VwWorkReports_3.VW_WORK_REPORTS_3;
 
 	/**
 	 * The table drm.work_reports

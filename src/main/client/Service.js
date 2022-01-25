@@ -38,7 +38,16 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		'Sonicle.webtop.drm.model.GridTickets',
 		'Sonicle.webtop.drm.ux.TicketSearch',
 		'Sonicle.webtop.drm.view.Ticket',
-		'Sonicle.webtop.drm.ux.ChooseTicketConfirmBox'
+		'Sonicle.webtop.drm.ux.ChooseTicketConfirmBox',
+		'Sonicle.webtop.drm.view.TimetableSettingCausals',
+		'Sonicle.webtop.drm.model.GridCausals',
+		'Sonicle.webtop.drm.view.Causal',
+		'Sonicle.webtop.drm.model.Causal',
+		'Sonicle.webtop.drm.view.TimetableSettingGis',
+		'Sonicle.webtop.drm.model.TimetableSettingGis',
+		'Sonicle.webtop.drm.view.TimetableSettingGeneral',
+		'Sonicle.webtop.drm.model.TimetableSettingGeneral',
+		'Sonicle.webtop.drm.store.RoundingHour'
 	],
 	needsReload: true,
 	opportunityRequiredFields: null,
@@ -1005,13 +1014,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								enableGroupingMenu: false
 							}],
 							columns: [
-								/*
 								{
-									header: me.res('gpTimetableReport.operator.lbl'),
-									dataIndex: 'targetUser',
-									editable: false,
-									flex: 1
-								}, */{
 									header: me.res('gpTimetableReport.date.lbl'),
 									dataIndex: 'date',
 									editable: false,
@@ -1031,7 +1034,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											clear: WTF.clearTrigger()
 										}
 									})),
-									// flex: 1,
                                     width: 70,
                                     cls: 'header'
 								}, {
@@ -1047,7 +1049,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											clear: WTF.clearTrigger()
 										}
 									})),
-									// flex: 1,
                                     width: 70,
                                     cls: 'header'
 								}, {
@@ -1063,26 +1064,26 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											clear: WTF.clearTrigger()
 										}
 									})),
-									// flex: 1,
                                     width: 80,
                                     cls: 'header'
-								}, {
-									header: me.res('gpTimetableReport.unpaidLeave.lbl'),
-									dataIndex: 'unpaidLeave',
-									editable: true,
-									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-                                        allowBlank: true,
-										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
-											autoLoad: true
-										}),
-										triggers: {
-											clear: WTF.clearTrigger()
-										}
-									})),
-									// flex: 1,
-                                    width: 85,
-                                    cls: 'header'
-								}, {
+								}, 
+//								{
+//									header: me.res('gpTimetableReport.unpaidLeave.lbl'),
+//									dataIndex: 'unpaidLeave',
+//									editable: true,
+//									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
+//                                        allowBlank: true,
+//										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
+//											autoLoad: true
+//										}),
+//										triggers: {
+//											clear: WTF.clearTrigger()
+//										}
+//									})),
+//                                    width: 85,
+//                                    cls: 'header'
+//								}, 
+								{
 									header: me.res('gpTimetableReport.holiday.lbl'),
 									dataIndex: 'holiday',
 									editable: true,
@@ -1095,26 +1096,26 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											clear: WTF.clearTrigger()
 										}
 									})),
-									// flex: 1,
                                     width: 70,
                                     cls: 'header'
-								}, {
-									header: me.res('gpTimetableReport.medicalVisit.lbl'),
-									dataIndex: 'medicalVisit',
-									editable: true,
-									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-										allowBlank: true,
-										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
-											autoLoad: true
-										}),
-										triggers: {
-											clear: WTF.clearTrigger()
-										}
-									})),
-									// flex: 1,
-                                    width: 90,
-                                    cls: 'header'
-								}, {
+								},
+//								{
+//									header: me.res('gpTimetableReport.medicalVisit.lbl'),
+//									dataIndex: 'medicalVisit',
+//									editable: true,
+//									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
+//										allowBlank: true,
+//										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
+//											autoLoad: true
+//										}),
+//										triggers: {
+//											clear: WTF.clearTrigger()
+//										}
+//									})),
+//                                    width: 90,
+//                                    cls: 'header'
+//								}, 
+								{
 									header: me.res('gpTimetableReport.sickness.lbl'),
 									dataIndex: 'sickness',
 									editable: true,
@@ -1127,67 +1128,74 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											clear: WTF.clearTrigger()
 										}
 									})),
-									// flex: 1,
                                     width: 80,
+                                    cls: 'header'
+								}, {
+									header: me.res('gpTimetableReport.other.lbl'),
+									dataIndex: 'other',
+									editable: true,
+									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
+										allowBlank: true,
+										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
+											autoLoad: true
+										}),
+										triggers: {
+											clear: WTF.clearTrigger()
+										}
+									})),
+                                    width: 80,
+                                    cls: 'header'
+								}, {
+									xtype: 'solookupcolumn',
+									header: me.res('gpTimetableReport.causalId.lbl'),
+									dataIndex: 'causalId',
+									editable: true,
+									store: Ext.create('Ext.data.Store', {
+										autoLoad: true,
+										model: 'WTA.model.Simple',
+										proxy: WTF.proxy(me.ID, 'LookupGisCausals', null, {
+											extraParams: {
+												filter: true
+											}
+										})
+									}),
+									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
+										ignoreNoChange: true,
+										allowBlank: true,
+										editable: true,
+										anyMatch: true,
+										store: Ext.create('Ext.data.Store', {
+											autoLoad: true,
+											model: 'WTA.model.Simple',
+											proxy: WTF.proxy(me.ID, 'LookupGisCausals', null, {
+												extraParams: {
+													filter: true
+												}
+											})
+										})
+									})),
+									displayField: 'desc',
+                                    flex: 2,
                                     cls: 'header'
 								}, {
 									header: me.res('gpTimetableReport.workReportHours.lbl'),
 									dataIndex: 'workReportHours',
-									editable: false,									
-									// flex: 1,
+									editable: false,	
                                     width: 80,
                                     cls: 'header'
 								}, {
 									header: me.res('gpTimetableReport.jobHours.lbl'),
 									dataIndex: 'jobHours',
-									editable: false,									
-									// flex: 1,
+									editable: false,	
                                     width: 80,
                                     cls: 'header'
 								}, {
 									header: me.res('gpTimetableReport.totHours.lbl'),
 									dataIndex: 'totHours',
-									editable: false,									
-									// flex: 1,
+									editable: false,	
                                     width: 70,
                                     cls: 'header'
-								}
-								/*, {
-									header: me.res('gpTimetableReport.contractual.lbl'),
-									dataIndex: 'contractual',
-									editable: true,
-									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-										allowBlank: true,
-										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
-											autoLoad: true
-										}),
-										triggers: {
-											clear: WTF.clearTrigger()
-										}
-									})),
-									flex: 1
 								}, {
-									header: me.res('gpTimetableReport.causal.lbl'),
-									dataIndex: 'causal',
-									editable: true,
-									editor: 'textfield',
-									flex: 1
-								}, {
-									header: me.res('gpTimetableReport.hour.lbl'),
-									dataIndex: 'hour',
-									editable: true,
-									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-										allowBlank: true,
-										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
-											autoLoad: true
-										}),
-										triggers: {
-											clear: WTF.clearTrigger()
-										}
-									})),
-									flex: 1
-								}*/
-								, {
 									header: me.res('gpTimetableReport.detail.lbl'),
 									dataIndex: 'detail',
 									editable: true,
@@ -1206,8 +1214,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							tbar: [
 //								me.getAct('timetableReport', 'save'),
 //								'-',
-								me.getAct('timetableReport', 'print')
-//								me.getAct('timetableReport', 'export')
+								me.getAct('timetableReport', 'print'),
+								(me.getVar('integrationGis') === true) ? me.getAct('timetableReport', 'export') : null
 							]
 						}
 					]
@@ -1644,6 +1652,23 @@ Ext.define('Sonicle.webtop.drm.Service', {
                             handler: function () {
                                 me.timetableSettingHourProfiles();
                             }
+                        },
+						{
+                            text: me.res('toolbox.tt-settings-causals.lbl'),
+                            tooltip: null,
+                            iconCls: 'wt-icon-options',
+                            handler: function () {
+                                me.timetableSettingCausals();
+                            }
+                        },
+						{
+                            text: me.res('toolbox.tt-settings-gis.lbl'),
+                            tooltip: null,
+                            iconCls: 'wt-icon-options',
+							hidden: !me.getVar('integrationGis'),
+                            handler: function () {
+                                me.timetableSettingGis();
+                            }
                         }
                     ]
                 }
@@ -1931,7 +1956,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			tooltip: null,
 			iconCls: 'wt-icon-file-download',
 			handler: function () {
-				
+				me.exportTimetableReportGis();
 			}
 		});
 		me.addAct('timetableStamp', 'add', {
@@ -2550,6 +2575,20 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			}
 		});
 	},
+	exportTimetableReportGis: function () {
+		var me = this;
+		
+		WT.ajaxReq(me.ID, 'ExportTimetableReportGis', {
+			params: {
+				op: 'do'
+			},
+			callback: function(success) {
+				if (success) {
+					Sonicle.URLMgr.download(WTF.processBinUrl(me.ID, 'ExportTimetableReportGis'));
+				}
+			}
+		});
+	},
 	addTicket: function (opts) {
 		opts = opts || {};
 		var me = this,
@@ -3122,7 +3161,31 @@ Ext.define('Sonicle.webtop.drm.Service', {
             vw = WT.createView(me.ID, 'view.TimetableSettingHourProfiles', {swapReturn: true});
 		vw.showView();
 	},
+	timetableSettingCausals: function (opts) {
+		opts = opts || {};
+
+		var me = this,
+            vw = WT.createView(me.ID, 'view.TimetableSettingCausals', {swapReturn: true});
+		vw.showView();
+	},
     
+	timetableSettingGis: function (opts) {
+		opts = opts || {};
+
+		var me = this,
+            vw = WT.createView(me.ID, 'view.TimetableSettingGis', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vw.showView(function () {
+            vw.begin('edit', {
+                data: {
+                    id: 'tmtbgis'
+                }
+            });
+        });
+	},
+	
 	reloadTimetableRequest: function (query) {
 		var me = this,
 				pars = {},

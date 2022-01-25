@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableReportTemp implements java.io.Serializable {
 
-	private static final long serialVersionUID = 1385040470;
+	private static final long serialVersionUID = -1704808796;
 
 	private java.lang.Integer      id;
 	private java.lang.String       domainId;
@@ -38,6 +38,8 @@ public class TimetableReportTemp implements java.io.Serializable {
 	private java.lang.String       workReportHours;
 	private java.lang.String       jobHours;
 	private java.lang.String       sickness;
+	private java.lang.String       other;
+	private java.lang.String       causalId;
 
 	public TimetableReportTemp() {}
 
@@ -61,7 +63,9 @@ public class TimetableReportTemp implements java.io.Serializable {
 		java.lang.String       targetUserId,
 		java.lang.String       workReportHours,
 		java.lang.String       jobHours,
-		java.lang.String       sickness
+		java.lang.String       sickness,
+		java.lang.String       other,
+		java.lang.String       causalId
 	) {
 		this.id = id;
 		this.domainId = domainId;
@@ -83,6 +87,8 @@ public class TimetableReportTemp implements java.io.Serializable {
 		this.workReportHours = workReportHours;
 		this.jobHours = jobHours;
 		this.sickness = sickness;
+		this.other = other;
+		this.causalId = causalId;
 	}
 
 	public java.lang.Integer getId() {
@@ -243,5 +249,21 @@ public class TimetableReportTemp implements java.io.Serializable {
 
 	public void setSickness(java.lang.String sickness) {
 		this.sickness = sickness;
+	}
+
+	public java.lang.String getOther() {
+		return this.other;
+	}
+
+	public void setOther(java.lang.String other) {
+		this.other = other;
+	}
+
+	public java.lang.String getCausalId() {
+		return this.causalId;
+	}
+
+	public void setCausalId(java.lang.String causalId) {
+		this.causalId = causalId;
 	}
 }

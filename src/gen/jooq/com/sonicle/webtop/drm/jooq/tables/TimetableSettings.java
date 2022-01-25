@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableSettings extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord> {
 
-	private static final long serialVersionUID = -379346635;
+	private static final long serialVersionUID = 816704964;
 
 	/**
 	 * The reference instance of <code>drm.timetable_settings</code>
@@ -135,6 +135,31 @@ public class TimetableSettings extends org.jooq.impl.TableImpl<com.sonicle.webto
 	 * The column <code>drm.timetable_settings.sickness_automatically_approved</code>.
 	 */
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord, java.lang.Boolean> SICKNESS_AUTOMATICALLY_APPROVED = createField("sickness_automatically_approved", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
+
+	/**
+	 * The column <code>drm.timetable_settings.default_causal_working_hours</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord, java.lang.String> DEFAULT_CAUSAL_WORKING_HOURS = createField("default_causal_working_hours", org.jooq.impl.SQLDataType.VARCHAR.length(5), this, "");
+
+	/**
+	 * The column <code>drm.timetable_settings.default_causal_overtime</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord, java.lang.String> DEFAULT_CAUSAL_OVERTIME = createField("default_causal_overtime", org.jooq.impl.SQLDataType.VARCHAR.length(5), this, "");
+
+	/**
+	 * The column <code>drm.timetable_settings.default_causal_permits</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord, java.lang.String> DEFAULT_CAUSAL_PERMITS = createField("default_causal_permits", org.jooq.impl.SQLDataType.VARCHAR.length(5), this, "");
+
+	/**
+	 * The column <code>drm.timetable_settings.default_causal_holidays</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord, java.lang.String> DEFAULT_CAUSAL_HOLIDAYS = createField("default_causal_holidays", org.jooq.impl.SQLDataType.VARCHAR.length(5), this, "");
+
+	/**
+	 * The column <code>drm.timetable_settings.default_causal_sickness</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord, java.lang.String> DEFAULT_CAUSAL_SICKNESS = createField("default_causal_sickness", org.jooq.impl.SQLDataType.VARCHAR.length(5), this, "");
 
 	/**
 	 * Create a <code>drm.timetable_settings</code> table reference

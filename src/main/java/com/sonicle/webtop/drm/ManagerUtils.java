@@ -41,6 +41,7 @@ import com.sonicle.webtop.core.dal.DAOException;
 import com.sonicle.webtop.drm.bol.OActivity;
 import com.sonicle.webtop.drm.bol.OActivityGroup;
 import com.sonicle.webtop.drm.bol.OBusinessTrip;
+import com.sonicle.webtop.drm.bol.OCausal;
 import com.sonicle.webtop.drm.bol.OCompany;
 import com.sonicle.webtop.drm.bol.OCompanyPicture;
 import com.sonicle.webtop.drm.bol.OCompanyUser;
@@ -104,6 +105,7 @@ import com.sonicle.webtop.drm.dal.WorkReportAttachmentDAO;
 import com.sonicle.webtop.drm.model.Activity;
 import com.sonicle.webtop.drm.model.ActivityGroupAssociation;
 import com.sonicle.webtop.drm.model.BusinessTrip;
+import com.sonicle.webtop.drm.model.Causal;
 import com.sonicle.webtop.drm.model.Company;
 import com.sonicle.webtop.drm.model.CompanyPicture;
 import com.sonicle.webtop.drm.model.CompanyUserAssociation;
@@ -1665,6 +1667,11 @@ public class ManagerUtils {
 		oSetting.setDefaultEventActivityId(tSetting.getDefaultEventActivityId());
 		oSetting.setRequestsSickness(tSetting.getRequestsSickness());
 		oSetting.setSicknessAutomaticallyApproved(tSetting.getSicknessAutomaticallyApproved());
+		oSetting.setDefaultCausalHolidays(tSetting.getDefaultCausalHolidays());
+		oSetting.setDefaultCausalOvertime(tSetting.getDefaultCausalOvertime());
+		oSetting.setDefaultCausalPermits(tSetting.getDefaultCausalPermits());
+		oSetting.setDefaultCausalSickness(tSetting.getDefaultCausalSickness());
+		oSetting.setDefaultCausalWorkingHours(tSetting.getDefaultCausalWorkingHours());
 		
 		return oSetting;
 	}
@@ -1695,6 +1702,11 @@ public class ManagerUtils {
 		tSetting.setDefaultEventActivityId(oTSetting.getDefaultEventActivityId());
 		tSetting.setRequestsSickness(oTSetting.getRequestsSickness());
 		tSetting.setSicknessAutomaticallyApproved(oTSetting.getSicknessAutomaticallyApproved());
+		tSetting.setDefaultCausalHolidays(oTSetting.getDefaultCausalHolidays());
+		tSetting.setDefaultCausalOvertime(oTSetting.getDefaultCausalOvertime());
+		tSetting.setDefaultCausalPermits(oTSetting.getDefaultCausalPermits());
+		tSetting.setDefaultCausalSickness(oTSetting.getDefaultCausalSickness());
+		tSetting.setDefaultCausalWorkingHours(oTSetting.getDefaultCausalWorkingHours());
 		
 		return tSetting;
 	}
@@ -1827,6 +1839,34 @@ public class ManagerUtils {
 		oHd.setDescription(hd.getDescription());
 
 		return oHd;
+	}
+	
+	static Causal createCausal(OCausal oC) {
+		if (oC == null) {
+			return null;
+		}
+
+		Causal c = new Causal();
+        
+        c.setId(oC.getId());
+		c.setDescription(oC.getDescription());
+		c.setExternalCode(oC.getExternalCode());
+
+		return c;
+	}
+
+	static OCausal createOCausal(Causal c) {
+		if (c == null) {
+			return null;
+		}
+
+		OCausal oC = new OCausal();
+        
+        oC.setId(c.getId());
+		oC.setDescription(c.getDescription());
+		oC.setExternalCode(c.getExternalCode());
+
+		return oC;
 	}
 
 	static BusinessTrip createBusinessTrip(OBusinessTrip oTrip) {
@@ -2316,6 +2356,8 @@ public class ManagerUtils {
 		oTr.setDetail(tr.getDetail());
 		oTr.setNote(tr.getNote());
 		oTr.setSickness(tr.getSickness());
+		oTr.setOther(tr.getOther());
+		oTr.setCausalId(tr.getCausalId());
 		
 		return oTr;
 	}

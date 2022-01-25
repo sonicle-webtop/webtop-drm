@@ -222,4 +222,24 @@ public class DrmServiceSettings extends BaseServiceSettings {
 	public void setSicknessAutomaticallyApproved(boolean value) {
 		setBoolean(LEAVE_REQUEST_SICKNESS_AUTOMATICALLY_APPROVED, value); 
 	}
+	
+	public boolean getIntegrationGis() {
+		return getBoolean(INTEGRATION_GIS, Boolean.FALSE);
+	}
+	
+	public String getGisCompanyCode() {
+		return getString(GIS_COMPANY_CODE, ""); 
+	}
+
+	public void setGisCompanyCode(String value) {
+		setString(GIS_COMPANY_CODE, value); 
+	}
+	
+	public String getGisHeadquartersCode() {
+		return getString(GIS_HEADQUARTERS_CODE, ""); 
+	}
+
+	public void setGisHeadquartersCode(String value) {
+		setString(GIS_HEADQUARTERS_CODE, value); 
+	}	
 }

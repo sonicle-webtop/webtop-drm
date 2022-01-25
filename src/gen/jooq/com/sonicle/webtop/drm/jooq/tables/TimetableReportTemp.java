@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableReportTemp extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord> {
 
-	private static final long serialVersionUID = 565338953;
+	private static final long serialVersionUID = 1354419213;
 
 	/**
 	 * The reference instance of <code>drm.timetable_report_temp</code>
@@ -114,7 +114,7 @@ public class TimetableReportTemp extends org.jooq.impl.TableImpl<com.sonicle.web
 	/**
 	 * The column <code>drm.timetable_report_temp.target_user_id</code>.
 	 */
-	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord, java.lang.String> TARGET_USER_ID = createField("target_user_id", org.jooq.impl.SQLDataType.VARCHAR.length(36).nullable(false), this, "");
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord, java.lang.String> TARGET_USER_ID = createField("target_user_id", org.jooq.impl.SQLDataType.VARCHAR.length(36), this, "");
 
 	/**
 	 * The column <code>drm.timetable_report_temp.work_report_hours</code>.
@@ -130,6 +130,16 @@ public class TimetableReportTemp extends org.jooq.impl.TableImpl<com.sonicle.web
 	 * The column <code>drm.timetable_report_temp.sickness</code>.
 	 */
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord, java.lang.String> SICKNESS = createField("sickness", org.jooq.impl.SQLDataType.VARCHAR.length(5), this, "");
+
+	/**
+	 * The column <code>drm.timetable_report_temp.other</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord, java.lang.String> OTHER = createField("other", org.jooq.impl.SQLDataType.VARCHAR.length(5), this, "");
+
+	/**
+	 * The column <code>drm.timetable_report_temp.causal_id</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord, java.lang.String> CAUSAL_ID = createField("causal_id", org.jooq.impl.SQLDataType.VARCHAR.length(5), this, "");
 
 	/**
 	 * Create a <code>drm.timetable_report_temp</code> table reference

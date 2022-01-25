@@ -40,7 +40,6 @@ import com.sonicle.webtop.core.sdk.WTException;
 import com.sonicle.webtop.drm.DrmManager;
 import com.sonicle.webtop.drm.bol.OTimetableReport;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Locale;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
@@ -74,6 +73,9 @@ public class RBTimetableReport {
 	public Float workReportHours;
 	public Float totHours;
 	public Float sickness;
+	public Float other;
+	public String gisCausalCode;
+	public String gisCausalDescription;
 	
 	public RBTimetableReport(CoreManager coreMgr, DrmManager drmMgr, OTimetableReport otr, Locale lcl) throws WTException, IOException {		
 		this.id = otr.getId();
@@ -100,6 +102,11 @@ public class RBTimetableReport {
 		this.totHours = ((this.workingHours == null) ? 0 : this.workingHours) + ((this.overtime == null) ? 0 : this.overtime);
 		this.totHours = (this.totHours == 0) ? null : this.totHours;
 		this.sickness = convertInMinutes(otr.getSickness());
+		this.other = convertInMinutes(otr.getOther());
+		if (otr.getCausalId() != null){
+			this.gisCausalCode = drmMgr.getCausal(otr.getCausalId()).getExternalCode();
+			this.gisCausalDescription = drmMgr.getCausal(otr.getCausalId()).getDescription();
+		}
 	}
 
 	private Float convertInMinutes(String hour){
@@ -330,5 +337,29 @@ public class RBTimetableReport {
 
 	public void setSickness(Float sickness) {
 		this.sickness = sickness;
+	}
+
+	public Float getOther() {
+		return other;
+	}
+
+	public void setOther(Float other) {
+		this.other = other;
+	}
+
+	public String getGisCausalCode() {
+		return gisCausalCode;
+	}
+
+	public void setGisCausalCode(String gisCausalCode) {
+		this.gisCausalCode = gisCausalCode;
+	}
+
+	public String getGisCausalDescription() {
+		return gisCausalDescription;
+	}
+
+	public void setGisCausalDescription(String gisCausalDescription) {
+		this.gisCausalDescription = gisCausalDescription;
 	}
 }

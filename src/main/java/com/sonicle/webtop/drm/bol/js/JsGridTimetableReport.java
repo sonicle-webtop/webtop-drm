@@ -65,6 +65,8 @@ public class JsGridTimetableReport {
 	public String workReportHours;
 	public String jobHours;
 	public String sickness;
+	public String other;
+	public String causalId;
 
 	public JsGridTimetableReport(OTimetableReport tr, DrmManager drmMgr) throws WTException {
 		this.id = tr.getId();
@@ -87,6 +89,8 @@ public class JsGridTimetableReport {
 		this.workReportHours = tr.getWorkReportHours();
 		this.jobHours = tr.getJobHours();
 		this.sickness = tr.getSickness();
+		this.other = tr.getOther();
+		this.causalId = tr.getCausalId();
 	}
 	
 	public static TimetableReport createTimetableReport(JsGridTimetableReport js) {
@@ -107,6 +111,8 @@ public class JsGridTimetableReport {
 		tr.setJobHours(js.jobHours);
 		tr.setWorkReportHours(js.workReportHours);
 		tr.setSickness(js.sickness);
+		tr.setOther(js.other);
+		tr.setCausalId(js.causalId);
 		
 		return tr;
 	}

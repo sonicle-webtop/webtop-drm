@@ -110,6 +110,11 @@ public class TimetableSettingDAO extends BaseDAO {
 				.set(TIMETABLE_SETTINGS.DEFAULT_EVENT_ACTIVITY_ID, item.getDefaultEventActivityId())
 				.set(TIMETABLE_SETTINGS.REQUESTS_SICKNESS, item.getRequestsSickness())
 				.set(TIMETABLE_SETTINGS.SICKNESS_AUTOMATICALLY_APPROVED, item.getSicknessAutomaticallyApproved())
+				.set(TIMETABLE_SETTINGS.DEFAULT_CAUSAL_WORKING_HOURS, item.getDefaultCausalWorkingHours())
+				.set(TIMETABLE_SETTINGS.DEFAULT_CAUSAL_OVERTIME, item.getDefaultCausalOvertime())
+				.set(TIMETABLE_SETTINGS.DEFAULT_CAUSAL_PERMITS, item.getDefaultCausalPermits())
+				.set(TIMETABLE_SETTINGS.DEFAULT_CAUSAL_HOLIDAYS, item.getDefaultCausalHolidays())
+				.set(TIMETABLE_SETTINGS.DEFAULT_CAUSAL_SICKNESS, item.getDefaultCausalSickness())
 				.where(
 						TIMETABLE_SETTINGS.TIMETABLE_SETTING_ID.equal(item.getTimetableSettingId())
 				)

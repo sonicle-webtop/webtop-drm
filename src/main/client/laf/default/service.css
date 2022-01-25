@@ -34,6 +34,8 @@
 .wtdrm-icon-configuration-employeeprofile-xs { background-image: url('employee_profile_16.png') !important; }
 .wtdrm-icon-configuration-ourprofile-xs { background-image: url('our_profile_16.png') !important; }
 .wtdrm-icon-configuration-activitiesconfiguration-xs { background-image: url('activity_configuration_16.png') !important; }
+.wtdrm-icon-configuration-causal-xs { background-image: url('causal_configuration_16.png') !important; }
+.wtdrm-icon-configuration-gis-xs { background-image: url('gis_configuration_16.png') !important; }
 
 .wtdrm-trash-trigger { background-image: url('trash-trigger.png') !important; }
 .wtdrm-add-trigger { background-image: url('add-trigger.png') !important; }

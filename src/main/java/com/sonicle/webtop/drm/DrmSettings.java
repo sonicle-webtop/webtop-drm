@@ -99,4 +99,10 @@ public class DrmSettings {
 	public static final String TICKET_AUTOMATIC_CLOSE = "ticket.automaticclose";
 	
 	public static final String LEAVE_REQUEST_SICKNESS_AUTOMATICALLY_APPROVED = "leaverequest.sicknessautomaticallyapproved";
+	
+	public static final String INTEGRATION_GIS = "integration.gis";
+	
+	public static final String GIS_COMPANY_CODE = "gis.company.code";
+	
+	public static final String GIS_HEADQUARTERS_CODE = "gis.headquarters.code";
 }

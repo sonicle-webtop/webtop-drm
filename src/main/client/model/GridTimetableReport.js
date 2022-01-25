@@ -59,7 +59,9 @@ Ext.define('Sonicle.webtop.drm.model.GridTimetableReport', {
 					rec.get('overtime')
 			);
 		}),
-		WTF.field('sickness', 'string', true)
+		WTF.field('sickness', 'string', true),
+		WTF.field('other', 'string', true),
+		WTF.field('causalId', 'string', true)
 	],
 	
 	statics: {

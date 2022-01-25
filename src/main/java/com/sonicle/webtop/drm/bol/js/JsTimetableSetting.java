@@ -32,10 +32,7 @@
  */
 package com.sonicle.webtop.drm.bol.js;
 
-import com.sonicle.webtop.drm.model.HolidayDate;
 import com.sonicle.webtop.drm.model.TimetableSetting;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -64,6 +61,11 @@ public class JsTimetableSetting {
 	public Integer defaultEventActivityId;
 	public Boolean sicknessAutomaticallyApproved;
 	public Boolean requestsSickness;
+	public String defaultCausalWorkingHours;
+	public String defaultCausalOvertime;
+	public String defaultCausalPermits;
+	public String defaultCausalHolidays;
+	public String defaultCausalSickness;
 	
 	// public List<JsGridHolidayDate> holidayDates = new ArrayList();
 
@@ -89,6 +91,11 @@ public class JsTimetableSetting {
 		this.defaultEventActivityId = setting.getDefaultEventActivityId();
 		this.requestsSickness = setting.getRequestsSickness();
 		this.sicknessAutomaticallyApproved = setting.getSicknessAutomaticallyApproved();
+		this.defaultCausalWorkingHours = setting.getDefaultCausalWorkingHours();
+		this.defaultCausalOvertime = setting.getDefaultCausalOvertime();
+		this.defaultCausalPermits = setting.getDefaultCausalPermits();
+		this.defaultCausalHolidays = setting.getDefaultCausalHolidays();
+		this.defaultCausalSickness = setting.getDefaultCausalSickness();
 		
         /*
 		for (HolidayDate hd : setting.getHolidayDates()) {
@@ -121,6 +128,11 @@ public class JsTimetableSetting {
 		tt.setDefaultEventActivityId(js.defaultEventActivityId);
 		tt.setRequestsSickness(js.requestsSickness);
 		tt.setSicknessAutomaticallyApproved(js.sicknessAutomaticallyApproved);
+		tt.setDefaultCausalWorkingHours(js.defaultCausalWorkingHours);
+		tt.setDefaultCausalOvertime(js.defaultCausalOvertime);
+		tt.setDefaultCausalPermits(js.defaultCausalPermits);
+		tt.setDefaultCausalHolidays(js.defaultCausalHolidays);
+		tt.setDefaultCausalSickness(js.defaultCausalSickness);
 		
         /*
 		for (JsGridHolidayDate hd : js.holidayDates) {

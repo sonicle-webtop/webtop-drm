@@ -150,7 +150,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 												model: 'WTA.model.Simple',
 												proxy: WTF.proxy(me.mys.ID, 'LookupCompanies', null, {
 													extraParams: {
-														operator: null
+														filter: false
 													}
 												}),
 												listeners: {

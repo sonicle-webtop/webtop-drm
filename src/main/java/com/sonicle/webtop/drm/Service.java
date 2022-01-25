@@ -62,8 +62,8 @@ import com.sonicle.webtop.core.bol.js.JsSimple;
 import com.sonicle.webtop.core.bol.js.JsSimpleSource;
 import com.sonicle.webtop.core.io.output.AbstractReport;
 import com.sonicle.webtop.core.io.output.ReportConfig;
-import com.sonicle.webtop.core.model.Causal;
 import com.sonicle.webtop.core.model.CausalExt;
+import com.sonicle.webtop.core.model.Causal;
 import com.sonicle.webtop.core.model.MasterData;
 import com.sonicle.webtop.core.sdk.BaseService;
 import com.sonicle.webtop.core.sdk.UserProfile;
@@ -105,6 +105,7 @@ import com.sonicle.webtop.drm.bol.js.JsGridTimetableReport;
 import com.sonicle.webtop.drm.bol.js.JsGridTimetableStamp;
 import com.sonicle.webtop.drm.bol.js.JsGridTimetableStampList;
 import com.sonicle.webtop.drm.bol.js.JsGridWorkReports;
+import com.sonicle.webtop.drm.bol.js.JsGridCausal;
 import com.sonicle.webtop.drm.bol.js.JsHourProfile;
 import com.sonicle.webtop.drm.bol.js.JsLeaveRequest;
 import com.sonicle.webtop.drm.bol.js.JsOpportunity;
@@ -188,6 +189,7 @@ import com.sonicle.webtop.core.sdk.WTRuntimeException;
 import com.sonicle.webtop.core.util.LogEntries;
 import com.sonicle.webtop.core.util.LogEntry;
 import com.sonicle.webtop.core.util.MessageLogEntry;
+import com.sonicle.webtop.drm.bol.OCausal;
 import com.sonicle.webtop.drm.bol.ODay;
 import com.sonicle.webtop.drm.bol.ODefaultCostType;
 import com.sonicle.webtop.drm.bol.OExpenseNote;
@@ -198,6 +200,7 @@ import com.sonicle.webtop.drm.bol.OViewJob;
 import com.sonicle.webtop.drm.bol.OViewTicket;
 import com.sonicle.webtop.drm.bol.OViewWorkReport;
 import com.sonicle.webtop.drm.bol.js.JsActivity;
+import com.sonicle.webtop.drm.bol.js.JsCausal;
 import com.sonicle.webtop.drm.bol.js.JsCostType;
 import com.sonicle.webtop.drm.bol.js.JsExpenseNote;
 import com.sonicle.webtop.drm.bol.js.JsExpenseNoteSetting;
@@ -211,6 +214,7 @@ import com.sonicle.webtop.drm.bol.js.JsHolidayDate;
 import com.sonicle.webtop.drm.bol.js.JsJob;
 import com.sonicle.webtop.drm.bol.js.JsTicket;
 import com.sonicle.webtop.drm.bol.js.JsTicketSetting;
+import com.sonicle.webtop.drm.bol.js.JsTimetableSettingGis;
 import com.sonicle.webtop.drm.bol.model.RBExpenseNote;
 import com.sonicle.webtop.drm.bol.model.RBOpportunity;
 import com.sonicle.webtop.drm.bol.model.RBTimetableEncoReport;
@@ -231,6 +235,7 @@ import com.sonicle.webtop.drm.model.Ticket;
 import com.sonicle.webtop.drm.model.TicketAttachment;
 import com.sonicle.webtop.drm.model.TicketAttachmentWithStream;
 import com.sonicle.webtop.drm.model.TicketSetting;
+import com.sonicle.webtop.drm.model.TimetableSettingGis;
 import com.sonicle.webtop.drm.model.WorkReportSummary;
 import com.sonicle.webtop.drm.rpt.RptExpenseNote;
 import com.sonicle.webtop.drm.rpt.RptOpportunity;
@@ -267,6 +272,7 @@ public class Service extends BaseService {
 
 	public static final Logger logger = WT.getLogger(Service.class);
 	public static final String JOB_EXPORT_FILENAME = "jobs_{0}-{1}.{2}";
+	public static final String TIMETABLE_GIS_EXPORT_FILENAME = "gis_{0}-{1}.{2}";
 
 	private DrmManager manager;
 	private DrmServiceSettings ss;
@@ -276,6 +282,7 @@ public class Service extends BaseService {
 	private LinkedHashMap<String, String> groupCategories = new LinkedHashMap();
 	
 	private CsvExportWizard csvWizard = null;
+	private TxtExportWizard txtWizard = null;
 	
 	@Override
 	public void initialize() throws Exception {
@@ -348,6 +355,7 @@ public class Service extends BaseService {
 		vs.put("sicknessAutomaticallyApproved", ss.getSicknessAutomaticallyApproved());
 		vs.put("ticketNotifyMail", us.getTicketNotifyMail());
         vs.put("ticketDefaultTicketCategory", ss.getTicketDefaultTicketCategoryId());
+		vs.put("integrationGis", ss.getIntegrationGis());
 		
 		try {
 			vs.put("opportunityRequiredFields", getOpportunityRequiredFields());
@@ -1273,6 +1281,42 @@ public class Service extends BaseService {
 			logger.error("Error in action ManageHolidayDate", ex);
 		}
 	}
+	
+	public void processManageCausal(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+            
+			if (crud.equals(Crud.READ)) {
+				String id = ServletUtils.getStringParameter(request, "id", false);
+                
+				if(id != null){
+					com.sonicle.webtop.drm.model.Causal c = manager.getCausal(id);
+                    
+					new JsonResult(new JsCausal(c)).printTo(out);
+				}
+			} else if (crud.equals(Crud.CREATE)) {
+				Payload<MapItem, JsCausal> pl = ServletUtils.getPayload(request, JsCausal.class);
+				manager.addCausal(JsCausal.createCausal(pl.data));
+
+				new JsonResult().printTo(out);
+			} else if (crud.equals(Crud.UPDATE)) {
+				Payload<MapItem, JsCausal> pl = ServletUtils.getPayload(request, JsCausal.class);
+
+				manager.updateCausal(JsCausal.createCausal(pl.data));
+
+				new JsonResult().printTo(out);
+			} else if (crud.equals(Crud.DELETE)) {
+				StringArray id = ServletUtils.getObjectParameter(request, "id", StringArray.class, true);
+                
+				manager.deleteCausal(id.get(0));
+
+				new JsonResult().printTo(out);
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageCausal", ex);
+		}
+	}
     
 	public void processManageHourProfile(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
@@ -1355,6 +1399,28 @@ public class Service extends BaseService {
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action ManageGridHolidayDate", ex);
+		}
+	}
+	
+	public void processManageGridCausals(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			JsGridCausal jsGC;
+			
+			if (crud.equals(Crud.READ)) {
+				List<JsGridCausal> jsGridC = new ArrayList();
+
+				for (OCausal oC : manager.listCausals(false)) {
+					jsGC = new JsGridCausal(oC);
+					jsGridC.add(jsGC);
+				}
+
+				new JsonResult(jsGridC).printTo(out);
+
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageGridCausals", ex);
 		}
 	}
     
@@ -2209,6 +2275,60 @@ public class Service extends BaseService {
 		}
 	}
 	
+	public void processExportTimetableReportGis(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		UserProfile up = getEnv().getProfile();
+		
+		try {
+			String op = ServletUtils.getStringParameter(request, "op", true);
+			if (op.equals("do")) {			
+				txtWizard = new TxtExportWizard();
+				txtWizard.date = new DateTime();
+				
+				LogEntries log = new LogEntries();
+				File file = WT.createTempFile();
+				
+				try {
+					DateTimeFormatter ymd2 = DateTimeUtils.createFormatter("yyyyMMdd", up.getTimeZone());
+					DateTimeFormatter ymdhms = DateTimeUtils.createFormatter("yyyy-MM-dd HH:mm:ss", up.getTimeZone());
+					
+					try (FileOutputStream fos = new FileOutputStream(file)) {
+						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Started on {0}", ymdhms.print(new DateTime())));
+						manager.exportTimetableReportGis(log, fos);
+						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Ended on {0}", ymdhms.print(new DateTime())));
+						txtWizard.file = file;
+						txtWizard.filename = MessageFormat.format(TIMETABLE_GIS_EXPORT_FILENAME, up.getDomainId(), ymd2.print(txtWizard.date), "txt");
+						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "File ready: {0}", txtWizard.filename));
+						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Operation completed succesfully"));
+						new JsonResult(new JsWizardData(log.print())).printTo(out);
+					}
+					
+				} catch(Throwable t) {
+					logger.error("Error generating export", t);
+					file.delete();
+					new JsonResult(new JsWizardData(log.print())).setSuccess(false).printTo(out);
+				}	
+			}
+		} catch(Exception ex) {
+			logger.error("Error in ExportTimetableReportGis", ex);
+			new JsonResult(false, ex.getMessage()).printTo(out);
+		}
+	}
+	
+	public void processExportTimetableReportGis(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			try(FileInputStream fis = new FileInputStream(txtWizard.file)) {
+				ServletUtils.setFileStreamHeaders(response, "application/octet-stream", DispositionType.ATTACHMENT, txtWizard.filename);
+				ServletUtils.setContentLengthHeader(response, txtWizard.file.length());
+				IOUtils.copy(fis, response.getOutputStream());
+			}
+			
+		} catch(Exception ex) {
+			logger.error("Error in ExportTimetableReportGis", ex);
+		} finally {
+			txtWizard = null;
+		}
+	}
+	
 	public void processManageLeaveRequest(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		JsLeaveRequest item = null;
 		try {
@@ -2768,6 +2888,39 @@ public class Service extends BaseService {
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action ManageTimetableSetting", ex);
+		}
+	}
+	
+	public void processManageTimetableSettingGis(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		JsTimetableSettingGis item = null;
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+
+			if (crud.equals(Crud.READ)) {
+				TimetableSettingGis ttSettingGis = new TimetableSettingGis();
+				
+				ttSettingGis.setCompanyCode(ss.getGisCompanyCode());
+				ttSettingGis.setHeadquartersCode(ss.getGisHeadquartersCode());
+
+				
+				item = new JsTimetableSettingGis(ttSettingGis);
+
+				new JsonResult(item).printTo(out);
+
+			} else if (crud.equals(Crud.UPDATE)) {
+				Payload<MapItem, JsTimetableSettingGis> pl = ServletUtils.getPayload(request, JsTimetableSettingGis.class);
+
+				if (pl.map.has("companyCode")) 
+					ss.setGisCompanyCode(pl.data.companyCode);
+				if (pl.map.has("headquartersCode")) 
+					ss.setGisHeadquartersCode(pl.data.headquartersCode);
+
+				new JsonResult().printTo(out);
+
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageTimetableSettingGis", ex);
 		}
 	}
 	
@@ -4807,4 +4960,27 @@ public class Service extends BaseService {
 		public File file;
 		public String filename;
 	}	
+	
+	private static class TxtExportWizard {
+		public DateTime date;
+		public File file;
+		public String filename;
+	}	
+	
+	public void processLookupGisCausals(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			Boolean filter = ServletUtils.getBooleanParameter(request, "filter", true);
+			
+			List<JsSimple> jsC = new ArrayList();
+
+			for (OCausal c : manager.listCausals(filter)) {
+				jsC.add(new JsSimple(c.getId(), "[" + c.getExternalCode() + "] " + c.getDescription()));
+			}
+			
+			new JsonResult(jsC, jsC.size()).printTo(out);
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupGisCausals", ex);
+		}
+	}
 }

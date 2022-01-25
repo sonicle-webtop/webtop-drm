@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableSettings implements java.io.Serializable {
 
-	private static final long serialVersionUID = -1221750801;
+	private static final long serialVersionUID = 1348004085;
 
 	private java.lang.Integer timetableSettingId;
 	private java.lang.String  domainId;
@@ -39,6 +39,11 @@ public class TimetableSettings implements java.io.Serializable {
 	private java.lang.Integer defaultEventActivityId;
 	private java.lang.Boolean requestsSickness;
 	private java.lang.Boolean sicknessAutomaticallyApproved;
+	private java.lang.String  defaultCausalWorkingHours;
+	private java.lang.String  defaultCausalOvertime;
+	private java.lang.String  defaultCausalPermits;
+	private java.lang.String  defaultCausalHolidays;
+	private java.lang.String  defaultCausalSickness;
 
 	public TimetableSettings() {}
 
@@ -63,7 +68,12 @@ public class TimetableSettings implements java.io.Serializable {
 		java.lang.String  calendarUserId,
 		java.lang.Integer defaultEventActivityId,
 		java.lang.Boolean requestsSickness,
-		java.lang.Boolean sicknessAutomaticallyApproved
+		java.lang.Boolean sicknessAutomaticallyApproved,
+		java.lang.String  defaultCausalWorkingHours,
+		java.lang.String  defaultCausalOvertime,
+		java.lang.String  defaultCausalPermits,
+		java.lang.String  defaultCausalHolidays,
+		java.lang.String  defaultCausalSickness
 	) {
 		this.timetableSettingId = timetableSettingId;
 		this.domainId = domainId;
@@ -86,6 +96,11 @@ public class TimetableSettings implements java.io.Serializable {
 		this.defaultEventActivityId = defaultEventActivityId;
 		this.requestsSickness = requestsSickness;
 		this.sicknessAutomaticallyApproved = sicknessAutomaticallyApproved;
+		this.defaultCausalWorkingHours = defaultCausalWorkingHours;
+		this.defaultCausalOvertime = defaultCausalOvertime;
+		this.defaultCausalPermits = defaultCausalPermits;
+		this.defaultCausalHolidays = defaultCausalHolidays;
+		this.defaultCausalSickness = defaultCausalSickness;
 	}
 
 	public java.lang.Integer getTimetableSettingId() {
@@ -254,5 +269,45 @@ public class TimetableSettings implements java.io.Serializable {
 
 	public void setSicknessAutomaticallyApproved(java.lang.Boolean sicknessAutomaticallyApproved) {
 		this.sicknessAutomaticallyApproved = sicknessAutomaticallyApproved;
+	}
+
+	public java.lang.String getDefaultCausalWorkingHours() {
+		return this.defaultCausalWorkingHours;
+	}
+
+	public void setDefaultCausalWorkingHours(java.lang.String defaultCausalWorkingHours) {
+		this.defaultCausalWorkingHours = defaultCausalWorkingHours;
+	}
+
+	public java.lang.String getDefaultCausalOvertime() {
+		return this.defaultCausalOvertime;
+	}
+
+	public void setDefaultCausalOvertime(java.lang.String defaultCausalOvertime) {
+		this.defaultCausalOvertime = defaultCausalOvertime;
+	}
+
+	public java.lang.String getDefaultCausalPermits() {
+		return this.defaultCausalPermits;
+	}
+
+	public void setDefaultCausalPermits(java.lang.String defaultCausalPermits) {
+		this.defaultCausalPermits = defaultCausalPermits;
+	}
+
+	public java.lang.String getDefaultCausalHolidays() {
+		return this.defaultCausalHolidays;
+	}
+
+	public void setDefaultCausalHolidays(java.lang.String defaultCausalHolidays) {
+		this.defaultCausalHolidays = defaultCausalHolidays;
+	}
+
+	public java.lang.String getDefaultCausalSickness() {
+		return this.defaultCausalSickness;
+	}
+
+	public void setDefaultCausalSickness(java.lang.String defaultCausalSickness) {
+		this.defaultCausalSickness = defaultCausalSickness;
 	}
 }

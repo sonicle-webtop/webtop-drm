@@ -30,13 +30,12 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.TimetableSettingGeneral', {
+Ext.define('Sonicle.webtop.drm.model.TimetableSettingGis', {
 	extend: 'WTA.ux.data.BaseModel',
 	requires: [
 		'Sonicle.data.writer.Json'
-		// 'Sonicle.webtop.drm.model.HolidayDate'
 	],
-	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageTimetableSetting', 'data', {
+	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageTimetableSettingGis', 'data', {
 		writer: {
 			type: 'sojson',
 			writeAssociations: true
@@ -46,31 +45,7 @@ Ext.define('Sonicle.webtop.drm.model.TimetableSettingGeneral', {
 	idProperty: 'id',
 	fields: [
 		WTF.field('id', 'string', true),
-		WTF.field('timetableSettingId', 'int', true),
-		WTF.field('domainId', 'string', true),
-		WTF.field('allowedAddresses', 'string', true),
-		WTF.field('allowedUsers', 'string', true),
-		WTF.field('staffOfficeEmail', 'string', true),
-		WTF.field('requestsHolidaysPermitsPreviousDates', 'bool', true, {defaultValue: false}),
-		WTF.field('totalToleranceInMinutes', 'string', true),
-		WTF.field('rounding', 'string', true),
-		WTF.field('minimumExtraordinary', 'string', true),
-		WTF.field('calendarUserId', 'string', true),
-		WTF.field('defaultEventActivityId', 'string', true),
-		WTF.field('companyExit', 'bool', true, {defaultValue: false}),
-		WTF.field('manageStamp', 'bool', true, {defaultValue: false}),
-		WTF.field('breakAnomaly', 'bool', true, {defaultValue: false}),
-		WTF.field('readOnlyEvents', 'bool', true, {defaultValue: false}),
-		WTF.field('requestsPermitsNotRemunered', 'bool', true, {defaultValue: false}),
-		WTF.field('requestsPermitsMedicalVisits', 'bool', true, {defaultValue: false}),
-		WTF.field('requestsPermitsContractuals', 'bool', true, {defaultValue: false}),
-		WTF.field('medicalVisitsAutomaticallyApproved', 'bool', true, {defaultValue: false}),
-		WTF.field('requestsSickness', 'bool', true, {defaultValue: false}),
-		WTF.field('sicknessAutomaticallyApproved', 'bool', true, {defaultValue: false}),
-		WTF.field('defaultCausalWorkingHours', 'string', true),
-		WTF.field('defaultCausalOvertime', 'string', true),
-		WTF.field('defaultCausalPermits', 'string', true),
-		WTF.field('defaultCausalHolidays', 'string', true),
-		WTF.field('defaultCausalSickness', 'string', true)
+		WTF.field('companyCode', 'string', true),
+		WTF.field('headquartersCode', 'string', true)
 	]
 });

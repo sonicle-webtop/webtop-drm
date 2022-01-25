@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Drm extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = -64942157;
+	private static final long serialVersionUID = 439865622;
 
 	/**
 	 * The reference instance of <code>drm</code>
@@ -93,6 +93,7 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.tables.Activities.ACTIVITIES,
 			com.sonicle.webtop.drm.jooq.tables.ActivitiesGroups.ACTIVITIES_GROUPS,
 			com.sonicle.webtop.drm.jooq.tables.BusinessTrips.BUSINESS_TRIPS,
+			com.sonicle.webtop.drm.jooq.tables.Causals.CAUSALS,
 			com.sonicle.webtop.drm.jooq.tables.Companies.COMPANIES,
 			com.sonicle.webtop.drm.jooq.tables.CompaniesPictures.COMPANIES_PICTURES,
 			com.sonicle.webtop.drm.jooq.tables.CompaniesUsers.COMPANIES_USERS,
@@ -140,6 +141,7 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.tables.TicketAttachmentsData.TICKET_ATTACHMENTS_DATA,
 			com.sonicle.webtop.drm.jooq.tables.TicketCategories.TICKET_CATEGORIES,
 			com.sonicle.webtop.drm.jooq.tables.Tickets.TICKETS,
+			com.sonicle.webtop.drm.jooq.tables.TicketsSettings.TICKETS_SETTINGS,
 			com.sonicle.webtop.drm.jooq.tables.TimetableEvents.TIMETABLE_EVENTS,
 			com.sonicle.webtop.drm.jooq.tables.TimetableReportTemp.TIMETABLE_REPORT_TEMP,
 			com.sonicle.webtop.drm.jooq.tables.TimetableSettings.TIMETABLE_SETTINGS,
@@ -147,8 +149,6 @@ public class Drm extends org.jooq.impl.SchemaImpl {
 			com.sonicle.webtop.drm.jooq.tables.VwJobs.VW_JOBS,
 			com.sonicle.webtop.drm.jooq.tables.VwTickets.VW_TICKETS,
 			com.sonicle.webtop.drm.jooq.tables.VwWorkReports.VW_WORK_REPORTS,
-			com.sonicle.webtop.drm.jooq.tables.VwWorkReports_2.VW_WORK_REPORTS_2,
-			com.sonicle.webtop.drm.jooq.tables.VwWorkReports_3.VW_WORK_REPORTS_3,
 			com.sonicle.webtop.drm.jooq.tables.WorkReports.WORK_REPORTS,
 			com.sonicle.webtop.drm.jooq.tables.WorkReportsAttachments.WORK_REPORTS_ATTACHMENTS,
 			com.sonicle.webtop.drm.jooq.tables.WorkReportsAttachmentsData.WORK_REPORTS_ATTACHMENTS_DATA,

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.15.0.final utlizzo versione della libreria JasperReports6.15.0-dd49bfb94918336b8321d5507193f0169ead4e95  -->
+<!-- Created with Jaspersoft Studio version 6.3.0.final using JasperReports Library version 6.3.0  -->
+<!-- 2022-01-18T17:49:46 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="timetablereport" printOrder="Horizontal" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="832" leftMargin="5" rightMargin="5" topMargin="5" bottomMargin="5" uuid="0c72a82c-982e-4a49-946e-fff85de6c39f">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
@@ -36,6 +37,9 @@
 	<field name="workReportHours" class="java.lang.Float"/>
 	<field name="totHours" class="java.lang.Float"/>
 	<field name="sickness" class="java.lang.Float"/>
+	<field name="other" class="java.lang.Float"/>
+	<field name="gisCausalCode" class="java.lang.String"/>
+	<field name="gisCausalDescription" class="java.lang.String"/>
 	<variable name="totWorkingHours" class="java.lang.Float" resetType="Group" resetGroup="grp_targetUserId" incrementType="Group" incrementGroup="grp_date" calculation="Sum">
 		<variableExpression><![CDATA[$F{workingHours}]]></variableExpression>
 		<initialValueExpression><![CDATA[0]]></initialValueExpression>
@@ -84,10 +88,15 @@
 		<variableExpression><![CDATA[$F{sickness}]]></variableExpression>
 		<initialValueExpression><![CDATA[0]]></initialValueExpression>
 	</variable>
+	<variable name="totOther" class="java.lang.Float" resetType="Group" resetGroup="grp_targetUserId" incrementType="Group" incrementGroup="grp_date" calculation="Sum">
+		<variableExpression><![CDATA[$F{other}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
 	<group name="grp_targetUserId" keepTogether="true">
 		<groupExpression><![CDATA[$F{targetUserId}]]></groupExpression>
 		<groupHeader>
 			<band height="28">
+				<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				<staticText>
 					<reportElement x="160" y="0" width="72" height="15" uuid="9a10fec6-8c07-4c55-ae56-23c596fd2fb7">
 						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
@@ -142,13 +151,7 @@
 					</reportElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="312" y="16" width="48" height="12" backcolor="#E8E8E8" uuid="860408b8-f3fa-491e-b359-100a9b1f40c0"/>
-				</rectangle>
-				<rectangle>
-					<reportElement x="266" y="16" width="46" height="12" backcolor="#E8E8E8" uuid="7d488e21-b121-4128-8115-b9ba013e637f"/>
-				</rectangle>
-				<rectangle>
-					<reportElement x="220" y="16" width="46" height="12" backcolor="#E8E8E8" uuid="0b059bc8-0302-4fe6-8130-6274572bddf3"/>
+					<reportElement x="220" y="16" width="46" height="12" backcolor="#E8E8E8" uuid="7d488e21-b121-4128-8115-b9ba013e637f"/>
 				</rectangle>
 				<rectangle>
 					<reportElement x="174" y="16" width="46" height="12" backcolor="#E8E8E8" uuid="dffddc84-ae6a-4cc8-bd50-19d0eed28c08">
@@ -201,31 +204,13 @@
 					<text><![CDATA[Permessi]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="220" y="16" width="46" height="12" uuid="1be892f9-b085-42b5-95cc-7897d6dd8445">
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font size="8" isBold="true"/>
-					</textElement>
-					<text><![CDATA[No retrib.]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="266" y="16" width="46" height="12" uuid="d75b7e4f-84fa-4482-9112-63a9cac4cb73">
+					<reportElement x="220" y="16" width="46" height="12" uuid="d75b7e4f-84fa-4482-9112-63a9cac4cb73">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[Ferie]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="312" y="16" width="48" height="12" uuid="ddbab345-9d7f-4063-a6c7-f7c2a5e24692">
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font size="8" isBold="true"/>
-					</textElement>
-					<text><![CDATA[Vis. medica]]></text>
 				</staticText>
 				<staticText>
 					<reportElement x="405" y="16" width="45" height="12" uuid="eb14cce2-2232-4bd2-abf2-b95529e2b0f1">
@@ -295,18 +280,44 @@
 					<textFieldExpression><![CDATA[MONTH($F{date} ) + "-" + YEAR($F{date} )]]></textFieldExpression>
 				</textField>
 				<rectangle>
-					<reportElement x="360" y="16" width="45" height="12" backcolor="#E8E8E8" uuid="f8ecd11b-f7ae-4bf1-9293-07c22bc2cfd0">
+					<reportElement x="266" y="16" width="45" height="12" backcolor="#E8E8E8" uuid="f8ecd11b-f7ae-4bf1-9293-07c22bc2cfd0">
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
 				</rectangle>
 				<staticText>
-					<reportElement x="360" y="16" width="45" height="12" uuid="a0944eeb-7a09-496f-8d44-7e33c833b986">
+					<reportElement x="266" y="16" width="45" height="12" uuid="a0944eeb-7a09-496f-8d44-7e33c833b986">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[Malattia]]></text>
+				</staticText>
+				<rectangle>
+					<reportElement x="311" y="16" width="45" height="12" backcolor="#E8E8E8" uuid="d509073c-b8dd-4c56-88ca-3341ead8abb5">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+				</rectangle>
+				<staticText>
+					<reportElement x="311" y="16" width="45" height="12" uuid="f31a0969-13b6-4461-991d-41f0b9bc0596">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Altro]]></text>
+				</staticText>
+				<rectangle>
+					<reportElement x="356" y="16" width="49" height="12" backcolor="#E8E8E8" uuid="890ce5df-2834-41c9-b418-0f5298d14414"/>
+				</rectangle>
+				<staticText>
+					<reportElement x="356" y="16" width="49" height="12" uuid="cf23a4c9-11c7-4dae-a39d-e51eb87bceae">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Causale]]></text>
 				</staticText>
 			</band>
 		</groupHeader>
@@ -334,17 +345,7 @@
 					</reportElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="220" y="0" width="46" height="12" uuid="a13dcc36-e3d3-4796-8751-698ef4e85095">
-						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-					</reportElement>
-				</rectangle>
-				<rectangle>
-					<reportElement x="266" y="0" width="46" height="12" uuid="b6a98487-af1b-4e20-87dc-78b564974c3d">
-						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-					</reportElement>
-				</rectangle>
-				<rectangle>
-					<reportElement x="312" y="0" width="48" height="12" uuid="6f35de59-5955-43e6-9782-0fc24d5369ed">
+					<reportElement x="220" y="0" width="46" height="12" uuid="b6a98487-af1b-4e20-87dc-78b564974c3d">
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
 				</rectangle>
@@ -425,20 +426,7 @@ CONCATENATE(
 )]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00">
-					<reportElement x="220" y="0" width="46" height="12" uuid="44fca3ee-ca75-4a54-9cee-798ef9053397"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font size="8" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$V{totUnpaidLeave} == null ? "" : 
-CONCATENATE( 
-	new Float($V{totUnpaidLeave}/60).toString().split("\\.")[0], 
-	",", 
-	new Integer(new Integer(new Float($V{totUnpaidLeave}/60).toString().split("\\.")[1] )*60/100).toString(),
-	LEN(new Integer(new Integer(new Float($V{totUnpaidLeave}/60).toString().split("\\.")[1] )*60/100).toString() ) == 1 ? "0" : ""
-)]]></textFieldExpression>
-				</textField>
-				<textField pattern="#,##0.00">
-					<reportElement x="266" y="0" width="46" height="12" uuid="fbeffcc6-83b7-44bd-bc72-23b39d5ed4f6">
+					<reportElement x="220" y="0" width="46" height="12" uuid="fbeffcc6-83b7-44bd-bc72-23b39d5ed4f6">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -450,19 +438,6 @@ CONCATENATE(
 	",", 
 	new Integer(new Integer(new Float($V{totHoliday}/60).toString().split("\\.")[1] )*60/100).toString(),
 	LEN(new Integer(new Integer(new Float($V{totHoliday}/60).toString().split("\\.")[1] )*60/100).toString() ) == 1 ? "0" : ""
-)]]></textFieldExpression>
-				</textField>
-				<textField pattern="#,##0.00">
-					<reportElement x="312" y="0" width="48" height="12" uuid="a563df68-eaba-4f8a-b2bb-da3cc5d6cbb3"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font size="8" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$V{totMedicalVisit} == null ? "" : 
-CONCATENATE( 
-	new Float($V{totMedicalVisit}/60).toString().split("\\.")[0], 
-	",", 
-	new Integer(new Integer(new Float($V{totMedicalVisit}/60).toString().split("\\.")[1] )*60/100).toString(),
-	LEN(new Integer(new Integer(new Float($V{totMedicalVisit}/60).toString().split("\\.")[1] )*60/100).toString() ) == 1 ? "0" : ""
 )]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00">
@@ -510,12 +485,12 @@ CONCATENATE(
 )]]></textFieldExpression>
 				</textField>
 				<rectangle>
-					<reportElement x="360" y="0" width="45" height="12" uuid="647d2704-70f2-4cee-890c-d692674dd971">
+					<reportElement x="266" y="0" width="45" height="12" uuid="647d2704-70f2-4cee-890c-d692674dd971">
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
 				</rectangle>
 				<textField pattern="#,##0.00">
-					<reportElement x="360" y="0" width="45" height="12" uuid="c9f9c47b-df01-4416-aff6-b46605127d3e"/>
+					<reportElement x="266" y="0" width="45" height="12" uuid="c9f9c47b-df01-4416-aff6-b46605127d3e"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font size="8" isBold="true"/>
 					</textElement>
@@ -525,6 +500,29 @@ CONCATENATE(
 	",", 
 	new Integer(new Integer(new Float($V{totSickness}/60).toString().split("\\.")[1] )*60/100).toString(),
 	LEN(new Integer(new Integer(new Float($V{totSickness}/60).toString().split("\\.")[1] )*60/100).toString() ) == 1 ? "0" : ""
+)]]></textFieldExpression>
+				</textField>
+				<rectangle>
+					<reportElement x="356" y="0" width="49" height="12" uuid="f9709c6d-d4aa-481c-b9af-2edded1f1253">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+				</rectangle>
+				<rectangle>
+					<reportElement x="311" y="0" width="45" height="12" uuid="0295ff0a-11db-45bb-85d9-206ecd5ae319">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+				</rectangle>
+				<textField pattern="#,##0.00">
+					<reportElement x="311" y="0" width="45" height="12" uuid="7e95bec1-f3c4-43de-9aaa-a00e7efe4e0a"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{totOther} == null ? "" : 
+CONCATENATE( 
+	new Float($V{totOther}/60).toString().split("\\.")[0], 
+	",", 
+	new Integer(new Integer(new Float($V{totOther}/60).toString().split("\\.")[1] )*60/100).toString(),
+	LEN(new Integer(new Integer(new Float($V{totOther}/60).toString().split("\\.")[1] )*60/100).toString() ) == 1 ? "0" : ""
 )]]></textFieldExpression>
 				</textField>
 			</band>
@@ -564,17 +562,7 @@ CONCATENATE(
 					</reportElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="220" y="0" width="46" height="16" uuid="2cd846e2-04c3-4485-a10d-656c8c2dcf25">
-						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-					</reportElement>
-				</rectangle>
-				<rectangle>
-					<reportElement x="266" y="0" width="46" height="16" uuid="e3d9193d-c936-4ba7-82d7-1b129f1f5682">
-						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-					</reportElement>
-				</rectangle>
-				<rectangle>
-					<reportElement x="312" y="0" width="48" height="16" uuid="4dcb3a09-7db8-4561-b604-322104b8c7fe">
+					<reportElement x="220" y="0" width="46" height="16" uuid="e3d9193d-c936-4ba7-82d7-1b129f1f5682">
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
 				</rectangle>
@@ -648,20 +636,7 @@ CONCATENATE(
 )]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00">
-					<reportElement x="220" y="0" width="46" height="16" uuid="d15a4e4e-4bd2-463b-be95-1e7d77f390f6"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font size="8"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{unpaidLeave} == null ? "" : 
-CONCATENATE( 
-	new Float($F{unpaidLeave}/60).toString().split("\\.")[0], 
-	",", 
-	new Integer(new Integer(new Float($F{unpaidLeave}/60).toString().split("\\.")[1] )*60/100).toString(),
-	LEN(new Integer(new Integer(new Float($F{unpaidLeave}/60).toString().split("\\.")[1] )*60/100).toString() ) == 1 ? "0" : ""
-)]]></textFieldExpression>
-				</textField>
-				<textField pattern="#,##0.00">
-					<reportElement x="266" y="0" width="46" height="16" uuid="dcb67ede-5bcd-4220-ac22-6fb860b2f180">
+					<reportElement x="220" y="0" width="46" height="16" uuid="dcb67ede-5bcd-4220-ac22-6fb860b2f180">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -673,19 +648,6 @@ CONCATENATE(
 	",", 
 	new Integer(new Integer(new Float($F{holiday}/60).toString().split("\\.")[1] )*60/100).toString(),
 	LEN(new Integer(new Integer(new Float($F{holiday}/60).toString().split("\\.")[1] )*60/100).toString() ) == 1 ? "0" : ""
-)]]></textFieldExpression>
-				</textField>
-				<textField pattern="#,##0.00">
-					<reportElement x="312" y="0" width="48" height="16" uuid="3c05e9d2-d585-40e4-9310-2f1033cb34a2"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font size="8"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{medicalVisit} == null ? "" : 
-CONCATENATE( 
-	new Float($F{medicalVisit}/60).toString().split("\\.")[0], 
-	",", 
-	new Integer(new Integer(new Float($F{medicalVisit}/60).toString().split("\\.")[1] )*60/100).toString(),
-	LEN(new Integer(new Integer(new Float($F{medicalVisit}/60).toString().split("\\.")[1] )*60/100).toString() ) == 1 ? "0" : ""
 )]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00">
@@ -753,12 +715,12 @@ CONCATENATE(
 					<textFieldExpression><![CDATA[$F{note} == null ? "" : $F{note}]]></textFieldExpression>
 				</textField>
 				<rectangle>
-					<reportElement x="360" y="0" width="45" height="16" uuid="3703ae85-5e7c-4088-b8f5-42adfc4188e7">
+					<reportElement x="266" y="0" width="45" height="16" uuid="3703ae85-5e7c-4088-b8f5-42adfc4188e7">
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
 				</rectangle>
 				<textField pattern="#,##0.00">
-					<reportElement x="360" y="0" width="45" height="16" uuid="841746d8-7e08-4808-8462-02b18628f726"/>
+					<reportElement x="266" y="0" width="45" height="16" uuid="841746d8-7e08-4808-8462-02b18628f726"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font size="8"/>
 					</textElement>
@@ -769,6 +731,39 @@ CONCATENATE(
 	new Integer(new Integer(new Float($F{sickness}/60).toString().split("\\.")[1] )*60/100).toString(),
 	LEN(new Integer(new Integer(new Float($F{sickness}/60).toString().split("\\.")[1] )*60/100).toString() ) == 1 ? "0" : ""
 )]]></textFieldExpression>
+				</textField>
+				<rectangle>
+					<reportElement x="311" y="0" width="45" height="16" uuid="9aee3904-8f73-471b-b0e1-14cc76a4a409">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+				</rectangle>
+				<rectangle>
+					<reportElement x="356" y="0" width="49" height="16" uuid="bf6bb026-3132-4c78-98ca-2bb84e0ce3e3">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+				</rectangle>
+				<textField pattern="#,##0.00">
+					<reportElement x="311" y="0" width="45" height="16" uuid="4e1c1841-b180-4f22-94ac-40100a046ba4"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{other} == null ? "" : 
+CONCATENATE( 
+	new Float($F{other}/60).toString().split("\\.")[0], 
+	",", 
+	new Integer(new Integer(new Float($F{other}/60).toString().split("\\.")[1] )*60/100).toString(),
+	LEN(new Integer(new Integer(new Float($F{other}/60).toString().split("\\.")[1] )*60/100).toString() ) == 1 ? "0" : ""
+)]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="356" y="0" width="49" height="16" uuid="0b03791a-8c96-4a74-821b-24ed0560abcc">
+						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{gisCausalCode} == null ? "" : "[" + $F{gisCausalCode} + "] " + $F{gisCausalDescription}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>
