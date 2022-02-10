@@ -261,12 +261,16 @@ import jakarta.mail.Session;
 import jakarta.mail.internet.InternetAddress;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.util.Calendar;
+import java.util.Date;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.imgscalr.Scalr;
 import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.joda.time.Minutes;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -4507,18 +4511,28 @@ public class DrmManager extends BaseManager {
 			if(query != null) {
 				//Empty Table for single user
 				
-				//Save "Other", "Causal", "Note" for re-set in new generation rows
-				for(OTimetableReport itm : trDAO.selectByDomainIdUserId(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId())){
-					vals = new HashMap();
-					vals.put("other", itm.getOther());
-					vals.put("causalId", itm.getCausalId());
-					vals.put("note", itm.getNote());
-					hashTrs.put(itm.getDomainId() + "|" + itm.getUserId() + "|" + itm.getDate(),  vals);
-				}
-						
-				trDAO.deleteByDomainIdUserId(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
+				Date d = new Date();
+				d.setDate(1);
+				d.setMonth(query.month-1);
+				d.setYear(query.year-1900);
+				LocalDate fromDate = LocalDate.fromDateFields(d);
+				
+				d = getLastDateOfMonth(d);
+				LocalDate toDate = LocalDate.fromDateFields(d);
 				
 				if(query.targetUserId == null) {
+					
+					//Save "Other", "Causal", "Note" for re-set in new generation rows
+					for(OTimetableReport itm : trDAO.selectByDomainIdUserIdMonthYear(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), fromDate, toDate)){
+						vals = new HashMap();
+						vals.put("other", itm.getOther());
+						vals.put("causalId", itm.getCausalId());
+						vals.put("note", itm.getNote());
+						hashTrs.put(itm.getDomainId() + "|" + itm.getUserId() + "|" + itm.getTargetUserId() + "|" + itm.getDate(),  vals);
+					}
+					
+					trDAO.deleteByDomainIdUserIdMonthYear(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), fromDate, toDate);
+					
 					//Get Data for All Users for Company by TargetProfileId.UserId if supervisor or himself
 					List<OUser> users = listCompanyProfileSupervisedUsers(query.companyId);
 					
@@ -4541,7 +4555,19 @@ public class DrmManager extends BaseManager {
 						
 						trs.addAll(ttrs);
 					}
-				} else {
+				}else {
+					
+					//Save "Other", "Causal", "Note" for re-set in new generation rows
+					for(OTimetableReport itm : trDAO.selectByDomainIdTargetUserIdMonthYear(con, getTargetProfileId().getDomainId(), query.targetUserId, fromDate, toDate)){
+						vals = new HashMap();
+						vals.put("other", itm.getOther());
+						vals.put("causalId", itm.getCausalId());
+						vals.put("note", itm.getNote());
+						hashTrs.put(itm.getDomainId() + "|" + itm.getUserId() + "|" + itm.getTargetUserId() + "|" + itm.getDate(),  vals);
+					}
+					
+					trDAO.deleteByDomainIdTargetUserIdMonthYear(con, getTargetProfileId().getDomainId(), query.targetUserId, fromDate, toDate);
+					
 					//Get Data for Single User Selected
 					trsf = tstmpDAO.getStampsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
 					te = teDAO.getEventsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
@@ -4565,7 +4591,7 @@ public class DrmManager extends BaseManager {
 					otr.setUserId(getTargetProfileId().getUserId());
 					
 					//Set if present other, causal, note from old generation
-					val = hashTrs.getOrDefault(otr.getDomainId() + "|" + otr.getUserId() + "|" + otr.getDate(), null);
+					val = hashTrs.getOrDefault(otr.getDomainId() + "|" + otr.getUserId() + "|" + otr.getTargetUserId() + "|" + otr.getDate(), null);
 					if(val != null){
 						otr.setOther(val.getOrDefault("other", null));
 						otr.setCausalId(val.getOrDefault("causalId", null));
@@ -4574,10 +4600,17 @@ public class DrmManager extends BaseManager {
 					
 					trDAO.insert(con, otr);
 				}
+				
+				
+				if(query.targetUserId == null) {
+					//Select for DomainId UserId
+					trs = trDAO.selectByDomainIdUserIdMonthYear(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), fromDate, toDate);
+				}else{
+					//Select for DomainId TargetUserId
+					trs = trDAO.selectByDomainIdTargetUserIdMonthYear(con, getTargetProfileId().getDomainId(), query.targetUserId, fromDate, toDate);
+				}
+				
 			}
-			
-			//Select for DomainId
-			trs = trDAO.selectByDomainIdUserId(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
 			
 			DbUtils.commitQuietly(con);
 
@@ -4594,15 +4627,31 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
-	public List<OTimetableReport> getTimetableReport() throws WTException{
+	public List<OTimetableReport> getTimetableReport(TimetableReportQuery query) throws WTException{
 		Connection con = null;
 		List<OTimetableReport> trs = new ArrayList();
 		TimetableReportDAO trDao = TimetableReportDAO.getInstance();
 
 		try {
 			con = WT.getConnection(SERVICE_ID);
-
-			trs = trDao.selectByDomainIdUserId(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
+			
+			if(query != null){
+				
+				Date d = new Date();
+				d.setDate(1);
+				d.setMonth(query.month-1);
+				d.setYear(query.year-1900);
+				LocalDate fromDate = LocalDate.fromDateFields(d);
+				
+				d = getLastDateOfMonth(d);
+				LocalDate toDate = LocalDate.fromDateFields(d);
+				
+				if(query.targetUserId == null){
+					trs = trDao.selectByDomainIdUserIdMonthYear(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), fromDate, toDate);
+				}else{
+					trs = trDao.selectByDomainIdTargetUserIdMonthYear(con, getTargetProfileId().getDomainId(), query.targetUserId, fromDate, toDate);
+				}
+			}
 
 			return trs;
 
@@ -5433,7 +5482,7 @@ public class DrmManager extends BaseManager {
 		}
 	}
 	
-	public void exportTimetableReportGis(LogEntries log, OutputStream os) throws Exception {
+	public void exportTimetableReportGis(LogEntries log, OutputStream os, TimetableReportQuery query) throws Exception {
 		Connection con = null;
 		OutputStreamWriter osWriter = null;		
 		DrmServiceSettings dss = null;
@@ -5466,10 +5515,10 @@ public class DrmManager extends BaseManager {
 			
 			osWriter = new OutputStreamWriter(os);
 			
-			for (OTimetableReport oTR : generateTimetableReport(null)) {
+			for (OTimetableReport oTR : generateTimetableReport(query)) {
 				
 				//Calculate Theoretical Hours
-				oEP = ePDao.selectEmployeeProfileByDomainUser(con, oTR.getDomainId(), oTR.getUserId());
+				oEP = ePDao.selectEmployeeProfileByDomainUser(con, oTR.getDomainId(), oTR.getTargetUserId());
 				oHP = hPDao.selectHourProfileById(con, oEP.getHourProfileId());
 				String theoreticalMinutes = lHDao.selectSumLineHourByHourProfileIdDayOfWeek(con, oHP.getId(),  oTR.getDate().getDayOfWeek());
 				String stringTheoreticalHours = "";
@@ -5691,4 +5740,11 @@ public class DrmManager extends BaseManager {
 			try { if(osWriter != null) osWriter.close(); } catch(Exception ex) { /* Do nothing... */ }
 		}
 	}
+	
+	public static Date getLastDateOfMonth(Date date){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+        return cal.getTime();
+    }
 }

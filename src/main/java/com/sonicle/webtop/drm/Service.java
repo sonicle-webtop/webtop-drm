@@ -2280,6 +2280,9 @@ public class Service extends BaseService {
 		
 		try {
 			String op = ServletUtils.getStringParameter(request, "op", true);
+			String query = ServletUtils.getStringParameter(request, "query", null);
+			TimetableReportQuery trQuery = TimetableReportQuery.fromJson(query);
+			
 			if (op.equals("do")) {			
 				txtWizard = new TxtExportWizard();
 				txtWizard.date = new DateTime();
@@ -2293,7 +2296,7 @@ public class Service extends BaseService {
 					
 					try (FileOutputStream fos = new FileOutputStream(file)) {
 						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Started on {0}", ymdhms.print(new DateTime())));
-						manager.exportTimetableReportGis(log, fos);
+						manager.exportTimetableReportGis(log, fos, trQuery);
 						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Ended on {0}", ymdhms.print(new DateTime())));
 						txtWizard.file = file;
 						txtWizard.filename = MessageFormat.format(TIMETABLE_GIS_EXPORT_FILENAME, up.getDomainId(), ymd2.print(txtWizard.date), "txt");
@@ -3104,8 +3107,10 @@ public class Service extends BaseService {
 		
 		try {
 			String filename = ServletUtils.getStringParameter(request, "filename", "print");
+			String query = ServletUtils.getStringParameter(request, "query", null);
+			TimetableReportQuery trQuery = TimetableReportQuery.fromJson(query);
 			
-			trs = manager.getTimetableReport();
+			trs = manager.getTimetableReport(trQuery);
 			
 			for(OTimetableReport otr : trs) {
 				items.add(new RBTimetableReport(WT.getCoreManager(), manager, otr, getEnv().getProfile().getLocale()));
@@ -3131,8 +3136,10 @@ public class Service extends BaseService {
 		
 		try {
 			String filename = ServletUtils.getStringParameter(request, "filename", "print");
+			String query = ServletUtils.getStringParameter(request, "query", null);
+			TimetableReportQuery trQuery = TimetableReportQuery.fromJson(query);
 			
-			trs = manager.getTimetableReport();
+			trs = manager.getTimetableReport(trQuery);
 			
 			for(OTimetableReport otr : trs) {
 				items.add(new RBTimetableEncoReport(WT.getCoreManager(), manager, otr));

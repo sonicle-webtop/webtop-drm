@@ -39,7 +39,11 @@ import com.sonicle.webtop.drm.jooq.Sequences;
 import static com.sonicle.webtop.drm.jooq.Tables.TIMETABLE_REPORT_TEMP;
 import com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord;
 import java.sql.Connection;
+import java.time.LocalDateTime;
 import java.util.List;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.jooq.DSLContext;
 
 /**
@@ -88,13 +92,14 @@ public class TimetableReportDAO extends BaseDAO{
 				.execute();
 	}
 	
-	public List<OTimetableReport> selectByDomainIdUserId(Connection con, String domainId, String userId) throws DAOException {
+	public List<OTimetableReport> selectByDomainIdUserIdMonthYear(Connection con, String domainId, String userId, LocalDate fD, LocalDate tD) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		return dsl
 				.select()
 				.from(TIMETABLE_REPORT_TEMP)
 				.where(TIMETABLE_REPORT_TEMP.DOMAIN_ID.equal(domainId))
 				.and(TIMETABLE_REPORT_TEMP.USER_ID.equal(userId))
+				.and(TIMETABLE_REPORT_TEMP.DATE.between(fD.toDateTime(LocalTime.MIDNIGHT), tD.toDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59)))
 				.orderBy(
 						TIMETABLE_REPORT_TEMP.USER_ID,
 						TIMETABLE_REPORT_TEMP.TARGET_USER_ID,
@@ -103,7 +108,7 @@ public class TimetableReportDAO extends BaseDAO{
 				.fetchInto(OTimetableReport.class);
 	}
 	
-	public int deleteByDomainIdUserId(Connection con, String domainId, String userId) {
+	public int deleteByDomainIdUserIdMonthYear(Connection con, String domainId, String userId, LocalDate fD, LocalDate tD) {
 		DSLContext dsl = getDSL(con);
 		return dsl
 				.delete(TIMETABLE_REPORT_TEMP)
@@ -111,6 +116,40 @@ public class TimetableReportDAO extends BaseDAO{
 						TIMETABLE_REPORT_TEMP.DOMAIN_ID.equal(domainId)
 				).and(
 						TIMETABLE_REPORT_TEMP.USER_ID.equal(userId)
+				)
+				.and(
+						TIMETABLE_REPORT_TEMP.DATE.between(fD.toDateTime(LocalTime.MIDNIGHT), tD.toDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
+				)
+				.execute();
+	}
+	
+	public List<OTimetableReport> selectByDomainIdTargetUserIdMonthYear(Connection con, String domainId, String targetUserId, LocalDate fD, LocalDate tD) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.select()
+				.from(TIMETABLE_REPORT_TEMP)
+				.where(TIMETABLE_REPORT_TEMP.DOMAIN_ID.equal(domainId))
+				.and(TIMETABLE_REPORT_TEMP.TARGET_USER_ID.equal(targetUserId))
+				.and(TIMETABLE_REPORT_TEMP.DATE.between(fD.toDateTime(LocalTime.MIDNIGHT), tD.toDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59)))
+				.orderBy(
+						TIMETABLE_REPORT_TEMP.USER_ID,
+						TIMETABLE_REPORT_TEMP.TARGET_USER_ID,
+						TIMETABLE_REPORT_TEMP.DATE
+				)
+				.fetchInto(OTimetableReport.class);
+	}
+	
+	public int deleteByDomainIdTargetUserIdMonthYear(Connection con, String domainId, String targetUserId, LocalDate fD, LocalDate tD) {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.delete(TIMETABLE_REPORT_TEMP)
+				.where(
+						TIMETABLE_REPORT_TEMP.DOMAIN_ID.equal(domainId)
+				).and(
+						TIMETABLE_REPORT_TEMP.TARGET_USER_ID.equal(targetUserId)
+				)
+				.and(
+						TIMETABLE_REPORT_TEMP.DATE.between(fD.toDateTime(LocalTime.MIDNIGHT), tD.toDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
 				)
 				.execute();
 	}

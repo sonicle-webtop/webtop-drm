@@ -51,6 +51,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	],
 	needsReload: true,
 	opportunityRequiredFields: null,
+	timetableReportGenerateQuery: null,
 	
 	init: function () {
 		var me = this;
@@ -974,6 +975,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								generate: function(s, query){
 									WT.confirm(me.res('gpTimetableReport.regeneratereport.lbl'), function (bid) {
 										if (bid === 'yes') {
+											me.timetableReportGenerateQuery = query;
 											me.reloadTimetableReport(query);
 										}
 									});
@@ -999,7 +1001,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								selType: 'cellmodel'
 							},
 							store: {
-								autoLoad: true,
+								autoLoad: false,
 								autoSync: true,
 								model: 'Sonicle.webtop.drm.model.GridTimetableReport',
 								proxy: WTF.apiProxy(me.ID, 'ManageGridTimetableReport'),
@@ -2580,7 +2582,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		
 		WT.ajaxReq(me.ID, 'ExportTimetableReportGis', {
 			params: {
-				op: 'do'
+				op: 'do',
+				query: Ext.JSON.encode(me.timetableReportGenerateQuery)
 			},
 			callback: function(success) {
 				if (success) {
@@ -3261,7 +3264,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	},
 	printTimetableReport: function() {
 		var me = this, url;
-		url = WTF.processBinUrl(me.ID, 'PrintTimetableReport', {});
+		url = WTF.processBinUrl(me.ID, 'PrintTimetableReport', {query: Ext.JSON.encode(me.timetableReportGenerateQuery)});
 		Sonicle.URLMgr.openFile(url, {filename: 'timetablereport', newWindow: true});
 	},
 	reloadTimetableStamp: function (query) {
