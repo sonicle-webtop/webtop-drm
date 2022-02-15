@@ -185,6 +185,7 @@ import com.sonicle.webtop.drm.bol.OActivity;
 import com.sonicle.webtop.contacts.model.ContactType;
 import com.sonicle.webtop.core.app.RunContext;
 import com.sonicle.webtop.core.bol.js.JsWizardData;
+import com.sonicle.webtop.core.model.BaseMasterData;
 import com.sonicle.webtop.core.sdk.WTRuntimeException;
 import com.sonicle.webtop.core.util.LogEntries;
 import com.sonicle.webtop.core.util.LogEntry;
@@ -568,7 +569,7 @@ public class Service extends BaseService {
 			List<JsSimple> customers = new ArrayList();
 			
 			if(operator != null){
-				Map<String, MasterData> items = WT.getCoreManager().listMasterData(Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER), EnumUtils.toSerializedName(MasterData.Type.SUPPLIER)));
+				Map<String, MasterData> items = WT.getCoreManager().listMasterData(Arrays.asList(EnumUtils.toSerializedName(BaseMasterData.Type.CUSTOMER), EnumUtils.toSerializedName(BaseMasterData.Type.SUPPLIER)));
 				
 				for(MasterData customer : items.values()) {
 					customers.add(new JsSimple(customer.getMasterDataId(), customer.getDescription()));
@@ -599,7 +600,7 @@ public class Service extends BaseService {
 				if(idCustomers.size() > 0)
 					items = WT.getCoreManager().listMasterDataIn(idCustomers);
 				else
-					items = WT.getCoreManager().listMasterData(Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER)), ((query == null) ? null : "%" + query + "%"));
+					items = WT.getCoreManager().listMasterData(Arrays.asList(EnumUtils.toSerializedName(BaseMasterData.Type.CUSTOMER)), ((query == null) ? null : "%" + query + "%"));
 				
 				for (MasterData customer : items.values()) {
 					customers.add(new JsSimple(customer.getMasterDataId(), customer.getDescription()));
@@ -626,7 +627,7 @@ public class Service extends BaseService {
 				DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID, new UserProfileId(getEnv().getProfileId().getDomain(), operator));
 
 				chek = manager.checkCustomersByProfileUser(realCustomerId);
-				items = WT.getCoreManager().listChildrenMasterData(realCustomerId, Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER)));
+				items = WT.getCoreManager().listChildrenMasterData(realCustomerId, Arrays.asList(EnumUtils.toSerializedName(BaseMasterData.Type.CUSTOMER)));
 				
 				for(MasterData customer : items) {
 					customers.add(new JsSimple(customer.getMasterDataId(), customer.getDescription()));
@@ -660,9 +661,9 @@ public class Service extends BaseService {
 			if(idCustomers.size() > 0)
 				items = WT.getCoreManager().listMasterDataIn(idCustomers);
 			else
-				items = WT.getCoreManager().listMasterData(Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER)));
+				items = WT.getCoreManager().listMasterData(Arrays.asList(EnumUtils.toSerializedName(BaseMasterData.Type.CUSTOMER)));
 			
-			items.putAll(WT.getCoreManager().listChildrenMasterData(Arrays.asList(EnumUtils.toSerializedName(MasterData.Type.CUSTOMER))));
+			items.putAll(WT.getCoreManager().listChildrenMasterData(Arrays.asList(EnumUtils.toSerializedName(BaseMasterData.Type.CUSTOMER))));
 
 			for(MasterData customer : items.values()) {
 				customers.add(new JsSimple(customer.getMasterDataId(), customer.getDescription()));

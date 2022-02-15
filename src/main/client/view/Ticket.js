@@ -169,7 +169,7 @@ Ext.define('Sonicle.webtop.drm.view.Ticket', {
 					},
 					anchor: '100%',
 					items: [
-						WTF.localCombo('id', 'desc', {
+						WTF.localCombo(((me.blnNew) ? 'id' : 'userId'),  ((me.blnNew) ? 'desc' : 'displayName'), {
 							reference: 'fldfromoperator',
 							bind: '{record.fromOperatorId}',
 							anyMatch: true,
@@ -177,7 +177,7 @@ Ext.define('Sonicle.webtop.drm.view.Ticket', {
 							store: {
 								autoLoad: true,
 								model: 'WTA.model.Simple',
-								proxy: WTF.proxy(me.mys.ID, 'LookupOperators'),
+								proxy: WTF.proxy(me.mys.ID, ((me.blnNew) ? 'LookupOperators' : 'LookupAllOperators')),
 								listeners: {
 									load: function (s) {
 										if (me.isMode('new')) {
@@ -201,7 +201,7 @@ Ext.define('Sonicle.webtop.drm.view.Ticket', {
 							},
 							// fieldLabel: me.mys.res('ticket.fld-fromOperator.lbl'),
 							allowBlank: false,
-							readOnly: false,
+							readOnly: ((me.blnNew) ? false : true),
 							width: 200,
 							tabIndex: 201
 						}),
@@ -275,10 +275,12 @@ Ext.define('Sonicle.webtop.drm.view.Ticket', {
 								if (me.isMode('new')) {
 									var meta = s.getProxy().getReader().metaData;
 									if (meta){
-										if (meta.selected) {
+										if ((meta.selected) && (me.getModel().get('fldstatmasterdata') === null)) {
 											me.lookupReference('fldstatmasterdata').setValue(meta.selected);
-										}
-									} else {
+										} else {
+                                            me.lookupReference('fldstatmasterdata').setValue(me.getModel().get('customerStatId'));
+                                        }
+                                    } else {
 										me.lookupReference('fldstatmasterdata').setValue(me.lookupReference('fldmasterdata').getValue());
 									}
 								}

@@ -49,10 +49,21 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		'Sonicle.webtop.drm.model.TimetableSettingGeneral',
 		'Sonicle.webtop.drm.store.RoundingHour'
 	],
+    uses: [
+        'Sonicle.webtop.drm.ServiceApi'  
+    ],
+    
 	needsReload: true,
+    api: null,
 	opportunityRequiredFields: null,
 	timetableReportGenerateQuery: null,
 	
+    getApiInstance: function() {
+		var me = this;
+		if (!me.api) me.api = Ext.create('Sonicle.webtop.drm.ServiceApi', {service: me});
+		return me.api;
+	},
+    
 	init: function () {
 		var me = this;
         
@@ -2479,6 +2490,27 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				});
 			});
 	},
+    addJobFromAliseoWeb: function (data, opts) {
+		opts = opts || {};
+
+		var me = this,
+			vw = WT.createView(me.ID, 'view.Job', {swapReturn: true});
+		vw.on('viewsave', function (s, success, model) {
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vw.showView(function () {
+				vw.begin('new', {
+					data: {
+						operatorId: data.operatorId,
+						startDate: data.startDate,
+						endDate: data.endDate,
+						timezone: data.timezone,
+                        customerId: data.customerId,
+                        customerStatId: data.customerStatId
+					}
+				});
+			});
+	},
 	addJobFromTicket: function (operatorId, customerId, customerStatId, companyId, title, timezone, ticketId, opts) {
 		opts = opts || {};
 
@@ -2596,7 +2628,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		opts = opts || {};
 		var me = this,
 			ft = me.filtersTicket(),
-			vw = WT.createView(me.ID, 'view.Ticket', {swapReturn: true});
+			vw = WT.createView(me.ID, 'view.Ticket', {
+                swapReturn: true,
+                viewCfg: {
+                    blnNew: true
+                }
+        });
 		vw.on('viewsave', function (s, success, model) {			
 			Ext.callback(opts.callback, opts.scope || me, [success, model, s.blnOpenJob === true]);
 		});
@@ -2605,7 +2642,33 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					data: {
 						fromOperatorId: WT.getVar('userId'),
 						date: new Date(),
-						timezone: WT.getVar('timezone')
+						timezone: WT.getVar('timezone'),
+                        blnNew: true
+					}
+				});
+			});
+	},
+    addTicketFromAliseoWeb: function (data, opts) {
+		opts = opts || {};
+
+		var me = this,
+			vw = WT.createView(me.ID, 'view.Ticket', {
+                swapReturn: true,
+                viewCfg: {
+                    blnNew: true
+                }
+        });
+		vw.on('viewsave', function (s, success, model) {
+			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+		});
+		vw.showView(function () {
+				vw.begin('new', {
+					data: {
+						fromOperatorId: data.fromOperatorId,
+						date: data.date,
+						timezone: data.timezone,
+                        customerId: data.customerId,
+                        customerStatId: data.customerStatId
 					}
 				});
 			});

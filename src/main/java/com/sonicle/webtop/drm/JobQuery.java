@@ -49,7 +49,9 @@ public class JobQuery {
 	public LocalDate endDate;
 	public Integer activityId;
 	public String title;
-
+    
+    public Boolean allJob;
+    
 	public JobQuery() {
 	}
 

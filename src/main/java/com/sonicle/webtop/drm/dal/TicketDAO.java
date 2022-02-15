@@ -66,12 +66,12 @@ public class TicketDAO extends BaseDAO {
 	public static TicketDAO getInstance() {
 		return INSTANCE;
 	}	
-	
+    
 	public List<OViewTicket> selectViewTickets(Connection con, TicketQuery query, String domainId, String userId) throws DAOException {
 		DSLContext dsl = getDSL(con);
 
 		Condition searchCndt = ensureViewCondition(query, domainId, userId);
-
+        
 		return dsl
 				.select()
 				.from(VW_TICKETS)
@@ -114,25 +114,27 @@ public class TicketDAO extends BaseDAO {
 		
 		if(query.toOperatorId != null){
 			searchCndt = searchCndt.and(VW_TICKETS.TO_OPERATOR_ID.equal(query.toOperatorId));
-		}else{			
-			SelectConditionStep<Record1<String>> operators = (SelectConditionStep<Record1<String>>) DSL
-				.select(
-						PROFILES_SUPERVISED_USERS.USER_ID
-					)
-					.from(PROFILES)
-					.join(PROFILES_MEMBERS).on(
-						PROFILES.PROFILE_ID.equal(PROFILES_MEMBERS.PROFILE_ID)
-					)
-					.join(PROFILES_SUPERVISED_USERS).on(
-						PROFILES.PROFILE_ID.equal(PROFILES_SUPERVISED_USERS.PROFILE_ID)
-					)
-					.where(
-							PROFILES.DOMAIN_ID.equal(domainId)
-							.and(PROFILES_MEMBERS.USER_ID.equal(userId)
-					))
-					.union(DSL.select(DSL.inline(userId)));
-			
-			searchCndt = searchCndt.and(VW_TICKETS.TO_OPERATOR_ID.in(operators));
+		}else{	
+            if (query.allTicket == null || query.allTicket == false) {
+                SelectConditionStep<Record1<String>> operators = (SelectConditionStep<Record1<String>>) DSL
+                    .select(
+                            PROFILES_SUPERVISED_USERS.USER_ID
+                        )
+                        .from(PROFILES)
+                        .join(PROFILES_MEMBERS).on(
+                            PROFILES.PROFILE_ID.equal(PROFILES_MEMBERS.PROFILE_ID)
+                        )
+                        .join(PROFILES_SUPERVISED_USERS).on(
+                            PROFILES.PROFILE_ID.equal(PROFILES_SUPERVISED_USERS.PROFILE_ID)
+                        )
+                        .where(
+                                PROFILES.DOMAIN_ID.equal(domainId)
+                                .and(PROFILES_MEMBERS.USER_ID.equal(userId)
+                        ))
+                        .union(DSL.select(DSL.inline(userId)));
+
+                searchCndt = searchCndt.and(VW_TICKETS.TO_OPERATOR_ID.in(operators));
+            }
 		}
 		
         if (query.ticketId != null) {

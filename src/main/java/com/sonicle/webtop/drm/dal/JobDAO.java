@@ -94,24 +94,28 @@ public class JobDAO extends BaseDAO {
 		if(query.operatorId != null){
 			searchCndt = VW_JOBS.OPERATOR_ID.equal(query.operatorId);
 		}else{			
-			SelectConditionStep<Record1<String>> operators = (SelectConditionStep<Record1<String>>) DSL
-				.select(
-						PROFILES_SUPERVISED_USERS.USER_ID
-					)
-					.from(PROFILES)
-					.join(PROFILES_MEMBERS).on(
-						PROFILES.PROFILE_ID.equal(PROFILES_MEMBERS.PROFILE_ID)
-					)
-					.join(PROFILES_SUPERVISED_USERS).on(
-						PROFILES.PROFILE_ID.equal(PROFILES_SUPERVISED_USERS.PROFILE_ID)
-					)
-					.where(
-							PROFILES.DOMAIN_ID.equal(domainId)
-							.and(PROFILES_MEMBERS.USER_ID.equal(userId)
-					))
-					.union(DSL.select(DSL.inline(userId)));
-			
-			searchCndt = VW_JOBS.OPERATOR_ID.in(operators);
+            if (query.allJob == null || query.allJob == false) {
+                SelectConditionStep<Record1<String>> operators = (SelectConditionStep<Record1<String>>) DSL
+                    .select(
+                            PROFILES_SUPERVISED_USERS.USER_ID
+                        )
+                        .from(PROFILES)
+                        .join(PROFILES_MEMBERS).on(
+                            PROFILES.PROFILE_ID.equal(PROFILES_MEMBERS.PROFILE_ID)
+                        )
+                        .join(PROFILES_SUPERVISED_USERS).on(
+                            PROFILES.PROFILE_ID.equal(PROFILES_SUPERVISED_USERS.PROFILE_ID)
+                        )
+                        .where(
+                                PROFILES.DOMAIN_ID.equal(domainId)
+                                .and(PROFILES_MEMBERS.USER_ID.equal(userId)
+                        ))
+                        .union(DSL.select(DSL.inline(userId)));
+
+                searchCndt = VW_JOBS.OPERATOR_ID.in(operators);
+            } else {
+                searchCndt = DSL.trueCondition();
+            }
 		}
 		
 		if (domainId != null) {

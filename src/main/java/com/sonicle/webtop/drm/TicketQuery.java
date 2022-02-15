@@ -55,6 +55,8 @@ public class TicketQuery {
 	public Boolean opened;
 	public String ticketId;
     
+    public Boolean allTicket;
+    
 	public TicketQuery() {
 	}
 

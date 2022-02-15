@@ -76,7 +76,9 @@ Ext.define('Sonicle.webtop.drm.model.Job', {
 		
 		WTF.field('eventId', 'int', true),
 		
-		WTF.field('requireCustomer', 'boolean', true, {defaultValue: false})
+		WTF.field('requireCustomer', 'boolean', true, {defaultValue: false}),
+        
+        WTF.field('ticketId', 'string', true)
 	],
 	hasMany: [
 		WTF.hasMany('attachments', 'Sonicle.webtop.drm.model.JobAttachment')

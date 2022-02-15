@@ -229,6 +229,8 @@ import com.sonicle.webtop.drm.model.TimetableReport;
 import com.sonicle.webtop.drm.model.TimetableSetting;
 import com.sonicle.webtop.drm.model.TimetableStamp;
 import com.sonicle.webtop.drm.model.UserForManager;
+import com.sonicle.webtop.drm.model.ViewJob;
+import com.sonicle.webtop.drm.model.ViewTicket;
 import com.sonicle.webtop.drm.model.WorkReport;
 import com.sonicle.webtop.drm.model.WorkReportAttachment;
 import com.sonicle.webtop.drm.model.WorkReportAttachmentWithBytes;
@@ -285,7 +287,7 @@ import org.supercsv.prefs.CsvPreference;
  *
  * @author lssndrvs
  */
-public class DrmManager extends BaseManager {
+public class DrmManager extends BaseManager implements IDrmManager{
 
 	public DrmManager(boolean fastInit, UserProfileId targetProfileId) {
 		super(fastInit, targetProfileId);
@@ -5319,13 +5321,15 @@ public class DrmManager extends BaseManager {
 
 		try {
 			DrmUserSettings dus = new DrmUserSettings(SERVICE_ID, new UserProfileId(oVwTckt.getDomainId(), oVwTckt.getToOperatorId()));
-				
-			if ((dus.getTicketNotifyMail().equals("true")) && (oVwTckt.getStatusId() != Integer.valueOf(defaultCloseDocStatusId)) && (!close)) {
-				String msgSubject = TplHelper.buildTicketNotificationSubject(udTo.getLocale(), oVwTckt);				
-				String msgBody = TplHelper.buildTicketNotificationBody(udTo.getLocale(), oVwTckt);
-				
-				WT.sendEmail(session, true, from, to, msgSubject, msgBody);
-			}			
+			
+            if (dus.getTicketNotifyMail() != null) {
+                if ((dus.getTicketNotifyMail().equals("true")) && (oVwTckt.getStatusId() != Integer.valueOf(defaultCloseDocStatusId)) && (!close)) {
+                    String msgSubject = TplHelper.buildTicketNotificationSubject(udTo.getLocale(), oVwTckt);				
+                    String msgBody = TplHelper.buildTicketNotificationBody(udTo.getLocale(), oVwTckt);
+
+                    WT.sendEmail(session, true, from, to, msgSubject, msgBody);
+                }		
+            }
 			
 		} catch (IOException ex) {
 			logger.error("Unable to notify recipient for ticket [{}]", ex, to.getAddress());
@@ -5354,10 +5358,11 @@ public class DrmManager extends BaseManager {
 		DrmUserSettings dus = new DrmUserSettings(SERVICE_ID, new UserProfileId(oVwTckt.getDomainId(), oVwTckt.getToOperatorId()));		
 		TicketDAO tcktDao = TicketDAO.getInstance();
 		
-		if ((dus.getTicketAutomaticClose().equals("true"))) {
-			tcktDao.closeById(con, oVwTckt.getTicketId(), defaultCloseDocStatusId);
-			// closeTicket(oVwTckt.getTicketId(), dss.getTicketDefaultCloseDocStatusId());
-		}
+        if (dus.getTicketAutomaticClose() != null) {
+            if ((dus.getTicketAutomaticClose().equals("true"))) 
+                tcktDao.closeById(con, oVwTckt.getTicketId(), defaultCloseDocStatusId);
+                // closeTicket(oVwTckt.getTicketId(), dss.getTicketDefaultCloseDocStatusId());
+        }
 	}
 	
 	public List<OTicket> listTicketsByNumberCustomer(String query, String customerId) throws WTException {
@@ -5747,4 +5752,73 @@ public class DrmManager extends BaseManager {
         cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
         return cal.getTime();
     }
+    
+    @Override
+    public ArrayList<ViewTicket> listTicketsOpenedByPcaId(String pcaId, String typePca) throws WTException {
+		Connection con = null;
+		TicketDAO tcktDao = TicketDAO.getInstance();
+		ArrayList<ViewTicket> tckts = new ArrayList<>();
+        ViewTicket tckt = null;
+        
+		try {
+			con = WT.getConnection(SERVICE_ID);
+            
+            TicketQuery query = new TicketQuery();
+            
+            if (typePca.equals("cliente"))
+                query.customerId = pcaId;
+            else
+                query.customerStatId = pcaId;
+            
+            query.opened = true;
+            query.allTicket = true;
+            
+            for (OViewTicket ovw : tcktDao.selectViewTickets(con, query, getTargetProfileId().getDomainId(), null)) {
+                tckt = ManagerUtils.createViewTicket(ovw);
+                
+                tckts.add(tckt);
+            }
+            
+			return tckts;
+			
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+    
+    @Override
+    public ArrayList<ViewJob> listJobsByPcaId(String pcaId, String typePca) throws WTException {
+		Connection con = null;
+		JobDAO jbDao = JobDAO.getInstance();
+		ArrayList<ViewJob> jbs = new ArrayList<>();
+        ViewJob jb = null;
+        
+		try {
+			con = WT.getConnection(SERVICE_ID);
+            
+            JobQuery query = new JobQuery();
+            
+            if (typePca.equals("cliente"))
+                query.customerId = pcaId;
+            else
+                query.customerStatId = pcaId;
+            
+            query.allJob = true;
+            
+            for (OViewJob ovj : jbDao.selectViewJobs(con, query, getTargetProfileId().getDomainId(), null)) {
+                jb = ManagerUtils.createViewJob(ovj);
+                
+                jbs.add(jb);
+            }
+            
+			return jbs;
+			
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
 }

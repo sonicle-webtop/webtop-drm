@@ -87,6 +87,8 @@ import com.sonicle.webtop.drm.bol.OTimetableEvent;
 import com.sonicle.webtop.drm.bol.OTimetableReport;
 import com.sonicle.webtop.drm.bol.OTimetableSetting;
 import com.sonicle.webtop.drm.bol.OTimetableStamp;
+import com.sonicle.webtop.drm.bol.OViewJob;
+import com.sonicle.webtop.drm.bol.OViewTicket;
 import com.sonicle.webtop.drm.bol.OWorkReport;
 import com.sonicle.webtop.drm.bol.OWorkReportAttachment;
 import com.sonicle.webtop.drm.bol.OWorkReportRow;
@@ -155,6 +157,8 @@ import com.sonicle.webtop.drm.model.TimetableReport;
 import com.sonicle.webtop.drm.model.TimetableSetting;
 import com.sonicle.webtop.drm.model.TimetableStamp;
 import com.sonicle.webtop.drm.model.UserForManager;
+import com.sonicle.webtop.drm.model.ViewJob;
+import com.sonicle.webtop.drm.model.ViewTicket;
 import com.sonicle.webtop.drm.model.WorkReport;
 import com.sonicle.webtop.drm.model.WorkReportAttachment;
 import com.sonicle.webtop.drm.model.WorkReportAttachmentWithStream;
@@ -2835,5 +2839,61 @@ public class ManagerUtils {
 		oActGroup.setGroupId(actGroup.getGroupId());
 
 		return oActGroup;
+	}
+    
+    static ViewTicket createViewTicket(OViewTicket oTckt) {
+		if (oTckt == null) {
+			return null;
+		}
+		ViewTicket tckt = new ViewTicket();
+		tckt.setTicketId(oTckt.getTicketId());
+		tckt.setCompanyId(oTckt.getCompanyId());
+        tckt.setCompanyDescription(oTckt.getCompanyDescription());
+		tckt.setFromOperatorId(oTckt.getFromOperatorId());
+        tckt.setFromOperatorDescription(oTckt.getFromOperatorDescription());
+		tckt.setToOperatorId(oTckt.getToOperatorId());
+        tckt.setToOperatorDescription(oTckt.getToOperatorDescription());
+		tckt.setCustomerId(oTckt.getCustomerId());
+        tckt.setCustomerDescription(oTckt.getCustomerDescription());
+		tckt.setCustomerStatId(oTckt.getCustomerStatId());
+        tckt.setCustomerStatDescription(oTckt.getCustomerStatDescription());
+		tckt.setTimezone(oTckt.getTimezone());
+		tckt.setDate(oTckt.getDate());
+		tckt.setTicketCategoryId(oTckt.getTicketCategoryId());
+        tckt.setTicketCategoryDescription(oTckt.getTicketCategoryDescription());
+		tckt.setPriorityId(oTckt.getPriorityId());
+		tckt.setStatusId(oTckt.getStatusId());
+        tckt.setStatusDescription(oTckt.getStatusDescription());
+		tckt.setTitle(oTckt.getTitle());
+		tckt.setNumber(oTckt.getNumber());
+		
+		return tckt;
+	}
+    
+    static ViewJob createViewJob(OViewJob oJb) {
+		if (oJb == null) {
+			return null;
+		}
+		ViewJob jb = new ViewJob();
+		jb.setJobId(oJb.getJobId());
+		jb.setCompanyId(oJb.getCompanyId());
+        jb.setCompanyDescription(oJb.getCompanyDescription());
+		jb.setOperatorId(oJb.getOperatorId());
+        jb.setOperatorDescription(oJb.getOperatorDescription());
+		jb.setCustomerId(oJb.getCustomerId());
+        jb.setCustomerDescription(oJb.getCustomerDescription());
+		jb.setCustomerStatId(oJb.getCustomerStatId());
+        jb.setCustomerStatDescription(oJb.getCustomerStatDescription());
+		jb.setTimezone(oJb.getTimezone());
+		jb.setStartDate(oJb.getStartDate());
+        jb.setEndDate(oJb.getEndDate());
+		jb.setActivityId(oJb.getActivityId());
+        jb.setActivityDescription(oJb.getActivityDescription());
+		jb.setCausalId(oJb.getCausalId());
+        jb.setCausalDescription(oJb.getCausalDescription());
+		jb.setTitle(oJb.getTitle());
+		jb.setNumber(oJb.getNumber());
+		
+		return jb;
 	}
 }

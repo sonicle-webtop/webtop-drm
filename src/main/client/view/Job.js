@@ -240,6 +240,16 @@ Ext.define('Sonicle.webtop.drm.view.Job', {
 							load: function (s) {
 								if (me.isMode('new')) {
 									var meta = s.getProxy().getReader().metaData;
+                                    if (meta){
+										if ((meta.selected) && (me.getModel().get('fldstatmasterdata') === null)) {
+											me.lookupReference('fldstatmasterdata').setValue(meta.selected);
+										} else {
+                                            me.lookupReference('fldstatmasterdata').setValue(me.getModel().get('customerStatId'));
+                                        }
+                                    } else {
+										me.lookupReference('fldstatmasterdata').setValue(me.lookupReference('fldmasterdata').getValue());
+									}
+                                    /*
 									if (meta){
 										if (meta.selected) {
 											me.lookupReference('fldstatmasterdata').setValue(meta.selected);
@@ -247,6 +257,7 @@ Ext.define('Sonicle.webtop.drm.view.Job', {
 									} else {
 										me.lookupReference('fldstatmasterdata').setValue(me.lookupReference('fldmasterdata').getValue());
 									}
+                                    */
 								}
 							},
 							beforeload: function(s,op) {
