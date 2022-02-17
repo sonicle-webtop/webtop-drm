@@ -39,7 +39,7 @@ Ext.define('Sonicle.webtop.drm.view.Profile', {
 	],
 	dockableConfig: {
 		title: '{profile.tit}',
-		iconCls: 'wtdrm-icon-configuration-profilesconfiguration-xs',
+		iconCls: 'wtdrm-icon-configurationProfiles',
 		width: 500,
 		height: 500
 	},

@@ -42,7 +42,7 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 	],
 	dockableConfig: {
 		title: '{opportunityAction.tit}',
-		iconCls: 'wtdrm-icon-opportunityaction-xs',
+		iconCls: 'wtdrm-icon-opportunityAction',
 		width: 535,
 		height: 494,
 		modal: true,
@@ -189,7 +189,7 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 												width: 80
 											}, {
 												xtype: 'button',
-												iconCls: 'wtcal-icon-now-xs',
+												iconCls: 'far fa-clock wt-theme-glyph',
 												tooltip: me.mys.res('opportunityAction.btn-now.tip'),
 												handler: function() {
 													me.getModel().setStartTime(new Date());
@@ -221,7 +221,7 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 												width: 80
 											}, {
 												xtype: 'button',
-												iconCls: 'wtcal-icon-now-xs',
+												iconCls: 'far fa-clock wt-theme-glyph',
 												tooltip: me.mys.res('opportunityAction.btn-now.tip'),
 												handler: function() {
 													me.getModel().setEndTime(new Date());
@@ -239,6 +239,7 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 											bind: '{record.activityId}',
 											autoLoadOnValue: true,
 											store: {
+												autoLoad: true,
 												model: 'WTA.model.ActivityLkp',
 												//Rimuovere gli extraParams quando Matteo m fa la modifica
 												proxy: WTF.proxy(WT.ID, 'LookupActivities', null, {

@@ -34,7 +34,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReportSetting', {
 	extend: 'WTA.sdk.ModelView',
 	dockableConfig: {
 		title: '{workreport.config.tit}',
-		iconCls: 'wtdrm-icon-configuration-generalconfiguration-xs',
+		iconCls: 'wtdrm-icon-configuration',
 		width: 500,
 		height: 500
 	},
@@ -141,7 +141,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReportSetting', {
 						me.addAct('add', {
 							text: WT.res('act-add.lbl'),
 							tooltip: null,
-							iconCls: 'wt-icon-add-xs',
+							iconCls: 'wt-icon-add',
 							handler: function () {
 								me.addType();
 							},
@@ -197,7 +197,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReportSetting', {
 						me.addAct('add', {
 							text: WT.res('act-add.lbl'),
 							tooltip: null,
-							iconCls: 'wt-icon-add-xs',
+							iconCls: 'wt-icon-add',
 							handler: function () {
 								me.addBusinessTrip();
 							},

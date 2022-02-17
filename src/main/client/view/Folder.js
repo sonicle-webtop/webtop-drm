@@ -38,7 +38,7 @@ Ext.define('Sonicle.webtop.drm.view.Folder', {
 	],
 	dockableConfig: {
 		title: '{folder.tit}',
-		iconCls: 'wtdrm-icon-configuration-foldersconfiguration-xs',
+		iconCls: 'wtdrm-icon-configuration-foldersconfiguration',
 		width: 500,
 		height: 500
 	},

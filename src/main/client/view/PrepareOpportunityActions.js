@@ -41,7 +41,7 @@ Ext.define('Sonicle.webtop.drm.view.PrepareOpportunityActions', {
 	],
 	dockableConfig: {
 		title: '{prepareOpportunityActions.tit}',
-		iconCls: 'wtdrm-icon-prepareopportunityaction-xs',
+		iconCls: 'wtdrm-icon-opportunityAction',
 		width: 325,
 		height: 324,
 		modal: true,
@@ -147,7 +147,7 @@ Ext.define('Sonicle.webtop.drm.view.PrepareOpportunityActions', {
 										width: 80
 									}, {
 										xtype: 'button',
-										iconCls: 'wtcal-icon-now-xs',
+										iconCls: 'far fa-clock wt-theme-glyph',
 										tooltip: me.mys.res('prepareOpportunityActions.btn-now.tip'),
 										handler: function() {
 											me.getModel().setStartTime(new Date());
@@ -179,7 +179,7 @@ Ext.define('Sonicle.webtop.drm.view.PrepareOpportunityActions', {
 										width: 80
 									}, {
 										xtype: 'button',
-										iconCls: 'wtcal-icon-now-xs',
+										iconCls: 'far fa-clock wt-theme-glyph',
 										tooltip: me.mys.res('prepareOpportunityActions.btn-now.tip'),
 										handler: function() {
 											me.getModel().setEndTime(new Date());

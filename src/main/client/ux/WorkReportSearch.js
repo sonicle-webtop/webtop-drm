@@ -96,10 +96,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 											operator: meta.selected,
 											realCustomer: null
 										});
-										WTU.loadWithExtraParams(me.lookupReference('fldcausal').getStore(), {
-											profileId: WT.toPid(WT.getVar('domainId'), meta.selected),
-											masterDataId: null
-										});
+										WTU.loadWithExtraParams(me.lookupReference('fldcausal').getStore());
 									}
 								}
 							}
@@ -116,9 +113,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 							WTU.loadWithExtraParams(me.lookupReference('fldstatmasterdata').getStore(), {
 								operator: r.id
 							});
-							WTU.loadWithExtraParams(me.lookupReference('fldcausal').getStore(), {
-								profileId: WT.toPid(WT.getVar('domainId'), r.id)
-							});
+							WTU.loadWithExtraParams(me.lookupReference('fldcausal').getStore());
 						}
 					},
 					triggers: {
@@ -280,6 +275,7 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 					autoLoadOnValue: true,
 					tabIndex: 104,
 					store: {
+						autoLoad: true,
 						model: 'WTA.model.Simple',
 						proxy: WTF.proxy(me.sid, (me.useStatisticCustomer === true) ? 'LookupStatisticCustomers' : 'LookupRealCustomers', null, {
 							extraParams: {
@@ -340,7 +336,14 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 								}
 								return rec;
 							}
-						}]
+						}],
+						listeners: {
+							beforeload: function(s,op) {
+								WTU.applyExtraParams(op.getProxy(), {
+									profileId: WT.toPid(WT.getVar('domainId'), me.getViewModel().get('operatorId'))
+								});
+							}
+						}
 					},
 					triggers: {
 						clear: WTF.clearTrigger()

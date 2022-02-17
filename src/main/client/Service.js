@@ -125,7 +125,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							xtype: 'wtdrmopportunitysearch',
 							reference: 'filtersOpportunity',
 							title: (me.getVar('opportunityTitle') == null  || me.getVar('opportunityTitle') == '') ? me.res('gpOpportunity.tit.lbl') : me.getVar('opportunityTitle'),
-							iconCls: 'wtdrm-icon-opportunity-xs',
+							iconCls: 'wtdrm-icon-opportunity',
 							titleCollapse: true,
 							collapsible: true,
 							sid: me.ID,
@@ -223,7 +223,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								me.getAct('opportunity', 'add'),
 								'-',
 								me.getAct('opportunity', 'edit'),
-								me.getAct('opportunity', 'remove'),
+								me.getAct('opportunity', 'delete'),
 								'-',
 								me.getAct('opportunity', 'addAction'),
 								me.getAct('opportunity', 'prepareActions')
@@ -231,7 +231,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							listeners: {
 								rowclick: function (s, rec) {
 									me.getAct('opportunity', 'edit').setDisabled(false);
-									me.getAct('opportunity', 'remove').setDisabled(false);
+									me.getAct('opportunity', 'delete').setDisabled(false);
 									
 									if(rec.get('actionId') === 0){
 										me.getAct('opportunity', 'addAction').setDisabled(false);
@@ -257,7 +257,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							xtype: 'wtdrmworkreportsearch',
 							reference: 'filtersWorkReport',
 							title: me.res('gpWorkReport.tit.lbl'),
-							iconCls: 'wtdrm-icon-workreport-xs',
+							iconCls: 'wtdrm-icon-workReport',
 							titleCollapse: true,
 							collapsible: true,
 							sid: me.ID,
@@ -463,14 +463,14 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								me.getAct('workReport', 'add'),
 								'-',
 								me.getAct('workReport', 'edit'),
-								me.getAct('workReport', 'remove'),
+								me.getAct('workReport', 'delete'),
 								'-',
 								me.getAct('workReport', 'printSummary')
 							],
 							listeners: {
 								rowclick: function (s, rec) {
 									me.getAct('workReport', 'edit').setDisabled(false);
-									me.getAct('workReport', 'remove').setDisabled(false);
+									me.getAct('workReport', 'delete').setDisabled(false);
 									me.getAct('workReport', 'sendMail').setDisabled(false);
 								},
 								rowdblclick: function (s, rec) {
@@ -489,7 +489,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							xtype: 'wtdrmexpensenotesearch',
 							reference: 'filtersExpenseNote',
 							title: me.res('expenseNote.tit.lbl'),
-							iconCls: 'wtdrm-icon-expensenote-xs',
+							iconCls: 'wtdrm-icon-expenseNote',
 							titleCollapse: true,
 							collapsible: true,
 							sid: me.ID,
@@ -561,12 +561,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								me.getAct('expenseNote', 'add'),
 								'-',
 								me.getAct('expenseNote', 'edit'),
-								me.getAct('expenseNote', 'remove')
+								me.getAct('expenseNote', 'delete')
 							],
 							listeners: {
 								rowclick: function (s, rec) {
 									me.getAct('expenseNote', 'edit').setDisabled(false);
-									me.getAct('expenseNote', 'remove').setDisabled(false);
+									me.getAct('expenseNote', 'delete').setDisabled(false);
 								},
 								rowdblclick: function (s, rec) {
 									me.editExpenseNoteUI(rec);
@@ -589,7 +589,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							itemId: 'tts',
 							layout: 'border',
 							title: me.res('timetabledaily.tit.lbl'),
-							iconCls: 'wtdrm-icon-timetable-timetabledaily-xs',
+							iconCls: 'wtdrm-icon-timetableDaily',
 							items: [
 								{
 									region: 'north',
@@ -625,7 +625,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											hideable: false,
 											align: 'center',
 											getIconCls: function(v, rec) {
-												return me.cssIconCls((rec.get('type') === 'M') ? 'mainstamp' : 'companystamp', 'xs');
+												return rec.get('type') === 'M' ? 'wtdrm-icon-stampDefault' : 'wtdrm-icon-stampCompany';
 											},
 											iconSize: WTU.imgSizeToPx('xs'),
 											width: 30
@@ -660,9 +660,10 @@ Ext.define('Sonicle.webtop.drm.Service', {
 										{
 											xtype: 'button',
 											reference: 'btnMainStamp',
+											scale: 'large',
 											disabled: true,
 											text: me.res('gpTimetable.mainstamp.lbl'),
-											iconCls: 'wtdrm-icon-mainstamp-m',
+											iconCls: 'wtdrm-icon-stampDefault',
 											handler: function () {
 												WT.ajaxReq(me.ID, 'SetTimetable', {
 													params: {
@@ -678,9 +679,10 @@ Ext.define('Sonicle.webtop.drm.Service', {
 										{
 											xtype: 'button',
 											reference: 'btnCompanyStamp',
+											scale: 'large',
 											hidden: true,
 											text: me.res('gpTimetable.companystamp.lbl'),
-											iconCls: 'wtdrm-icon-companystamp-m',
+											iconCls: 'wtdrm-icon-stampCompany',
 											handler: function () {
 												WT.ajaxReq(me.ID, 'SetTimetable', {
 													params: {
@@ -701,14 +703,14 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							xtype: 'container',
 							layout: 'border',
 							title: me.res('timetable.tit.lbl'),
-							iconCls: 'wtdrm-icon-timetable-timetablelist-xs',
+							iconCls: 'wtdrm-icon-timetableList',
 							items: [
 								{
 									region: 'north',
 									xtype: 'wtdrmtimetablestampsearch',
 									reference: 'filtersTimetableStamp',
 									title: me.res('timetablesearch.tit.lbl'),
-									iconCls: 'wtdrm-icon-timetable1-xs',
+									iconCls: 'wtdrm-icon-timetableList',
 									titleCollapse: true,
 									collapsible: true,
 									sid: me.ID,
@@ -741,7 +743,13 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											hideable: false,
 											align: 'center',
 											getIconCls: function(v, rec) {
-												return me.cssIconCls((rec.get('type') === 'M') ? 'mainstamp' : ((rec.get('type') === 'C') ? 'companystamp' : 'specialstamp'), 'xs');
+												if (rec.get('type') === 'M') {
+													return 'wtdrm-icon-stampType-default';
+												} else if (rec.get('type') === 'C') {
+													return 'wtdrm-icon-stampType-company';
+												} else {
+													return 'wtdrm-icon-stampType-special';
+												}
 											},
 											iconSize: WTU.imgSizeToPx('xs'),
 											width: 30
@@ -781,7 +789,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									tbar: [
 										me.getAct('timetableStamp', 'add'),
 										'-',
-										me.getAct('timetableStamp', 'remove')
+										me.getAct('timetableStamp', 'delete')
 									]
 								}
 							]
@@ -798,7 +806,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							xtype: 'wtdrmtimetablerequestsearch',
 							reference: 'filtersTimetableRequest',
 							title: me.res('timetableRequest.tit.lbl'),
-							iconCls: 'wtdrm-icon-timetable2-xs',
+							iconCls: 'wtdrm-icon-timetableRequests',
 							titleCollapse: true,
 							collapsible: true,
 							sid: me.ID,
@@ -828,7 +836,18 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									align: 'center',
 									dataIndex: 'result',
 									getIconCls: function(v, rec) {
-										return me.cssIconCls((rec.get('status') === 'D') ? 'cancellationrequest-approved' : ((rec.get('result') === true || rec.get('result') === false) && rec.get('employeeCancReq') === true) ? 'cancellationrequest-new' : (rec.get('result') === true) ? 'approvedrequest' : (rec.get('result') === false) ? 'notapprovedrequest' : 'sendedrequest', 'xs');
+										if (rec.get('status') === 'D') {
+											return 'wtdrm-icon-timetableCancRequest-approved';
+										} else if ((rec.get('result') === true || rec.get('result') === false) && rec.get('employeeCancReq') === true) {
+											return 'wtdrm-icon-timetableCancRequest-new'; 
+										} else if (rec.get('result') === true) {
+											return 'wtdrm-icon-timetableRequest-approved';
+										} else if (rec.get('result') === false) {
+											return 'wtdrm-icon-timetableRequest-declined';
+										} else {
+											return 'wtdrm-icon-timetableRequest-sent';
+										}
+										//return me.cssIconCls((rec.get('status') === 'D') ? 'cancellationrequest-approved' : ((rec.get('result') === true || rec.get('result') === false) && rec.get('employeeCancReq') === true) ? 'cancellationrequest-new' : (rec.get('result') === true) ? 'approvedrequest' : (rec.get('result') === false) ? 'notapprovedrequest' : 'sendedrequest', 'xs');
 									},
 									iconSize: WTU.imgSizeToPx('xs'),
 									width: 30,
@@ -919,7 +938,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							tbar: [
 								me.getAct('timetableRequest', 'add'),
 								me.getAct('timetableRequest', 'edit'),
-								me.getAct('timetableRequest', 'remove'),
+								me.getAct('timetableRequest', 'delete'),
 								'-',
 								me.getAct('timetableRequest', 'approve'),
 								me.getAct('timetableRequest', 'decline'),
@@ -978,7 +997,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							xtype: 'wtdrmtimetablereportgenerate',
 							reference: 'filtersTimetableReport',
 							title: me.res('timetableReport.tit.lbl'),
-							iconCls: 'wtdrm-icon-timetable3-xs',
+							iconCls: 'wtdrm-icon-timetableReport',
 							titleCollapse: true,
 							collapsible: true,
 							sid: me.ID,
@@ -1242,7 +1261,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							xtype: 'wtdrmtimetablesummaryexcel',
 							reference: 'filtersTimetableSummaryExcel',
 							title: me.res('timetableSummaryExcel.tit.lbl'),
-							iconCls: 'wtdrm-icon-timetable4-xs',
+							iconCls: 'wtdrm-icon-timetable4',
 							titleCollapse: false,
 							collapsible: false,
 							sid: me.ID,
@@ -1273,7 +1292,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							xtype: 'wtdrmjobsearch',
 							reference: 'filtersJob',
 							title: me.res('gpJob.tit.lbl'),
-							iconCls: 'wtdrm-icon-job-xs',
+							iconCls: 'wtdrm-icon-job',
 							titleCollapse: true,
 							collapsible: true,
 							sid: me.ID,
@@ -1342,7 +1361,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								me.getAct('job', 'add'),
 								'-',
 								me.getAct('job', 'edit'),
-								me.getAct('job', 'remove'),
+								me.getAct('job', 'delete'),
 								'-',
 								me.getAct('job', 'associate'),
 								'-',
@@ -1351,7 +1370,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							listeners: {
 								rowclick: function (s, rec) {
 									me.getAct('job', 'edit').setDisabled(false);
-									me.getAct('job', 'remove').setDisabled(false);
+									me.getAct('job', 'delete').setDisabled(false);
 									me.getAct('job', 'associate').setDisabled(false);
 								},
 								rowdblclick: function (s, rec) {
@@ -1370,7 +1389,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							xtype: 'wtdrmticketsearch',
 							reference: 'filtersTicket',
 							title: me.res('gpTicket.tit.lbl'),
-							iconCls: 'wtdrm-icon-ticket-xs',
+							iconCls: 'wtdrm-icon-ticket',
 							titleCollapse: true,
 							collapsible: true,
 							sid: me.ID,
@@ -1446,14 +1465,14 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								me.getAct('ticket', 'add'),
 								'-',
 								me.getAct('ticket', 'edit'),
-								me.getAct('ticket', 'remove'),
+								me.getAct('ticket', 'delete'),
 								'-',
 								me.getAct('ticket', 'close')
 							],
 							listeners: {
 								rowclick: function (s, rec) {
 									me.getAct('ticket', 'edit').setDisabled(false);
-									me.getAct('ticket', 'remove').setDisabled(false);
+									me.getAct('ticket', 'delete').setDisabled(false);
 									me.getAct('ticket', 'close').setDisabled(rec.get('statusId') === parseInt(me.getVar('ticketDefaultCloseStatus')));
 								},
 								rowdblclick: function (s, rec) {
@@ -1588,7 +1607,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			me.addAct('toolbox', 'configurations', {
 				text: me.res('toolbox.configuration.lbl'),
 				tooltip: null,
-				iconCls: 'wtdrm-icon-configuration-xs',
+				iconCls: 'wtdrm-icon-configuration',
 				handler: function () {
 					me.configurationView();
 				}
@@ -1598,7 +1617,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			me.addAct('toolbox', 'opSetting', {
 				text: me.res('toolbox.op-settings.lbl'),
 				tooltip: null,
-				iconCls: 'wt-icon-options',
+				iconCls: 'wtdrm-icon-configuration',
 				handler: function () {
 					me.opportunitySetting();
 				}
@@ -1608,7 +1627,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			me.addAct('toolbox', 'wrSetting', {
 				text: me.res('toolbox.wr-settings.lbl'),
 				tooltip: null,
-				iconCls: 'wt-icon-options',
+				iconCls: 'wtdrm-icon-configuration',
 				handler: function () {
 					me.workReportSetting();
 				}
@@ -1618,7 +1637,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			me.addAct('toolbox', 'enSetting', {
 				text: me.res('toolbox.en-settings.lbl'),
 				tooltip: null,
-				iconCls: 'wt-icon-options',
+				iconCls: 'wtdrm-icon-configuration',
 				handler: function () {
 					me.expenseNoteSetting();
 				}
@@ -1628,7 +1647,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			me.addAct('toolbox', 'ttSetting', {
                 xtype: 'splitbutton',
                 text: me.res('toolbox.tt-settings.lbl'),
-				iconCls: 'wt-icon-options',
+				iconCls: 'wtdrm-icon-configuration',
                 handler: function () {
 					// do nothing()
 				},
@@ -1637,7 +1656,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
                        {
                             text: me.res('toolbox.tt-settings-general.lbl'),
                             tooltip: null,
-                            iconCls: 'wt-icon-options',
+                            iconCls: 'wtdrm-icon-configuration',
                             handler: function () {
                                 me.timetableSettingGeneral();
                             }
@@ -1645,7 +1664,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
                         {
                             text: me.res('toolbox.tt-settings-holidays.lbl'),
                             tooltip: null,
-                            iconCls: 'wt-icon-options',
+                            iconCls: 'wtdrm-icon-configuration',
                             handler: function () {
                                 me.timetableSettingHolidays();
                             }
@@ -1653,7 +1672,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
                         {
                             text: me.res('toolbox.tt-settings-employeeprofiles.lbl'),
                             tooltip: null,
-                            iconCls: 'wt-icon-options',
+                            iconCls: 'wtdrm-icon-configuration',
                             handler: function () {
                                 me.timetableSettingEmployeeProfiles();
                             }
@@ -1661,7 +1680,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
                         {
                             text: me.res('toolbox.tt-settings-hourprofiles.lbl'),
                             tooltip: null,
-                            iconCls: 'wt-icon-options',
+                            iconCls: 'wtdrm-icon-configuration',
                             handler: function () {
                                 me.timetableSettingHourProfiles();
                             }
@@ -1691,7 +1710,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			me.addAct('toolbox', 'tkSetting', {
 				text: me.res('toolbox.tk-settings.lbl'),
 				tooltip: null,
-				iconCls: 'wt-icon-options',
+				iconCls: 'wtdrm-icon-configuration',
 				handler: function () {
 					me.ticketSetting();
 				}
@@ -1700,7 +1719,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('opportunity', 'add', {
 			text: me.res('act-addOpportunity.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-add-xs',
+			iconCls: 'wt-icon-add',
 			handler: function () {
 				me.addOpportunity({
 					callback: function (success) {
@@ -1714,17 +1733,17 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('opportunity', 'edit', {
 			text: WT.res('act-edit.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-edit-xs',
+			iconCls: 'wt-icon-edit',
 			disabled: true,
 			handler: function () {
 				var sel = me.gpOpportunitySelected();
 				me.editUI(sel);
 			}
 		});
-		me.addAct('opportunity', 'remove', {
-			text: WT.res('act-remove.lbl'),
+		me.addAct('opportunity', 'delete', {
+			text: WT.res('act-delete.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-remove-xs',
+			iconCls: 'wt-icon-delete',
 			disabled: true,
 			handler: function () {
 				var sel = me.gpOpportunitySelected();
@@ -1734,7 +1753,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('opportunity', 'addAction', {
 			text: me.res('act-addOpportunityAction.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-add-xs',
+			iconCls: 'wt-icon-add',
 			disabled: true,
 			handler: function () {
 				me.addOpportunityActionUI({
@@ -1749,7 +1768,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('opportunity', 'prepareActions', {
 			text: me.res('act-prepareOpportunityAction.lbl'),
 			tooltip: null,
-			iconCls: 'wtdrm-icon-prepareopportunityaction-xs',
+			iconCls: 'wtdrm-icon-initializeOpportunity',
 			disabled: true,
 			handler: function () {
 				me.prepareOpportunityActions({
@@ -1764,7 +1783,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('workReport', 'add', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-add-xs',
+			iconCls: 'wt-icon-add',
 			handler: function () {
 				me.addWorkReport({
 					callback: function (success) {
@@ -1778,17 +1797,17 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('workReport', 'edit', {
 			text: WT.res('act-edit.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-edit-xs',
+			iconCls: 'wt-icon-edit',
 			disabled: true,
 			handler: function () {
 				var sel = me.gpWorkReportSelected();
 				me.editWorkReportUI(sel);
 			}
 		});
-		me.addAct('workReport', 'remove', {
-			text: WT.res('act-remove.lbl'),
+		me.addAct('workReport', 'delete', {
+			text: WT.res('act-delete.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-remove-xs',
+			iconCls: 'wt-icon-delete',
 			disabled: true,
 			handler: function () {
 				var sel = me.gpWorkReportSelected();
@@ -1806,7 +1825,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('job', 'add', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-add-xs',
+			iconCls: 'wt-icon-add',
 			handler: function () {
 				me.addJob({
 					callback: function (success) {
@@ -1820,17 +1839,17 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('job', 'edit', {
 			text: WT.res('act-edit.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-edit-xs',
+			iconCls: 'wt-icon-edit',
 			disabled: true,
 			handler: function () {
 				var sel = me.gpJobSelected();
 				me.editJobUI(sel);
 			}
 		});
-		me.addAct('job', 'remove', {
-			text: WT.res('act-remove.lbl'),
+		me.addAct('job', 'delete', {
+			text: WT.res('act-delete.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-remove-xs',
+			iconCls: 'wt-icon-delete',
 			disabled: true,
 			handler: function () {
 				var sel = me.gpJobSelected();
@@ -1840,7 +1859,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('expenseNote', 'add', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-add-xs',
+			iconCls: 'wt-icon-add',
 			handler: function () {
 				me.addExpenseNote({
 					callback: function (success) {
@@ -1854,17 +1873,17 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('expenseNote', 'edit', {
 			text: WT.res('act-edit.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-edit-xs',
+			iconCls: 'wt-icon-edit',
 			disabled: true,
 			handler: function () {
 				var sel = me.gpExpenseNoteSelected();
 				me.editExpenseNoteUI(sel);
 			}
 		});
-		me.addAct('expenseNote', 'remove', {
-			text: WT.res('act-remove.lbl'),
+		me.addAct('expenseNote', 'delete', {
+			text: WT.res('act-delete.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-remove-xs',
+			iconCls: 'wt-icon-delete',
 			disabled: true,
 			handler: function () {
 				var sel = me.gpExpenseNoteSelected();
@@ -1874,7 +1893,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('timetableRequest', 'add', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-add-xs',
+			iconCls: 'wt-icon-add',
 			handler: function () {
 				me.addTimetableRequest({
 					callback: function (success) {
@@ -1888,17 +1907,17 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('timetableRequest', 'edit', {
 			text: WT.res('act-edit.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-edit-xs',
+			iconCls: 'wt-icon-edit',
 			disabled: true,
 			handler: function () {
 				var sel = me.gpTimetableRequestSelected();
 				me.editTimetableRequestUI(sel);
 			}
 		});
-		me.addAct('timetableRequest', 'remove', {
-			text: WT.res('act-remove.lbl'),
+		me.addAct('timetableRequest', 'delete', {
+			text: WT.res('act-delete.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-remove-xs',
+			iconCls: 'wt-icon-delete',
 			disabled: true,
 			handler: function () {
 				var sel = me.gpTimetableRequestSelected();
@@ -1908,7 +1927,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('timetableRequest', 'approve', {
 			text: me.res('timetablerequest.approve.lbl'),
 			tooltip: null,
-			iconCls: 'wtdrm-icon-approve-xs',
+			iconCls: 'wtdrm-icon-timetableRequest-approved',
 			disabled: true,
 			hidden: true,
 			handler: function () {
@@ -1919,7 +1938,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('timetableRequest', 'decline', {
 			text: me.res('timetablerequest.decline.lbl'),
 			tooltip: null,
-			iconCls: 'wtdrm-icon-decline-xs',
+			iconCls: 'wtdrm-icon-timetableRequest-declined',
 			disabled: true,
 			hidden: true,
 			handler: function () {
@@ -1930,7 +1949,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('timetableRequest', 'cancel', {
 			text: me.res('timetablerequest.cancel.lbl'),
 			tooltip: null,
-			iconCls: 'wtdrm-icon-cancellationrequest-approved-xs',
+			iconCls: 'wtdrm-icon-timetableCancRequest-approved',
 			disabled: true,
 			hidden: true,
 			handler: function () {
@@ -1941,7 +1960,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('timetableRequest', 'requestcancellation', {
 			text: me.res('timetablerequest.requestcancellation.lbl'),
 			tooltip: null,
-			iconCls: 'wtdrm-icon-cancellationrequest-new-xs',
+			iconCls: 'wtdrm-icon-timetableCancRequest-new',
 			disabled: true,
 			handler: function () {
 				var sel = me.gpTimetableRequestSelected();
@@ -1951,7 +1970,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('timetableReport', 'save', {
 			text: WT.res('act-save.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-save-xs',
+			iconCls: 'wt-icon-save',
 			handler: function () {
 				
 			}
@@ -1975,7 +1994,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('timetableStamp', 'add', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-add-xs',
+			iconCls: 'wt-icon-add',
 			disabled: true,
 			handler: function () {
 				me.addTimetableStamp({
@@ -1987,10 +2006,10 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				});
 			}
 		});
-		me.addAct('timetableStamp', 'remove', {
-			text: WT.res('act-remove.lbl'),
+		me.addAct('timetableStamp', 'delete', {
+			text: WT.res('act-delete.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-remove-xs',
+			iconCls: 'wt-icon-delete',
 			disabled: true,
 			handler: function () {
 				var sel = me.gpTimetableStampSelected();
@@ -2000,7 +2019,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('ticket', 'add', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-add-xs',
+			iconCls: 'wt-icon-add',
 			handler: function () {
 				me.addTicket({
 					callback: function (success, model, blnOpenJob) {
@@ -2016,17 +2035,17 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('ticket', 'edit', {
 			text: WT.res('act-edit.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-edit-xs',
+			iconCls: 'wt-icon-edit',
 			disabled: true,
 			handler: function () {
 				var sel = me.gpTicketSelected();
 				me.editTicketUI(sel);
 			}
 		});
-		me.addAct('ticket', 'remove', {
-			text: WT.res('act-remove.lbl'),
+		me.addAct('ticket', 'delete', {
+			text: WT.res('act-delete.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-remove-xs',
+			iconCls: 'wt-icon-delete',
 			disabled: true,
 			handler: function () {
 				var sel = me.gpTicketSelected();
@@ -2036,7 +2055,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('ticket', 'close', {
 			text: me.res('ticket.btn-closeTicket.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-lock-xs',
+			iconCls: 'wt-icon-lock',
 			disabled: true,
 			handler: function () {
 				var sel = me.gpTicketSelected();
@@ -2046,7 +2065,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		me.addAct('job', 'associate', {
 			text: me.res('job.btn-associateTicket.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-format-createlink-xs',
+			iconCls: 'wtdrm-icon-associateTicket',
 			disabled: true,
 			handler: function () {
 				var sel = me.gpJobSelected();
@@ -2939,21 +2958,21 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				if(sel.get('status') === 'D'){
 					//e se la richiesta è stata cancellata, disabilito tutti i pulsanti
 					me.getAct('timetableRequest', 'edit').setDisabled(true);
-					me.getAct('timetableRequest', 'remove').setDisabled(true);
+					me.getAct('timetableRequest', 'delete').setDisabled(true);
 					me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
 				}else if(sel.get('result') === null){
 					//e se il supervisore non ha ancora gestito la richiesta, abilito update, delete e disabilito request delete
 					me.getAct('timetableRequest', 'edit').setDisabled(false);
-					me.getAct('timetableRequest', 'remove').setDisabled(false);
+					me.getAct('timetableRequest', 'delete').setDisabled(false);
 					me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
 				}else if(sel.get('result') !== null){
 					//e se il supervisore ha già gestito la richiesta, disabilito update, delete e abilito request delete
 					me.getAct('timetableRequest', 'edit').setDisabled(true);
-					me.getAct('timetableRequest', 'remove').setDisabled(true);
+					me.getAct('timetableRequest', 'delete').setDisabled(true);
 					me.getAct('timetableRequest', 'requestcancellation').setDisabled(false);
 					//Ma se è attiva l'approvazione automatica dei permessi per visita medica, attivo il bottone di cancellazione fisica sulla riga di visita medica e disabilito request delete
 					if(me.getVar('medicalVisitsAutomaticallyApproved') && sel.get('type') === 'M'){
-						me.getAct('timetableRequest', 'remove').setDisabled(false);
+						me.getAct('timetableRequest', 'delete').setDisabled(false);
 						me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
 					}
 				}
@@ -2964,7 +2983,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					if(sel.get('status') === 'D'){
 						//e se la richiesta è stata cancellata, disabilito tutti i pulsanti
 						me.getAct('timetableRequest', 'edit').setDisabled(true);
-						me.getAct('timetableRequest', 'remove').setDisabled(true);
+						me.getAct('timetableRequest', 'delete').setDisabled(true);
 						me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
 						me.getAct('timetableRequest', 'approve').setDisabled(true);
 						me.getAct('timetableRequest', 'decline').setDisabled(true);
@@ -2974,13 +2993,13 @@ Ext.define('Sonicle.webtop.drm.Service', {
 						me.getAct('timetableRequest', 'approve').setDisabled(false);
 						me.getAct('timetableRequest', 'decline').setDisabled(false);
 						me.getAct('timetableRequest', 'edit').setDisabled(true);
-						me.getAct('timetableRequest', 'remove').setDisabled(true);
+						me.getAct('timetableRequest', 'delete').setDisabled(true);
 						me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
 						me.getAct('timetableRequest', 'cancel').setDisabled(true);
 					}else if(sel.get('result') !== null){
 						//e se ho già gestito la richiesta, disabilito tutto
 						me.getAct('timetableRequest', 'edit').setDisabled(true);
-						me.getAct('timetableRequest', 'remove').setDisabled(true);
+						me.getAct('timetableRequest', 'delete').setDisabled(true);
 						me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
 						me.getAct('timetableRequest', 'approve').setDisabled(true);
 						me.getAct('timetableRequest', 'decline').setDisabled(true);
@@ -3316,10 +3335,10 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				if(success){
 					if(json.data === true){
 						me.getAct('timetableStamp', 'add').setDisabled(false);
-						me.getAct('timetableStamp', 'remove').setDisabled(false);
+						me.getAct('timetableStamp', 'delete').setDisabled(false);
 					}else {
 						me.getAct('timetableStamp', 'add').setDisabled(true);
-						me.getAct('timetableStamp', 'remove').setDisabled(true);
+						me.getAct('timetableStamp', 'delete').setDisabled(true);
 					}
 				}
 			}

@@ -18,6 +18,8 @@
 		<webtop.service.package>com.sonicle.webtop.drm</webtop.service.package>
 		<webtop.service.jsPackage>Sonicle.webtop.drm</webtop.service.jsPackage>
 		<webtop.service.restApi.oas>openapi-v1.json</webtop.service.restApi.oas>
+		<!-- SENCHA -->
+		<sencha.properties.target>sencha75</sencha.properties.target>
     </properties>
 	
     <dependencies>

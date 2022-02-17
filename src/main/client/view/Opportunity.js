@@ -42,7 +42,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 	],
 	dockableConfig: {
 		title: '{opportunity.tit}',
-		iconCls: 'wtdrm-icon-opportunity-xs',
+		iconCls: 'wtdrm-icon-opportunity',
 		width: 920,
 		height: 572
 	},
@@ -252,6 +252,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 					width: '420px',
 					hidden: true,
 					store: {
+						autoLoad: true,
 						model: 'WTA.model.ActivityLkp',
 						//Rimuovere gli extraParams quando Matteo m fa la modifica
 						proxy: WTF.proxy(me.mys.ID, 'LookupActivities', null, {
@@ -419,7 +420,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 				me.addAct('sendMail', {
 					text: me.res('act-sendMail.lbl'),
 					tooltip: null,
-					iconCls: 'wtdrm-icon-mail-xs ',
+					iconCls: 'wtdrm-icon-mailto',
 					hidden: !me.mys.getVar('opportunityEnablePrint'),
 					handler: function () {
 						me.sendMail(me.getModel().getId());
@@ -547,7 +548,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 												width: 80
 											}, {
 												xtype: 'button',
-												iconCls: 'wtcal-icon-now-xs',
+												iconCls: 'far fa-clock wt-theme-glyph',
 												tooltip: me.mys.res('opportunity.btn-now.tip'),
 												handler: function() {
 													me.getModel().setStartTime(new Date());
@@ -579,7 +580,7 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 												width: 80
 											}, {
 												xtype: 'button',
-												iconCls: 'wtcal-icon-now-xs',
+												iconCls: 'far fa-clock wt-theme-glyph',
 												tooltip: me.mys.res('opportunity.btn-now.tip'),
 												handler: function() {
 													me.getModel().setEndTime(new Date());

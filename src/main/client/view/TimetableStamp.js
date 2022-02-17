@@ -38,7 +38,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableStamp', {
 	],
 	dockableConfig: {
 		title: '{timetableStamp.tit}',
-		iconCls: 'wtdrm-icon-timetable1-xs',
+		iconCls: 'wtdrm-icon-timetable-stamps',
 		width: 460,
 		height: 140
 	},

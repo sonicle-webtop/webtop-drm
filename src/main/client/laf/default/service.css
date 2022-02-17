@@ -1,82 +1,45 @@
-.wtdrm-icon-service-xs { background-image: url('service_16.png') !important; }
-.wtdrm-icon-service-s { background-image: url('service_24.png') !important; }
-.wtdrm-icon-service-m { background-image: url('service_32.png') !important; }
-.wtdrm-icon-service-l { background-image: url('service_48.png') !important; }
-
-
-.wtdrm-icon-downloadAttachment-xs { background-image: url('file-download_16.png') !important; }
-.wtdrm-icon-openAttachment-xs { background-image: url('file-open_16.png') !important; }
-.wtdrm-icon-deleteAttachment-xs { background-image: url('file-delete_16.png') !important; }
-
-.wtdrm-icon-downloadDocument-xs { background-image: url('file-download_16.png') !important; }
-.wtdrm-icon-openDocument-xs { background-image: url('file-open_16.png') !important; }
-.wtdrm-icon-deleteDocument-xs { background-image: url('file-delete_16.png') !important; }
-
-.wtdrm-icon-opportunity-xs { background-image: url('opportunity_16.png') !important; }
-.wtdrm-icon-workreport-xs { background-image: url('work_report_16.png') !important; }
-.wtdrm-icon-expensenote-xs { background-image: url('expense_note_16.png') !important; }
-.wtdrm-icon-timetable-xs { background-image: url('timetable_16.png') !important; }
-.wtdrm-icon-timetable1-xs { background-image: url('timetable1_16.png') !important; }
-.wtdrm-icon-timetable2-xs { background-image: url('timetable2_16.png') !important; }
-.wtdrm-icon-timetable3-xs { background-image: url('timetable3_16.png') !important; }
-.wtdrm-icon-timetable4-xs { background-image: url('timetable4_16.png') !important; }
-.wtdrm-icon-job-xs { background-image: url('job_16.png') !important; }
-.wtdrm-icon-ticket-xs { background-image: url('ticket_16.png') !important; }
-
-.wtdrm-icon-configuration-xs { background-image: url('configuration_16.png') !important; }
-.wtdrm-icon-configuration-generalconfiguration-xs { background-image: url('general_configurations_16.png') !important; }
-.wtdrm-icon-configuration-companiesconfiguration-xs { background-image: url('companies_configuration_16.png') !important; }
-.wtdrm-icon-configuration-profilesconfiguration-xs { background-image: url('profiles_configuration_16.png') !important; }
-.wtdrm-icon-configuration-foldersconfiguration-xs { background-image: url('folders_configuration_16.png') !important; }
-.wtdrm-icon-configuration-statusconfiguration-xs { background-image: url('status_configuration_16.png') !important; }
-.wtdrm-icon-configuration-enabledprograms-xs { background-image: url('enabledprograms_configuration_16.png') !important; }
-.wtdrm-icon-configuration-manager-xs { background-image: url('manager_configuration_16.png') !important; }
-.wtdrm-icon-configuration-employeeprofile-xs { background-image: url('employee_profile_16.png') !important; }
-.wtdrm-icon-configuration-ourprofile-xs { background-image: url('our_profile_16.png') !important; }
-.wtdrm-icon-configuration-activitiesconfiguration-xs { background-image: url('activity_configuration_16.png') !important; }
-.wtdrm-icon-configuration-causal-xs { background-image: url('causal_configuration_16.png') !important; }
-.wtdrm-icon-configuration-gis-xs { background-image: url('gis_configuration_16.png') !important; }
+.wtdrm-icon-service { background-image: url('service_16.svg') !important; background-size: contain; }
+.wtdrm-icon-service-xs { background-image: url('service_16.svg') !important; background-size: contain; }
+.wtdrm-icon-service-s { background-image: url('service_16.svg') !important; background-size: contain; }
+.wtdrm-icon-service-m { background-image: url('service_32.svg') !important; background-size: contain; }
+.wtdrm-icon-service-l { background-image: url('service_32.svg') !important; background-size: contain; }
+.wtdrm-icon-opportunity { background-image: url('opportunity_16.svg') !important; background-size: contain; }
+.wtdrm-icon-opportunityAction { background-image: url('opportunityaction_16.svg') !important; background-size: contain; }
+.wtdrm-icon-workReport { background-image: url('workreport_16.svg') !important; background-size: contain; }
+.wtdrm-icon-expenseNote { background-image: url('expensenote_16.svg') !important; background-size: contain; }
+.wtdrm-icon-timetable { background-image: url('timetable_16.svg') !important; background-size: contain; }
+.wtdrm-icon-timetableStamps { background-image: url('timetable-stamps_16.svg') !important; background-size: contain; }
+.wtdrm-icon-timetableRequests { background-image: url('timetable-requests_16.svg') !important; background-size: contain; }
+.wtdrm-icon-timetableReport { background-image: url('timetable-report_16.svg') !important; background-size: contain; }
+.wtdrm-icon-ticket { background-image: url('ticket_16.svg') !important; background-size: contain; }
+.wtdrm-icon-job { background-image: url('job_16.svg') !important; background-size: contain; }
+.wtdrm-icon-configuration { background-image: url('configuration_16.svg') !important; background-size: contain; }
+.wtdrm-icon-configurationCompanies { background-image: url('configuration-companies_16.svg') !important; background-size: contain; }
+.wtdrm-icon-configurationLineManagers { background-image: url('configuration-linemanagers_16.svg') !important; background-size: contain; }
+.wtdrm-icon-configurationDocStatuses { background-image: url('configuration-docstatuses_16.svg') !important; background-size: contain; }
+.wtdrm-icon-configurationProfiles { background-image: url('configuration-profiles_16.svg') !important; background-size: contain; }
+.wtdrm-icon-configurationTimeProfiles { background-image: url('configuration-timeprofiles_16.svg') !important; background-size: contain; }
+.wtdrm-icon-configurationEmployeeProfiles { background-image: url('configuration-employeeprofiles_16.svg') !important; background-size: contain; }
+.wtdrm-icon-configurationHolidayDates { background-image: url('configuration-holidaydates_16.svg') !important; background-size: contain; }
+.wtdrm-icon-timetableRequest-sent { background-image: url('timetable-request-sent_16.svg') !important; background-size: contain; }
+.wtdrm-icon-timetableRequest-approved { background-image: url('timetable-request-approved_16.svg') !important; background-size: contain; }
+.wtdrm-icon-timetableRequest-declined { background-image: url('timetable-request-declined_16.svg') !important; background-size: contain; }
+.wtdrm-icon-timetableCancRequest-new { background-image: url('timetable-requestcanc-new_16.svg') !important; background-size: contain; }
+.wtdrm-icon-timetableCancRequest-approved { background-image: url('timetable-requestcanc-approved_16.svg') !important; background-size: contain; }
+.wtdrm-icon-stampDefault { background-image: url('stamp-default_16.svg') !important; background-size: contain; }
+.wtdrm-icon-stampCompany { background-image: url('stamp-company_16.svg') !important; background-size: contain; }
+.wtdrm-icon-stampType-default { background-image: url('stamp-type-default_16.svg') !important; background-size: contain; }
+.wtdrm-icon-stampType-exit { background-image: url('stamp-type-exit_16.svg') !important; background-size: contain; }
+.wtdrm-icon-stampType-special { background-image: url('stamp-type-special_16.svg') !important; background-size: contain; }
+.wtdrm-icon-initializeOpportunity { background-image: url('opportunity-initialize_16.svg') !important; background-size: contain; }
+.wtdrm-icon-associateTicket { background-image: url('job-linkticket_16.svg') !important; background-size: contain; }
+.wtdrm-icon-mailto { background-image: url('mailto_16.svg') !important; background-size: contain; }
 
 .wtdrm-trash-trigger { background-image: url('trash-trigger.png') !important; }
 .wtdrm-add-trigger { background-image: url('add-trigger.png') !important; }
-
-.wtdrm-icon-totcurrency-xs { background-image: url('totcurrency_16.png') !important; }
-.wtdrm-icon-notes-xs { background-image: url('notes_16.png') !important; }
-
-.wtdrm-icon-mainstamp-xs { background-image: url('mainstamp_16.png') !important; }
-.wtdrm-icon-companystamp-xs { background-image: url('companystamp_16.png') !important; }
-.wtdrm-icon-specialstamp-xs { background-image: url('specialstamp_16.png') !important; }
-
-.wtdrm-icon-mainstamp-m { background-image: url('mainstamp_32.png') !important; width: 32px !important; height: 32px !important; }
-.wtdrm-icon-companystamp-m { background-image: url('companystamp_32.png') !important; width: 32px !important; height: 32px !important; }
-
-.wtdrm-icon-approvedrequest-xs { background-image: url('approvedrequest_16.png') !important; }
-.wtdrm-icon-notapprovedrequest-xs { background-image: url('notapprovedrequest_16.png') !important; }
-.wtdrm-icon-sendedrequest-xs { background-image: url('sendedrequest_16.png') !important; }
-
-.wtdrm-icon-timetable-timetabledaily-xs { background-image: url('timetable_daily_16.png') !important; }
-.wtdrm-icon-timetable-timetablelist-xs { background-image: url('timetable_list_16.png') !important; }
-
-.wtdrm-icon-approve-xs { background-image: url('approvedrequest_16.png') !important; }
-.wtdrm-icon-decline-xs { background-image: url('notapprovedrequest_16.png') !important; }
-.wtdrm-icon-cancellationrequest-new-xs { background-image: url('cancellationrequest-new_16.png') !important;}
-.wtdrm-icon-cancellationrequest-approved-xs { background-image: url('cancellationrequest-approved_16.png') !important;}
-
 .timetablerequest-grid-row-ownrequests { background-color: rgba(249, 249, 147, 0.6); }
-
-.wtdrm-icon-opportunity-initializefields-xs { background-image: url('opportunity_initializefields_16.png') !important; }
-.wtdrm-icon-opportunityaction-xs { background-image: url('opportunityaction_16.png') !important; }
-.wtdrm-icon-prepareopportunityaction-xs { background-image: url('prepare_opportunity_action_16.png') !important; }
 .opportunity-grid-row-expired { background-color: rgba(255, 109, 109, 0.6); }
 .opportunity-grid-row-notexpired { background-color: rgba(185, 255, 165, 0.6); }
 .opportunity-grid-row-closed { background-color: rgba(209, 209, 209, 0.6); }
-
-.wtdrm-icon-mail-xs { background-image: url('mail_16.png') !important; }
-
-.wtdrm-icon-saveAdd-xs { background-image: url('saveAdd_16.png') !important; }
-
 .wtdrm-grid .header .x-column-header-text {font-size: 12px; font-weight: bold; }
 .wtdrm-grid .rows { font-size: 10px !important; }
-
-.wtdrm-icon-clone-xs { background-image: url('clone_16.png') !important; }
-.wtdrm-icon-configuration-holidaydate-xs { background-image: url('holiday_date_16.png') !important; }

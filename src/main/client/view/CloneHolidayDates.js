@@ -38,7 +38,7 @@ Ext.define('Sonicle.webtop.drm.view.CloneHolidayDates', {
 	],
 	
 	dockableConfig: {
-		iconCls: 'wtdrm-icon-configuration-holidaydate-xs',
+		iconCls: 'wtdrm-icon-configurationHolidayDates',
 		width: 220,
 		height: 160,
 		modal: true,
@@ -70,7 +70,7 @@ Ext.define('Sonicle.webtop.drm.view.CloneHolidayDates', {
 					reference: 'btnok',
 					text: WT.res('act-clone.lbl'),
 					tooltip: WT.res('act-clone.lbl'),
-					iconCls: 'wtdrm-icon-clone-xs',
+					iconCls: 'far fa-clone',
 					handler: function() {
 						me.clone();
 					}

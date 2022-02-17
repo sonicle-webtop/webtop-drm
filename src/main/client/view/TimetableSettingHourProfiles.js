@@ -37,7 +37,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingHourProfiles', {
 	],
 	dockableConfig: {
 		title: '{timetable.config.hourprofiles.tit}',
-		iconCls: 'wtdrm-icon-configuration-generalconfiguration-xs',
+		iconCls: 'wtdrm-icon-configuration',
 		width: 650,
 		height: 670
 	},
@@ -77,7 +77,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingHourProfiles', {
 						me.addAct('add', {
 							text: WT.res('act-add.lbl'),
 							tooltip: null,
-							iconCls: 'wt-icon-add-xs',
+							iconCls: 'wt-icon-add',
 							handler: function () {
 								me.addHourProfile({
 									callback: function (success) {
@@ -93,7 +93,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingHourProfiles', {
 						me.addAct('edit', {
 							text: WT.res('act-edit.lbl'),
 							tooltip: null,
-							iconCls: 'wt-icon-edit-xs',
+							iconCls: 'wt-icon-edit',
 							handler: function () {
 								var sel = me.lref('gpHourProfile').getSelection()[0];
 								me.editHourProfileUI(sel);

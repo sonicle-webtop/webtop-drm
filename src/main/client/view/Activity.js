@@ -38,7 +38,7 @@ Ext.define('Sonicle.webtop.drm.view.Activity', {
 	],
 	dockableConfig: {
 		title: '{activity.tit}',
-		iconCls: 'wtdrm-icon-configuration-activitiesconfiguration-xs',
+		iconCls: 'wtdrm-icon-configurationActivities',
 		width: 500,
 		height: 500
 	},

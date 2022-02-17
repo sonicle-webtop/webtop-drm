@@ -41,7 +41,7 @@ Ext.define('Sonicle.webtop.drm.view.Job', {
 	],
 	dockableConfig: {
 		title: '{job.tit}',
-		iconCls: 'wtdrm-icon-job-xs',
+		iconCls: 'wtdrm-icon-job',
 		width: 700,
 		height: 600
 	},
@@ -194,6 +194,7 @@ Ext.define('Sonicle.webtop.drm.view.Job', {
 					queryMode: 'remote',
 					triggerAction: 'query',
 					store: {
+						autoLoad: true,
 						model: 'WTA.model.Simple',
 						proxy: WTF.proxy(me.mys.ID, 'LookupRealCustomers', null, {
 							extraParams: {
@@ -229,6 +230,7 @@ Ext.define('Sonicle.webtop.drm.view.Job', {
 					autoLoadOnValue: true,
 					tabIndex: 203,
 					store: {
+						autoLoad: true,
 						model: 'WTA.model.Simple',
 						proxy: WTF.proxy(me.mys.ID, (me.mys.getVar('useStatisticCustomer') === true) ? 'LookupStatisticCustomers' : 'LookupRealCustomers', null, {
 							extraParams: {
@@ -385,7 +387,7 @@ Ext.define('Sonicle.webtop.drm.view.Job', {
 						tabIndex: 206
 					}, {
 						xtype: 'button',
-						iconCls: 'wtcal-icon-now-xs',
+						iconCls: 'far fa-clock wt-theme-glyph',
 						tooltip: me.mys.res('job.btn-now.tip'),					
 						handler: function() {
 							me.getModel().setStartTime(new Date());
@@ -419,7 +421,7 @@ Ext.define('Sonicle.webtop.drm.view.Job', {
 						tabIndex: 208
 					}, {
 						xtype: 'button',
-						iconCls: 'wtcal-icon-now-xs',
+						iconCls: 'far fa-clock wt-theme-glyph',
 						tooltip: me.mys.res('job.btn-now.tip'),
 						handler: function() {
 							me.getModel().setEndTime(new Date());

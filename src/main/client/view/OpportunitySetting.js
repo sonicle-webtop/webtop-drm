@@ -38,7 +38,7 @@ Ext.define('Sonicle.webtop.drm.view.OpportunitySetting', {
 	],
 	dockableConfig: {
 		title: '{opportunity.config.tit}',
-		iconCls: 'wtdrm-icon-configuration-generalconfiguration-xs',
+		iconCls: 'wtdrm-icon-configuration',
 		width: 500,
 		height: 500
 	},
@@ -309,7 +309,7 @@ Ext.define('Sonicle.webtop.drm.view.OpportunitySetting', {
 		me.addAct('initializeFields', {
 			text: me.mys.res('act-initializefields.lbl'),
 			tooltip: null,
-			iconCls: 'wtdrm-icon-opportunity-initializefields-xs',
+			iconCls: 'wtdrm-icon-initializeOpportunity',
 			handler: function () {
 				WT.confirm(me.mys.res('opportunity.configurationfield.confirm.initializefields'), function(bid) {
 					if (bid === 'yes') {

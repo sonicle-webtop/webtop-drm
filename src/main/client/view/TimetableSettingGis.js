@@ -37,7 +37,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingGis', {
 	],
 	dockableConfig: {
 		title: '{timetable.config.gis.tit}',
-		iconCls: 'wtdrm-icon-configuration-gis-xs',
+		iconCls: 'wtdrm-icon-configuration',
 		width: 350,
 		height: 200
 	},

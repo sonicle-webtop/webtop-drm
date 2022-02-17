@@ -37,7 +37,7 @@ Ext.define('Sonicle.webtop.drm.view.HolidayDate', {
 	],
 	dockableConfig: {
 		title: '{holidayDate.tit}',
-		iconCls: 'wtdrm-icon-configuration-holidaydate-xs',
+		iconCls: 'wtdrm-icon-configurationHolidayDates',
 		width: 400,
 		height: 150,
 		modal: true

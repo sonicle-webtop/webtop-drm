@@ -38,7 +38,7 @@ Ext.define('Sonicle.webtop.drm.view.Group', {
 	],
 	dockableConfig: {
 		title: '{group.tit}',
-		iconCls: 'wtdrm-icon-company-xs',
+		iconCls: '',
 		width: 500,
 		height: 500
 	},

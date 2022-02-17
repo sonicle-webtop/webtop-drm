@@ -123,6 +123,7 @@ Ext.define('Sonicle.webtop.drm.ux.JobSearch', {
 					queryMode: 'remote',
 					triggerAction: 'query',
 					store: {
+						autoLoad: true,
 						model: 'WTA.model.Simple',
 						proxy: WTF.proxy(me.sid, 'LookupRealCustomers', null, {
 							extraParams: {
@@ -227,6 +228,7 @@ Ext.define('Sonicle.webtop.drm.ux.JobSearch', {
 					autoLoadOnValue: true,
 					tabIndex: 104,
 					store: {
+						autoLoad: true,
 						model: 'WTA.model.Simple',
 						proxy: WTF.proxy(me.sid, (me.useStatisticCustomer === true) ? 'LookupStatisticCustomers' : 'LookupRealCustomers', null, {
 							extraParams: {

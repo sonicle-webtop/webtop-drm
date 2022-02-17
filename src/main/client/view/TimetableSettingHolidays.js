@@ -37,7 +37,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingHolidays', {
 	],
 	dockableConfig: {
 		title: '{timetable.config.holidays.tit}',
-		iconCls: 'wtdrm-icon-configuration-generalconfiguration-xs',
+		iconCls: 'wtdrm-icon-configuration',
 		width: 650,
 		height: 670
 	},
@@ -103,7 +103,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingHolidays', {
                         me.addAct('add', {
                             text: WT.res('act-add.lbl'),
                             tooltip: null,
-                            iconCls: 'wt-icon-add-xs',
+                            iconCls: 'wt-icon-add',
                             handler: function () {
                                 me.addHolidayDate({
                                     callback: function (success) {
@@ -119,7 +119,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingHolidays', {
                         me.addAct('edit', {
                             text: WT.res('act-edit.lbl'),
                             tooltip: null,
-                            iconCls: 'wt-icon-edit-xs',
+                            iconCls: 'wt-icon-edit',
                             handler: function () {
                                 var sel = me.lref('gpHolidayDate').getSelection()[0];
                                 me.editHolidayDateUI(sel);
@@ -140,7 +140,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingHolidays', {
                         me.addAct('clone', {
                             text: WT.res('act-clone.lbl'),
                             tooltip: null,
-                            iconCls: 'wtdrm-icon-clone-xs',
+                            iconCls: 'far fa-clone',
                             handler: function () {
                                 me.cloneHolidayDate({
                                     callback: function (success) {

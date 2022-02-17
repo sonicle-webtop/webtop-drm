@@ -297,22 +297,22 @@ public class Service extends BaseService {
 		/*
 		RootProgramNode prog = null;
 		
-		prog = new RootProgramNode(lookupResource(DrmTreeNode.OPPORTUNITY), "wtdrm-icon-opportunity-xs");
+		prog = new RootProgramNode(lookupResource(DrmTreeNode.OPPORTUNITY), "wtdrm-icon-opportunity");
 		programs.put(prog.getId(), prog);
 
-		prog = new RootProgramNode(lookupResource(DrmTreeNode.WORK_REPORT), "wtdrm-icon-workreport-xs");
+		prog = new RootProgramNode(lookupResource(DrmTreeNode.WORK_REPORT), "wtdrm-icon-workreport");
 		programs.put(prog.getId(), prog);
 
-		prog = new RootProgramNode(lookupResource(DrmTreeNode.EXPENSE_NOTE), "wtdrm-icon-expensenote-xs");
+		prog = new RootProgramNode(lookupResource(DrmTreeNode.EXPENSE_NOTE), "wtdrm-icon-expensenote");
 		programs.put(prog.getId(), prog);
 
-		prog = new RootProgramNode(lookupResource(DrmTreeNode.TIMETABLE), "wtdrm-icon-timetable-xs");
-		prog.addSubPrograms(lookupResource(DrmTreeNode.TIMETABLE_STAMP), "wtdrm-icon-timetable1-xs");
-		prog.addSubPrograms(lookupResource(DrmTreeNode.TIMETABLE_REQUEST), "wtdrm-icon-timetable2-xs");
-		prog.addSubPrograms(lookupResource(DrmTreeNode.TIMETABLE_REPORT), "wtdrm-icon-timetable3-xs");
+		prog = new RootProgramNode(lookupResource(DrmTreeNode.TIMETABLE), "wtdrm-icon-timetable");
+		prog.addSubPrograms(lookupResource(DrmTreeNode.TIMETABLE_STAMP), "wtdrm-icon-timetable1");
+		prog.addSubPrograms(lookupResource(DrmTreeNode.TIMETABLE_REQUEST), "wtdrm-icon-timetable2");
+		prog.addSubPrograms(lookupResource(DrmTreeNode.TIMETABLE_REPORT), "wtdrm-icon-timetable3");
 		programs.put(prog.getId(), prog);		
 
-		prog = new RootProgramNode(lookupResource(DrmTreeNode.JOB), "wtdrm-icon-job-xs");
+		prog = new RootProgramNode(lookupResource(DrmTreeNode.JOB), "wtdrm-icon-job");
 		programs.put(prog.getId(), prog);
 		*/
 		
@@ -891,33 +891,33 @@ public class Service extends BaseService {
 			if (nodeId.equals(DrmTreeNode.TREE_NODE_ROOT)) { // Nodi livello 1
 				// + OPPORTUNITY
 				if("".equals(ss.getOpportunityGeneralTitle()) || null == ss.getOpportunityGeneralTitle())
-					nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_OPPORTUNITY, null, lookupResource(DrmTreeNode.OPPORTUNITY), true, "wtdrm-icon-opportunity-xs"));
+					nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_OPPORTUNITY, null, lookupResource(DrmTreeNode.OPPORTUNITY), true, "wtdrm-icon-opportunity"));
 				else
-					nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_OPPORTUNITY, null, ss.getOpportunityGeneralTitle(), true, "wtdrm-icon-opportunity-xs"));				
+					nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_OPPORTUNITY, null, ss.getOpportunityGeneralTitle(), true, "wtdrm-icon-opportunity"));				
 				// + WORK REPORT
-				nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_WORKREPORT, null, lookupResource(DrmTreeNode.WORK_REPORT), true, "wtdrm-icon-workreport-xs"));
+				nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_WORKREPORT, null, lookupResource(DrmTreeNode.WORK_REPORT), true, "wtdrm-icon-workReport"));
 				// + EXPENSE NOTE
-				nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_EXPENSENOTE, null, lookupResource(DrmTreeNode.EXPENSE_NOTE), true, "wtdrm-icon-expensenote-xs"));
+				nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_EXPENSENOTE, null, lookupResource(DrmTreeNode.EXPENSE_NOTE), true, "wtdrm-icon-expenseNote"));
 				// + TIMETABLE
-				nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE, null, lookupResource(DrmTreeNode.TIMETABLE), false, "wtdrm-icon-timetable-xs"));
+				nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE, null, lookupResource(DrmTreeNode.TIMETABLE), false, "wtdrm-icon-timetable"));
 				// + TICKET
                 if (RunContext.isPermitted(true, pid, SERVICE_ID, "TICKET", "ACCESS"))
-                    nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TICKET, null, lookupResource(DrmTreeNode.TICKET), true, "wtdrm-icon-ticket-xs"));
+                    nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TICKET, null, lookupResource(DrmTreeNode.TICKET), true, "wtdrm-icon-ticket"));
 				// + JOB
                 if (RunContext.isPermitted(true, pid, SERVICE_ID, "JOB", "ACCESS"))
-                    nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_JOB, null, lookupResource(DrmTreeNode.JOB), true, "wtdrm-icon-job-xs"));
+                    nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_JOB, null, lookupResource(DrmTreeNode.JOB), true, "wtdrm-icon-job"));
 			} else {
 				String tokens[] = StringUtils.split(nodeId, ".");
 				if(tokens.length == 1) {
 					if(tokens[0].equals(DrmTreeNode.TREE_NODE_TIMETABLE)) {
 						// + TIMETABLE STAMP
-						nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE_STAMP, null, lookupResource(DrmTreeNode.TIMETABLE_STAMP), true, "wtdrm-icon-timetable1-xs"));
+						nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE_STAMP, null, lookupResource(DrmTreeNode.TIMETABLE_STAMP), true, "wtdrm-icon-timetableStamps"));
 						// + TIMETABLE REQUEST
-						nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE_REQUEST, null, lookupResource(DrmTreeNode.TIMETABLE_REQUEST), true, "wtdrm-icon-timetable2-xs"));
+						nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE_REQUEST, null, lookupResource(DrmTreeNode.TIMETABLE_REQUEST), true, "wtdrm-icon-timetableRequests"));
 						// + TIMETABLE REPORT
-						nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE_REPORT, null, lookupResource(DrmTreeNode.TIMETABLE_REPORT), true, "wtdrm-icon-timetable3-xs"));
+						nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE_REPORT, null, lookupResource(DrmTreeNode.TIMETABLE_REPORT), true, "wtdrm-icon-timetableReport"));
 						// + TIMETABLE SUMMARY
-						//nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE_SUMMARY, null, lookupResource(DrmTreeNode.TIMETABLE_SUMMARY), true, "wtdrm-icon-timetable4-xs"));
+						//nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE_SUMMARY, null, lookupResource(DrmTreeNode.TIMETABLE_SUMMARY), true, "wtdrm-icon-timetable4"));
 					}
 				}
 			}			

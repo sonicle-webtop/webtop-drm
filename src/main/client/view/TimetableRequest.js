@@ -41,7 +41,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 	],
 	dockableConfig: {
 		title: '{timetableRequest.tit}',
-		iconCls: 'wtdrm-icon-timetable2-xs',
+		iconCls: 'wtdrm-icon-timetableRequests',
 		width: 580,
 		height: 360
 	},

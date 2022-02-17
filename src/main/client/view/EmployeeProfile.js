@@ -37,7 +37,7 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 	],
 	dockableConfig: {
 		title: '{EmployeeProfile.tit}',
-		iconCls: 'wtdrm-icon-configuration-employeeprofile-xs',
+		iconCls: 'wtdrm-icon-configurationEmployeeProfiles',
 		width: 400,
 		height: 280,
 		modal: true

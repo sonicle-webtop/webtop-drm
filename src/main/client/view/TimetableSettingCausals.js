@@ -37,7 +37,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingCausals', {
 	],
 	dockableConfig: {
 		title: '{timetable.config.causals.tit}',
-		iconCls: 'wtdrm-icon-configuration-generalconfiguration-xs',
+		iconCls: 'wtdrm-icon-configuration',
 		width: 650,
 		height: 670
 	},
@@ -86,7 +86,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingCausals', {
                         me.addAct('add', {
                             text: WT.res('act-add.lbl'),
                             tooltip: null,
-                            iconCls: 'wt-icon-add-xs',
+                            iconCls: 'wt-icon-add',
                             handler: function () {
                                 me.addCausal({
                                     callback: function (success) {
@@ -102,7 +102,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingCausals', {
                         me.addAct('edit', {
                             text: WT.res('act-edit.lbl'),
                             tooltip: null,
-                            iconCls: 'wt-icon-edit-xs',
+                            iconCls: 'wt-icon-edit',
                             handler: function () {
                                 var sel = me.lref('gpCausals').getSelection()[0];
                                 me.editCausalUI(sel);

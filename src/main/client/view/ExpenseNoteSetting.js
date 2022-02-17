@@ -34,7 +34,7 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteSetting', {
 	extend: 'WTA.sdk.ModelView',
 	dockableConfig: {
 		title: '{expensenote.config.tit}',
-		iconCls: 'wtdrm-icon-configuration-generalconfiguration-xs',
+		iconCls: 'wtdrm-icon-configuration',
 		width: 650,
 		height: 500
 	},
@@ -200,7 +200,7 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteSetting', {
 						me.addAct('add', {
 							text: WT.res('act-add.lbl'),
 							tooltip: null,
-							iconCls: 'wt-icon-add-xs',
+							iconCls: 'wt-icon-add',
 							handler: function () {
 								me.addCostType();
 							},

@@ -44,7 +44,7 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 	],
 	dockableConfig: {
 		title: '{expenseNoteDetail.tit}',
-		iconCls: 'wtdrm-icon-expensenote-xs',
+		iconCls: 'wtdrm-icon-expenseNote',
 		width: 450,
 		height: 390,
 		modal: true
@@ -61,7 +61,7 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 				me.addAct('saveAdd', {
 					text: me.mys.res('act-saveAdd.lbl'),
 					tooltip: null,
-					iconCls: 'wtdrm-icon-saveAdd-xs',
+					iconCls: 'wt-icon-saveAdd',
 					handler: function() {
 						me.addNewOnSave = true;
 						me.saveView(true);

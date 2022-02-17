@@ -42,7 +42,7 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 	],
 	dockableConfig: {
 		title: '{expenseNote.tit}',
-		iconCls: 'wtdrm-icon-expensenote-xs',
+		iconCls: 'wtdrm-icon-expenseNote',
 		width: 910,
 		height: 500
 	},
@@ -65,7 +65,7 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 				me.addAct('sendMail', {
 					text: me.res('act-sendMail.lbl'),
 					tooltip: null,
-					iconCls: 'wtdrm-icon-mail-xs ',
+					iconCls: 'wtdrm-icon-mailto',
 					handler: function () {
 						me.sendMail(me.getModel().getId());
 					}
@@ -330,14 +330,14 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 							],
 							tbar: [
 								me.getAct('expenseNoteDetail', 'add'),
-								me.getAct('expenseNoteDetail', 'remove'),
+								me.getAct('expenseNoteDetail', 'delete'),
 								'-',
 								me.getAct('expenseNoteDetail', 'edit')
 							],
 							listeners: {
 								rowclick: function (s, rec) {
 									me.getAct('expenseNoteDetail', 'edit').setDisabled(false);
-									me.getAct('expenseNoteDetail', 'remove').setDisabled(false);
+									me.getAct('expenseNoteDetail', 'delete').setDisabled(false);
 								},
 								rowdblclick: function (s, rec) {
 									me.editExpenseNoteDetailUI(rec);
@@ -392,7 +392,7 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 		me.addAct('expenseNoteDetail', 'add', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-add-xs',
+			iconCls: 'wt-icon-add',
 			handler: function () {
 				me.addExpenseNoteDetail(
 					me.getModel().get('operatorId'), me.getModel().get('companyId'), me.getModel().get('fromDate'), me.getModel().get('toDate'), {
@@ -401,10 +401,10 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 				});
 			}
 		});
-		me.addAct('expenseNoteDetail', 'remove', {
-			text: WT.res('act-remove.lbl'),
+		me.addAct('expenseNoteDetail', 'delete', {
+			text: WT.res('act-delete.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-remove-xs',
+			iconCls: 'wt-icon-delete',
 			disabled: true,
 			handler: function () {
 				var sm = me.lref('gpExpenseNoteDetail').getSelectionModel();
@@ -414,7 +414,7 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 		me.addAct('expenseNoteDetail', 'edit', {
 			text: WT.res('act-edit.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-edit-xs',
+			iconCls: 'wt-icon-edit',
 			disabled: true,
 			handler: function () {
 				var sm = me.lref('gpExpenseNoteDetail').getSelectionModel();

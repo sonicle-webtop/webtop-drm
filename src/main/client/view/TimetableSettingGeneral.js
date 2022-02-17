@@ -32,12 +32,9 @@
  */
 Ext.define('Sonicle.webtop.drm.view.TimetableSettingGeneral', {
 	extend: 'WTA.sdk.ModelView',
-	requires: [
-		// nothing
-	],
 	dockableConfig: {
 		title: '{timetable.config.general.tit}',
-		iconCls: 'wtdrm-icon-configuration-generalconfiguration-xs',
+		iconCls: 'wtdrm-icon-configuration',
 		width: 650,
 		height: 670
 	},
@@ -51,7 +48,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingGeneral', {
 			items: [
 				{
 					xtype: 'wtform',
-					title: me.mys.res('timetable.settings.tit'),
+						title: me.mys.res('timetable.settings.tit'),
 					defaults: {
 						labelWidth: 160
 					},

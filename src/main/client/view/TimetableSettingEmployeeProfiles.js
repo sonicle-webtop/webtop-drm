@@ -37,7 +37,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingEmployeeProfiles', {
 	],
 	dockableConfig: {
 		title: '{timetable.config.employeeprofiles.tit}',
-		iconCls: 'wtdrm-icon-configuration-generalconfiguration-xs',
+		iconCls: 'wtdrm-icon-configuration',
 		width: 650,
 		height: 670
 	},
@@ -107,7 +107,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingEmployeeProfiles', {
 						me.addAct('add', {
 							text: WT.res('act-add.lbl'),
 							tooltip: null,
-							iconCls: 'wt-icon-add-xs',
+							iconCls: 'wt-icon-add',
 							handler: function () {
 								me.addEmployeeProfile({
 									callback: function (success) {
@@ -123,7 +123,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingEmployeeProfiles', {
 						me.addAct('edit', {
 							text: WT.res('act-edit.lbl'),
 							tooltip: null,
-							iconCls: 'wt-icon-edit-xs',
+							iconCls: 'wt-icon-edit',
 							handler: function () {
 								var sel = me.lref('gpEmployeeProfile').getSelection()[0];
 								me.editEmployeeProfileUI(sel);

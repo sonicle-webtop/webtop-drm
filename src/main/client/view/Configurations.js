@@ -42,7 +42,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 	],
 	dockableConfig: {
 		title: '{config.tit}',
-		iconCls: 'wtdrm-icon-configuration-xs',
+		iconCls: 'wtdrm-icon-configuration',
 		width: 800,
 		height: 600
 	},
@@ -60,7 +60,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				{
 					xtype: 'wtform',
 					title: me.mys.res('config.configGeneral.tit'),
-					iconCls: 'wtdrm-icon-configuration-generalconfiguration-xs',
+					iconCls: 'wtdrm-icon-configuration',
 					tabConfig: {
 						textAlign: 'left'
 					},
@@ -79,7 +79,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 					xtype: 'grid',
 					reference: 'gpCompany',
 					title: me.mys.res('config.company.tit'),
-					iconCls: 'wtdrm-icon-configuration-companiesconfiguration-xs',
+					iconCls: 'wtdrm-icon-configurationCompanies',
 					tabConfig: {
 						textAlign: 'left'
 					},
@@ -108,12 +108,12 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 						me.getAct('company', 'add'),
 						'-',
 						me.getAct('company', 'edit'),
-						me.getAct('company', 'remove')
+						me.getAct('company', 'delete')
 					],
 					listeners: {
 						rowclick: function (s, rec) {
 							me.getAct('company', 'edit').setDisabled(false);
-							me.getAct('company', 'remove').setDisabled(false);
+							me.getAct('company', 'delete').setDisabled(false);
 						},
 						rowdblclick: function (s, rec) {
 							me.editCompanyUI(rec);
@@ -167,7 +167,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 					xtype: 'grid',
 					title: me.mys.res('config.profile.tit'),
 					reference: 'gpProfile',
-					iconCls: 'wtdrm-icon-configuration-profilesconfiguration-xs',
+					iconCls: 'wtdrm-icon-configurationEmployeeProfiles',
 					tabConfig: {
 						textAlign: 'left'
 					},
@@ -192,7 +192,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 					tbar: [
 						Ext.create('Ext.button.Split', {
 							text: me.mys.res('gpProfile.btn-genericAdd.lbl'),
-							iconCls: 'wt-icon-add-xs',
+							iconCls: 'wt-icon-add',
 							menu: new Ext.menu.Menu({
 								items: [
 									me.getAct('addSupervisorProfile'),
@@ -221,7 +221,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 					xtype: 'grid',
 					title: me.mys.res('config.manager.tit'),
 					reference: 'gpManagers',
-					iconCls: 'wtdrm-icon-configuration-manager-xs',
+					iconCls: 'wtdrm-icon-configurationLineManagers',
 					tabConfig: {
 						textAlign: 'left'
 					},
@@ -261,11 +261,12 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 						}
 					}
 				},
+				/*
 				{
 					xtype: 'grid',
 					reference: 'gpFolders',
 					title: me.mys.res('config.folders.tit'),
-					iconCls: 'wtdrm-icon-configuration-foldersconfiguration-xs',
+					iconCls: 'wtdrm-icon-configuration-foldersconfiguration',
 					tabConfig: {
 						textAlign: 'left'
 					},
@@ -294,11 +295,11 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 						me.getAct('folder', 'add'),
 						me.getAct('folder', 'edit'),
 						'-',
-						me.getAct('folder', 'remove')						
+						me.getAct('folder', 'delete')						
 					],
 					listeners: {
 						rowclick: function (s, rec) {
-							me.getAct('folder', 'remove').setDisabled(false);
+							me.getAct('folder', 'delete').setDisabled(false);
 							me.getAct('folder', 'edit').setDisabled(false);
 						},
 						rowdblclick: function (s, rec) {
@@ -306,11 +307,12 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 						}
 					}
 				},
+				*/
 				{
 					xtype: 'grid',
 					reference: 'gpDocStatus',
 					title: me.mys.res('config.status.tit'),
-					iconCls: 'wtdrm-icon-configuration-statusconfiguration-xs',
+					iconCls: 'wwtdrm-icon-configurationDocStatuses',
 					tabConfig: {
 						textAlign: 'left'
 					},
@@ -337,13 +339,13 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 						}],
 					tbar: [
 						me.getAct('docStatus', 'add'),
-						me.getAct('docStatus', 'remove'),
+						me.getAct('docStatus', 'delete'),
 						'-',
 						me.getAct('docStatus', 'edit')
 					],
 					listeners: {
 						rowclick: function (s, rec) {
-							me.getAct('docStatus', 'remove').setDisabled(false);
+							me.getAct('docStatus', 'delete').setDisabled(false);
 							me.getAct('docStatus', 'edit').setDisabled(false);
 						},
 						rowdblclick: function (s, rec) {
@@ -351,19 +353,21 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 						}
 					}
 				},
+				/*
 				{
 					xtype: 'panel',
 					title: me.mys.res('config.enabledProgram.tit'),
-					iconCls: 'wtdrm-icon-configuration-enabledprograms-xs',
+					iconCls: 'wtdrm-icon-configuration-enabledprograms',
 					tabConfig: {
 						textAlign: 'left'
 					}
 				},
+				*/
 				{
 					xtype: 'grid',
 					reference: 'gpActivities',
 					title: me.mys.res('config.activities.tit'),
-					iconCls: 'wtdrm-icon-configuration-activitiesconfiguration-xs',
+					iconCls: 'wtdrm-icon-configurationActivities',
 					tabConfig: {
 						textAlign: 'left'
 					},
@@ -419,13 +423,13 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 						}],
 					tbar: [
 						me.getAct('activity', 'add'),
-						me.getAct('activity', 'remove'),
+						me.getAct('activity', 'delete'),
 						'-',
 						me.getAct('activity', 'edit')
 					],
 					listeners: {
 						rowclick: function (s, rec) {
-							me.getAct('activity', 'remove').setDisabled(false);
+							me.getAct('activity', 'delete').setDisabled(false);
 							me.getAct('activity', 'edit').setDisabled(false);
 						},
 						rowdblclick: function (s, rec) {
@@ -440,7 +444,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		me.addAct('company', 'add', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-add-xs',
+			iconCls: 'wt-icon-add',
 			handler: function () {
 				me.addCompany({
 					callback: function (success) {
@@ -451,10 +455,10 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				});
 			}
 		});
-		me.addAct('company', 'remove', {
-			text: WT.res('act-remove.lbl'),
+		me.addAct('company', 'delete', {
+			text: WT.res('act-delete.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-remove-xs',
+			iconCls: 'wt-icon-delete',
 			disabled: true,
 			handler: function () {
 				var sel = me.getSelectedCompany();
@@ -466,7 +470,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		me.addAct('company', 'edit', {
 			text: WT.res('act-edit.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-edit-xs',
+			iconCls: 'wt-icon-edit',
 			disabled: true,
 			handler: function () {
 				var sel = me.getSelectedCompany();
@@ -478,7 +482,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		me.addAct('addGroup', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-add-xs',
+			iconCls: 'wt-icon-add',
 			handler: function () {
 				me.addGroup({
 					callback: function (success) {
@@ -490,9 +494,9 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 			}
 		});
 		me.addAct('deleteGroup', {
-			text: WT.res('act-remove.lbl'),
+			text: WT.res('act-delete.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-remove-xs',
+			iconCls: 'wt-icon-delete',
 			disabled: true,
 			handler: function () {
 				var sel = me.treeGroupSelected();
@@ -504,7 +508,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		me.addAct('editGroup', {
 			text: WT.res('act-edit.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-edit-xs',
+			iconCls: 'wt-icon-edit',
 			disabled: true,
 			handler: function () {
 				var sel = me.treeGroupSelected();
@@ -516,7 +520,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		me.addAct('addSupervisorProfile', {
 			text: me.mys.res('act-addSupervisorProfile.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-add-xs',
+			iconCls: 'wt-icon-add',
 			handler: function () {
 				me.addProfile('S', {
 					callback: function (success) {
@@ -530,7 +534,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		me.addAct('addExternalProfile', {
 			text: me.mys.res('act-addExternalProfile.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-add-xs',
+			iconCls: 'wt-icon-add',
 			handler: function () {
 				me.addProfile('E', {
 					callback: function (success) {
@@ -542,9 +546,9 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 			}
 		});
 		me.addAct('deleteProfile', {
-			text: WT.res('act-remove.lbl'),
+			text: WT.res('act-delete.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-remove-xs',
+			iconCls: 'wt-icon-delete',
 			disabled: true,
 			handler: function () {
 				var sel = me.getSelectedProfile();
@@ -556,7 +560,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		me.addAct('editProfile', {
 			text: WT.res('act-edit.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-edit-xs',
+			iconCls: 'wt-icon-edit',
 			disabled: true,
 			handler: function () {
 				var sel = me.getSelectedProfile();
@@ -568,7 +572,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		me.addAct('addManager', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-add-xs',
+			iconCls: 'wt-icon-add',
 			handler: function () {
 				me.addManager({
 					callback: function (success) {
@@ -580,9 +584,9 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 			}
 		});
 		me.addAct('deleteManager', {
-			text: WT.res('act-remove.lbl'),
+			text: WT.res('act-delete.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-remove-xs',
+			iconCls: 'wt-icon-delete',
 			disabled: true,
 			handler: function () {
 				var sel = me.getSelectedManager();
@@ -594,7 +598,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		me.addAct('editManager', {
 			text: WT.res('act-edit.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-edit-xs',
+			iconCls: 'wt-icon-edit',
 			disabled: true,
 			handler: function () {
 				var sel = me.getSelectedManager();
@@ -606,7 +610,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		me.addAct('folder', 'add', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-add-xs',
+			iconCls: 'wt-icon-add',
 			handler: function () {
 				me.addFolder({
 					callback: function (success) {
@@ -617,10 +621,10 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				});
 			}
 		});
-		me.addAct('folder', 'remove', {
-			text: WT.res('act-remove.lbl'),
+		me.addAct('folder', 'delete', {
+			text: WT.res('act-delete.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-remove-xs',
+			iconCls: 'wt-icon-delete',
 			disabled: true,
 			handler: function () {
 				var sel = me.getSelectedFolder();
@@ -632,7 +636,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		me.addAct('folder', 'edit', {
 			text: WT.res('act-edit.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-edit-xs',
+			iconCls: 'wt-icon-edit',
 			disabled: true,
 			handler: function () {
 				var sel = me.getSelectedFolder();
@@ -644,7 +648,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		me.addAct('docStatus', 'add', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-add-xs',
+			iconCls: 'wt-icon-add',
 			handler: function () {
 				me.addDocStatus({
 					callback: function (success) {
@@ -655,10 +659,10 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				});
 			}
 		});
-		me.addAct('docStatus', 'remove', {
-			text: WT.res('act-remove.lbl'),
+		me.addAct('docStatus', 'delete', {
+			text: WT.res('act-delete.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-remove-xs',
+			iconCls: 'wt-icon-delete',
 			disabled: true,
 			handler: function () {
 				var sel = me.getSelectedDocStatus();
@@ -670,7 +674,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		me.addAct('docStatus', 'edit', {
 			text: WT.res('act-edit.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-edit-xs',
+			iconCls: 'wt-icon-edit',
 			disabled: true,
 			handler: function () {
 				var sel = me.getSelectedDocStatus();
@@ -682,7 +686,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		me.addAct('activity', 'add', {
 			text: WT.res('act-add.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-add-xs',
+			iconCls: 'wt-icon-add',
 			handler: function () {
 				me.addActivity({
 					callback: function (success) {
@@ -693,10 +697,10 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 				});
 			}
 		});
-		me.addAct('activity', 'remove', {
-			text: WT.res('act-remove.lbl'),
+		me.addAct('activity', 'delete', {
+			text: WT.res('act-delete.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-remove-xs',
+			iconCls: 'wt-icon-delete',
 			disabled: true,
 			handler: function () {
 				var sel = me.getSelectedActivity();
@@ -708,7 +712,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 		me.addAct('activity', 'edit', {
 			text: WT.res('act-edit.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-edit-xs',
+			iconCls: 'wt-icon-edit',
 			disabled: true,
 			handler: function () {
 				var sel = me.getSelectedActivity();

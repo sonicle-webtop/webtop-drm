@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="16px" height="16px" viewBox="0 0 16 16" enable-background="new 0 0 16 16" xml:space="preserve">
+  <g id="main">
+    <g id="icon">
+      <path d="M0.318,7.363L3.828,9.631L8.74,6.673L5.329,4.505zM0,10.9L3.494,13.35L3.498,10.31L0.003906,8.058zM4.147,10.29L4.15,13.38L6.041,12.16L6,11.5L6.029,10.94L6.112,10.39L6.248,9.866L6.433,9.361L6.665,8.88L6.771,8.707zz" fill-rule="evenodd" fill="#E78155"/>
+      <path d="M5.958,4.088L9.415,6.254L14.68,3.165L11.22,1zM11.27,6.012L11.5,6L12.19,6.043L12.85,6.167L13.48,6.368L14.07,6.641L14.55,6.929L15,6.653L14.99,3.797zz" fill-rule="evenodd" fill="#E78155"/>
+    </g>
+    <g id="overlay">
+      <path d="M11.5,7c-2.4853,0,-4.5,2.0147,-4.5,4.5c0,2.4853,2.0147,4.5,4.5,4.5s4.5,-2.0147,4.5,-4.5C16,9.0147,13.9853,7,11.5,7zM10.9867,14.0054l-2.3571,-2.4126l0.9353,-0.9554l1.4215,1.4551l2.7426,-2.7834l0.942,0.9622L10.9867,14.0054z" fill-rule="evenodd" fill="#4EA17E"/>
+      <polygon points="10.9867,14.0054 14.6709,10.2713 13.729,9.3091 10.9864,12.0925 9.5649,10.6374 8.6296,11.5928" fill="#FFFFFF" stroke-linejoin="miter"/>
+    </g>
+  </g>
+</svg>

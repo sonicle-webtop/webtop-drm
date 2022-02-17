@@ -38,7 +38,7 @@ Ext.define('Sonicle.webtop.drm.view.LineManager', {
 	],
 	dockableConfig: {
 		title: '{manager.tit}',
-		iconCls: 'wtdrm-icon-configuration-manager-xs',
+		iconCls: 'wtdrm-icon-configurationLineManagers',
 		width: 500,
 		height: 500
 	},

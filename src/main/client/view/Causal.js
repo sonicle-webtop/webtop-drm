@@ -37,7 +37,7 @@ Ext.define('Sonicle.webtop.drm.view.Causal', {
 	],
 	dockableConfig: {
 		title: '{causal.tit}',
-		iconCls: 'wtdrm-icon-configuration-causal-xs',
+		iconCls: 'wtdrm-icon-configuration',
 		width: 400,
 		height: 150,
 		modal: true

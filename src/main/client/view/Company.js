@@ -39,7 +39,7 @@ Ext.define('Sonicle.webtop.drm.view.Company', {
 	],
 	dockableConfig: {
 		title: '{company.tit}',
-		iconCls: 'wtdrm-icon-configuration-companiesconfiguration-xs',
+		iconCls: 'wtdrm-icon-configurationCompanies',
 		width: 500,
 		height: 530
 	},

@@ -41,7 +41,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 	],
 	dockableConfig: {
 		title: '{workReport.tit}',
-		iconCls: 'wtdrm-icon-workreport-xs',
+		iconCls: 'wtdrm-icon-workReport',
 		width: 920,
 		height: 500
 	},
@@ -71,7 +71,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 				me.addAct('sendMail', {
 					text: me.res('act-sendMail.lbl'),
 					tooltip: null,
-					iconCls: 'wtdrm-icon-mail-xs ',
+					iconCls: 'wtdrm-icon-mailto',
 					handler: function () {
 						me.sendMail(me.getModel().getId());
 					}
@@ -547,7 +547,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 										me.addAct('add', {
 											text: WT.res('act-add.lbl'),
 											tooltip: null,
-											iconCls: 'wt-icon-add-xs',
+											iconCls: 'wt-icon-add',
 											handler: function () {
 												me.addDetail();
 											},

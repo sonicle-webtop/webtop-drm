@@ -41,7 +41,7 @@ Ext.define('Sonicle.webtop.drm.view.Ticket', {
 	],
 	dockableConfig: {
 		title: '{ticket.tit}',
-		iconCls: 'wtdrm-icon-ticket-xs',
+		iconCls: 'wtdrm-icon-ticket',
 		width: 700,
 		height: 480
 	},
@@ -94,7 +94,7 @@ Ext.define('Sonicle.webtop.drm.view.Ticket', {
 					xtype: 'button',	
 					reference: 'btnaddjob',
 					text: me.mys.res('ticket.btn-addJob.lbl'),
-					iconCls: 'wt-icon-add-xs',
+					iconCls: 'wt-icon-add',
 					handler: function () {
 						me.addJob(true);
 					}
@@ -103,7 +103,7 @@ Ext.define('Sonicle.webtop.drm.view.Ticket', {
 					xtype: 'button',	
 					reference: 'btncloseticket',
 					text: me.mys.res('ticket.btn-closeTicket.lbl'),
-					iconCls: 'wt-icon-lock-xs',
+					iconCls: 'wt-icon-lock',
 					handler: function () {
 						me.closeTicket();
 					}
@@ -231,6 +231,7 @@ Ext.define('Sonicle.webtop.drm.view.Ticket', {
 					queryMode: 'remote',
 					triggerAction: 'query',
 					store: {
+						autoLoad: true,
 						model: 'WTA.model.Simple',
 						proxy: WTF.proxy(me.mys.ID, 'LookupRealCustomers', null, {
 							extraParams: {
@@ -263,6 +264,7 @@ Ext.define('Sonicle.webtop.drm.view.Ticket', {
 					autoLoadOnValue: true,
 					tabIndex: 204,
 					store: {
+						autoLoad: true,
 						model: 'WTA.model.Simple',
 						proxy: WTF.proxy(me.mys.ID, (me.mys.getVar('useStatisticCustomer') === true) ? 'LookupStatisticCustomers' : 'LookupRealCustomers', null, {
 							extraParams: {
@@ -337,7 +339,7 @@ Ext.define('Sonicle.webtop.drm.view.Ticket', {
 							tabIndex: 207
 						}, {
 							xtype: 'button',
-							iconCls: 'wtcal-icon-now-xs',
+							iconCls: 'far fa-clock wt-theme-glyph',
 							tooltip: me.mys.res('ticket.btn-now.tip'),					
 							handler: function() {
 								me.getModel().setTime(new Date());
@@ -709,7 +711,7 @@ Ext.define('Sonicle.webtop.drm.view.Ticket', {
 		me.addAct('ticket', 'addJob', {
 			text: me.mys.res('ticket.btn-addJob.lbl'),
 			tooltip: null,
-			iconCls: 'wt-icon-add-xs',
+			iconCls: 'wt-icon-add',
 			handler: function () {
 				me.mys.addJobFromTicket(
 					me.getModel().get('toOperatorId'), 

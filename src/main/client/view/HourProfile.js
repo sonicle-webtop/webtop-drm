@@ -37,7 +37,7 @@ Ext.define('Sonicle.webtop.drm.view.HourProfile', {
 	],
 	dockableConfig: {
 		title: '{HourProfile.tit}',
-		iconCls: 'wtdrm-icon-configuration-ourprofile-xs',
+		iconCls: 'wtdrm-icon-configurationTimeProfiles',
 		width: 1160,
 		height: 500,
 		modal: true,
@@ -262,7 +262,7 @@ Ext.define('Sonicle.webtop.drm.view.HourProfile', {
 						me.addAct('add', {
 							text: WT.res('act-add.lbl'),
 							tooltip: null,
-							iconCls: 'wt-icon-add-xs',
+							iconCls: 'wt-icon-add',
 							handler: function () {
 								me.addLineHour();
 							},
