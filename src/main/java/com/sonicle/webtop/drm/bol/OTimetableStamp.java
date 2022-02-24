@@ -43,4 +43,7 @@ public class OTimetableStamp extends TimetableStamp{
 	public final static String TYPE_MAIN = "M";
 	public final static String TYPE_COMPANY = "C";
 	public final static String TYPE_SPECIAL = "S";
+
+	public final static String LOCATION_OFFICE = "O";
+	public final static String LOCATION_SMART_WORKING = "S";
 }

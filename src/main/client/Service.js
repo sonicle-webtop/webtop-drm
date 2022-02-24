@@ -47,7 +47,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		'Sonicle.webtop.drm.model.TimetableSettingGis',
 		'Sonicle.webtop.drm.view.TimetableSettingGeneral',
 		'Sonicle.webtop.drm.model.TimetableSettingGeneral',
-		'Sonicle.webtop.drm.store.RoundingHour'
+		'Sonicle.webtop.drm.store.RoundingHour',
+		'Sonicle.webtop.drm.view.DailyPresences'
 	],
     uses: [
         'Sonicle.webtop.drm.ServiceApi'  
@@ -590,6 +591,11 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							layout: 'border',
 							title: me.res('timetabledaily.tit.lbl'),
 							iconCls: 'wtdrm-icon-timetableDaily',
+							listeners: {
+								activate: function() {
+									me.getMainComponent().lookupReference('gpTimetable').getStore().reload();
+								}
+							},
 							items: [
 								{
 									region: 'north',
@@ -641,6 +647,19 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											flex: 1,
 											hideable: false,
 											align: 'center'
+										}, {
+											xtype: 'soiconcolumn',
+											hideable: false,
+											align: 'center',
+											getIconCls: function(v, rec) {
+												if (rec.get('location') === 'S') {
+													return 'wtdrm-icon-smartworking';
+												} else {
+													return 'wtdrm-icon-office';
+												}
+											},
+											iconSize: WTU.imgSizeToPx('xs'),
+											width: 30											
 										}/*, {
 											xtype: 'solookupcolumn',
 											header: me.res('gpTimetable.activityId.lbl'),
@@ -665,12 +684,62 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											text: me.res('gpTimetable.mainstamp.lbl'),
 											iconCls: 'wtdrm-icon-stampDefault',
 											handler: function () {
-												WT.ajaxReq(me.ID, 'SetTimetable', {
+												WT.ajaxReq(me.ID, 'CheckExistEntranceTimetableStamp', {
 													params: {
 														type: 'M'
 													},
 													callback: function (success, json) {
-														if(success) me.getMainComponent().lookupReference('gpTimetable').getStore().reload();
+														if(success){
+															if(json.data == true){
+																WT.ajaxReq(me.ID, 'SetTimetable', {
+																	params: {
+																		type: 'M',
+																		timestamp: new Date()
+																	},
+																	callback: function (success, json) {
+																		if(success) me.getMainComponent().lookupReference('gpTimetable').getStore().reload();
+																	}
+																});
+															}else{
+																var wnd = Ext.create('Ext.window.Window', {
+																	title: me.res('gpTimetable.mainstamp.wnd.workplace.lbl'),
+																	height: 135,
+																	width: 400,
+																	modal: true,
+																	resizable: false,
+																	layout: {
+																		type: 'hbox',
+																		align: 'middle'
+																	},
+																	items:[
+																		{
+																			xtype: 'button',
+																			width: 200,
+																			height: 100,
+																			scale: 'large',
+																			text: me.res('gpTimetable.mainstamp.wnd.workplaceoffice.lbl'),
+																			iconCls: 'wtdrm-icon-office',
+																			handler: function () {
+																				me.setTimetable("O");
+																				wnd.destroy();
+																			}
+																		},
+																		{
+																			xtype: 'button',
+																			width: 200,
+																			height: 100,
+																			scale: 'large',
+																			text: me.res('gpTimetable.mainstamp.wnd.workplacesmartworking.lbl'),
+																			iconCls: 'wtdrm-icon-smartworking',
+																			handler: function () {
+																				me.setTimetable("S");
+																				wnd.destroy();
+																			}
+																		}
+																	] 
+																}).show();
+															}
+														}
 													}
 												});
 											}
@@ -702,8 +771,14 @@ Ext.define('Sonicle.webtop.drm.Service', {
 						{
 							xtype: 'container',
 							layout: 'border',
+							itemId: 'ttslist',
 							title: me.res('timetable.tit.lbl'),
 							iconCls: 'wtdrm-icon-timetableList',
+							listeners: {
+								activate: function() {
+									me.getMainComponent().lookupReference('gpTimetableStamp').getStore().reload();
+								}
+							},
 							items: [
 								{
 									region: 'north',
@@ -771,6 +846,19 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											flex: 1,
 											hideable: false,
 											align: 'center'
+										}, {
+											xtype: 'soiconcolumn',
+											hideable: false,
+											align: 'center',
+											getIconCls: function(v, rec) {
+												if (rec.get('location') === 'S') {
+													return 'wtdrm-icon-smartworking';
+												} else {
+													return 'wtdrm-icon-office';
+												}
+											},
+											iconSize: WTU.imgSizeToPx('xs'),
+											width: 30
 										}/*, {
 											xtype: 'solookupcolumn',
 											header: me.res('gpTimetable.activityId.lbl'),
@@ -1001,6 +1089,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							titleCollapse: true,
 							collapsible: true,
 							sid: me.ID,
+							isSupervisorUser: me.getVar('isSupervisorUser'),
 							listeners: {
 								generate: function(s, query){
 									WT.confirm(me.res('gpTimetableReport.regeneratereport.lbl'), function (bid) {
@@ -1009,6 +1098,18 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											me.reloadTimetableReport(query);
 										}
 									});
+								},
+								openWndDailyPresences: function(s){
+									var me = this,
+											vw = WT.createView(me.sid, 'view.DailyPresences', {
+												swapReturn: true,
+												viewCfg: {
+													dockableConfig: {
+														title: '{dailyPresences.tit}'
+													}
+												}
+											});
+									vw.showView();
 								}
 							}
 						}, {
@@ -3411,6 +3512,20 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			},
 			callback: function (success, json) {
 				Ext.callback(opts.callback, opts.scope || me, [success, json]);
+			}
+		});
+	},
+	
+	setTimetable: function (location){
+		var me = this;
+		
+		WT.ajaxReq(me.ID, 'SetTimetable', {
+			params: {
+				type: 'M',
+				location: location
+			},
+			callback: function (success, json) {
+				if(success) me.getMainComponent().lookupReference('gpTimetable').getStore().reload();
 			}
 		});
 	},

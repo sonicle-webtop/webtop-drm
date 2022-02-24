@@ -4223,6 +4223,42 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			DbUtils.closeQuietly(con);
 		}
 	}
+
+	public Boolean checkExistEntranceTimetableStamp(TimetableStamp stamp) throws WTException {
+		Connection con = null;
+		List<OTimetableStamp> stamps = null;
+		boolean exist = false;
+
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			TimetableStampDAO tsDao = TimetableStampDAO.getInstance();
+
+			OTimetableStamp oTS = ManagerUtils.createOTimetableStamp(stamp);
+
+			//Check stamps, if not exixt insert a new object, else check exit
+			stamps = tsDao.getDailyStampsByDomainUserIdType(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), oTS.getType());
+			
+			if(stamps.size() > 0){
+				for(OTimetableStamp ts : stamps){
+					if(ts.getExit() == null){
+						exist = true;
+						break;
+					}
+				}
+			}		
+
+			return exist;
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
 	
 	public OTimetableStamp setTimetable(TimetableStamp stamp) throws WTException {
 
@@ -4338,6 +4374,28 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			// tss = tsDao.getDailyStampsByDomainUserId(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
 			tss = new ArrayList<>();
 			for (OTimetableStamp ots : tsDao.getDailyStampsByDomainUserId(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId())) {
+				tss.add(ManagerUtils.fillTimetableStamp(new TimetableStamp(), ots));
+			}
+			
+			return tss;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
+	public List<TimetableStamp> listUsersTimetableStamp(Date date) throws WTException {
+		Connection con = null;
+		TimetableStampDAO tsDao = TimetableStampDAO.getInstance();
+		List<TimetableStamp> tss = null;
+		
+		try {
+			con = WT.getConnection(SERVICE_ID);
+
+			tss = new ArrayList<>();
+			for (OTimetableStamp ots : tsDao.getUsersStampsByDomainUserIdDate(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), new DateTime(date.getTime()))) {
 				tss.add(ManagerUtils.fillTimetableStamp(new TimetableStamp(), ots));
 			}
 			

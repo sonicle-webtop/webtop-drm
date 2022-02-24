@@ -30,24 +30,21 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.model.TimetableStamp', {
-	extend: 'WTA.ux.data.BaseModel',
-	requires: [
-		'Sonicle.data.writer.Json'
+
+Ext.define('Sonicle.webtop.drm.store.LocationType', {
+	extend: 'Ext.data.ArrayStore',
+	
+	model: 'WTA.model.Simple',
+	data: [
+		['O',''],
+		['S','']
 	],
-	proxy: WTF.apiProxy('com.sonicle.webtop.drm', 'ManageTimetableStamp', 'data', {
-		writer: {
-			type: 'sojson',
-			writeAssociations: true
-		}
-	}),
-	identifier: 'negative',
-	idProperty: 'id',
-	fields: [
-		WTF.field('userId', 'string', false),
-		WTF.field('date', 'date', false, {dateFormat: 'd/m/Y', defaultValue: new Date()}),
-		WTF.field('fromHour', 'date', false, {dateFormat: 'H:i:s'}),
-		WTF.field('toHour', 'date', false, {dateFormat: 'H:i:s'}),
-		WTF.field('location', 'string', false)
-	]
+	
+	constructor: function(cfg) {
+		var me = this;
+		Ext.each(me.config.data, function(row) {
+			row[1] = WT.res('com.sonicle.webtop.drm', 'store.locationtype.'+row[0]);
+		});
+		me.callParent([cfg]);
+	}
 });

@@ -195,6 +195,7 @@ import com.sonicle.webtop.drm.bol.ODay;
 import com.sonicle.webtop.drm.bol.ODefaultCostType;
 import com.sonicle.webtop.drm.bol.OExpenseNote;
 import com.sonicle.webtop.drm.bol.OHolidayDate;
+import com.sonicle.webtop.drm.bol.OProfileMember;
 import com.sonicle.webtop.drm.bol.OTicket;
 import com.sonicle.webtop.drm.bol.OTicketCategory;
 import com.sonicle.webtop.drm.bol.OViewJob;
@@ -362,6 +363,7 @@ public class Service extends BaseService {
 			vs.put("opportunityRequiredFields", getOpportunityRequiredFields());
 			vs.put("expenseNoteDefaultCurrency", getExpenseNoteDefaultCurrency());
 			vs.put("expenseNoteKmCost", getExpenseNoteKmCost());
+			vs.put("isSupervisorUser", isSupervisorUser());
 		} catch (WTException ex) {
 			java.util.logging.Logger.getLogger(Service.class.getName()).log(Level.SEVERE, null, ex);
 		}
@@ -408,6 +410,18 @@ public class Service extends BaseService {
 			return (value == null) ? "EUR" : value;			
 		} catch (Exception ex) {
 			throw new WTException("Error in getExpenseNoteDefaultCurrency", ex);
+		}
+	}
+
+	private boolean isSupervisorUser() throws WTException {
+		try{
+			List<OProfileMember> items = new ArrayList<>();
+			items = manager.getDrmProfileMemberByUserId(getEnv().getProfileId().getUserId());
+
+			return (items.size() > 0) ? true : false;	
+
+		} catch (Exception ex) {
+			throw new WTException("Error in isSupervisorUser", ex);
 		}
 	}
 	
@@ -3163,9 +3177,11 @@ public class Service extends BaseService {
 	public void processSetTimetable(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			String type = ServletUtils.getStringParameter(request, "type", true);
+			String location = ServletUtils.getStringParameter(request, "location", null);
 			
 			TimetableStamp stamp = new TimetableStamp();
 			stamp.setType(type);
+			if (location != null) stamp.setLocation(location);
 			
 			if(ChekIpAddressNetwork()){
 				manager.setTimetable(stamp);
@@ -3175,6 +3191,25 @@ public class Service extends BaseService {
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action SetTimetable", ex);
+		}
+	}
+
+	public void processCheckExistEntranceTimetableStamp(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		Boolean exist = null;
+		try {
+			String type = ServletUtils.getStringParameter(request, "type", true);
+			
+			TimetableStamp stamp = new TimetableStamp();
+			stamp.setType(type);
+			
+			if(ChekIpAddressNetwork()){
+				exist = manager.checkExistEntranceTimetableStamp(stamp);
+			}
+			
+			new JsonResult(exist).printTo(out);
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action CheckExistEntranceTimetableStamp", ex);
 		}
 	}
 	
@@ -3303,6 +3338,29 @@ public class Service extends BaseService {
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action ManageGridTimetableList", ex);
+		}
+	}
+
+public void processManageGridTimetableListUsers(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			if (crud.equals(Crud.READ)) {
+
+				Date date = ServletUtils.getDateParameter(request, "date", new Date());
+
+				List<JsGridTimetableStamp> jsGridTS = new ArrayList();
+
+				for (TimetableStamp ts:  manager.listUsersTimetableStamp(date)) {
+
+					jsGridTS.add(new JsGridTimetableStamp(ts));
+				}
+
+				new JsonResult(jsGridTS).printTo(out);
+
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageGridTimetable", ex);
 		}
 	}
 	

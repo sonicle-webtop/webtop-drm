@@ -48,6 +48,7 @@ public class JsTimetableStamp {
 	public String date;
 	public String fromHour;
 	public String toHour;
+	public String location;
 
 	public JsTimetableStamp(TimetableStamp ts) {
 		this.userId = ts.getUserId();
@@ -62,6 +63,7 @@ public class JsTimetableStamp {
 		newTs.setUserId(js.userId);
 		newTs.setEntrance(entrance);
 		newTs.setExit(exit);
+		newTs.setLocation(js.location);
 		
 		return newTs;
 	}

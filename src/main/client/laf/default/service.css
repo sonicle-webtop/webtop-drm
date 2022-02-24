@@ -11,6 +11,8 @@
 .wtdrm-icon-timetableStamps { background-image: url('timetable-stamps_16.svg') !important; background-size: contain; }
 .wtdrm-icon-timetableRequests { background-image: url('timetable-requests_16.svg') !important; background-size: contain; }
 .wtdrm-icon-timetableReport { background-image: url('timetable-report_16.svg') !important; background-size: contain; }
+.wtdrm-icon-timetableDaily { background-image: url('timetable-daily_16.svg') !important; background-size: contain; }
+.wtdrm-icon-timetableList { background-image: url('timetable-list_16.svg') !important; background-size: contain; }
 .wtdrm-icon-ticket { background-image: url('ticket_16.svg') !important; background-size: contain; }
 .wtdrm-icon-job { background-image: url('job_16.svg') !important; background-size: contain; }
 .wtdrm-icon-configuration { background-image: url('configuration_16.svg') !important; background-size: contain; }
@@ -34,6 +36,8 @@
 .wtdrm-icon-initializeOpportunity { background-image: url('opportunity-initialize_16.svg') !important; background-size: contain; }
 .wtdrm-icon-associateTicket { background-image: url('job-linkticket_16.svg') !important; background-size: contain; }
 .wtdrm-icon-mailto { background-image: url('mailto_16.svg') !important; background-size: contain; }
+.wtdrm-icon-office { background-image: url('configuration-companies_16.svg') !important; background-size: contain; }
+.wtdrm-icon-smartworking { background-image: url('smartworking_16.svg') !important; background-size: contain; }
 
 .wtdrm-trash-trigger { background-image: url('trash-trigger.png') !important; }
 .wtdrm-add-trigger { background-image: url('add-trigger.png') !important; }

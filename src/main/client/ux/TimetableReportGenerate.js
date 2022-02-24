@@ -129,11 +129,29 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableReportGenerate', {
 					]
 				},
 				{
-					xtype: 'button',
-					text: WT.res(me.sid, 'btn-generate.lbl'),
-					handler: function () {
-						me.extractData();
-					}
+					xtype: 'fieldcontainer',
+					layout: 'hbox',
+					defaults: {
+						margin: '0 5 0 0'
+					},
+					items: [
+						{
+							xtype: 'button',
+							text: WT.res(me.sid, 'btn-generate.lbl'),
+								handler: function () {
+									me.extractData();
+								}
+						},{
+							xtype: 'spacer'
+						},{
+							xtype: 'button',
+							hidden: !me.isSupervisorUser,
+							text: WT.res(me.sid, 'timetableReportGenerate.btn-dailyPresences.lbl'),
+							handler: function () {
+								me.fireEvent('openWndDailyPresences', me);
+							}
+						}
+					]
 				}
 			]
 		},

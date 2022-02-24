@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableStamp implements java.io.Serializable {
 
-	private static final long serialVersionUID = 427371533;
+	private static final long serialVersionUID = 326085409;
 
 	private java.lang.Integer      id;
 	private java.lang.String       domainId;
@@ -24,6 +24,7 @@ public class TimetableStamp implements java.io.Serializable {
 	private java.lang.String       type;
 	private org.joda.time.DateTime entrance;
 	private org.joda.time.DateTime exit;
+	private java.lang.String       location;
 
 	public TimetableStamp() {}
 
@@ -33,7 +34,8 @@ public class TimetableStamp implements java.io.Serializable {
 		java.lang.String       userId,
 		java.lang.String       type,
 		org.joda.time.DateTime entrance,
-		org.joda.time.DateTime exit
+		org.joda.time.DateTime exit,
+		java.lang.String       location
 	) {
 		this.id = id;
 		this.domainId = domainId;
@@ -41,6 +43,7 @@ public class TimetableStamp implements java.io.Serializable {
 		this.type = type;
 		this.entrance = entrance;
 		this.exit = exit;
+		this.location = location;
 	}
 
 	public java.lang.Integer getId() {
@@ -89,5 +92,13 @@ public class TimetableStamp implements java.io.Serializable {
 
 	public void setExit(org.joda.time.DateTime exit) {
 		this.exit = exit;
+	}
+
+	public java.lang.String getLocation() {
+		return this.location;
+	}
+
+	public void setLocation(java.lang.String location) {
+		this.location = location;
 	}
 }

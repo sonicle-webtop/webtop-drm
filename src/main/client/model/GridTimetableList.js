@@ -40,6 +40,7 @@ Ext.define('Sonicle.webtop.drm.model.GridTimetableList', {
 		WTF.roField('type', 'string'),
 		WTF.roField('date', 'string'),
 		WTF.roField('entrance', 'string'),		
-		WTF.roField('exit', 'string')
+		WTF.roField('exit', 'string'),
+		WTF.roField('location', 'string')
 	]
 });

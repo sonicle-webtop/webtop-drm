@@ -1070,6 +1070,7 @@ public class ManagerUtils {
 		stamp.setType(oTS.getType());
 		stamp.setEntrance(oTS.getEntrance());
 		stamp.setExit(oTS.getExit());
+		stamp.setLocation(oTS.getLocation());
 		// stamp.setActivityId(oTS.getActivityId());
 
 		return stamp;
@@ -1083,6 +1084,7 @@ public class ManagerUtils {
 			tgt.setType(src.getType());
 			tgt.setEntrance(src.getEntrance());
 			tgt.setExit(src.getExit());
+			tgt.setLocation(src.getLocation());
 			// tgt.setActivityId(src.getActivityId());
 		}
 		return tgt;
@@ -1101,6 +1103,7 @@ public class ManagerUtils {
 		oTS.setType(stamp.getType());
 		oTS.setEntrance(stamp.getEntrance());
 		oTS.setExit(stamp.getExit());
+		oTS.setLocation(stamp.getLocation());
 
 		return oTS;
 	}

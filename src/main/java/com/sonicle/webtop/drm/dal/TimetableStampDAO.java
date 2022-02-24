@@ -42,15 +42,19 @@ import static com.sonicle.webtop.drm.jooq.Tables.TIMETABLE_STAMP;
 import static com.sonicle.webtop.drm.jooq.Tables.EMPLOYEE_PROFILES;
 import static com.sonicle.webtop.drm.jooq.Tables.TIMETABLE_SETTINGS;
 import static com.sonicle.webtop.drm.jooq.Tables.COMPANIES_USERS;
+import static com.sonicle.webtop.drm.jooq.Tables.PROFILES_MEMBERS;
+import static com.sonicle.webtop.drm.jooq.Tables.PROFILES_SUPERVISED_USERS;
 import com.sonicle.webtop.drm.jooq.tables.records.TimetableStampRecord;
 import java.sql.Connection;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
+import org.jooq.JoinType;
 import org.jooq.impl.DSL;
 
 /**
@@ -154,7 +158,7 @@ public class TimetableStampDAO extends BaseDAO{
 		DSLContext dsl = getDSL(con);
 		
 		Field<Integer> workingHours = DSL.field("((DATE_PART('day', {0} - {1}) * 24 + DATE_PART('hour', {0} - {1})) * 60 + DATE_PART('minute', {0} - {1}))", Integer.class, TIMETABLE_STAMP.EXIT, TIMETABLE_STAMP.ENTRANCE);
-		Field<String> detail = DSL.field("'e ' || to_char({0}, 'HH24:MI') || ' u ' || to_char({1}, 'HH24:MI') || ' '", String.class, TIMETABLE_STAMP.ENTRANCE, TIMETABLE_STAMP.EXIT);
+		Field<String> detail = DSL.field("'e ' || to_char({0}, 'HH24:MI') || ' u ' || to_char({1}, 'HH24:MI') || ' [' || CASE WHEN {2} = 'O' THEN 'U' WHEN {2} IS NULL THEN '' ELSE {2} END || '] '", String.class, TIMETABLE_STAMP.ENTRANCE, TIMETABLE_STAMP.EXIT, TIMETABLE_STAMP.LOCATION);
 		
 		return dsl
 				.select(
@@ -163,7 +167,8 @@ public class TimetableStampDAO extends BaseDAO{
 						TIMETABLE_STAMP.USER_ID.as("target_user_id"), 
 						TIMETABLE_STAMP.ENTRANCE.as("date"),
 						workingHours.as("working_hours"),
-						detail.as("detail")
+						detail.as("detail"),
+						TIMETABLE_STAMP.LOCATION
 				)
 				.from(TIMETABLE_STAMP)
 				.leftOuterJoin(
@@ -244,5 +249,28 @@ public class TimetableStampDAO extends BaseDAO{
 				)
 			)
 			.execute();
+	}
+
+	public List<OTimetableStamp> getUsersStampsByDomainUserIdDate(Connection con, String domainId, String userId, DateTime date) {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.select()
+				.from(TIMETABLE_STAMP)
+				.where(
+						TIMETABLE_STAMP.DOMAIN_ID.equal(domainId)
+				)
+				.and(
+						TIMETABLE_STAMP.ENTRANCE.between(date.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0), date.withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
+				)
+				.and(
+						TIMETABLE_STAMP.USER_ID.in(
+							dsl.select(PROFILES_SUPERVISED_USERS.USER_ID)
+							.from(PROFILES_SUPERVISED_USERS)
+							.join(PROFILES_MEMBERS)
+							.on(PROFILES_SUPERVISED_USERS.PROFILE_ID.eq(PROFILES_MEMBERS.PROFILE_ID))
+							.where(PROFILES_MEMBERS.USER_ID.eq(userId))
+						)
+				)
+				.fetchInto(OTimetableStamp.class);
 	}
 }

@@ -46,6 +46,7 @@ public class JsGridTimetableStamp {
 	public String type;
 	public String entrance;
 	public String exit;
+	public String location;
 	
 	public JsGridTimetableStamp(TimetableStamp ts){
 		this.id = ts.getId();
@@ -54,5 +55,6 @@ public class JsGridTimetableStamp {
 		this.type = ts.getType();
 		this.entrance = (null != ts.getEntrance()) ? ((ts.getEntrance().getHourOfDay() < 10 ? "0" + ts.getEntrance().getHourOfDay() : ts.getEntrance().getHourOfDay()) + ":" + (ts.getEntrance().getMinuteOfHour() < 10 ? "0" + ts.getEntrance().getMinuteOfHour() : ts.getEntrance().getMinuteOfHour())) : ("");
 		this.exit = (null != ts.getExit()) ? ((ts.getExit().getHourOfDay() < 10 ? "0" + ts.getExit().getHourOfDay() : ts.getExit().getHourOfDay()) + ":" + (ts.getExit().getMinuteOfHour() < 10 ? "0" + ts.getExit().getMinuteOfHour() : ts.getExit().getMinuteOfHour())) : ("");
+		this.location = ts.getLocation();
 	}
 }
