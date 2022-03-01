@@ -46,6 +46,7 @@ public class TimetableReportQuery {
 	public Integer fromDay;
 	public String crud;
 	public String targetUserId;
+	public String mode;
 	
 	public TimetableReportQuery() {
 	}

@@ -137,10 +137,23 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableReportGenerate', {
 					items: [
 						{
 							xtype: 'button',
+							text: WT.res(me.sid, 'btn-view.lbl'),
+							tooltip: WT.res(me.sid, 'btn-view-tltp.lbl'),
+							handler: function () {
+								me.extractData(1);
+							}
+						},{
+							xtype: 'spacer'
+						},{
+							xtype: 'button',
+							hidden: !me.isSupervisorUser,
 							text: WT.res(me.sid, 'btn-generate.lbl'),
-								handler: function () {
-									me.extractData();
-								}
+							tooltip: WT.res(me.sid, 'btn-generate-tltp.lbl'),
+							handler: function () {
+								me.extractData(2);
+							}
+						},{
+							xtype: 'spacer'
 						},{
 							xtype: 'spacer'
 						},{
@@ -202,7 +215,7 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableReportGenerate', {
 		});
 	},
 	
-	extractData: function () {
+	extractData: function (mode) {
 		var me = this;
 
 		var query = {
@@ -210,10 +223,11 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableReportGenerate', {
 			targetUserId: me.lookupReference('flduser').getValue(),
 			month: me.lookupReference('fldmonth').getValue(),
 			year: me.lookupReference('fldyear').getValue(),
-			fromDay: me.lookupReference('fldfromday').getValue()
+			fromDay: me.lookupReference('fldfromday').getValue(),
+			mode: mode
 		};
 		
-		me.fireEvent('generate', me, query);
+		me.fireEvent('generateOrView', me, query);
 	},
 	
 	getData: function () {

@@ -112,7 +112,24 @@ Ext.define('Sonicle.webtop.drm.view.TimetableStamp', {
 									width: 105
 								}
 							]
-						}
+						},
+						{
+							xtype: 'fieldcontainer',
+							fieldLabel: me.mys.res('timetableStamp.fld-location.lbl'),
+							layout: 'hbox',
+							defaults: {
+								margin: '0'
+							},
+							items: [
+								WTF.lookupCombo('id', 'desc', {
+									bind: '{record.location}',
+									store: Ext.create('Sonicle.webtop.drm.store.LocationType', {
+										autoLoad: true
+									}),
+									width: 250
+								})
+							]
+ 						}
 					]
 				}
 			]

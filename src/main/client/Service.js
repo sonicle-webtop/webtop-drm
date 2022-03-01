@@ -1091,13 +1091,18 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							sid: me.ID,
 							isSupervisorUser: me.getVar('isSupervisorUser'),
 							listeners: {
-								generate: function(s, query){
-									WT.confirm(me.res('gpTimetableReport.regeneratereport.lbl'), function (bid) {
-										if (bid === 'yes') {
-											me.timetableReportGenerateQuery = query;
-											me.reloadTimetableReport(query);
-										}
-									});
+								generateOrView: function(s, query){
+									if(query.mode === 1){
+										me.timetableReportGenerateQuery = query;
+										me.reloadTimetableReport(query);
+									}else if(query.mode === 2){
+										WT.confirm(me.res('gpTimetableReport.regeneratereport.lbl'), function (bid) {
+											if (bid === 'yes') {
+												me.timetableReportGenerateQuery = query;
+												me.reloadTimetableReport(query);
+											}
+										});
+									}
 								},
 								openWndDailyPresences: function(s){
 									var me = this,
@@ -1157,8 +1162,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								}, {
 									header: me.res('gpTimetableReport.workingHours.lbl'),
 									dataIndex: 'workingHours',
-									editable: true,
+									editable: me.getVar('isSupervisorUser'),
 									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
+										readOnly: !me.getVar('isSupervisorUser'),
 										allowBlank: true,
 										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
 											autoLoad: true
@@ -1172,8 +1178,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								}, {
 									header: me.res('gpTimetableReport.overtime.lbl'),
 									dataIndex: 'overtime',
-									editable: true,
+									editable: me.getVar('isSupervisorUser'),
 									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
+										readOnly: !me.getVar('isSupervisorUser'),
 										allowBlank: true,
 										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
 											autoLoad: true
@@ -1187,8 +1194,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								}, {
 									header: me.res('gpTimetableReport.paidLeave.lbl'),
 									dataIndex: 'paidLeave',
-									editable: true,
+									editable: me.getVar('isSupervisorUser'),
 									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
+										readOnly: !me.getVar('isSupervisorUser'),
 										allowBlank: true,
 										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
 											autoLoad: true
@@ -1219,8 +1227,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								{
 									header: me.res('gpTimetableReport.holiday.lbl'),
 									dataIndex: 'holiday',
-									editable: true,
+									editable: me.getVar('isSupervisorUser'),
 									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
+										readOnly: !me.getVar('isSupervisorUser'),
 										allowBlank: true,
 										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
 											autoLoad: true
@@ -1251,8 +1260,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								{
 									header: me.res('gpTimetableReport.sickness.lbl'),
 									dataIndex: 'sickness',
-									editable: true,
+									editable: me.getVar('isSupervisorUser'),
 									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
+										readOnly: !me.getVar('isSupervisorUser'),
 										allowBlank: true,
 										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
 											autoLoad: true

@@ -4546,8 +4546,37 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			DbUtils.closeQuietly(con);
 		}
 	}
+
+	public List<OTimetableReport> generateOeViewTimetableReport(TimetableReportQuery query) throws WTException {
+
+		List<OTimetableReport> items = new ArrayList<>();
+
+		if(query != null) {
+			if(query.mode.equals("1")){
+				Date generationDate = new Date();
+				generationDate.setDate(1);
+				generationDate.setMonth(query.month-1);
+				generationDate.setYear(query.year-1900);
+
+				Date todayDate = new Date();
+				todayDate.setDate(1);
+
+				if(todayDate.after(generationDate)) {
+					//Se oggi Ã¨ dopo rispetto alla data da controllare, visualizzo.
+					items = getTimetableReport(query);
+				}else{
+					//Altrimenti significa che oggi Ã¨ uguale o prima alla data da controllare, rigenero.
+					items = generateTimetableReport(query);
+				}
+			}else if(query.mode.equals("2")){
+				items = generateTimetableReport(query);
+			}
+		}
+
+		return items;
+	}
 	
-	public List<OTimetableReport> generateTimetableReport(TimetableReportQuery query) throws WTException {
+	private List<OTimetableReport> generateTimetableReport(TimetableReportQuery query) throws WTException {
 		Connection con = null;
 		List<OTimetableReport> trs = new ArrayList();
 		List<OTimetableReport> ttrs;
@@ -4567,7 +4596,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			WorkReportDAO wrDAO = WorkReportDAO.getInstance();
 			JobDAO jbDAO = JobDAO.getInstance();
 			EmployeeProfileDAO epDAO = EmployeeProfileDAO.getInstance();			
-			
+
 			if(query != null) {
 				//Empty Table for single user
 				
