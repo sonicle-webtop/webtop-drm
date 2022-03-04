@@ -272,6 +272,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.imgscalr.Scalr;
 import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
 import org.joda.time.Minutes;
 import org.jooq.Record;
@@ -4279,7 +4280,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			if(stamps.size() > 0){
 				for(OTimetableStamp ts : stamps){
 					if(ts.getExit() == null){
-						ts.setExit(new DateTime());
+						ts.setExit(new LocalDateTime());
 						
 						tsDao.update(con, ts);
 						chek = true;
@@ -4291,7 +4292,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					oTS.setId(tsDao.getSequence(con).intValue());
 					oTS.setDomainId(getTargetProfileId().getDomainId());
 					oTS.setUserId(getTargetProfileId().getUserId());
-					oTS.setEntrance(new DateTime());
+					oTS.setEntrance(new LocalDateTime());
 
 					tsDao.insert(con, oTS);
 				}
@@ -4299,7 +4300,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				oTS.setId(tsDao.getSequence(con).intValue());
 				oTS.setDomainId(getTargetProfileId().getDomainId());
 				oTS.setUserId(getTargetProfileId().getUserId());
-				oTS.setEntrance(new DateTime());
+				oTS.setEntrance(new LocalDateTime());
 				
 				tsDao.insert(con, oTS);
 			}			

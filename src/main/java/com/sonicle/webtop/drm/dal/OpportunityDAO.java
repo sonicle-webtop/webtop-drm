@@ -281,18 +281,18 @@ public class OpportunityDAO extends BaseDAO {
 		
 		if (query.date != null) {
 			if(query.toDate != null){
-				searchCndt = searchCndt.and(OPPORTUNITIES.START_DATE.between(query.date.toDateTime(LocalTime.MIDNIGHT), query.toDate.toDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59)));
+				searchCndt = searchCndt.and(OPPORTUNITIES.START_DATE.between(query.date.toLocalDateTime(LocalTime.MIDNIGHT), query.toDate.toLocalDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59)));
 				searchCndt = searchCndt.or(OPPORTUNITIES.ID.in(
 						dsl.select(OPPORTUNITY_ACTIONS.OPPORTUNITY_ID)
 								.from(OPPORTUNITY_ACTIONS)
-								.where(OPPORTUNITY_ACTIONS.START_DATE.between(query.date.toDateTime(LocalTime.MIDNIGHT), query.toDate.toDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59)))
+								.where(OPPORTUNITY_ACTIONS.START_DATE.between(query.date.toLocalDateTime(LocalTime.MIDNIGHT), query.toDate.toLocalDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59)))
 				));
 			}else{
-				searchCndt = searchCndt.and(OPPORTUNITIES.START_DATE.greaterOrEqual(query.date.toDateTime(LocalTime.MIDNIGHT)));
+				searchCndt = searchCndt.and(OPPORTUNITIES.START_DATE.greaterOrEqual(query.date.toLocalDateTime(LocalTime.MIDNIGHT)));
 				searchCndt = searchCndt.or(OPPORTUNITIES.ID.in(
 						dsl.select(OPPORTUNITY_ACTIONS.OPPORTUNITY_ID)
 								.from(OPPORTUNITY_ACTIONS)
-								.where(OPPORTUNITY_ACTIONS.START_DATE.greaterOrEqual(query.date.toDateTime(LocalTime.MIDNIGHT)))
+								.where(OPPORTUNITY_ACTIONS.START_DATE.greaterOrEqual(query.date.toLocalDateTime(LocalTime.MIDNIGHT)))
 				));
 			}
 		}

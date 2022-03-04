@@ -1068,8 +1068,8 @@ public class ManagerUtils {
 		stamp.setDomainId(oTS.getDomainId());
 		stamp.setUserId(oTS.getUserId());
 		stamp.setType(oTS.getType());
-		stamp.setEntrance(oTS.getEntrance());
-		stamp.setExit(oTS.getExit());
+		stamp.setEntrance(oTS.getEntrance().toDateTime());
+		stamp.setExit(oTS.getExit().toDateTime());
 		stamp.setLocation(oTS.getLocation());
 		// stamp.setActivityId(oTS.getActivityId());
 
@@ -1082,8 +1082,8 @@ public class ManagerUtils {
 			tgt.setDomainId(src.getDomainId());
 			tgt.setUserId(src.getUserId());
 			tgt.setType(src.getType());
-			tgt.setEntrance(src.getEntrance());
-			tgt.setExit(src.getExit());
+			tgt.setEntrance(src.getEntrance().toDateTime());
+			tgt.setExit(src.getExit().toDateTime());
 			tgt.setLocation(src.getLocation());
 			// tgt.setActivityId(src.getActivityId());
 		}
@@ -1101,8 +1101,8 @@ public class ManagerUtils {
 		oTS.setDomainId(stamp.getDomainId());
 		oTS.setUserId(stamp.getUserId());
 		oTS.setType(stamp.getType());
-		oTS.setEntrance(stamp.getEntrance());
-		oTS.setExit(stamp.getExit());
+		oTS.setEntrance(stamp.getEntrance().toLocalDateTime());
+		oTS.setExit(stamp.getExit().toLocalDateTime());
 		oTS.setLocation(stamp.getLocation());
 
 		return oTS;
@@ -1337,8 +1337,8 @@ public class ManagerUtils {
 		o.setDomainId(oOpt.getDomainId());
 		o.setCompanyId(oOpt.getCompanyId());
 		o.setOperatorId(oOpt.getOperatorId());
-		o.setStartDate(oOpt.getStartDate());
-		o.setEndDate(oOpt.getEndDate());
+		o.setStartDate(oOpt.getStartDate().toDateTime());
+		o.setEndDate(oOpt.getEndDate().toDateTime());
 		o.setExecutedWith(oOpt.getExecutedWith());
 		o.setCustomerId(oOpt.getCustomerId());
 		o.setCustomerStatId(oOpt.getCustomerStatId());
@@ -1371,8 +1371,8 @@ public class ManagerUtils {
 		oOpt.setDomainId(o.getDomainId());
 		oOpt.setCompanyId(o.getCompanyId());
 		oOpt.setOperatorId(o.getOperatorId());
-		oOpt.setStartDate(o.getStartDate());
-		oOpt.setEndDate(o.getEndDate());
+		oOpt.setStartDate(o.getStartDate().toLocalDateTime());
+		oOpt.setEndDate(o.getEndDate().toLocalDateTime());
 		oOpt.setExecutedWith(o.getExecutedWith());
 		oOpt.setCustomerId(o.getCustomerId());
 		oOpt.setCustomerStatId(o.getCustomerStatId());
@@ -1407,8 +1407,8 @@ public class ManagerUtils {
 		oAct.setOpportunityId(act.getOpportunityId());
 		oAct.setOperatorId(act.getOperatorId());
 		oAct.setStatusId(act.getStatusId());
-		oAct.setStartDate(act.getStartDate());
-		oAct.setEndDate(act.getEndDate());
+		oAct.setStartDate(act.getStartDate().toLocalDateTime());
+		oAct.setEndDate(act.getEndDate().toLocalDateTime());
 		oAct.setDescription(act.getDescription());
 		oAct.setPlace(act.getPlace());
 		oAct.setSubsequentActions(act.getSubsequentActions());
@@ -1429,8 +1429,8 @@ public class ManagerUtils {
 		act.setOpportunityId(oAct.getOpportunityId());
 		act.setOperatorId(oAct.getOperatorId());
 		act.setStatusId(oAct.getStatusId());
-		act.setStartDate(oAct.getStartDate());
-		act.setEndDate(oAct.getEndDate());
+		act.setStartDate(oAct.getStartDate().toDateTime());
+		act.setEndDate(oAct.getEndDate().toDateTime());
 		act.setDescription(oAct.getDescription());
 		act.setPlace(oAct.getPlace());
 		act.setSubsequentActions(oAct.getSubsequentActions());
@@ -2092,7 +2092,7 @@ public class ManagerUtils {
 		if(!trsf.isEmpty()){
 			List<DateTime> dates = new ArrayList();
 			for(int i = trsf.get(0).getDate().dayOfMonth().getMinimumValue(); i <= trsf.get(0).getDate().dayOfMonth().getMaximumValue(); i++){
-				dates.add(trsf.get(0).getDate().withDayOfMonth(i));
+				dates.add(trsf.get(0).getDate().withDayOfMonth(i).toDateTime());
 			}
 
 			for(DateTime dt : dates){
@@ -2103,7 +2103,7 @@ public class ManagerUtils {
 					temp.setDomainId(trsf.get(0).getDomainId());
 					temp.setCompanyId(trsf.get(0).getCompanyId());
 					temp.setUserId(trsf.get(0).getUserId());
-					temp.setDate(dt);																						
+					temp.setDate(dt.toLocalDateTime());																						
 					
 					hashTr.put(dt.toLocalDate(), temp);
 					
@@ -2275,7 +2275,7 @@ public class ManagerUtils {
 			tr.setDomainId(te.getDomainId());
 			tr.setCompanyId(te.getCompanyId());
 			tr.setUserId(te.getUserId());
-			tr.setDate(te.getDate().toDateTimeAtStartOfDay());
+			tr.setDate(te.getDate().toDateTimeAtStartOfDay().toLocalDateTime());
 			
 			OLeaveRequestType requestType = EnumUtils.forSerializedName(te.getType(), OLeaveRequestType.class);
 			
@@ -2315,7 +2315,7 @@ public class ManagerUtils {
 			tr.setDomainId(te.getDomainId());
 			tr.setCompanyId(te.getCompanyId());
 			tr.setUserId(te.getOperatorId());
-			tr.setDate(te.getFromDate().toDateTimeAtStartOfDay());
+			tr.setDate(te.getFromDate().toDateTimeAtStartOfDay().toLocalDateTime());
 			
 			tr.setWorkReportHours(String.format("%d.%02d", (te.getTimetableHours() / 60), (te.getTimetableHours() % 60)));
 			
@@ -2335,7 +2335,7 @@ public class ManagerUtils {
 			tr.setDomainId(te.getDomainId());
 			tr.setCompanyId(te.getCompanyId());
 			tr.setUserId(te.getOperatorId());
-			tr.setDate(te.getStartDate().toLocalDate().toDateTimeAtStartOfDay());
+			tr.setDate(te.getStartDate().toLocalDate().toDateTimeAtStartOfDay().toLocalDateTime());
 			
 			tr.setJobHours(String.format("%d.%02d", (te.getJobHours() / 60), (te.getJobHours() % 60)));
 			

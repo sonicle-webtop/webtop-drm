@@ -42,6 +42,7 @@ import com.sonicle.webtop.drm.bol.OTimetableReport;
 import java.io.IOException;
 import java.util.Locale;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
 
 /**
@@ -126,7 +127,7 @@ public class RBTimetableReport {
 		}
 	}
 	
-	private String concatDate(DateTime dtDate, Locale lcl){		
+	private String concatDate(LocalDateTime dtDate, Locale lcl){		
 		// SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MMM/yyyy EEE", lcl);
         
         DateTimeFormatter dtFm = DateTimeUtils.createFormatter("dd/MM/yyyy EEE").withLocale(lcl);

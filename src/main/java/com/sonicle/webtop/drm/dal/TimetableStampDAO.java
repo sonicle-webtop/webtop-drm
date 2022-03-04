@@ -111,7 +111,7 @@ public class TimetableStampDAO extends BaseDAO{
 						TIMETABLE_STAMP.TYPE.equal(type)
 				)
 				.and(
-						TIMETABLE_STAMP.ENTRANCE.between(new DateTime().withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0), new DateTime().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
+						TIMETABLE_STAMP.ENTRANCE.between(new DateTime().withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).toLocalDateTime(), new DateTime().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toLocalDateTime())
 				)
 				.fetchInto(OTimetableStamp.class);
 	}
@@ -128,7 +128,7 @@ public class TimetableStampDAO extends BaseDAO{
 						TIMETABLE_STAMP.USER_ID.equal(userId)
 				)
 				.and(
-						TIMETABLE_STAMP.ENTRANCE.between(new DateTime().withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0), new DateTime().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
+						TIMETABLE_STAMP.ENTRANCE.between(new DateTime().withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).toLocalDateTime(), new DateTime().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toLocalDateTime())
 				)
 				.fetchInto(OTimetableStamp.class);
 	}
@@ -146,10 +146,10 @@ public class TimetableStampDAO extends BaseDAO{
 						TIMETABLE_STAMP.USER_ID.equal(operatorId)
 				)
 				.and(
-						TIMETABLE_STAMP.ENTRANCE.between(new DateTime().withYear(year).withMonthOfYear(month).withDayOfMonth(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0), new DateTime().withYear(year).withMonthOfYear(month).dayOfMonth().withMaximumValue().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
+						TIMETABLE_STAMP.ENTRANCE.between(new DateTime().withYear(year).withMonthOfYear(month).withDayOfMonth(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).toLocalDateTime(), new DateTime().withYear(year).withMonthOfYear(month).dayOfMonth().withMaximumValue().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toLocalDateTime())
 				)
 				.and(
-						TIMETABLE_STAMP.EXIT.between(new DateTime().withYear(year).withMonthOfYear(month).withDayOfMonth(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0), new DateTime().withYear(year).withMonthOfYear(month).dayOfMonth().withMaximumValue().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
+						TIMETABLE_STAMP.EXIT.between(new DateTime().withYear(year).withMonthOfYear(month).withDayOfMonth(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).toLocalDateTime(), new DateTime().withYear(year).withMonthOfYear(month).dayOfMonth().withMaximumValue().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toLocalDateTime())
 				)
 				.fetchInto(OTimetableStamp.class);
 	}
@@ -196,10 +196,10 @@ public class TimetableStampDAO extends BaseDAO{
 						TIMETABLE_STAMP.USER_ID.equal(userId)
 				)
 				.and(
-						TIMETABLE_STAMP.ENTRANCE.between(new DateTime().withYear(year).withMonthOfYear(month).withDayOfMonth(fromDay).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0), new DateTime().withYear(year).withMonthOfYear(month).dayOfMonth().withMaximumValue().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
+						TIMETABLE_STAMP.ENTRANCE.between(new DateTime().withYear(year).withMonthOfYear(month).withDayOfMonth(fromDay).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).toLocalDateTime(), new DateTime().withYear(year).withMonthOfYear(month).dayOfMonth().withMaximumValue().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toLocalDateTime())
 				)
 				.and(
-						TIMETABLE_STAMP.EXIT.between(new DateTime().withYear(year).withMonthOfYear(month).withDayOfMonth(fromDay).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0), new DateTime().withYear(year).withMonthOfYear(month).dayOfMonth().withMaximumValue().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
+						TIMETABLE_STAMP.EXIT.between(new DateTime().withYear(year).withMonthOfYear(month).withDayOfMonth(fromDay).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).toLocalDateTime(), new DateTime().withYear(year).withMonthOfYear(month).dayOfMonth().withMaximumValue().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toLocalDateTime())
 				)
 				.and(
 						TIMETABLE_STAMP.TYPE.in(OTimetableStamp.TYPE_MAIN, OTimetableStamp.TYPE_SPECIAL)
@@ -229,8 +229,8 @@ public class TimetableStampDAO extends BaseDAO{
 				TIMETABLE_STAMP.DOMAIN_ID.eq(domainId).and(
 					TIMETABLE_STAMP.USER_ID.in(userIds)
 				).and(
-					TIMETABLE_STAMP.ENTRANCE.between(fromDate, toDate).or(
-						TIMETABLE_STAMP.EXIT.between(fromDate, toDate)
+					TIMETABLE_STAMP.ENTRANCE.between(fromDate.toLocalDateTime(), toDate.toLocalDateTime()).or(
+						TIMETABLE_STAMP.EXIT.between(fromDate.toLocalDateTime(), toDate.toLocalDateTime())
 					)
 				)
 			)
@@ -243,8 +243,8 @@ public class TimetableStampDAO extends BaseDAO{
 			.delete(TIMETABLE_STAMP)
 			.where(
 				TIMETABLE_STAMP.DOMAIN_ID.eq(domainId).and(
-					TIMETABLE_STAMP.ENTRANCE.between(fromDate, toDate).or(
-						TIMETABLE_STAMP.EXIT.between(fromDate, toDate)
+					TIMETABLE_STAMP.ENTRANCE.between(fromDate.toLocalDateTime(), toDate.toLocalDateTime()).or(
+						TIMETABLE_STAMP.EXIT.between(fromDate.toLocalDateTime(), toDate.toLocalDateTime())
 					)
 				)
 			)
@@ -260,7 +260,7 @@ public class TimetableStampDAO extends BaseDAO{
 						TIMETABLE_STAMP.DOMAIN_ID.equal(domainId)
 				)
 				.and(
-						TIMETABLE_STAMP.ENTRANCE.between(date.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0), date.withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
+						TIMETABLE_STAMP.ENTRANCE.between(date.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).toLocalDateTime(), date.withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toLocalDateTime())
 				)
 				.and(
 						TIMETABLE_STAMP.USER_ID.in(

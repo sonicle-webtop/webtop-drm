@@ -99,7 +99,7 @@ public class TimetableReportDAO extends BaseDAO{
 				.from(TIMETABLE_REPORT_TEMP)
 				.where(TIMETABLE_REPORT_TEMP.DOMAIN_ID.equal(domainId))
 				.and(TIMETABLE_REPORT_TEMP.USER_ID.equal(userId))
-				.and(TIMETABLE_REPORT_TEMP.DATE.between(fD.toDateTime(LocalTime.MIDNIGHT), tD.toDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59)))
+				.and(TIMETABLE_REPORT_TEMP.DATE.between(fD.toLocalDateTime(LocalTime.MIDNIGHT), tD.toLocalDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59)))
 				.orderBy(
 						TIMETABLE_REPORT_TEMP.USER_ID,
 						TIMETABLE_REPORT_TEMP.TARGET_USER_ID,
@@ -118,7 +118,7 @@ public class TimetableReportDAO extends BaseDAO{
 						TIMETABLE_REPORT_TEMP.USER_ID.equal(userId)
 				)
 				.and(
-						TIMETABLE_REPORT_TEMP.DATE.between(fD.toDateTime(LocalTime.MIDNIGHT), tD.toDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
+						TIMETABLE_REPORT_TEMP.DATE.between(fD.toLocalDateTime(LocalTime.MIDNIGHT), tD.toLocalDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
 				)
 				.execute();
 	}
@@ -130,7 +130,7 @@ public class TimetableReportDAO extends BaseDAO{
 				.from(TIMETABLE_REPORT_TEMP)
 				.where(TIMETABLE_REPORT_TEMP.DOMAIN_ID.equal(domainId))
 				.and(TIMETABLE_REPORT_TEMP.TARGET_USER_ID.equal(targetUserId))
-				.and(TIMETABLE_REPORT_TEMP.DATE.between(fD.toDateTime(LocalTime.MIDNIGHT), tD.toDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59)))
+				.and(TIMETABLE_REPORT_TEMP.DATE.between(fD.toLocalDateTime(LocalTime.MIDNIGHT), tD.toLocalDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59)))
 				.orderBy(
 						TIMETABLE_REPORT_TEMP.USER_ID,
 						TIMETABLE_REPORT_TEMP.TARGET_USER_ID,
@@ -149,7 +149,7 @@ public class TimetableReportDAO extends BaseDAO{
 						TIMETABLE_REPORT_TEMP.TARGET_USER_ID.equal(targetUserId)
 				)
 				.and(
-						TIMETABLE_REPORT_TEMP.DATE.between(fD.toDateTime(LocalTime.MIDNIGHT), tD.toDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
+						TIMETABLE_REPORT_TEMP.DATE.between(fD.toLocalDateTime(LocalTime.MIDNIGHT), tD.toLocalDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
 				)
 				.execute();
 	}
