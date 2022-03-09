@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableReportTemp implements java.io.Serializable {
 
-	private static final long serialVersionUID = -1704808796;
+	private static final long serialVersionUID = -426198332;
 
 	private java.lang.Integer      id;
 	private java.lang.String       domainId;
@@ -40,6 +40,7 @@ public class TimetableReportTemp implements java.io.Serializable {
 	private java.lang.String       sickness;
 	private java.lang.String       other;
 	private java.lang.String       causalId;
+	private java.lang.String       totalLineHour;
 
 	public TimetableReportTemp() {}
 
@@ -65,7 +66,8 @@ public class TimetableReportTemp implements java.io.Serializable {
 		java.lang.String       jobHours,
 		java.lang.String       sickness,
 		java.lang.String       other,
-		java.lang.String       causalId
+		java.lang.String       causalId,
+		java.lang.String       totalLineHour
 	) {
 		this.id = id;
 		this.domainId = domainId;
@@ -89,6 +91,7 @@ public class TimetableReportTemp implements java.io.Serializable {
 		this.sickness = sickness;
 		this.other = other;
 		this.causalId = causalId;
+		this.totalLineHour = totalLineHour;
 	}
 
 	public java.lang.Integer getId() {
@@ -265,5 +268,13 @@ public class TimetableReportTemp implements java.io.Serializable {
 
 	public void setCausalId(java.lang.String causalId) {
 		this.causalId = causalId;
+	}
+
+	public java.lang.String getTotalLineHour() {
+		return this.totalLineHour;
+	}
+
+	public void setTotalLineHour(java.lang.String totalLineHour) {
+		this.totalLineHour = totalLineHour;
 	}
 }

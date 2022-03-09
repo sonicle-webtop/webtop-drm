@@ -48,7 +48,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		'Sonicle.webtop.drm.view.TimetableSettingGeneral',
 		'Sonicle.webtop.drm.model.TimetableSettingGeneral',
 		'Sonicle.webtop.drm.store.RoundingHour',
-		'Sonicle.webtop.drm.view.DailyPresences'
+		'Sonicle.webtop.drm.view.DailyPresences',
+		'Sonicle.webtop.drm.view.UserTimetableRequests'
 	],
     uses: [
         'Sonicle.webtop.drm.ServiceApi'  
@@ -1123,9 +1124,21 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							reference: 'gpTimetableReport',
                             cls: 'wtdrm-grid',
 							modelValidation: true,
-                                viewConfig: {
-                                    getRowClass: function(r, rowIndex, rp, ds) {
-                                        return 'rows';
+							viewConfig: {
+								getRowClass: function(r, rowIndex, rp, ds) {
+									var today = new Date();
+									var dateParts = r.get('date').substring(0, 10).split("/");
+									var dateObject = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]); 
+
+									if(today > dateObject){
+										if(null === r.get('missingHours')){
+											return null;
+										}else if('00.00' === r.get('missingHours')){
+											return 'timetablereport-grid-row-correct';
+										}else{
+											return 'timetablereport-grid-row-wrong';
+										}
+									}
 								} 
 							},
 							plugins: [
@@ -1158,7 +1171,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									editable: false,
 									// flex: 2,
                                     cls: 'header',
-                                    width: 110
+                                    width: 100
 								}, {
 									header: me.res('gpTimetableReport.workingHours.lbl'),
 									dataIndex: 'workingHours',
@@ -1241,22 +1254,22 @@ Ext.define('Sonicle.webtop.drm.Service', {
                                     width: 70,
                                     cls: 'header'
 								},
-//								{
-//									header: me.res('gpTimetableReport.medicalVisit.lbl'),
-//									dataIndex: 'medicalVisit',
-//									editable: true,
-//									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
-//										allowBlank: true,
-//										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
-//											autoLoad: true
-//										}),
-//										triggers: {
-//											clear: WTF.clearTrigger()
-//										}
-//									})),
-//                                    width: 90,
-//                                    cls: 'header'
-//								}, 
+								{
+									header: me.res('gpTimetableReport.medicalVisit.lbl'),
+									dataIndex: 'medicalVisit',
+									editable: true,
+									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
+										allowBlank: true,
+										store:  Ext.create('Sonicle.webtop.drm.store.TimetableStampHours', {
+											autoLoad: true
+										}),
+										triggers: {
+											clear: WTF.clearTrigger()
+										}
+									})),
+                                    width: 80,
+                                    cls: 'header'
+								}, 
 								{
 									header: me.res('gpTimetableReport.sickness.lbl'),
 									dataIndex: 'sickness',
@@ -1286,7 +1299,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											clear: WTF.clearTrigger()
 										}
 									})),
-                                    width: 80,
+                                    width: 60,
                                     cls: 'header'
 								}, {
 									xtype: 'solookupcolumn',
@@ -1315,7 +1328,10 @@ Ext.define('Sonicle.webtop.drm.Service', {
 													filter: true
 												}
 											})
-										})
+										}),
+										triggers: {
+											clear: WTF.clearTrigger()
+										}
 									})),
 									displayField: 'desc',
                                     flex: 2,
@@ -1332,11 +1348,19 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									editable: false,	
                                     width: 80,
                                     cls: 'header'
-								}, {
-									header: me.res('gpTimetableReport.totHours.lbl'),
-									dataIndex: 'totHours',
+								}, 
+//								{
+//									header: me.res('gpTimetableReport.totHours.lbl'),
+//									dataIndex: 'totHours',
+//									editable: false,	
+//                                    width: 70,
+//                                    cls: 'header'
+//								}, 
+								{
+									header: me.res('gpTimetableReport.missingHours.lbl'),
+									dataIndex: 'missingHours',
 									editable: false,	
-                                    width: 70,
+                                    width: 100,
                                     cls: 'header'
 								}, {
 									header: me.res('gpTimetableReport.detail.lbl'),
@@ -1359,7 +1383,22 @@ Ext.define('Sonicle.webtop.drm.Service', {
 //								'-',
 								me.getAct('timetableReport', 'print'),
 								(me.getVar('integrationGis') === true) ? me.getAct('timetableReport', 'export') : null
-							]
+							],
+							listeners: {
+								rowdblclick: function (s, rec) {
+									var	vw = WT.createView(me.ID, 'view.UserTimetableRequests', {
+											swapReturn: true,
+											viewCfg: {
+												targetUserId: rec.get('userId'),
+												date: rec.get('dateObj'),
+												dockableConfig: {
+													title: me.res('usertimetablerequests.tit') + rec.get('date')
+												}
+											}
+										});
+									vw.showView();
+								}
+							}
 						}
 					]
 				},{
@@ -3140,6 +3179,16 @@ Ext.define('Sonicle.webtop.drm.Service', {
 						}
 					});
 				});
+	},
+	editUserTimetableRequestUI: function (rec) {
+		var me = this;
+		me.editTimetableRequest(rec.get('leaveRequestId'), rec.get('status'), rec.get('userId'), {
+			callback: function (success, model) {
+				if (!success) {
+					alert('error');
+				}
+			}
+		});
 	},
 	editTimetableRequestUI: function (rec) {
 		var me = this;

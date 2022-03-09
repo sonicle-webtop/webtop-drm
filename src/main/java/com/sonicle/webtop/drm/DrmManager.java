@@ -2815,6 +2815,25 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		}
 	}
 	
+	public List<OLeaveRequest> listLeaveRequestsByTargetUserIdDate(String targetUserId, LocalDate date) throws WTException {
+		Connection con = null;
+		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
+		List<OLeaveRequest> lrs = new ArrayList<>();
+		
+		try {
+			con = WT.getConnection(SERVICE_ID);
+			
+			lrs = lrDao.selectLeaveRequestsByTargetUserIdDate(con, getTargetProfileId().getDomainId(), targetUserId, date);
+
+			return lrs;
+			
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
 	public LeaveRequest getLeaveRequest(Integer leaveRequestId) throws WTException {
 		Connection con = null;
 		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
@@ -4547,7 +4566,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		}
 	}
 
-	public List<OTimetableReport> generateOeViewTimetableReport(TimetableReportQuery query) throws WTException {
+	public List<OTimetableReport> generateOrViewTimetableReport(TimetableReportQuery query) throws WTException {
 
 		List<OTimetableReport> items = new ArrayList<>();
 
@@ -4562,10 +4581,10 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				todayDate.setDate(1);
 
 				if(todayDate.after(generationDate)) {
-					//Se oggi Ã¨ dopo rispetto alla data da controllare, visualizzo.
+					//Se oggi è dopo rispetto alla data da controllare, visualizzo.
 					items = getTimetableReport(query);
 				}else{
-					//Altrimenti significa che oggi Ã¨ uguale o prima alla data da controllare, rigenero.
+					//Altrimenti significa che oggi è uguale o prima alla data da controllare, rigenero.
 					items = generateTimetableReport(query);
 				}
 			}else if(query.mode.equals("2")){
@@ -4595,7 +4614,8 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			TimetableEventDAO teDAO = TimetableEventDAO.getInstance();
 			WorkReportDAO wrDAO = WorkReportDAO.getInstance();
 			JobDAO jbDAO = JobDAO.getInstance();
-			EmployeeProfileDAO epDAO = EmployeeProfileDAO.getInstance();			
+			EmployeeProfileDAO epDAO = EmployeeProfileDAO.getInstance();
+			LineHourDAO lhDAO = LineHourDAO.getInstance();			
 
 			if(query != null) {
 				//Empty Table for single user
@@ -4679,6 +4699,12 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					otr.setId(trDAO.getTimetableReportTempSequence(con).intValue());
 					otr.setUserId(getTargetProfileId().getUserId());
 					
+					//VASI SETTO PROFILO ORARIO
+					Integer hourProfileId =  epDAO.selectEmployeeProfileByDomainUser(con, getTargetProfileId().getDomainId(), otr.getTargetUserId()).getHourProfileId();
+					String profileHour = lhDAO.selectSumLineHourByHourProfileIdDayOfWeek(con, hourProfileId, otr.getDate().toLocalDate().dayOfWeek().get());
+					otr.setTotalLineHour(profileHour);
+					//VASI FINE
+	
 					//Set if present other, causal, note from old generation
 					val = hashTrs.getOrDefault(otr.getDomainId() + "|" + otr.getUserId() + "|" + otr.getTargetUserId() + "|" + otr.getDate(), null);
 					if(val != null){
@@ -5607,7 +5633,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			
 			osWriter = new OutputStreamWriter(os);
 			
-			for (OTimetableReport oTR : generateTimetableReport(query)) {
+			for (OTimetableReport oTR : getTimetableReport(query)) {
 				
 				//Calculate Theoretical Hours
 				oEP = ePDao.selectEmployeeProfileByDomainUser(con, oTR.getDomainId(), oTR.getTargetUserId());
@@ -5780,6 +5806,38 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					osWriter.write(headquartersCod); //3 Codice Sede
 					osWriter.write(employee); //4 Dipendente
 					osWriter.write(causalExternalCode);//5 Causale per ogni colonna del oTR (causale associata a sickness)
+					osWriter.write(date); //6 Data
+					osWriter.write(unitOfMeasure); //7 UnitÃ  di misura
+					osWriter.write(rate); //8 Tariffa
+					osWriter.write(hour); //9 QuantitÃ 
+					osWriter.write(result); //10 Risultato
+					osWriter.write(stringTheoreticalHours); //11 Ore teoriche
+					osWriter.write(movementType); //12 Tipo movimento
+					osWriter.write(" "); //13 Inizio evento (da capire come valorizzarlo)
+					
+					osWriter.write("\n"); //End of row, go to head
+				}
+				//Medical Visit
+				if(oTR.getMedicalVisit() != null && !"".equals(oTR.getMedicalVisit())){
+					oC = cDao.selectById(con, oTts.getDefaultCausalMedicalVisit());
+					String causalExternalCode = oC.getExternalCode() + StringUtils.repeat(" ", 5 - oC.getExternalCode().length());
+					
+					//Convert sexagesimal minutes to centesimal minutes
+					String hour = oTR.getMedicalVisit();
+					if(hour.contains(".")){
+						String sexagesimalMinutes = hour.split("\\.")[1];
+						Integer centesimalMinutes = (Integer.parseInt(sexagesimalMinutes) * 100)/60;
+						hour = hour.split("\\.")[0] + centesimalMinutes.toString() + StringUtils.repeat("0", 2 - centesimalMinutes.toString().length());
+						hour = StringUtils.repeat("0", 10 - hour.length()) + hour;
+					}else{
+						hour = StringUtils.repeat("0", 10 - hour.length()) + hour;
+					}
+							
+					osWriter.write(empty); //1 Vuoto
+					osWriter.write(companyCode); //2 Codice Azienda
+					osWriter.write(headquartersCod); //3 Codice Sede
+					osWriter.write(employee); //4 Dipendente
+					osWriter.write(causalExternalCode);//5 Causale per ogni colonna del oTR (causale associata a medical visit)
 					osWriter.write(date); //6 Data
 					osWriter.write(unitOfMeasure); //7 UnitÃ  di misura
 					osWriter.write(rate); //8 Tariffa

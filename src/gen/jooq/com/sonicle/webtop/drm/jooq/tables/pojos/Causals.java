@@ -16,22 +16,25 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Causals implements java.io.Serializable {
 
-	private static final long serialVersionUID = 1796178279;
+	private static final long serialVersionUID = 1960304915;
 
-	private java.lang.String id;
-	private java.lang.String description;
-	private java.lang.String externalCode;
+	private java.lang.String     id;
+	private java.lang.String     description;
+	private java.lang.String     externalCode;
+	private java.math.BigDecimal sign;
 
 	public Causals() {}
 
 	public Causals(
-		java.lang.String id,
-		java.lang.String description,
-		java.lang.String externalCode
+		java.lang.String     id,
+		java.lang.String     description,
+		java.lang.String     externalCode,
+		java.math.BigDecimal sign
 	) {
 		this.id = id;
 		this.description = description;
 		this.externalCode = externalCode;
+		this.sign = sign;
 	}
 
 	public java.lang.String getId() {
@@ -56,5 +59,13 @@ public class Causals implements java.io.Serializable {
 
 	public void setExternalCode(java.lang.String externalCode) {
 		this.externalCode = externalCode;
+	}
+
+	public java.math.BigDecimal getSign() {
+		return this.sign;
+	}
+
+	public void setSign(java.math.BigDecimal sign) {
+		this.sign = sign;
 	}
 }

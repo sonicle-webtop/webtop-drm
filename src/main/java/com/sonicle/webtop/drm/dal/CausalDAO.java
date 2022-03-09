@@ -70,7 +70,7 @@ public class CausalDAO extends BaseDAO {
 		return dsl
             .select()
             .from(CAUSALS)
-			.where(CAUSALS.ID.notIn(tts.getDefaultCausalHolidays(), tts.getDefaultCausalOvertime(), tts.getDefaultCausalPermits(), tts.getDefaultCausalSickness(), tts.getDefaultCausalWorkingHours()))
+			.where(CAUSALS.ID.notIn(tts.getDefaultCausalHolidays(), tts.getDefaultCausalOvertime(), tts.getDefaultCausalPermits(), tts.getDefaultCausalSickness(), tts.getDefaultCausalMedicalVisit(), tts.getDefaultCausalWorkingHours()))
             .orderBy(CAUSALS.ID.asc())
             .fetchInto(OCausal.class);
 	}
@@ -106,6 +106,7 @@ public class CausalDAO extends BaseDAO {
             .update(CAUSALS)
             .set(CAUSALS.DESCRIPTION, item.getDescription())
 			.set(CAUSALS.EXTERNAL_CODE, item.getExternalCode())
+			.set(CAUSALS.SIGN, item.getSign())
             .where(
                     CAUSALS.ID.equal(item.getId())
             )

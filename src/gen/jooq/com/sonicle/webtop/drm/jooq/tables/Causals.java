@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Causals extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.CausalsRecord> {
 
-	private static final long serialVersionUID = -895749147;
+	private static final long serialVersionUID = -342389557;
 
 	/**
 	 * The reference instance of <code>drm.causals</code>
@@ -45,6 +45,11 @@ public class Causals extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq
 	 * The column <code>drm.causals.external_code</code>.
 	 */
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.CausalsRecord, java.lang.String> EXTERNAL_CODE = createField("external_code", org.jooq.impl.SQLDataType.VARCHAR.length(5).nullable(false), this, "");
+
+	/**
+	 * The column <code>drm.causals.sign</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.CausalsRecord, java.math.BigDecimal> SIGN = createField("sign", org.jooq.impl.SQLDataType.NUMERIC.nullable(false), this, "");
 
 	/**
 	 * Create a <code>drm.causals</code> table reference
