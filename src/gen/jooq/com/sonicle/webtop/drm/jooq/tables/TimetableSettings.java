@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableSettings extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord> {
 
-	private static final long serialVersionUID = 816704964;
+	private static final long serialVersionUID = -2030123250;
 
 	/**
 	 * The reference instance of <code>drm.timetable_settings</code>
@@ -160,6 +160,11 @@ public class TimetableSettings extends org.jooq.impl.TableImpl<com.sonicle.webto
 	 * The column <code>drm.timetable_settings.default_causal_sickness</code>.
 	 */
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord, java.lang.String> DEFAULT_CAUSAL_SICKNESS = createField("default_causal_sickness", org.jooq.impl.SQLDataType.VARCHAR.length(5), this, "");
+
+	/**
+	 * The column <code>drm.timetable_settings.default_causal_medical_visit</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord, java.lang.String> DEFAULT_CAUSAL_MEDICAL_VISIT = createField("default_causal_medical_visit", org.jooq.impl.SQLDataType.VARCHAR.length(5), this, "");
 
 	/**
 	 * Create a <code>drm.timetable_settings</code> table reference

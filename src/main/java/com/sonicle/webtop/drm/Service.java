@@ -364,6 +364,13 @@ public class Service extends BaseService {
 			vs.put("expenseNoteDefaultCurrency", getExpenseNoteDefaultCurrency());
 			vs.put("expenseNoteKmCost", getExpenseNoteKmCost());
 			vs.put("isSupervisorUser", isSupervisorUser());
+
+			HashMap<String, Integer> hs = new HashMap<>();
+			List<OCausal> oC = manager.listCausals(false);
+			for(OCausal c : oC){
+				hs.put(c.getId(), c.getSign().intValue());
+			}
+			vs.put("causalsOperation", hs);
 		} catch (WTException ex) {
 			java.util.logging.Logger.getLogger(Service.class.getName()).log(Level.SEVERE, null, ex);
 		}
@@ -2654,7 +2661,7 @@ public class Service extends BaseService {
 		}
 	}
 	
-	public void processDownloadTimetableRequestDocument(HttpServletRequest request, HttpServletResponse response) {
+	public void processDownloadLeaveRequestDocument(HttpServletRequest request, HttpServletResponse response) {
 
 		try {
 			boolean inline = ServletUtils.getBooleanParameter(request, "inline", false);
@@ -2685,7 +2692,7 @@ public class Service extends BaseService {
 			}
 			
 		} catch(Throwable t) {
-			logger.error("Error in DownloadTimetableRequestDocument", t);
+			logger.error("Error in DownloadLeaveRequestDocument", t);
 			ServletUtils.writeErrorHandlingJs(response, t.getMessage());
 		}
 	}
@@ -3387,6 +3394,28 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		}
 	}
 	
+	public void processManageGridUserTimetableRequests(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+			if (crud.equals(Crud.READ)) {
+
+				String targetUserId = ServletUtils.getStringParameter(request, "targetUserId", null);
+				Date date = ServletUtils.getDateParameter(request, "date", null);
+				LocalDate lDate = new LocalDate(date);
+				List<JsGridLeaveRequest> jsGridLR = new ArrayList();
+
+				for (OLeaveRequest oLR : manager.listLeaveRequestsByTargetUserIdDate(targetUserId, lDate)) {
+					jsGridLR.add(new JsGridLeaveRequest(oLR));
+				}
+
+				new JsonResult(jsGridLR).printTo(out);
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageGridUserTimetableRequests", ex);
+		}
+	}
+
 	public void processManageGridTimetableReport(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			String crud = ServletUtils.getStringParameter(request, "crud", true);
@@ -3398,7 +3427,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 				
 				List<JsGridTimetableReport> jsGridTR = new ArrayList();
 				
-				for (OTimetableReport oTR : manager.generateOeViewTimetableReport(trQuery)) {
+				for (OTimetableReport oTR : manager.generateOrViewTimetableReport(trQuery)) {
 
 					jsGridTR.add(new JsGridTimetableReport(oTR, manager));
 				}

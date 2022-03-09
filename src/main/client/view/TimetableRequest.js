@@ -366,7 +366,18 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 		});
 		
 		if(me.isMode(me.MODE_VIEW)){
-			me.getAct('saveClose').setDisabled(true);
+			//Disabilito tutti i campi della form, tranne la tab dei documenti (permetto dunque il salvataggio degli allegati tramite bottone saveClose)
+			me.lref('flduser').setReadOnly(true);
+			me.lref('fldcompany').setReadOnly(true);
+			me.lref('fldmanager').setReadOnly(true);
+			me.lref('fldtype').setReadOnly(true);
+			me.lref('fldfromdate').setReadOnly(true);
+			me.lref('fldtodate').setReadOnly(true);
+			me.lref('fldfromhour').setReadOnly(true);
+			me.lref('fldtohour').setReadOnly(true);
+			me.lref('fldnotes').setReadOnly(true);
+			me.lref('fldcancellationreason').setReadOnly(true);
+			//me.getAct('saveClose').setDisabled(true);
 		}else if(me.isMode(me.MODE_EDIT)) {
 			me.lref('flduser').setReadOnly(true);
 			me.lref('fldcompany').setReadOnly(true);

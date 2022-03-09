@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.records;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableSettingsRecord extends org.jooq.impl.UpdatableRecordImpl<com.sonicle.webtop.drm.jooq.tables.records.TimetableSettingsRecord> {
 
-	private static final long serialVersionUID = 1508598651;
+	private static final long serialVersionUID = -1720957231;
 
 	/**
 	 * Setter for <code>drm.timetable_settings.timetable_setting_id</code>.
@@ -382,6 +382,20 @@ public class TimetableSettingsRecord extends org.jooq.impl.UpdatableRecordImpl<c
 		return (java.lang.String) getValue(25);
 	}
 
+	/**
+	 * Setter for <code>drm.timetable_settings.default_causal_medical_visit</code>.
+	 */
+	public void setDefaultCausalMedicalVisit(java.lang.String value) {
+		setValue(26, value);
+	}
+
+	/**
+	 * Getter for <code>drm.timetable_settings.default_causal_medical_visit</code>.
+	 */
+	public java.lang.String getDefaultCausalMedicalVisit() {
+		return (java.lang.String) getValue(26);
+	}
+
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
@@ -408,7 +422,7 @@ public class TimetableSettingsRecord extends org.jooq.impl.UpdatableRecordImpl<c
 	/**
 	 * Create a detached, initialised TimetableSettingsRecord
 	 */
-	public TimetableSettingsRecord(java.lang.Integer timetableSettingId, java.lang.String domainId, java.lang.String allowedAddresses, java.lang.String allowedUsers, java.lang.String staffOfficeEmail, java.lang.Boolean requestsHolidaysPermitsPreviousDates, java.lang.String totalToleranceInMinutes, java.lang.String rounding, java.lang.String minimumExtraordinary, java.lang.Boolean breakAnomaly, java.lang.Boolean readOnlyEvents, java.lang.Boolean requestsPermitsNotRemunered, java.lang.Boolean requestsPermitsMedicalVisits, java.lang.Boolean requestsPermitsContractuals, java.lang.Boolean companyExit, java.lang.Boolean manageStamp, java.lang.Boolean medicalVisitsAutomaticallyApproved, java.lang.String calendarUserId, java.lang.Integer defaultEventActivityId, java.lang.Boolean requestsSickness, java.lang.Boolean sicknessAutomaticallyApproved, java.lang.String defaultCausalWorkingHours, java.lang.String defaultCausalOvertime, java.lang.String defaultCausalPermits, java.lang.String defaultCausalHolidays, java.lang.String defaultCausalSickness) {
+	public TimetableSettingsRecord(java.lang.Integer timetableSettingId, java.lang.String domainId, java.lang.String allowedAddresses, java.lang.String allowedUsers, java.lang.String staffOfficeEmail, java.lang.Boolean requestsHolidaysPermitsPreviousDates, java.lang.String totalToleranceInMinutes, java.lang.String rounding, java.lang.String minimumExtraordinary, java.lang.Boolean breakAnomaly, java.lang.Boolean readOnlyEvents, java.lang.Boolean requestsPermitsNotRemunered, java.lang.Boolean requestsPermitsMedicalVisits, java.lang.Boolean requestsPermitsContractuals, java.lang.Boolean companyExit, java.lang.Boolean manageStamp, java.lang.Boolean medicalVisitsAutomaticallyApproved, java.lang.String calendarUserId, java.lang.Integer defaultEventActivityId, java.lang.Boolean requestsSickness, java.lang.Boolean sicknessAutomaticallyApproved, java.lang.String defaultCausalWorkingHours, java.lang.String defaultCausalOvertime, java.lang.String defaultCausalPermits, java.lang.String defaultCausalHolidays, java.lang.String defaultCausalSickness, java.lang.String defaultCausalMedicalVisit) {
 		super(com.sonicle.webtop.drm.jooq.tables.TimetableSettings.TIMETABLE_SETTINGS);
 
 		setValue(0, timetableSettingId);
@@ -437,5 +451,6 @@ public class TimetableSettingsRecord extends org.jooq.impl.UpdatableRecordImpl<c
 		setValue(23, defaultCausalPermits);
 		setValue(24, defaultCausalHolidays);
 		setValue(25, defaultCausalSickness);
+		setValue(26, defaultCausalMedicalVisit);
 	}
 }

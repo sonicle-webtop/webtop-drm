@@ -115,6 +115,7 @@ public class TimetableSettingDAO extends BaseDAO {
 				.set(TIMETABLE_SETTINGS.DEFAULT_CAUSAL_PERMITS, item.getDefaultCausalPermits())
 				.set(TIMETABLE_SETTINGS.DEFAULT_CAUSAL_HOLIDAYS, item.getDefaultCausalHolidays())
 				.set(TIMETABLE_SETTINGS.DEFAULT_CAUSAL_SICKNESS, item.getDefaultCausalSickness())
+				.set(TIMETABLE_SETTINGS.DEFAULT_CAUSAL_MEDICAL_VISIT, item.getDefaultCausalMedicalVisit())
 				.where(
 						TIMETABLE_SETTINGS.TIMETABLE_SETTING_ID.equal(item.getTimetableSettingId())
 				)

@@ -44,11 +44,13 @@ public class JsCausal {
 	public String id;
 	public String description;
 	public String externalCode;
+	public Integer sign;
 
 	public JsCausal(Causal c) {
 		this.id = c.getId();
 		this.description = c.getDescription();
 		this.externalCode = c.getExternalCode();
+		this.sign = c.getSign();
 	}
 
 	public static Causal createCausal(JsCausal js) {
@@ -57,6 +59,7 @@ public class JsCausal {
 		newC.setId(js.id);
 		newC.setDescription(js.description);
 		newC.setExternalCode(js.externalCode);
+		newC.setSign(js.sign);
 		
 		return newC;
 	}

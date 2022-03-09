@@ -44,10 +44,12 @@ public class JsGridCausal {
 	public String id;
 	public String description;
     public String externalCode;
+	public Integer sign;
     
 	public JsGridCausal(OCausal c) {
 		this.id = c.getId();
 		this.description = c.getDescription();
         this.externalCode = c.getExternalCode();
+		this.sign = c.getSign().intValue();
 	}
 }
