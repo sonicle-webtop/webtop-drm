@@ -78,7 +78,7 @@ Ext.define('Sonicle.webtop.drm.model.GridTimetableReport', {
 					rec.get('holiday'),
 					rec.get('other'),
 					rec.get('causalId'),
-					rec.get('totalLineHour'),
+					rec.get('totalLineHour')
 			);
 		})
 	],
