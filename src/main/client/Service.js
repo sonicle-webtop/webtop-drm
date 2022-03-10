@@ -1134,12 +1134,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 										var mh=r.get('missingHours');
 										if(mh === null){
 											return null;
-										} else if (mh === '00.00'){
-											return 'timetablereport-grid-row-correct';
+										} else if (mh.charAt(0) === '+') {
+											return 'timetablereport-grid-row-plus';
 										} else if (mh.charAt(0) === '-') {
 											return 'timetablereport-grid-row-minus';
 										} else {
-											return 'timetablereport-grid-row-plus';
+											return 'timetablereport-grid-row-correct';
 										}
 									}
 								} 
@@ -1168,6 +1168,28 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								enableGroupingMenu: false
 							}],
 							columns: [
+								{
+									xtype: 'soiconcolumn',
+									iconSize: WTU.imgSizeToPx('xs'),
+									menuDisabled: true,
+									width: 35,
+									getIconCls: function(value,rec) {
+										return 'far fa-eye'; //value ? 'far fa-eye' : '';
+									},
+									handler: function(g, ridx, cidx, evt, rec) {
+										var	vw = WT.createView(me.ID, 'view.UserTimetableRequests', {
+												swapReturn: true,
+												viewCfg: {
+													targetUserId: rec.get('userId'),
+													date: rec.get('dateObj'),
+													dockableConfig: {
+														title: me.res('usertimetablerequests.tit') + rec.get('date')
+													}
+												}
+											});
+										vw.showView();
+									}
+								},								
 								{
 									header: me.res('gpTimetableReport.date.lbl'),
 									dataIndex: 'date',
@@ -1364,6 +1386,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									dataIndex: 'missingHours',
 									editable: false,	
                                     width: 100,
+									align: 'right',
                                     cls: 'header'
 								}, {
 									header: me.res('gpTimetableReport.detail.lbl'),
@@ -1387,7 +1410,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								me.getAct('timetableReport', 'print'),
 								(me.getVar('integrationGis') === true) ? me.getAct('timetableReport', 'export') : null
 							],
-							listeners: {
+/*							listeners: {
 								rowdblclick: function (s, rec) {
 									var	vw = WT.createView(me.ID, 'view.UserTimetableRequests', {
 											swapReturn: true,
@@ -1401,7 +1424,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 										});
 									vw.showView();
 								}
-							}
+							}*/
 						}
 					]
 				},{
