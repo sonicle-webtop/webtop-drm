@@ -1170,24 +1170,28 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							columns: [
 								{
 									xtype: 'soiconcolumn',
+									dataIndex: 'hasRequests',
+									editable: false,
 									iconSize: WTU.imgSizeToPx('xs'),
 									menuDisabled: true,
 									width: 35,
 									getIconCls: function(value,rec) {
-										return 'far fa-eye'; //value ? 'far fa-eye' : '';
+										return value ? 'far fa-eye' : '';
 									},
 									handler: function(g, ridx, cidx, evt, rec) {
-										var	vw = WT.createView(me.ID, 'view.UserTimetableRequests', {
-												swapReturn: true,
-												viewCfg: {
-													targetUserId: rec.get('userId'),
-													date: rec.get('dateObj'),
-													dockableConfig: {
-														title: me.res('usertimetablerequests.tit') + rec.get('date')
+										if (rec.get("hasRequests")) {
+											var	vw = WT.createView(me.ID, 'view.UserTimetableRequests', {
+													swapReturn: true,
+													viewCfg: {
+														targetUserId: rec.get('userId'),
+														date: rec.get('dateObj'),
+														dockableConfig: {
+															title: me.res('usertimetablerequests.tit') + rec.get('date')
+														}
 													}
-												}
-											});
-										vw.showView();
+												});
+											vw.showView();
+										}
 									}
 								},								
 								{

@@ -4660,7 +4660,9 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					
 						ttrs = ManagerUtils.mergeStampAndEventByDate(con, ttrs, epDAO.selectEmployeeProfileByDomainUser(con, getTargetProfileId().getDomainId(), usr.getUserId()).getHourProfileId());
 						
-						for(OTimetableReport itm : ttrs) itm.setTargetUserId(usr.getUserId());
+						for(OTimetableReport itm : ttrs) {
+							itm.setTargetUserId(usr.getUserId());
+						}
 						
 						trs.addAll(ttrs);
 					}
@@ -4691,11 +4693,15 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					
 					trs = ManagerUtils.mergeStampAndEventByDate(con, trs, epDAO.selectEmployeeProfileByDomainUser(con, getTargetProfileId().getDomainId(), query.targetUserId).getHourProfileId());
 					
-					for(OTimetableReport itm : trs) itm.setTargetUserId(query.targetUserId);
+					for(OTimetableReport itm : trs) {
+						itm.setTargetUserId(query.targetUserId);
+					}
 				}
 				
 				//Insert Data in Table
 				for(OTimetableReport otr : trs){
+					if (otr.getHasRequests()==null) otr.setHasRequests(false);
+					
 					otr.setId(trDAO.getTimetableReportTempSequence(con).intValue());
 					otr.setUserId(getTargetProfileId().getUserId());
 					

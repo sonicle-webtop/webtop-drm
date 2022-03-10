@@ -2305,7 +2305,7 @@ public class ManagerUtils {
 			}else if(OLeaveRequestType.SICKNESS.equals(requestType)){
 				tr.setSickness(String.format("%d.%02d", h, m));
 			}
-			
+			tr.setHasRequests(Boolean.TRUE);
 			trl.add(tr);
 		}
 		

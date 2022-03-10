@@ -71,6 +71,7 @@ public class JsGridTimetableReport {
 	public String totalLineHour;
 	public String userId;
 	public String dateObj;
+	public boolean hasRequests;
 
 	public JsGridTimetableReport(OTimetableReport tr, DrmManager drmMgr) throws WTException {
 		this.id = tr.getId();
@@ -98,6 +99,7 @@ public class JsGridTimetableReport {
 		this.totalLineHour = tr.getTotalLineHour();
 		this.userId = tr.getUserId();
 		this.dateObj = tr.getDate().toString();
+		this.hasRequests = tr.getHasRequests();
 	}
 	
 	public static TimetableReport createTimetableReport(JsGridTimetableReport js) {

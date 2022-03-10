@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableReportTemp implements java.io.Serializable {
 
-	private static final long serialVersionUID = -426198332;
+	private static final long serialVersionUID = 1027167068;
 
 	private java.lang.Integer      id;
 	private java.lang.String       domainId;
@@ -41,6 +41,7 @@ public class TimetableReportTemp implements java.io.Serializable {
 	private java.lang.String       other;
 	private java.lang.String       causalId;
 	private java.lang.String       totalLineHour;
+	private java.lang.Boolean      hasRequests;
 
 	public TimetableReportTemp() {}
 
@@ -67,7 +68,8 @@ public class TimetableReportTemp implements java.io.Serializable {
 		java.lang.String       sickness,
 		java.lang.String       other,
 		java.lang.String       causalId,
-		java.lang.String       totalLineHour
+		java.lang.String       totalLineHour,
+		java.lang.Boolean      hasRequests
 	) {
 		this.id = id;
 		this.domainId = domainId;
@@ -92,6 +94,7 @@ public class TimetableReportTemp implements java.io.Serializable {
 		this.other = other;
 		this.causalId = causalId;
 		this.totalLineHour = totalLineHour;
+		this.hasRequests = hasRequests;
 	}
 
 	public java.lang.Integer getId() {
@@ -276,5 +279,13 @@ public class TimetableReportTemp implements java.io.Serializable {
 
 	public void setTotalLineHour(java.lang.String totalLineHour) {
 		this.totalLineHour = totalLineHour;
+	}
+
+	public java.lang.Boolean getHasRequests() {
+		return this.hasRequests;
+	}
+
+	public void setHasRequests(java.lang.Boolean hasRequests) {
+		this.hasRequests = hasRequests;
 	}
 }

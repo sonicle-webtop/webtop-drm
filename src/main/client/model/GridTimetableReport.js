@@ -60,6 +60,7 @@ Ext.define('Sonicle.webtop.drm.model.GridTimetableReport', {
 		WTF.field('totalLineHour', 'string', true),
 		WTF.field('userId', 'string', false),
 		WTF.field('dateObj', 'string'),
+		WTF.field('hasRequest', 'boolean'),
 //		WTF.calcField('totHours', 'string', ['workingHours', 'overtime'], function(v, rec) {
 //			return Sonicle.webtop.drm.model.GridTimetableReport.calcTotHours(
 //					rec.get('workingHours'),
