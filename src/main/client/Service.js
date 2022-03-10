@@ -1131,12 +1131,15 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									var dateObject = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]); 
 
 									if(today > dateObject){
-										if(null === r.get('missingHours')){
+										var mh=r.get('missingHours');
+										if(mh === null){
 											return null;
-										}else if('00.00' === r.get('missingHours')){
+										} else if (mh === '00.00'){
 											return 'timetablereport-grid-row-correct';
-										}else{
-											return 'timetablereport-grid-row-wrong';
+										} else if (mh.charAt(0) === '-') {
+											return 'timetablereport-grid-row-minus';
+										} else {
+											return 'timetablereport-grid-row-plus';
 										}
 									}
 								} 

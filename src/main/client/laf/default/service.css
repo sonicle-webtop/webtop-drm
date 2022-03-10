@@ -48,4 +48,5 @@
 .wtdrm-grid .header .x-column-header-text {font-size: 12px; font-weight: bold; }
 .wtdrm-grid .rows { font-size: 10px !important; }
 .timetablereport-grid-row-correct { background-color: rgba(185, 255, 165, 0.6); }
-.timetablereport-grid-row-wrong { background-color: rgba(255, 109, 109, 0.6); }
+.timetablereport-grid-row-plus { background-color: rgba(255, 109, 109, 0.6); }
+.timetablereport-grid-row-minus { background-color: rgba(125, 172, 231, 0.6); }
