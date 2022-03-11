@@ -917,7 +917,14 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							store: {
 								autoLoad: false,
 								model: 'Sonicle.webtop.drm.model.GridTimetableRequests',
-								proxy: WTF.apiProxy(me.ID, 'ManageGridTimetableRequest')
+								proxy: WTF.apiProxy(me.ID, 'ManageGridTimetableRequest'),
+								listeners: {
+									beforeload: function() {
+										me.gpTimetableRequest().setSelection(null);
+										me.updateTimetableRequestAction(null);
+										return true;
+									}
+								}
 							},
 							columns: [
 								{
@@ -3161,9 +3168,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				if(sel.get("userId") !== WT.getVar('userId')){
 					//e se non sono su una mia richiesta
 					if(sel.get('status') === 'D'){
-						//e se la richiesta è stata cancellata, disabilito tutti i pulsanti
+						//e se la richiesta è stata cancellata, disabilito tutti i pulsanti meno delete
 						me.getAct('timetableRequest', 'edit').setDisabled(true);
-						me.getAct('timetableRequest', 'delete').setDisabled(true);
+						me.getAct('timetableRequest', 'delete').setDisabled(false);
 						me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
 						me.getAct('timetableRequest', 'approve').setDisabled(true);
 						me.getAct('timetableRequest', 'decline').setDisabled(true);
@@ -3191,6 +3198,13 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					}
 				}
 			}
+		} else {
+			me.getAct('timetableRequest', 'edit').setDisabled(true);
+			me.getAct('timetableRequest', 'delete').setDisabled(true);
+			me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
+			me.getAct('timetableRequest', 'approve').setDisabled(true);
+			me.getAct('timetableRequest', 'decline').setDisabled(true);
+			me.getAct('timetableRequest', 'cancel').setDisabled(true);
 		}
 	},
 	addTimetableRequest: function (opts) {
