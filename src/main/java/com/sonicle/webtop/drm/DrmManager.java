@@ -4562,6 +4562,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			
 			lrDao.updateRequestCancellation(con, id, cancellationReason, createRevisionTimestamp());
 			retlr=ManagerUtils.createLeaveRequest(lr);
+			retlr.setCancRequest(true);
 
 			DbUtils.commitQuietly(con);
 			
