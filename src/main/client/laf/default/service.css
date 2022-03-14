@@ -16,12 +16,13 @@
 .wtdrm-icon-ticket { background-image: url('ticket_16.svg') !important; background-size: contain; }
 .wtdrm-icon-job { background-image: url('job_16.svg') !important; background-size: contain; }
 .wtdrm-icon-configuration { background-image: url('configuration_16.svg') !important; background-size: contain; }
+.wtdrm-icon-configurationActivities { background-image: url('configuration-activities_16.svg') !important; background-size: contain; }
 .wtdrm-icon-configurationCompanies { background-image: url('configuration-companies_16.svg') !important; background-size: contain; }
 .wtdrm-icon-configurationLineManagers { background-image: url('configuration-linemanagers_16.svg') !important; background-size: contain; }
 .wtdrm-icon-configurationDocStatuses { background-image: url('configuration-docstatuses_16.svg') !important; background-size: contain; }
 .wtdrm-icon-configurationProfiles { background-image: url('configuration-profiles_16.svg') !important; background-size: contain; }
 .wtdrm-icon-configurationTimeProfiles { background-image: url('configuration-timeprofiles_16.svg') !important; background-size: contain; }
-.wtdrm-icon-configurationEmployeeProfiles { background-image: url('configuration-employeeprofiles_16.svg') !important; background-size: contain; }
+.wtdrm-icon-configurationEmployeeProfiles { background-image: url('configuration-profiles_16.svg') !important; background-size: contain; }
 .wtdrm-icon-configurationHolidayDates { background-image: url('configuration-holidaydates_16.svg') !important; background-size: contain; }
 .wtdrm-icon-timetableRequest-sent { background-image: url('timetable-request-sent_16.svg') !important; background-size: contain; }
 .wtdrm-icon-timetableRequest-approved { background-image: url('timetable-request-approved_16.svg') !important; background-size: contain; }
@@ -48,5 +49,5 @@
 .wtdrm-grid .header .x-column-header-text {font-size: 12px; font-weight: bold; }
 .wtdrm-grid .rows { font-size: 10px !important; }
 .timetablereport-grid-row-correct { background-color: rgba(185, 255, 165, 0.6); }
-.timetablereport-grid-row-plus { background-color: rgba(255, 109, 109, 0.6); }
-.timetablereport-grid-row-minus { background-color: rgba(125, 172, 231, 0.6); }
+.timetablereport-grid-row-plus { background-color: rgba(125, 172, 231, 0.6); }
+.timetablereport-grid-row-minus { background-color: rgba(255, 109, 109, 0.6); }

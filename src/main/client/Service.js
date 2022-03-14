@@ -917,7 +917,14 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							store: {
 								autoLoad: false,
 								model: 'Sonicle.webtop.drm.model.GridTimetableRequests',
-								proxy: WTF.apiProxy(me.ID, 'ManageGridTimetableRequest')
+								proxy: WTF.apiProxy(me.ID, 'ManageGridTimetableRequest'),
+								listeners: {
+									beforeload: function() {
+										me.gpTimetableRequest().setSelection(null);
+										me.updateTimetableRequestAction(null);
+										return true;
+									}
+								}
 							},
 							columns: [
 								{
@@ -1134,12 +1141,12 @@ Ext.define('Sonicle.webtop.drm.Service', {
 										var mh=r.get('missingHours');
 										if(mh === null){
 											return null;
-										} else if (mh === '00.00'){
-											return 'timetablereport-grid-row-correct';
+										} else if (mh.charAt(0) === '+') {
+											return 'timetablereport-grid-row-plus';
 										} else if (mh.charAt(0) === '-') {
 											return 'timetablereport-grid-row-minus';
 										} else {
-											return 'timetablereport-grid-row-plus';
+											return 'timetablereport-grid-row-correct';
 										}
 									}
 								} 
@@ -1168,6 +1175,32 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								enableGroupingMenu: false
 							}],
 							columns: [
+								{
+									xtype: 'soiconcolumn',
+									dataIndex: 'hasRequests',
+									editable: false,
+									iconSize: WTU.imgSizeToPx('xs'),
+									menuDisabled: true,
+									width: 35,
+									getIconCls: function(value,rec) {
+										return value ? 'far fa-eye' : '';
+									},
+									handler: function(g, ridx, cidx, evt, rec) {
+										if (rec.get("hasRequests")) {
+											var	vw = WT.createView(me.ID, 'view.UserTimetableRequests', {
+													swapReturn: true,
+													viewCfg: {
+														targetUserId: rec.get('userId'),
+														date: rec.get('dateObj'),
+														dockableConfig: {
+															title: me.res('usertimetablerequests.tit') + rec.get('date')
+														}
+													}
+												});
+											vw.showView();
+										}
+									}
+								},								
 								{
 									header: me.res('gpTimetableReport.date.lbl'),
 									dataIndex: 'date',
@@ -1364,6 +1397,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									dataIndex: 'missingHours',
 									editable: false,	
                                     width: 100,
+									align: 'right',
                                     cls: 'header'
 								}, {
 									header: me.res('gpTimetableReport.detail.lbl'),
@@ -1387,7 +1421,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								me.getAct('timetableReport', 'print'),
 								(me.getVar('integrationGis') === true) ? me.getAct('timetableReport', 'export') : null
 							],
-							listeners: {
+/*							listeners: {
 								rowdblclick: function (s, rec) {
 									var	vw = WT.createView(me.ID, 'view.UserTimetableRequests', {
 											swapReturn: true,
@@ -1401,7 +1435,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 										});
 									vw.showView();
 								}
-							}
+							}*/
 						}
 					]
 				},{
@@ -3134,9 +3168,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				if(sel.get("userId") !== WT.getVar('userId')){
 					//e se non sono su una mia richiesta
 					if(sel.get('status') === 'D'){
-						//e se la richiesta è stata cancellata, disabilito tutti i pulsanti
+						//e se la richiesta è stata cancellata, disabilito tutti i pulsanti meno delete
 						me.getAct('timetableRequest', 'edit').setDisabled(true);
-						me.getAct('timetableRequest', 'delete').setDisabled(true);
+						me.getAct('timetableRequest', 'delete').setDisabled(false);
 						me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
 						me.getAct('timetableRequest', 'approve').setDisabled(true);
 						me.getAct('timetableRequest', 'decline').setDisabled(true);
@@ -3164,6 +3198,13 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					}
 				}
 			}
+		} else {
+			me.getAct('timetableRequest', 'edit').setDisabled(true);
+			me.getAct('timetableRequest', 'delete').setDisabled(true);
+			me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
+			me.getAct('timetableRequest', 'approve').setDisabled(true);
+			me.getAct('timetableRequest', 'decline').setDisabled(true);
+			me.getAct('timetableRequest', 'cancel').setDisabled(true);
 		}
 	},
 	addTimetableRequest: function (opts) {

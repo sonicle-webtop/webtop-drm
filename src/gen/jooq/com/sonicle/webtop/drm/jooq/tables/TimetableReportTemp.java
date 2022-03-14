@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableReportTemp extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord> {
 
-	private static final long serialVersionUID = -1038027011;
+	private static final long serialVersionUID = -1736665359;
 
 	/**
 	 * The reference instance of <code>drm.timetable_report_temp</code>
@@ -145,6 +145,11 @@ public class TimetableReportTemp extends org.jooq.impl.TableImpl<com.sonicle.web
 	 * The column <code>drm.timetable_report_temp.total_line_hour</code>.
 	 */
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord, java.lang.String> TOTAL_LINE_HOUR = createField("total_line_hour", org.jooq.impl.SQLDataType.VARCHAR.length(5), this, "");
+
+	/**
+	 * The column <code>drm.timetable_report_temp.has_requests</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord, java.lang.Boolean> HAS_REQUESTS = createField("has_requests", org.jooq.impl.SQLDataType.BOOLEAN.defaulted(true), this, "");
 
 	/**
 	 * Create a <code>drm.timetable_report_temp</code> table reference

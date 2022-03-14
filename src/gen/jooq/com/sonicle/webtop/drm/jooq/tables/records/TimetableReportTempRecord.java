@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.records;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimetableReportTempRecord extends org.jooq.impl.UpdatableRecordImpl<com.sonicle.webtop.drm.jooq.tables.records.TimetableReportTempRecord> {
 
-	private static final long serialVersionUID = -1318182483;
+	private static final long serialVersionUID = -308079098;
 
 	/**
 	 * Setter for <code>drm.timetable_report_temp.id</code>.
@@ -340,6 +340,20 @@ public class TimetableReportTempRecord extends org.jooq.impl.UpdatableRecordImpl
 		return (java.lang.String) getValue(22);
 	}
 
+	/**
+	 * Setter for <code>drm.timetable_report_temp.has_requests</code>.
+	 */
+	public void setHasRequests(java.lang.Boolean value) {
+		setValue(23, value);
+	}
+
+	/**
+	 * Getter for <code>drm.timetable_report_temp.has_requests</code>.
+	 */
+	public java.lang.Boolean getHasRequests() {
+		return (java.lang.Boolean) getValue(23);
+	}
+
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
@@ -366,7 +380,7 @@ public class TimetableReportTempRecord extends org.jooq.impl.UpdatableRecordImpl
 	/**
 	 * Create a detached, initialised TimetableReportTempRecord
 	 */
-	public TimetableReportTempRecord(java.lang.Integer id, java.lang.String domainId, java.lang.String userId, java.lang.Integer companyId, org.joda.time.DateTime date, java.lang.String workingHours, java.lang.String overtime, java.lang.String paidLeave, java.lang.String unpaidLeave, java.lang.String holiday, java.lang.String medicalVisit, java.lang.String contractual, java.lang.String causal, java.lang.String hour, java.lang.String detail, java.lang.String note, java.lang.String targetUserId, java.lang.String workReportHours, java.lang.String jobHours, java.lang.String sickness, java.lang.String other, java.lang.String causalId, java.lang.String totalLineHour) {
+	public TimetableReportTempRecord(java.lang.Integer id, java.lang.String domainId, java.lang.String userId, java.lang.Integer companyId, org.joda.time.DateTime date, java.lang.String workingHours, java.lang.String overtime, java.lang.String paidLeave, java.lang.String unpaidLeave, java.lang.String holiday, java.lang.String medicalVisit, java.lang.String contractual, java.lang.String causal, java.lang.String hour, java.lang.String detail, java.lang.String note, java.lang.String targetUserId, java.lang.String workReportHours, java.lang.String jobHours, java.lang.String sickness, java.lang.String other, java.lang.String causalId, java.lang.String totalLineHour, java.lang.Boolean hasRequests) {
 		super(com.sonicle.webtop.drm.jooq.tables.TimetableReportTemp.TIMETABLE_REPORT_TEMP);
 
 		setValue(0, id);
@@ -392,5 +406,6 @@ public class TimetableReportTempRecord extends org.jooq.impl.UpdatableRecordImpl
 		setValue(20, other);
 		setValue(21, causalId);
 		setValue(22, totalLineHour);
+		setValue(23, hasRequests);
 	}
 }

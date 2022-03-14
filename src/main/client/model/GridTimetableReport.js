@@ -60,6 +60,7 @@ Ext.define('Sonicle.webtop.drm.model.GridTimetableReport', {
 		WTF.field('totalLineHour', 'string', true),
 		WTF.field('userId', 'string', false),
 		WTF.field('dateObj', 'string'),
+		WTF.field('hasRequest', 'boolean'),
 //		WTF.calcField('totHours', 'string', ['workingHours', 'overtime'], function(v, rec) {
 //			return Sonicle.webtop.drm.model.GridTimetableReport.calcTotHours(
 //					rec.get('workingHours'),
@@ -168,18 +169,19 @@ Ext.define('Sonicle.webtop.drm.model.GridTimetableReport', {
 						th = Math.abs(th);
 						var hours = Math.floor(th / 60);
 						var minutes = Math.abs(th % 60);
-						hours = -Math.abs(hours);
-						ret = Sonicle.webtop.drm.model.GridTimetableReport.pad(hours, 2) + "." + Sonicle.webtop.drm.model.GridTimetableReport.pad(minutes, 2);
+						hours = Math.abs(hours);
+						ret = '+'+Sonicle.webtop.drm.model.GridTimetableReport.pad(hours, 2) + "." + Sonicle.webtop.drm.model.GridTimetableReport.pad(minutes, 2);
 					}else{
 						var hours = Math.floor(th / 60);
 						var minutes = Math.abs(th % 60);
-						ret = Sonicle.webtop.drm.model.GridTimetableReport.pad(hours, 2) + "." + Sonicle.webtop.drm.model.GridTimetableReport.pad(minutes, 2);
+						var chsign=(th===0)?'&nbsp;':'-';
+						ret = chsign+Sonicle.webtop.drm.model.GridTimetableReport.pad(hours, 2) + "." + Sonicle.webtop.drm.model.GridTimetableReport.pad(minutes, 2);
 					}
 					return ret;
 				} else {
 					var hours = Math.floor(totalLineHour / 60);
 					var minutes = Math.abs(totalLineHour % 60);
-					ret = Sonicle.webtop.drm.model.GridTimetableReport.pad(hours, 2) + "." + Sonicle.webtop.drm.model.GridTimetableReport.pad(minutes, 2);
+					ret = '-'+Sonicle.webtop.drm.model.GridTimetableReport.pad(hours, 2) + "." + Sonicle.webtop.drm.model.GridTimetableReport.pad(minutes, 2);
 					return ret;
 				}
 			}else {
