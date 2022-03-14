@@ -16,12 +16,13 @@
 .wtdrm-icon-ticket { background-image: url('ticket_16.svg') !important; background-size: contain; }
 .wtdrm-icon-job { background-image: url('job_16.svg') !important; background-size: contain; }
 .wtdrm-icon-configuration { background-image: url('configuration_16.svg') !important; background-size: contain; }
+.wtdrm-icon-configurationActivities { background-image: url('configuration-activities_16.svg') !important; background-size: contain; }
 .wtdrm-icon-configurationCompanies { background-image: url('configuration-companies_16.svg') !important; background-size: contain; }
 .wtdrm-icon-configurationLineManagers { background-image: url('configuration-linemanagers_16.svg') !important; background-size: contain; }
 .wtdrm-icon-configurationDocStatuses { background-image: url('configuration-docstatuses_16.svg') !important; background-size: contain; }
 .wtdrm-icon-configurationProfiles { background-image: url('configuration-profiles_16.svg') !important; background-size: contain; }
 .wtdrm-icon-configurationTimeProfiles { background-image: url('configuration-timeprofiles_16.svg') !important; background-size: contain; }
-.wtdrm-icon-configurationEmployeeProfiles { background-image: url('configuration-employeeprofiles_16.svg') !important; background-size: contain; }
+.wtdrm-icon-configurationEmployeeProfiles { background-image: url('configuration-profiles_16.svg') !important; background-size: contain; }
 .wtdrm-icon-configurationHolidayDates { background-image: url('configuration-holidaydates_16.svg') !important; background-size: contain; }
 .wtdrm-icon-timetableRequest-sent { background-image: url('timetable-request-sent_16.svg') !important; background-size: contain; }
 .wtdrm-icon-timetableRequest-approved { background-image: url('timetable-request-approved_16.svg') !important; background-size: contain; }
