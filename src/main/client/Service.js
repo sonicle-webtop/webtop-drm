@@ -1190,7 +1190,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											var	vw = WT.createView(me.ID, 'view.UserTimetableRequests', {
 													swapReturn: true,
 													viewCfg: {
-														targetUserId: rec.get('userId'),
+														targetUserId: rec.get('targetUserId'),
 														date: rec.get('dateObj'),
 														dockableConfig: {
 															title: me.res('usertimetablerequests.tit') + rec.get('date')

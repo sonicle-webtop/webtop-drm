@@ -51,6 +51,7 @@ Ext.define('Sonicle.webtop.drm.model.GridTimetableReport', {
 		WTF.field('detail', 'string', true),
 		WTF.field('note', 'string', true),
 		WTF.field('targetUser', 'string', false),
+		WTF.field('targetUserId', 'string', false),
 		WTF.field('jobHours', 'string', true),
 		WTF.field('workReportHours', 'string', true),
 		WTF.field('sickness', 'string', true),

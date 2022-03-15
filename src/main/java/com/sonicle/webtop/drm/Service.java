@@ -3407,7 +3407,8 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 				List<JsGridLeaveRequest> jsGridLR = new ArrayList();
 
 				for (OLeaveRequest oLR : manager.listLeaveRequestsByTargetUserIdDate(targetUserId, lDate)) {
-					jsGridLR.add(new JsGridLeaveRequest(oLR));
+					boolean hasCancResult=oLR.getCancResult()!=null && oLR.getCancResult();
+					if (!hasCancResult) jsGridLR.add(new JsGridLeaveRequest(oLR));
 				}
 
 				new JsonResult(jsGridLR).printTo(out);
