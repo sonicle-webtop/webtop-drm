@@ -63,6 +63,7 @@ public class JsGridTimetableReport {
 	public String detail;
 	public String note;
 	public String targetUser;
+	public String targetUserId;
 	public String workReportHours;
 	public String jobHours;
 	public String sickness;
@@ -91,6 +92,7 @@ public class JsGridTimetableReport {
 		this.detail = tr.getDetail();
 		this.note = tr.getNote();
 		this.targetUser = WT.getUserData(new UserProfileId(tr.getDomainId(), tr.getTargetUserId())).getDisplayName();
+		this.targetUserId = tr.getTargetUserId();
 		this.workReportHours = tr.getWorkReportHours();
 		this.jobHours = tr.getJobHours();
 		this.sickness = tr.getSickness();

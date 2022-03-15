@@ -106,8 +106,11 @@ public class LeaveRequestDAO extends BaseDAO {
 					LEAVE_REQUESTS.USER_ID.equal(targetUserId)
 				)
 				.and(
-					LEAVE_REQUESTS.FROM_DATE.equal(date)
+					LEAVE_REQUESTS.FROM_DATE.lessOrEqual(date)
 				)
+				.and(
+					LEAVE_REQUESTS.TO_DATE.greaterOrEqual(date)
+				)				
 				.fetchInto(OLeaveRequest.class);
 	}
 	
