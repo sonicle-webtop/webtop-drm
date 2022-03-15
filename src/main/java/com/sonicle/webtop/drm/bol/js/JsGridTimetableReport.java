@@ -38,6 +38,7 @@ import com.sonicle.webtop.core.sdk.WTException;
 import com.sonicle.webtop.drm.DrmManager;
 import com.sonicle.webtop.drm.bol.OTimetableReport;
 import com.sonicle.webtop.drm.model.TimetableReport;
+import java.util.Date;
 
 /**
  *
@@ -67,6 +68,10 @@ public class JsGridTimetableReport {
 	public String sickness;
 	public String other;
 	public String causalId;
+	public String totalLineHour;
+	public String userId;
+	public String dateObj;
+	public boolean hasRequests;
 
 	public JsGridTimetableReport(OTimetableReport tr, DrmManager drmMgr) throws WTException {
 		this.id = tr.getId();
@@ -91,6 +96,10 @@ public class JsGridTimetableReport {
 		this.sickness = tr.getSickness();
 		this.other = tr.getOther();
 		this.causalId = tr.getCausalId();
+		this.totalLineHour = tr.getTotalLineHour();
+		this.userId = tr.getUserId();
+		this.dateObj = tr.getDate().toString();
+		this.hasRequests = tr.getHasRequests();
 	}
 	
 	public static TimetableReport createTimetableReport(JsGridTimetableReport js) {

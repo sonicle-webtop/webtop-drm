@@ -312,7 +312,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 					xtype: 'grid',
 					reference: 'gpDocStatus',
 					title: me.mys.res('config.status.tit'),
-					iconCls: 'wwtdrm-icon-configurationDocStatuses',
+					iconCls: 'wtdrm-icon-configurationDocStatuses',
 					tabConfig: {
 						textAlign: 'left'
 					},

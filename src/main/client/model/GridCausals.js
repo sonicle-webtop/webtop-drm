@@ -37,6 +37,7 @@ Ext.define('Sonicle.webtop.drm.model.GridCausals', {
 	fields: [
         WTF.roField('id', 'string'),
 		WTF.roField('description', 'string'),
-        WTF.roField('externalCode', 'string')
+        WTF.roField('externalCode', 'string'),
+		WTF.roField('sign', 'int')
 	]
 });

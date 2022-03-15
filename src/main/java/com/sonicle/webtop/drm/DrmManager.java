@@ -39,6 +39,11 @@ import com.sonicle.commons.LangUtils.CollectionChangeSet;
 import static com.sonicle.commons.LangUtils.getCollectionChanges;
 import com.sonicle.commons.PathUtils;
 import com.sonicle.commons.db.DbUtils;
+import com.sonicle.webtop.calendar.ICalendarManager;
+import com.sonicle.webtop.calendar.model.Event;
+import com.sonicle.webtop.calendar.model.EventInstance;
+import com.sonicle.webtop.calendar.model.EventKey;
+import com.sonicle.webtop.calendar.model.UpdateEventTarget;
 import com.sonicle.webtop.contacts.IContactsManager;
 import com.sonicle.webtop.contacts.model.Contact;
 import com.sonicle.webtop.core.CoreManager;
@@ -50,6 +55,7 @@ import com.sonicle.webtop.core.sdk.BaseManager;
 import com.sonicle.webtop.core.sdk.UserProfile;
 import com.sonicle.webtop.core.sdk.UserProfileId;
 import com.sonicle.webtop.core.sdk.WTException;
+import com.sonicle.webtop.core.sdk.WTRuntimeException;
 import com.sonicle.webtop.core.util.LogEntries;
 import static com.sonicle.webtop.drm.ManagerUtils.createCostType;
 import static com.sonicle.webtop.drm.Service.logger;
@@ -266,6 +272,8 @@ import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
+import java.util.concurrent.Callable;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -2816,6 +2824,25 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		}
 	}
 	
+	public List<OLeaveRequest> listLeaveRequestsByTargetUserIdDate(String targetUserId, LocalDate date) throws WTException {
+		Connection con = null;
+		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
+		List<OLeaveRequest> lrs = new ArrayList<>();
+		
+		try {
+			con = WT.getConnection(SERVICE_ID);
+			
+			lrs = lrDao.selectLeaveRequestsByTargetUserIdDate(con, getTargetProfileId().getDomainId(), targetUserId, date);
+
+			return lrs;
+			
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+
 	public LeaveRequest getLeaveRequest(Integer leaveRequestId) throws WTException {
 		Connection con = null;
 		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
@@ -3065,23 +3092,25 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		}
 	}
 	
-	public void updateCancellationLeaveRequest(int id, Boolean choice) throws WTException, MessagingException, IOException, TemplateException {
+	public LeaveRequest updateCancellationLeaveRequest(int id, Boolean choice) throws WTException, MessagingException, IOException, TemplateException {
 		Connection con = null;
 		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
 		TimetableEventDAO teDao = TimetableEventDAO.getInstance();
-		
+		OLeaveRequest lr = null;
+		LeaveRequest retlr=null;
 		try {
 			DateTime revisionTimestamp = createRevisionTimestamp();
 
 			con = WT.getConnection(SERVICE_ID, false);
 
-			OLeaveRequest lr = lrDao.selectById(con, id);
+			lr = lrDao.selectById(con, id);
 			
 			lr.setManagerCancRespTimetamp(revisionTimestamp);
 			lr.setCancResult(choice);
 			if(choice)lr.setStatus("D");
 				
 			lrDao.update(con, lr);
+			retlr=ManagerUtils.createLeaveRequest(lr);
 			
 			//Delete in TimetableEvents
 			teDao.deleteByLeaveRequestId(con, id);
@@ -3095,6 +3124,8 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		} finally {
 			DbUtils.closeQuietly(con);
 		}
+		
+		return retlr;
 	}
 
 	public void deleteLeaveRequest(Integer leaveRequestId) throws WTException {
@@ -4518,9 +4549,10 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		}
 	}
 	
-	public void timetableRequestCancellation(Integer id, String cancellationReason) throws WTException {
+	public LeaveRequest timetableRequestCancellation(Integer id, String cancellationReason) throws WTException {
 		Connection con = null;
-
+		LeaveRequest retlr=null;
+		
 		try {
 			con = WT.getConnection(SERVICE_ID, false);
 			
@@ -4530,6 +4562,8 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			lr.setCancReason(cancellationReason);
 			
 			lrDao.updateRequestCancellation(con, id, cancellationReason, createRevisionTimestamp());
+			retlr=ManagerUtils.createLeaveRequest(lr);
+			retlr.setCancRequest(true);
 
 			DbUtils.commitQuietly(con);
 			
@@ -4546,9 +4580,11 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		} finally {
 			DbUtils.closeQuietly(con);
 		}
+		
+		return retlr;
 	}
 
-	public List<OTimetableReport> generateOeViewTimetableReport(TimetableReportQuery query) throws WTException {
+	public List<OTimetableReport> generateOrViewTimetableReport(TimetableReportQuery query) throws WTException {
 
 		List<OTimetableReport> items = new ArrayList<>();
 
@@ -4563,10 +4599,10 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				todayDate.setDate(1);
 
 				if(todayDate.after(generationDate)) {
-					//Se oggi Ã¨ dopo rispetto alla data da controllare, visualizzo.
+					//Se oggi è dopo rispetto alla data da controllare, visualizzo.
 					items = getTimetableReport(query);
 				}else{
-					//Altrimenti significa che oggi Ã¨ uguale o prima alla data da controllare, rigenero.
+					//Altrimenti significa che oggi è uguale o prima alla data da controllare, rigenero.
 					items = generateTimetableReport(query);
 				}
 			}else if(query.mode.equals("2")){
@@ -4596,7 +4632,8 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			TimetableEventDAO teDAO = TimetableEventDAO.getInstance();
 			WorkReportDAO wrDAO = WorkReportDAO.getInstance();
 			JobDAO jbDAO = JobDAO.getInstance();
-			EmployeeProfileDAO epDAO = EmployeeProfileDAO.getInstance();			
+			EmployeeProfileDAO epDAO = EmployeeProfileDAO.getInstance();
+			LineHourDAO lhDAO = LineHourDAO.getInstance();			
 
 			if(query != null) {
 				//Empty Table for single user
@@ -4641,7 +4678,9 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					
 						ttrs = ManagerUtils.mergeStampAndEventByDate(con, ttrs, epDAO.selectEmployeeProfileByDomainUser(con, getTargetProfileId().getDomainId(), usr.getUserId()).getHourProfileId());
 						
-						for(OTimetableReport itm : ttrs) itm.setTargetUserId(usr.getUserId());
+						for(OTimetableReport itm : ttrs) {
+							itm.setTargetUserId(usr.getUserId());
+						}
 						
 						trs.addAll(ttrs);
 					}
@@ -4672,14 +4711,24 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					
 					trs = ManagerUtils.mergeStampAndEventByDate(con, trs, epDAO.selectEmployeeProfileByDomainUser(con, getTargetProfileId().getDomainId(), query.targetUserId).getHourProfileId());
 					
-					for(OTimetableReport itm : trs) itm.setTargetUserId(query.targetUserId);
+					for(OTimetableReport itm : trs) {
+						itm.setTargetUserId(query.targetUserId);
+					}
 				}
 				
 				//Insert Data in Table
 				for(OTimetableReport otr : trs){
+					if (otr.getHasRequests()==null) otr.setHasRequests(false);
+					
 					otr.setId(trDAO.getTimetableReportTempSequence(con).intValue());
 					otr.setUserId(getTargetProfileId().getUserId());
 					
+					//VASI SETTO PROFILO ORARIO
+					Integer hourProfileId =  epDAO.selectEmployeeProfileByDomainUser(con, getTargetProfileId().getDomainId(), otr.getTargetUserId()).getHourProfileId();
+					String profileHour = lhDAO.selectSumLineHourByHourProfileIdDayOfWeek(con, hourProfileId, otr.getDate().toLocalDate().dayOfWeek().get());
+					otr.setTotalLineHour(profileHour);
+					//VASI FINE
+	
 					//Set if present other, causal, note from old generation
 					val = hashTrs.getOrDefault(otr.getDomainId() + "|" + otr.getUserId() + "|" + otr.getTargetUserId() + "|" + otr.getDate(), null);
 					if(val != null){
@@ -5608,7 +5657,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			
 			osWriter = new OutputStreamWriter(os);
 			
-			for (OTimetableReport oTR : generateTimetableReport(query)) {
+			for (OTimetableReport oTR : getTimetableReport(query)) {
 				
 				//Calculate Theoretical Hours
 				oEP = ePDao.selectEmployeeProfileByDomainUser(con, oTR.getDomainId(), oTR.getTargetUserId());
@@ -5792,6 +5841,38 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					
 					osWriter.write("\n"); //End of row, go to head
 				}
+				//Medical Visit
+				if(oTR.getMedicalVisit() != null && !"".equals(oTR.getMedicalVisit())){
+					oC = cDao.selectById(con, oTts.getDefaultCausalMedicalVisit());
+					String causalExternalCode = oC.getExternalCode() + StringUtils.repeat(" ", 5 - oC.getExternalCode().length());
+					
+					//Convert sexagesimal minutes to centesimal minutes
+					String hour = oTR.getMedicalVisit();
+					if(hour.contains(".")){
+						String sexagesimalMinutes = hour.split("\\.")[1];
+						Integer centesimalMinutes = (Integer.parseInt(sexagesimalMinutes) * 100)/60;
+						hour = hour.split("\\.")[0] + centesimalMinutes.toString() + StringUtils.repeat("0", 2 - centesimalMinutes.toString().length());
+						hour = StringUtils.repeat("0", 10 - hour.length()) + hour;
+					}else{
+						hour = StringUtils.repeat("0", 10 - hour.length()) + hour;
+					}
+							
+					osWriter.write(empty); //1 Vuoto
+					osWriter.write(companyCode); //2 Codice Azienda
+					osWriter.write(headquartersCod); //3 Codice Sede
+					osWriter.write(employee); //4 Dipendente
+					osWriter.write(causalExternalCode);//5 Causale per ogni colonna del oTR (causale associata a medical visit)
+					osWriter.write(date); //6 Data
+					osWriter.write(unitOfMeasure); //7 UnitÃ  di misura
+					osWriter.write(rate); //8 Tariffa
+					osWriter.write(hour); //9 QuantitÃ 
+					osWriter.write(result); //10 Risultato
+					osWriter.write(stringTheoreticalHours); //11 Ore teoriche
+					osWriter.write(movementType); //12 Tipo movimento
+					osWriter.write(" "); //13 Inizio evento (da capire come valorizzarlo)
+					
+					osWriter.write("\n"); //End of row, go to head
+				}
 				//Other
 				if(oTR.getOther() != null && !"".equals(oTR.getOther())){
 					oC = cDao.selectById(con, oTR.getCausalId());
@@ -5909,4 +5990,249 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			DbUtils.closeQuietly(con);
 		}
 	}
+    
+    
+	public Integer createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(LeaveRequest lReq) throws WTException {
+		TimetableSetting ts = getTimetableSetting();
+ 		UserProfileId cupid = null;
+ 		Integer activityId = null; 
+		boolean ownCalendar=true;
+		
+		
+		if(ts!=null && ts.getCalendarUserId() != null){
+			cupid = new UserProfileId(lReq.getDomainId(), ts.getCalendarUserId());
+			ownCalendar=false;
+		}else{
+			//upi = getEnv().getProfileId();
+			cupid = new UserProfileId(lReq.getDomainId(), lReq.getUserId());
+		}
+
+		activityId = ts.getDefaultEventActivityId();
+			
+ 		return catchEventId(cupid, lReq, activityId, ownCalendar);
+ 		
+ 		/*
+ 		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, upi);
+ 		
+		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
+		Integer eventId = null;
+		Event ev = null;
+		
+		if (cm != null) {
+			Integer lrCalId = us.getLeaveRequestCalendarId();
+			
+			if(lrCalId == null || !cm.existCalendar(lrCalId)){
+				lrCalId = createLeaveRequestCalendar(cm, lReq);
+				us.setLeaveRequestCalendarId(lrCalId);
+			}
+			
+			if(lReq.getEventId() != null){
+				ev = cm.getEvent(lReq.getEventId());
+				
+				if(ev != null){
+					eventId = updateLeaveRequestEvent(cm, lReq, ev);
+				}else{
+					eventId = createLeaveRequestEvent(cm, lReq, lrCalId);
+				}
+			}else{
+				eventId = createLeaveRequestEvent(cm, lReq, lrCalId);
+			}			
+		}
+		
+		return eventId;*/
+	}
+	
+	private Integer catchEventId(final UserProfileId targetPid, final LeaveRequest lReq, final Integer activityId, final boolean ownCalendar) throws WTException {
+		final ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, targetPid);
+		
+		Integer eventId = null;
+		
+		if (cm != null) {
+			eventId = WT.runPrivileged(new Callable<Integer>(){
+				public Integer call() throws WTException {
+					UserProfileId lReqPid=new UserProfileId(targetPid.getDomainId(), lReq.getUserId());
+					DrmUserSettings rus=new DrmUserSettings(SERVICE_ID,lReqPid);
+					Integer lrCalId = rus.getLeaveRequestCalendarId();
+					try {
+						if (lrCalId!=null) cm.getCalendar(lrCalId);
+					} catch(WTRuntimeException exc) {
+						lrCalId=null;
+					}
+					if(lrCalId == null){
+						lrCalId = createLeaveRequestCalendar(cm, lReqPid, targetPid, ownCalendar);
+
+						rus.setLeaveRequestCalendarId(lrCalId);
+					}
+
+					if(lReq.getEventId() != null){
+						Event ev = cm.getEvent(lReq.getEventId());
+
+						if(ev != null){
+							return updateLeaveRequestEvent(targetPid, cm, lReq, ev, ownCalendar);
+						}else{
+							return createLeaveRequestEvent(targetPid, cm, lReq, lrCalId, activityId, ownCalendar);
+						}
+					}else{
+						return createLeaveRequestEvent(targetPid, cm, lReq, lrCalId, activityId, ownCalendar);
+					}		
+				}
+			});	
+		}
+		return eventId;
+	}
+	
+	private Integer createLeaveRequestCalendar(ICalendarManager cm, final UserProfileId lReqPid, final UserProfileId targetPid, boolean ownCalendar) throws WTException{
+		com.sonicle.webtop.calendar.model.Calendar cal = new com.sonicle.webtop.calendar.model.Calendar();
+		if (ownCalendar) {
+			cal.setName(lookupResource(WT.getUserData(targetPid).getLocale(), "leaverequest.calendar.name"));
+			cal.setColor("#42D692");
+		} else {
+			cal.setName(WT.getUserData(lReqPid).getDisplayName());
+			cal.setColor("#42D692");
+		}
+		cal.setProfileId(targetPid);
+		
+		cal = cm.addCalendar(cal);
+		
+		return cal.getCalendarId();
+	}
+	
+	private int createLeaveRequestEvent(UserProfileId upid, ICalendarManager cm, LeaveRequest lReq, int lrCalId, Integer activityId, boolean ownCalendar) throws WTException{
+		DateTimeZone tz = WT.getUserData(upid).getTimeZone();
+		Event ev = new Event();
+		
+		ev.setCalendarId(lrCalId);
+		ev.setAllDay(true);
+		ev.setTimezone(tz.getID());
+		ev.setIsPrivate(false);
+		ev.setBusy(false);
+
+		ev.setActivityId(activityId);
+		
+		if(lReq.getFromDate() != null && lReq.getToDate() != null){			
+			if(lReq.getFromHour() != null && lReq.getToHour() != null){
+				ev.setAllDay(false);
+				
+				ev.setDatesAndTimes(false, tz.getID(), lReq.getFromDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(lReq.getFromHour().split(":")[0]), Integer.parseInt(lReq.getFromHour().split(":")[1]), 0, 0), lReq.getToDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(lReq.getToHour().split(":")[0]), Integer.parseInt(lReq.getToHour().split(":")[1]), 0, 0));
+			}else{
+				ev.setAllDay(true);
+				
+				ev.setStartDate(lReq.getFromDate().toDateTimeAtStartOfDay(tz));
+				ev.setEndDate(lReq.getToDate().toDateTimeAtStartOfDay(tz));
+			}
+		}
+		
+		ev.setTitle(getLeaveReqestTitle(upid, ev, lReq, ownCalendar));
+
+		ev = cm.addEvent(ev, false);
+		
+		return ev.getEventId();
+	}
+	
+	private int updateLeaveRequestEvent(UserProfileId upid, ICalendarManager cm, LeaveRequest lReq, Event ev, boolean ownCalendar) throws WTException{
+		EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
+		DateTimeZone tz = WT.getUserData(upid).getTimeZone();
+		if(lReq.getFromDate() != null && lReq.getToDate() != null){			
+			if(lReq.getFromHour() != null && lReq.getToHour() != null){
+				evI.setAllDay(false);
+				
+				evI.setDatesAndTimes(false, tz.getID(), lReq.getFromDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(lReq.getFromHour().split(":")[0]), Integer.parseInt(lReq.getFromHour().split(":")[1]), 0, 0), lReq.getToDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(lReq.getToHour().split(":")[0]), Integer.parseInt(lReq.getToHour().split(":")[1]), 0, 0));
+			}else{
+				evI.setAllDay(true);
+				
+				evI.setStartDate(lReq.getFromDate().toDateTimeAtStartOfDay(tz));
+				evI.setEndDate(lReq.getToDate().toDateTimeAtStartOfDay(tz));
+			}
+		}
+		
+		evI.setTitle(getLeaveReqestTitle(upid, evI, lReq, ownCalendar));
+
+		cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false, false);
+		
+		return evI.getEventId();
+	}
+	
+	private String getLeaveReqestTitle(UserProfileId upid, Event ev, LeaveRequest lReq, boolean ownCalendar) {
+		String title="";
+		Locale locale=WT.getUserData(upid).getLocale();
+		
+		if(lReq.getType() != null) {
+			UserProfileId lReqPid=new UserProfileId(upid.getDomainId(), lReq.getUserId());
+			if (!ownCalendar) 
+				title+="["+getInitials(WT.getUserData(lReqPid).getDisplayName())+"] ";
+			title += "["+lookupResource(locale, "leaverequest.type." + lReq.getType()) + "] ";
+		}
+		if(lReq.getNotes()!= null) 
+			ev.setDescription(lReq.getNotes());
+		if(LangUtils.value(lReq.getCancResult(), Boolean.FALSE))
+			title += lookupResource(locale, "leaverequest.calendar.requesttype.D");
+		else if(LangUtils.value(lReq.getCancRequest(), Boolean.FALSE))
+			title += lookupResource(locale, "leaverequest.calendar.requesttype.RD");
+		else if(LangUtils.value(lReq.getResult(), Boolean.FALSE))
+			title += lookupResource(locale, "leaverequest.calendar.requesttype.A");
+		else if(!LangUtils.value(lReq.getResult(), Boolean.TRUE))
+			title += lookupResource(locale, "leaverequest.calendar.requesttype.NA");
+		else
+			title += lookupResource(locale, "leaverequest.calendar.requesttype.S");
+		return title;
+	}
+
+	private String getInitials(String name) { 
+        if (name==null || name.length() == 0) 
+            return "";
+		
+        StringBuffer initials=new StringBuffer();
+		initials.append(Character.toUpperCase(name.charAt(0))); 
+  
+        // Traverse rest of the string and  
+        // print the characters after spaces. 
+		boolean wasSpace=false;
+        for (int i = 1; i < name.length() - 1; i++) {
+			if (Character.isSpaceChar(name.charAt(i))) {
+				wasSpace=true;
+				continue;
+			} 
+			if (wasSpace) {
+				initials.append(Character.toUpperCase(name.charAt(i)));
+			}
+			wasSpace=false;
+		}
+		
+		return initials.toString();
+    } 
+
+	public void deleteLeaveRequestEvent(final LeaveRequest lReq) throws WTException {		
+ 		TimetableSetting ts = getTimetableSetting();
+ 		UserProfileId upi = null;
+		
+		if (ts!=null && ts.getCalendarUserId() != null){
+			upi = new UserProfileId(lReq.getDomainId(), ts.getCalendarUserId());
+		}else{
+			//upi = getEnv().getProfileId();
+			upi = new UserProfileId(lReq.getDomainId(), lReq.getUserId());
+		}
+			
+		final ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, upi);
+		
+		if (cm != null) {
+			if(lReq.getEventId() != null){
+				WTException exc=WT.runPrivileged(new Callable<WTException>(){
+					public WTException call() {
+						try {
+							Event ev = cm.getEvent(lReq.getEventId());
+							if(ev != null) {
+								cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(lReq.getEventId(), null), false);
+							}
+						} catch(WTException exc) {
+							return exc;
+						}
+						return null;
+					}
+				});
+				if (exc!=null) throw exc;
+			}
+		}
+	}
+	
+	
 }

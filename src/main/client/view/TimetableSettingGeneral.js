@@ -312,6 +312,25 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingGeneral', {
 							},
 							fieldLabel: me.mys.res('timetable.settings.fld-defaultCausalSickness.lbl'),
 							width: 500
+						}),
+						WTF.localCombo('id', 'desc', {
+							bind: '{record.defaultCausalMedicalVisit}',
+							anyMatch: true,
+							allowBlank: true,
+							store: {
+								autoLoad: true,
+								model: 'WTA.model.Simple',
+								proxy: WTF.proxy(me.mys.ID, 'LookupGisCausals', null, {
+									extraParams: {
+										filter: false
+									}
+								})
+							},
+							triggers: {
+								clear: WTF.clearTrigger()
+							},
+							fieldLabel: me.mys.res('timetable.settings.fld-defaultCausalMedicalVisit.lbl'),
+							width: 500
 						})
 					]
 				}

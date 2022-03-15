@@ -1678,6 +1678,7 @@ public class ManagerUtils {
 		oSetting.setDefaultCausalOvertime(tSetting.getDefaultCausalOvertime());
 		oSetting.setDefaultCausalPermits(tSetting.getDefaultCausalPermits());
 		oSetting.setDefaultCausalSickness(tSetting.getDefaultCausalSickness());
+		oSetting.setDefaultCausalMedicalVisit(tSetting.getDefaultCausalMedicalVisit());
 		oSetting.setDefaultCausalWorkingHours(tSetting.getDefaultCausalWorkingHours());
 		
 		return oSetting;
@@ -1713,6 +1714,7 @@ public class ManagerUtils {
 		tSetting.setDefaultCausalOvertime(oTSetting.getDefaultCausalOvertime());
 		tSetting.setDefaultCausalPermits(oTSetting.getDefaultCausalPermits());
 		tSetting.setDefaultCausalSickness(oTSetting.getDefaultCausalSickness());
+		tSetting.setDefaultCausalMedicalVisit(oTSetting.getDefaultCausalMedicalVisit());
 		tSetting.setDefaultCausalWorkingHours(oTSetting.getDefaultCausalWorkingHours());
 		
 		return tSetting;
@@ -1858,6 +1860,7 @@ public class ManagerUtils {
         c.setId(oC.getId());
 		c.setDescription(oC.getDescription());
 		c.setExternalCode(oC.getExternalCode());
+		c.setSign(oC.getSign().intValue());
 
 		return c;
 	}
@@ -1872,6 +1875,7 @@ public class ManagerUtils {
         oC.setId(c.getId());
 		oC.setDescription(c.getDescription());
 		oC.setExternalCode(c.getExternalCode());
+		oC.setSign(new BigDecimal(c.getSign()));
 
 		return oC;
 	}
@@ -2205,49 +2209,52 @@ public class ManagerUtils {
 						calculateLeaveHours = paidLeaveHours;
 					}																	
                     */
- 					if (profileHours <= workingHours) {
-						calculateWorkingHours = profileHours;
-						calculateOvertimeHours = (workingHours - (profileHours + overtimeHours)) + overtimeHours;
-						calculateLeaveHours = 0 + paidLeaveHours;
-					} else {
-						calculateWorkingHours = workingHours;
-						calculateOvertimeHours = 0 + overtimeHours;
-						if ((workingHours + paidLeaveHours + unpaidLeaveHours + medicalVisitHours + holidayHours + sicknessHours) >= profileHours){
-							calculateLeaveHours = paidLeaveHours;
-						} else {
-							calculateLeaveHours = (profileHours - (workingHours + paidLeaveHours + unpaidLeaveHours + medicalVisitHours + holidayHours + sicknessHours)) + paidLeaveHours;
-						}
-					}	
-                    
-					if (oHD != null) {							
-						calculateOvertimeHours += calculateWorkingHours;
-						calculateWorkingHours = 0;
-						hashTr.get(dt.toLocalDate()).setWorkingHours(null);
-						calculateLeaveHours = 0;
-						hashTr.get(dt.toLocalDate()).setPaidLeave(null);
-						hashTr.get(dt.toLocalDate()).setNote((oHD.getDescription() == null) ? "" : oHD.getDescription());
-					}						
-					if (calculateWorkingHours > 0) {
-						int h = calculateWorkingHours / 60;
-						int m = calculateWorkingHours % 60;
-						hashTr.get(dt.toLocalDate()).setWorkingHours(String.format("%d.%02d", h, m));
-					} else {
-						hashTr.get(dt.toLocalDate()).setWorkingHours(null);
-					}
-					if (calculateLeaveHours > 0) {
-						int h = calculateLeaveHours / 60;
-						int m = calculateLeaveHours % 60;
-						hashTr.get(dt.toLocalDate()).setPaidLeave(String.format("%d.%02d", h, m));	
-					} else {
-						hashTr.get(dt.toLocalDate()).setPaidLeave(null);
-					}
-					if (calculateOvertimeHours > 0) {
-						int h = calculateOvertimeHours / 60;
-						int m = calculateOvertimeHours % 60;
-						hashTr.get(dt.toLocalDate()).setOvertime(String.format("%d.%02d", h, m));	
-					} else {
-						hashTr.get(dt.toLocalDate()).setOvertime(null);
-					}
+
+//					VASI - Commentato in data 04/03/2022 per inserire nel timetable report i dati puliti senza calcoli
+
+// 					if (profileHours <= workingHours) {
+//						calculateWorkingHours = profileHours;
+//						calculateOvertimeHours = (workingHours - (profileHours + overtimeHours)) + overtimeHours;
+//						calculateLeaveHours = 0 + paidLeaveHours;
+//					} else {
+//						calculateWorkingHours = workingHours;
+//						calculateOvertimeHours = 0 + overtimeHours;
+//						if ((workingHours + paidLeaveHours + unpaidLeaveHours + medicalVisitHours + holidayHours + sicknessHours) >= profileHours){
+//							calculateLeaveHours = paidLeaveHours;
+//						} else {
+//							calculateLeaveHours = (profileHours - (workingHours + paidLeaveHours + unpaidLeaveHours + medicalVisitHours + holidayHours + sicknessHours)) + paidLeaveHours;
+//						}
+//					}	
+//                    
+//					if (oHD != null) {							
+//						calculateOvertimeHours += calculateWorkingHours;
+//						calculateWorkingHours = 0;
+//						hashTr.get(dt.toLocalDate()).setWorkingHours(null);
+//						calculateLeaveHours = 0;
+//						hashTr.get(dt.toLocalDate()).setPaidLeave(null);
+//						hashTr.get(dt.toLocalDate()).setNote((oHD.getDescription() == null) ? "" : oHD.getDescription());
+//					}						
+//					if (calculateWorkingHours > 0) {
+//						int h = calculateWorkingHours / 60;
+//						int m = calculateWorkingHours % 60;
+//						hashTr.get(dt.toLocalDate()).setWorkingHours(String.format("%d.%02d", h, m));
+//					} else {
+//						hashTr.get(dt.toLocalDate()).setWorkingHours(null);
+//					}
+//					if (calculateLeaveHours > 0) {
+//						int h = calculateLeaveHours / 60;
+//						int m = calculateLeaveHours % 60;
+//						hashTr.get(dt.toLocalDate()).setPaidLeave(String.format("%d.%02d", h, m));	
+//					} else {
+//						hashTr.get(dt.toLocalDate()).setPaidLeave(null);
+//					}
+//					if (calculateOvertimeHours > 0) {
+//						int h = calculateOvertimeHours / 60;
+//						int m = calculateOvertimeHours % 60;
+//						hashTr.get(dt.toLocalDate()).setOvertime(String.format("%d.%02d", h, m));	
+//					} else {
+//						hashTr.get(dt.toLocalDate()).setOvertime(null);
+//					}
 					
 				}
 				
@@ -2298,7 +2305,7 @@ public class ManagerUtils {
 			}else if(OLeaveRequestType.SICKNESS.equals(requestType)){
 				tr.setSickness(String.format("%d.%02d", h, m));
 			}
-			
+			tr.setHasRequests(Boolean.TRUE);
 			trl.add(tr);
 		}
 		

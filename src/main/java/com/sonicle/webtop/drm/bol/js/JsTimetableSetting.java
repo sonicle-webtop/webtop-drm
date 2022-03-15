@@ -66,7 +66,8 @@ public class JsTimetableSetting {
 	public String defaultCausalPermits;
 	public String defaultCausalHolidays;
 	public String defaultCausalSickness;
-	
+	public String defaultCausalMedicalVisit;
+
 	// public List<JsGridHolidayDate> holidayDates = new ArrayList();
 
 	public JsTimetableSetting(TimetableSetting setting) {
@@ -96,6 +97,7 @@ public class JsTimetableSetting {
 		this.defaultCausalPermits = setting.getDefaultCausalPermits();
 		this.defaultCausalHolidays = setting.getDefaultCausalHolidays();
 		this.defaultCausalSickness = setting.getDefaultCausalSickness();
+		this.defaultCausalMedicalVisit = setting.getDefaultCausalMedicalVisit();
 		
         /*
 		for (HolidayDate hd : setting.getHolidayDates()) {
@@ -133,6 +135,7 @@ public class JsTimetableSetting {
 		tt.setDefaultCausalPermits(js.defaultCausalPermits);
 		tt.setDefaultCausalHolidays(js.defaultCausalHolidays);
 		tt.setDefaultCausalSickness(js.defaultCausalSickness);
+		tt.setDefaultCausalMedicalVisit(js.defaultCausalMedicalVisit);
 		
         /*
 		for (JsGridHolidayDate hd : js.holidayDates) {

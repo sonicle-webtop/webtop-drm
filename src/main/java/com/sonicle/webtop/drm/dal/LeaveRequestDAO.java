@@ -43,6 +43,7 @@ import com.sonicle.webtop.drm.jooq.tables.records.LeaveRequestsRecord;
 import java.sql.Connection;
 import java.util.List;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 
@@ -88,6 +89,24 @@ public class LeaveRequestDAO extends BaseDAO {
 						searchCndt
 				).and(
 						LEAVE_REQUESTS.DOMAIN_ID.equal(domainId)
+				)
+				.fetchInto(OLeaveRequest.class);
+	}
+
+	public List<OLeaveRequest> selectLeaveRequestsByTargetUserIdDate(Connection con, String domainId, String targetUserId, LocalDate date) throws DAOException {
+		DSLContext dsl = getDSL(con);
+
+		return dsl
+				.select()
+				.from(LEAVE_REQUESTS)
+				.where(
+						LEAVE_REQUESTS.DOMAIN_ID.equal(domainId)
+				)
+				.and(
+					LEAVE_REQUESTS.USER_ID.equal(targetUserId)
+				)
+				.and(
+					LEAVE_REQUESTS.FROM_DATE.equal(date)
 				)
 				.fetchInto(OLeaveRequest.class);
 	}

@@ -80,6 +80,11 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingCausals', {
                             dataIndex: 'externalCode',
                             header: me.mys.res('gpcausals.externalCode.lbl'),
                             flex: 1
+                        },
+						{
+                            dataIndex: 'sign',
+                            header: me.mys.res('gpcausals.sign.lbl'),
+                            flex: 1
                         }
                     ],
                     tbar: [

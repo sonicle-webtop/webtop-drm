@@ -103,11 +103,12 @@ public class PublicService extends BasePublicService {
 									lr.setResult(responseStatus);
 									adminDrmMgr.updateLeaveRequest(lr, true);
 								} else if("delete".equals(crud)){
-									adminDrmMgr.updateCancellationLeaveRequest(Integer.valueOf(lrUrlPath.getPublicUid()), responseStatus);
+									lr=adminDrmMgr.updateCancellationLeaveRequest(Integer.valueOf(lrUrlPath.getPublicUid()), responseStatus);
 								} else{
 									throw new WTException("Invalid crud [{0}]", crud);
-								}	
-
+								}
+								adminDrmMgr.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+								
 								writeLeaveRequestPage(request, response, domainId, wts, resp);
 							} else {
 								logger.trace("Invalid id [{}]", lrUrlPath.getPublicUid());

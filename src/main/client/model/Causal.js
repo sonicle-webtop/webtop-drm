@@ -43,7 +43,8 @@ Ext.define('Sonicle.webtop.drm.model.Causal', {
 	fields: [
         WTF.field('id', 'string', false),
 		WTF.field('description', 'string', false),
-		WTF.field('externalCode', 'string', false)
+		WTF.field('externalCode', 'string', false),
+		WTF.field('sign', 'int', false)
 	]
 });
 

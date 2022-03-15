@@ -38,8 +38,8 @@ Ext.define('Sonicle.webtop.drm.view.Causal', {
 	dockableConfig: {
 		title: '{causal.tit}',
 		iconCls: 'wtdrm-icon-configuration',
-		width: 400,
-		height: 150,
+		width: 420,
+		height: 200,
 		modal: true
 	},
 	fieldTitle: 'id',
@@ -92,6 +92,19 @@ Ext.define('Sonicle.webtop.drm.view.Causal', {
 							fieldLabel: me.mys.res('causal.fld-externalCode.lbl'),
 							selectOnFocus: true,
                             width: 380,
+							maxLength: 5
+						},
+						{
+							xtype: 'numberfield',
+							bind: '{record.sign}',
+							allowBlank: false,
+							allowDecimals: false,
+                            minValue: -1,
+							maxValue: 1,
+							fieldLabel: me.mys.res('causal.fld-sign.lbl'),
+							emptyText: me.mys.res('causal.fld-sign-emptytext.lbl'),
+							selectOnFocus: true,
+                            width: 280,
 							maxLength: 5
 						}
 					]
