@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.0.final using JasperReports Library version 6.3.0  -->
-<!-- 2022-03-04T15:35:58 -->
+<!-- 2022-03-28T12:42:32 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="timetablereport" printOrder="Horizontal" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="832" leftMargin="5" rightMargin="5" topMargin="5" bottomMargin="5" uuid="0c72a82c-982e-4a49-946e-fff85de6c39f">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
@@ -136,17 +136,12 @@
 					</reportElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="515" y="16" width="45" height="12" backcolor="#E8E8E8" uuid="77661a0c-bc80-497c-b008-8e7db2cdfc1d">
+					<reportElement x="515" y="16" width="45" height="12" backcolor="#E8E8E8" uuid="845f4ea5-4631-4eaa-8c10-7bd208163b5e">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="470" y="16" width="45" height="12" backcolor="#E8E8E8" uuid="845f4ea5-4631-4eaa-8c10-7bd208163b5e">
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-				</rectangle>
-				<rectangle>
-					<reportElement x="425" y="16" width="45" height="12" backcolor="#E8E8E8" uuid="253adad4-4e1e-4a18-ad1a-675010032e37">
+					<reportElement x="470" y="16" width="45" height="12" backcolor="#E8E8E8" uuid="253adad4-4e1e-4a18-ad1a-675010032e37">
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
 				</rectangle>
@@ -213,7 +208,7 @@
 					<text><![CDATA[Ferie]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="425" y="16" width="45" height="12" uuid="eb14cce2-2232-4bd2-abf2-b95529e2b0f1">
+					<reportElement x="470" y="16" width="45" height="12" uuid="eb14cce2-2232-4bd2-abf2-b95529e2b0f1">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -222,7 +217,7 @@
 					<text><![CDATA[Ore (Lav)]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="470" y="16" width="45" height="12" uuid="f894756e-9cdf-465b-ba92-576dd2f888c8">
+					<reportElement x="515" y="16" width="45" height="12" uuid="f894756e-9cdf-465b-ba92-576dd2f888c8">
 						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -231,16 +226,6 @@
 						<font size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[Ore (Rap)]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="515" y="16" width="45" height="12" uuid="d0a5180e-c343-4ed3-b58b-b18eb13b3f74">
-						<property name="com.jaspersoft.studio.unit.x" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font size="8" isBold="true"/>
-					</textElement>
-					<text><![CDATA[Tot. Ore]]></text>
 				</staticText>
 				<staticText>
 					<reportElement x="560" y="16" width="150" height="12" uuid="683eafad-5d72-4289-ae9f-51c82b56de87"/>
@@ -308,10 +293,10 @@
 					<text><![CDATA[Altro]]></text>
 				</staticText>
 				<rectangle>
-					<reportElement x="376" y="16" width="49" height="12" backcolor="#E8E8E8" uuid="890ce5df-2834-41c9-b418-0f5298d14414"/>
+					<reportElement x="376" y="16" width="94" height="12" backcolor="#E8E8E8" uuid="890ce5df-2834-41c9-b418-0f5298d14414"/>
 				</rectangle>
 				<staticText>
-					<reportElement x="376" y="16" width="49" height="12" uuid="cf23a4c9-11c7-4dae-a39d-e51eb87bceae">
+					<reportElement x="376" y="16" width="94" height="12" uuid="cf23a4c9-11c7-4dae-a39d-e51eb87bceae">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -362,17 +347,12 @@
 					</reportElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="425" y="0" width="45" height="12" uuid="aede25cc-1fa8-432d-8570-df3e16140137">
+					<reportElement x="470" y="0" width="45" height="12" uuid="aede25cc-1fa8-432d-8570-df3e16140137">
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="515" y="0" width="45" height="12" uuid="5bfb46e7-b3b5-4c6b-9d0a-b2c2a115e51e">
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-				</rectangle>
-				<rectangle>
-					<reportElement x="470" y="0" width="45" height="12" uuid="b26309d5-2151-4c55-ba0d-93dc29429707">
+					<reportElement x="515" y="0" width="45" height="12" uuid="b26309d5-2151-4c55-ba0d-93dc29429707">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
 				</rectangle>
@@ -453,7 +433,7 @@ CONCATENATE(
 )]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00">
-					<reportElement x="425" y="0" width="45" height="12" uuid="2035711e-da71-4cc3-b273-a705e54bcddc"/>
+					<reportElement x="470" y="0" width="45" height="12" uuid="2035711e-da71-4cc3-b273-a705e54bcddc"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font size="8" isBold="true"/>
 					</textElement>
@@ -466,23 +446,7 @@ CONCATENATE(
 )]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00">
-					<reportElement x="515" y="0" width="45" height="12" uuid="0a5389f6-0e86-43ed-a3a7-a72f6c7382dc">
-						<property name="com.jaspersoft.studio.unit.x" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font size="8" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$V{totTotHours} == null ? "" : 
-CONCATENATE( 
-	new Float($V{totTotHours}/60).toString().split("\\.")[0], 
-	",", 
-	new Integer(new Integer(new Float($V{totTotHours}/60).toString().split("\\.")[1] )*60/100).toString(),
-	LEN(new Integer(new Integer(new Float($V{totTotHours}/60).toString().split("\\.")[1] )*60/100).toString() ) == 1 ? "0" : ""
-)]]></textFieldExpression>
-				</textField>
-				<textField pattern="#,##0.00">
-					<reportElement x="470" y="0" width="45" height="12" uuid="cfb9391f-99cb-4ff5-a4ec-757bdd253eb6">
+					<reportElement x="515" y="0" width="45" height="12" uuid="cfb9391f-99cb-4ff5-a4ec-757bdd253eb6">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -515,7 +479,7 @@ CONCATENATE(
 )]]></textFieldExpression>
 				</textField>
 				<rectangle>
-					<reportElement x="376" y="0" width="49" height="12" uuid="f9709c6d-d4aa-481c-b9af-2edded1f1253">
+					<reportElement x="376" y="0" width="94" height="12" uuid="f9709c6d-d4aa-481c-b9af-2edded1f1253">
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
 				</rectangle>
@@ -600,17 +564,12 @@ CONCATENATE(
 					</reportElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="425" y="0" width="45" height="16" uuid="8d5f96c7-1b04-49e1-b1e3-40fb02ab48d2">
+					<reportElement x="470" y="0" width="45" height="16" uuid="8d5f96c7-1b04-49e1-b1e3-40fb02ab48d2">
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="515" y="0" width="45" height="16" uuid="968286f0-8ebe-40c4-ac09-c3dc507bf3d3">
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-				</rectangle>
-				<rectangle>
-					<reportElement x="470" y="0" width="45" height="16" uuid="336741a0-98da-4f4e-920d-be3158ef88bf">
+					<reportElement x="515" y="0" width="45" height="16" uuid="336741a0-98da-4f4e-920d-be3158ef88bf">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
 				</rectangle>
@@ -684,7 +643,7 @@ CONCATENATE(
 )]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00">
-					<reportElement x="425" y="0" width="45" height="16" uuid="5633de31-20bf-49ca-a3db-3c380dd5ba8f"/>
+					<reportElement x="470" y="0" width="45" height="16" uuid="5633de31-20bf-49ca-a3db-3c380dd5ba8f"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font size="8"/>
 					</textElement>
@@ -697,7 +656,7 @@ CONCATENATE(
 )]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00">
-					<reportElement x="470" y="0" width="45" height="16" uuid="6c73ec5e-b906-423e-bc24-af2c71bfd04c">
+					<reportElement x="515" y="0" width="45" height="16" uuid="6c73ec5e-b906-423e-bc24-af2c71bfd04c">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
@@ -710,22 +669,6 @@ CONCATENATE(
 	",", 
 	new Integer(new Integer(new Float($F{workReportHours}/60).toString().split("\\.")[1] )*60/100).toString(),
 	LEN(new Integer(new Integer(new Float($F{workReportHours}/60).toString().split("\\.")[1] )*60/100).toString() ) == 1 ? "0" : ""
-)]]></textFieldExpression>
-				</textField>
-				<textField pattern="#,##0.00">
-					<reportElement x="515" y="0" width="45" height="16" uuid="bb2d0170-6439-4e4a-b765-d409ab7b7b21">
-						<property name="com.jaspersoft.studio.unit.x" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font size="8"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{totHours} == null ? "" : 
-CONCATENATE( 
-	new Float($F{totHours}/60).toString().split("\\.")[0], 
-	",", 
-	new Integer(new Integer(new Float($F{totHours}/60).toString().split("\\.")[1] )*60/100).toString(),
-	LEN(new Integer(new Integer(new Float($F{totHours}/60).toString().split("\\.")[1] )*60/100).toString() ) == 1 ? "0" : ""
 )]]></textFieldExpression>
 				</textField>
 				<textField>
@@ -771,7 +714,7 @@ CONCATENATE(
 					</reportElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="376" y="0" width="49" height="16" uuid="bf6bb026-3132-4c78-98ca-2bb84e0ce3e3">
+					<reportElement x="376" y="0" width="94" height="16" uuid="bf6bb026-3132-4c78-98ca-2bb84e0ce3e3">
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
 				</rectangle>
@@ -789,7 +732,7 @@ CONCATENATE(
 )]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="376" y="0" width="49" height="16" uuid="0b03791a-8c96-4a74-821b-24ed0560abcc">
+					<reportElement x="376" y="0" width="94" height="16" uuid="0b03791a-8c96-4a74-821b-24ed0560abcc">
 						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
