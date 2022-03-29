@@ -5663,9 +5663,10 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				oHP = hPDao.selectHourProfileById(con, oEP.getHourProfileId());
 				String theoreticalMinutes = lHDao.selectSumLineHourByHourProfileIdDayOfWeek(con, oHP.getId(),  oTR.getDate().getDayOfWeek());
 				String stringTheoreticalHours = "";
+				Float floatTheoreticalHours=0.0f;
 				if(theoreticalMinutes != null && !"".equals(theoreticalMinutes)){
-					Float theoreticalHours = Float.parseFloat(theoreticalMinutes) / 60;
-					stringTheoreticalHours = df.format(theoreticalHours);
+					floatTheoreticalHours = Float.parseFloat(theoreticalMinutes) / 60;
+					stringTheoreticalHours = floatTheoreticalHours.toString();
 					stringTheoreticalHours = stringTheoreticalHours.replaceAll("\\.", "");
 				}
 				stringTheoreticalHours = StringUtils.repeat("0", 4 - stringTheoreticalHours.length()) + stringTheoreticalHours;
@@ -5687,6 +5688,10 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					
 					//Convert sexagesimal minutes to centesimal minutes
 					String hour = oTR.getWorkingHours();
+					Float floatHour = Float.parseFloat(hour);
+					//GIS wants hours to be maximum the theoretical hours, and then find records for the exceptions (overs or absence)
+					if (floatHour>floatTheoreticalHours) hour=floatTheoreticalHours.toString();
+					
 					if(hour.contains(".")){
 						String sexagesimalMinutes = hour.split("\\.")[1];
 						Integer centesimalMinutes = (Integer.parseInt(sexagesimalMinutes) * 100)/60;
