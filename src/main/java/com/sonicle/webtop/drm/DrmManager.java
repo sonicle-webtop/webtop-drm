@@ -5666,7 +5666,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				if(theoreticalMinutes != null && !"".equals(theoreticalMinutes)){
 					Float theoreticalHours = Float.parseFloat(theoreticalMinutes) / 60;
 					stringTheoreticalHours = df.format(theoreticalHours);
-					stringTheoreticalHours = stringTheoreticalHours.replaceAll(",", "");
+					stringTheoreticalHours = stringTheoreticalHours.replaceAll("\\.", "");
 				}
 				stringTheoreticalHours = StringUtils.repeat("0", 4 - stringTheoreticalHours.length()) + stringTheoreticalHours;
 				
