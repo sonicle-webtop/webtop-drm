@@ -234,12 +234,4 @@ public class DrmServiceSettings extends BaseServiceSettings {
 	public void setGisCompanyCode(String value) {
 		setString(GIS_COMPANY_CODE, value); 
 	}
-	
-	public String getGisHeadquartersCode() {
-		return getString(GIS_HEADQUARTERS_CODE, ""); 
-	}
-
-	public void setGisHeadquartersCode(String value) {
-		setString(GIS_HEADQUARTERS_CODE, value); 
-	}	
 }

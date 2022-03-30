@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class EmployeeProfiles extends org.jooq.impl.TableImpl<com.sonicle.webtop.drm.jooq.tables.records.EmployeeProfilesRecord> {
 
-	private static final long serialVersionUID = 583043620;
+	private static final long serialVersionUID = -1098692449;
 
 	/**
 	 * The reference instance of <code>drm.employee_profiles</code>
@@ -70,6 +70,11 @@ public class EmployeeProfiles extends org.jooq.impl.TableImpl<com.sonicle.webtop
 	 * The column <code>drm.employee_profiles.hour_profile_id</code>.
 	 */
 	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.EmployeeProfilesRecord, java.lang.Integer> HOUR_PROFILE_ID = createField("hour_profile_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+	/**
+	 * The column <code>drm.employee_profiles.headquarters_code</code>.
+	 */
+	public final org.jooq.TableField<com.sonicle.webtop.drm.jooq.tables.records.EmployeeProfilesRecord, java.lang.String> HEADQUARTERS_CODE = createField("headquarters_code", org.jooq.impl.SQLDataType.VARCHAR.length(4), this, "");
 
 	/**
 	 * Create a <code>drm.employee_profiles</code> table reference

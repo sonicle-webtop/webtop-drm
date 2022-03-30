@@ -935,6 +935,7 @@ public class ManagerUtils {
 		eProfile.setExtraordinary(oEP.getExtraordinary());
 		eProfile.setOnlyPresence(oEP.getOnlyPresence());
 		eProfile.setHourProfileId(oEP.getHourProfileId());
+		eProfile.setHeadquartersCode(oEP.getHeadquartersCode());
 
 		return eProfile;
 	}
@@ -953,6 +954,7 @@ public class ManagerUtils {
 		oEp.setExtraordinary(eProfile.getExtraordinary());
 		oEp.setOnlyPresence(eProfile.getOnlyPresence());
 		oEp.setHourProfileId(eProfile.getHourProfileId());
+		oEp.setHeadquartersCode(eProfile.getHeadquartersCode());
 
 		return oEp;
 	}

@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class EmployeeProfiles implements java.io.Serializable {
 
-	private static final long serialVersionUID = 1482847721;
+	private static final long serialVersionUID = 2089173083;
 
 	private java.lang.Integer id;
 	private java.lang.String  domainId;
@@ -26,6 +26,7 @@ public class EmployeeProfiles implements java.io.Serializable {
 	private java.lang.Boolean extraordinary;
 	private java.lang.Boolean onlyPresence;
 	private java.lang.Integer hourProfileId;
+	private java.lang.String  headquartersCode;
 
 	public EmployeeProfiles() {}
 
@@ -37,7 +38,8 @@ public class EmployeeProfiles implements java.io.Serializable {
 		java.lang.String  tolerance,
 		java.lang.Boolean extraordinary,
 		java.lang.Boolean onlyPresence,
-		java.lang.Integer hourProfileId
+		java.lang.Integer hourProfileId,
+		java.lang.String  headquartersCode
 	) {
 		this.id = id;
 		this.domainId = domainId;
@@ -47,6 +49,7 @@ public class EmployeeProfiles implements java.io.Serializable {
 		this.extraordinary = extraordinary;
 		this.onlyPresence = onlyPresence;
 		this.hourProfileId = hourProfileId;
+		this.headquartersCode = headquartersCode;
 	}
 
 	public java.lang.Integer getId() {
@@ -111,5 +114,13 @@ public class EmployeeProfiles implements java.io.Serializable {
 
 	public void setHourProfileId(java.lang.Integer hourProfileId) {
 		this.hourProfileId = hourProfileId;
+	}
+
+	public java.lang.String getHeadquartersCode() {
+		return this.headquartersCode;
+	}
+
+	public void setHeadquartersCode(java.lang.String headquartersCode) {
+		this.headquartersCode = headquartersCode;
 	}
 }

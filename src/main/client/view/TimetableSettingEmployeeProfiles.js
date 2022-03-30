@@ -84,6 +84,11 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingEmployeeProfiles', {
 							flex: 1
 						},
 						{
+							dataIndex: 'headquartersCode',
+							header: me.mys.res('gpEmployeeProfile.headquartersCode.lbl'),
+							flex: 1
+						},
+						{
 							dataIndex: 'tolerance',
 							header: me.mys.res('gpEmployeeProfile.tolerance.lbl'),
 							flex: 1
