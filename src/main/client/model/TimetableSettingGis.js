@@ -45,7 +45,6 @@ Ext.define('Sonicle.webtop.drm.model.TimetableSettingGis', {
 	idProperty: 'id',
 	fields: [
 		WTF.field('id', 'string', true),
-		WTF.field('companyCode', 'string', true),
-		WTF.field('headquartersCode', 'string', true)
+		WTF.field('companyCode', 'string', true)
 	]
 });

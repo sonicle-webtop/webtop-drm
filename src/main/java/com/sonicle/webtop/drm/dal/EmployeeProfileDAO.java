@@ -139,6 +139,7 @@ public class EmployeeProfileDAO extends BaseDAO {
 				.set(EMPLOYEE_PROFILES.TOLERANCE, item.getTolerance())
 				.set(EMPLOYEE_PROFILES.USER_ID, item.getUserId())
 				.set(EMPLOYEE_PROFILES.HOUR_PROFILE_ID, item.getHourProfileId())
+				.set(EMPLOYEE_PROFILES.HEADQUARTERS_CODE, item.getHeadquartersCode())
 				.where(
 						EMPLOYEE_PROFILES.ID.equal(item.getId())
 				)

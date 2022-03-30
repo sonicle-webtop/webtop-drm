@@ -39,7 +39,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingGis', {
 		title: '{timetable.config.gis.tit}',
 		iconCls: 'wtdrm-icon-configuration',
 		width: 350,
-		height: 200
+		height: 140
 	},
 	modelName: 'Sonicle.webtop.drm.model.TimetableSettingGis',
 	initComponent: function () {
@@ -59,14 +59,6 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingGis', {
                     selectOnFocus: true,
                     width: 300,
 					maxLength: 6
-                },
-                {
-                    xtype: 'textfield',
-                    bind: '{record.headquartersCode}',
-                    fieldLabel: me.mys.res('timetable.settings.gis.fld-headquartersCode.lbl'),
-                    selectOnFocus: true,
-                    width: 300,
-					maxLength: 4
                 }
             ]
 		});

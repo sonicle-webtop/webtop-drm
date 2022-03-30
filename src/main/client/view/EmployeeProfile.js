@@ -39,7 +39,7 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 		title: '{EmployeeProfile.tit}',
 		iconCls: 'wtdrm-icon-configurationEmployeeProfiles',
 		width: 400,
-		height: 280,
+		height: 320,
 		modal: true
 	},
 	fieldTitle: 'description',
@@ -86,6 +86,14 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 							fieldLabel: me.mys.res('EmployeeProfile.fld-number.lbl'),
 							selectOnFocus: true,
                             width: 260
+						},
+						{
+							xtype: 'textfield',
+							bind: '{record.headquartersCode}',
+							fieldLabel: me.mys.res('EmployeeProfile.fld-headquartersCode.lbl'),
+							selectOnFocus: true,
+							width: 300,
+							maxLength: 4
 						},
 						{
 							xtype: 'numberfield',

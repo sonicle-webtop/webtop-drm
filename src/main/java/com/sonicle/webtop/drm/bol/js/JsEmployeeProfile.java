@@ -32,10 +32,7 @@
  */
 package com.sonicle.webtop.drm.bol.js;
 
-import com.sonicle.webtop.drm.model.LineHour;
 import com.sonicle.webtop.drm.model.EmployeeProfile;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -51,6 +48,7 @@ public class JsEmployeeProfile {
 	public Boolean extraordinary;
 	public Boolean onlyPresence;
 	public Integer hourProfileId;
+	public String headquartersCode;
 
 
 	public JsEmployeeProfile(EmployeeProfile ep) {
@@ -62,6 +60,7 @@ public class JsEmployeeProfile {
 		this.extraordinary = ep.getExtraordinary();
 		this.onlyPresence = ep.getOnlyPresence();
 		this.hourProfileId = ep.getHourProfileId();
+		this.headquartersCode = ep.getHeadquartersCode();
 
 	}
 
@@ -77,6 +76,7 @@ public class JsEmployeeProfile {
 		newHp.setExtraordinary(js.extraordinary);
 		newHp.setOnlyPresence(js.onlyPresence);
 		newHp.setHourProfileId(js.hourProfileId);
+		newHp.setHeadquartersCode(js.headquartersCode);
 
 		return newHp;
 	}

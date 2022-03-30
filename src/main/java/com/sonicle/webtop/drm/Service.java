@@ -2926,8 +2926,6 @@ public class Service extends BaseService {
 				TimetableSettingGis ttSettingGis = new TimetableSettingGis();
 				
 				ttSettingGis.setCompanyCode(ss.getGisCompanyCode());
-				ttSettingGis.setHeadquartersCode(ss.getGisHeadquartersCode());
-
 				
 				item = new JsTimetableSettingGis(ttSettingGis);
 
@@ -2938,8 +2936,6 @@ public class Service extends BaseService {
 
 				if (pl.map.has("companyCode")) 
 					ss.setGisCompanyCode(pl.data.companyCode);
-				if (pl.map.has("headquartersCode")) 
-					ss.setGisHeadquartersCode(pl.data.headquartersCode);
 
 				new JsonResult().printTo(out);
 

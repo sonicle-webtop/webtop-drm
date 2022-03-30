@@ -4114,7 +4114,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 
 	public EmployeeProfile getEmployeeProfile(Integer id) throws WTException {
 		Connection con = null;
-		EmployeeProfileDAO epDao =EmployeeProfileDAO.getInstance();
+		EmployeeProfileDAO epDao = EmployeeProfileDAO.getInstance();
 		LineHourDAO ehDao = LineHourDAO.getInstance();
 
 		EmployeeProfile employeeProfile = null;
@@ -5674,7 +5674,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				
 				String empty = "000";
 				String companyCode = StringUtils.repeat("0", 6 - dss.getGisCompanyCode().length()) + dss.getGisCompanyCode();
-				String headquartersCod = StringUtils.repeat("0", 4 - dss.getGisHeadquartersCode().length()) + dss.getGisHeadquartersCode();
+				String headquartersCod = (oEP.getHeadquartersCode() == null) ? ("0000") : (StringUtils.repeat("0", 4 - oEP.getHeadquartersCode().length()) + oEP.getHeadquartersCode());
 				String employee = StringUtils.repeat("0", 6 - oEP.getNumber().length()) + oEP.getNumber();
 				String date = sdf.format(oTR.getDate().toDate());
 				String unitOfMeasure = "H";

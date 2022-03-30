@@ -32,11 +32,7 @@
  */
 package com.sonicle.webtop.drm.bol.js;
 
-import com.sonicle.webtop.drm.model.HolidayDate;
-import com.sonicle.webtop.drm.model.TimetableSetting;
 import com.sonicle.webtop.drm.model.TimetableSettingGis;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -46,18 +42,15 @@ public class JsTimetableSettingGis {
 	
 	public String id = "tmtbgis";
 	public String companyCode;
-	public String headquartersCode;
 
 	public JsTimetableSettingGis(TimetableSettingGis setting) {
 		this.companyCode = setting.getCompanyCode();
-		this.headquartersCode = setting.getHeadquartersCode();
 	}
 
 	public static TimetableSettingGis createTimetableSettingGis(JsTimetableSettingGis js) {
 
 		TimetableSettingGis ttg = new TimetableSettingGis();
 		ttg.setCompanyCode(js.companyCode);
-		ttg.setHeadquartersCode(js.headquartersCode);
 		
 		return ttg;
 	}
