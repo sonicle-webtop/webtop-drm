@@ -936,6 +936,7 @@ public class ManagerUtils {
 		eProfile.setOnlyPresence(oEP.getOnlyPresence());
 		eProfile.setHourProfileId(oEP.getHourProfileId());
 		eProfile.setHeadquartersCode(oEP.getHeadquartersCode());
+		eProfile.setNoStamping(oEP.getNoStamping());
 
 		return eProfile;
 	}
@@ -955,6 +956,7 @@ public class ManagerUtils {
 		oEp.setOnlyPresence(eProfile.getOnlyPresence());
 		oEp.setHourProfileId(eProfile.getHourProfileId());
 		oEp.setHeadquartersCode(eProfile.getHeadquartersCode());
+		oEp.setNoStamping(eProfile.getNoStamping());
 
 		return oEp;
 	}

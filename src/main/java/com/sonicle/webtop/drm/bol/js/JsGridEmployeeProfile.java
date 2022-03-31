@@ -51,6 +51,7 @@ public class JsGridEmployeeProfile {
 	public Boolean onlyPresence;
 	public String hourProfile;
 	public String headquartersCode;
+	public Boolean noStamping;
 	
 	public JsGridEmployeeProfile(OEmployeeProfile ep){
 		this.id = ep.getId();
@@ -61,5 +62,6 @@ public class JsGridEmployeeProfile {
 		this.extraordinary = ep.getExtraordinary();
 		this.onlyPresence = ep.getOnlyPresence();
 		this.headquartersCode = ep.getHeadquartersCode();
+		this.noStamping = ep.getNoStamping();
 	}
 }

@@ -49,6 +49,7 @@ public class JsEmployeeProfile {
 	public Boolean onlyPresence;
 	public Integer hourProfileId;
 	public String headquartersCode;
+	public Boolean noStamping;
 
 
 	public JsEmployeeProfile(EmployeeProfile ep) {
@@ -61,6 +62,7 @@ public class JsEmployeeProfile {
 		this.onlyPresence = ep.getOnlyPresence();
 		this.hourProfileId = ep.getHourProfileId();
 		this.headquartersCode = ep.getHeadquartersCode();
+		this.noStamping = ep.getNoStamping();
 
 	}
 
@@ -77,6 +79,7 @@ public class JsEmployeeProfile {
 		newHp.setOnlyPresence(js.onlyPresence);
 		newHp.setHourProfileId(js.hourProfileId);
 		newHp.setHeadquartersCode(js.headquartersCode);
+		newHp.setNoStamping(js.noStamping);
 
 		return newHp;
 	}

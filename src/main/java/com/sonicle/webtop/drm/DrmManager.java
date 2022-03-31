@@ -4585,27 +4585,33 @@ public class DrmManager extends BaseManager implements IDrmManager{
 	}
 
 	public List<OTimetableReport> generateOrViewTimetableReport(TimetableReportQuery query) throws WTException {
-
 		List<OTimetableReport> items = new ArrayList<>();
 
 		if(query != null) {
 			if(query.mode.equals("1")){
-				Date generationDate = new Date();
-				generationDate.setDate(1);
-				generationDate.setMonth(query.month-1);
-				generationDate.setYear(query.year-1900);
-
-				Date todayDate = new Date();
-				todayDate.setDate(1);
-
-				if(todayDate.after(generationDate)) {
-					//Se oggi è dopo rispetto alla data da controllare, visualizzo.
+				//Bottone Visualizza
+				if(query.targetUserId == null){
+					//Se sto generando per tutti gli utenti, il visualizza è sempre e solo visualizza
 					items = getTimetableReport(query);
 				}else{
-					//Altrimenti significa che oggi è uguale o prima alla data da controllare, rigenero.
-					items = generateTimetableReport(query);
+					Date generationDate = new Date();
+					generationDate.setDate(1);
+					generationDate.setMonth(query.month-1);
+					generationDate.setYear(query.year-1900);
+
+					Date todayDate = new Date();
+					todayDate.setDate(1);
+
+					if(todayDate.after(generationDate)) {
+						//Se oggi è dopo rispetto alla data da controllare, visualizzo.
+						items = getTimetableReport(query);
+					}else{
+						//Altrimenti significa che oggi è uguale o prima alla data da controllare, rigenero.
+						items = generateTimetableReport(query);
+					}
 				}
 			}else if(query.mode.equals("2")){
+				//Bottone Forza Ricalcolo
 				items = generateTimetableReport(query);
 			}
 		}
@@ -4635,9 +4641,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			EmployeeProfileDAO epDAO = EmployeeProfileDAO.getInstance();
 			LineHourDAO lhDAO = LineHourDAO.getInstance();			
 
-			if(query != null) {
-				//Empty Table for single user
-				
+			if(query != null) {				
 				Date d = new Date();
 				d.setDate(1);
 				d.setMonth(query.month-1);
@@ -4666,25 +4670,62 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					for (OUser usr : users) {
 						ttrs = new ArrayList();
 					
-						trsf = tstmpDAO.getStampsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
-						te = teDAO.getEventsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
-						wr = wrDAO.getWorkReportsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
-						jb = jbDAO.getJobsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
-					
-						ttrs.addAll(mergeStampByDate(trsf, con));
-						ttrs.addAll(ManagerUtils.mergeEventByDate(ManagerUtils.createOTimetableReport(te)));
-						ttrs.addAll(ManagerUtils.mergeWorkReportByDate(ManagerUtils.createOTimetableReportByWorkReport(wr)));
-						ttrs.addAll(ManagerUtils.mergeJobByDate(ManagerUtils.createOTimetableReportByJob(jb)));
-					
-						ttrs = ManagerUtils.mergeStampAndEventByDate(con, ttrs, epDAO.selectEmployeeProfileByDomainUser(con, getTargetProfileId().getDomainId(), usr.getUserId()).getHourProfileId());
+						OEmployeeProfile oEP = epDAO.selectEmployeeProfileByDomainUser(con, getTargetProfileId().getDomainId(),  usr.getUserId());
 						
-						for(OTimetableReport itm : ttrs) {
-							itm.setTargetUserId(usr.getUserId());
+						if(Boolean.TRUE.equals(oEP.getNoStamping())){
+							//Utente che non utilizza le timbrature, creo report con ore lavorative coincidenti alle ore del proprio profilo orario.
+							trsf = new ArrayList<>();
+							Integer hourProfileId =  oEP.getHourProfileId();
+							List<DateTime> dates = new ArrayList();							
+							DateTime dt = new DateTime(query.year, query.month, 1, 0, 0, 0, 0);
+							
+							for(int i = 1; i <= dt.dayOfMonth().withMaximumValue().getDayOfMonth(); i++){
+								dates.add(dt.withDayOfMonth(i));
+							}
+							for(DateTime dT : dates){
+								OTimetableReport temp = new OTimetableReport();
+								temp.setDomainId(getTargetProfileId().getDomainId());
+								temp.setCompanyId(query.companyId);
+								temp.setTargetUserId(usr.getUserId());
+								temp.setDate(dT);		
+
+								String profileHour = lhDAO.selectSumLineHourByHourProfileIdDayOfWeek(con, hourProfileId, dT.getDayOfWeek());
+								
+								if (profileHour != null) {
+									Float pH = Float.parseFloat(profileHour);
+									pH = pH/60;
+
+									temp.setWorkingHours(pH.toString());	
+								}																	
+
+								trsf.add(temp);
+							}
+
+							ttrs.addAll(trsf);
+
+						}else{
+							trsf = tstmpDAO.getStampsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
+							te = teDAO.getEventsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
+							wr = wrDAO.getWorkReportsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
+							jb = jbDAO.getJobsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
+
+							ttrs.addAll(mergeStampByDate(trsf, con));
+							ttrs.addAll(ManagerUtils.mergeEventByDate(ManagerUtils.createOTimetableReport(te)));
+							ttrs.addAll(ManagerUtils.mergeWorkReportByDate(ManagerUtils.createOTimetableReportByWorkReport(wr)));
+							ttrs.addAll(ManagerUtils.mergeJobByDate(ManagerUtils.createOTimetableReportByJob(jb)));
+
+							ttrs = ManagerUtils.mergeStampAndEventByDate(con, ttrs, oEP.getHourProfileId());
+
+							for(OTimetableReport itm : ttrs) {
+								itm.setTargetUserId(usr.getUserId());
+							}
 						}
 						
 						trs.addAll(ttrs);
 					}
 				}else {
+					
+					OEmployeeProfile oEP = epDAO.selectEmployeeProfileByDomainUser(con, getTargetProfileId().getDomainId(),  query.targetUserId);
 					
 					//Save "Other", "Causal", "Note" for re-set in new generation rows
 					for(OTimetableReport itm : trDAO.selectByDomainIdTargetUserIdMonthYear(con, getTargetProfileId().getDomainId(), query.targetUserId, fromDate, toDate)){
@@ -4697,19 +4738,51 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					
 					trDAO.deleteByDomainIdTargetUserIdMonthYear(con, getTargetProfileId().getDomainId(), query.targetUserId, fromDate, toDate);
 					
-					//Get Data for Single User Selected
-					trsf = tstmpDAO.getStampsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
-					te = teDAO.getEventsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
-					wr = wrDAO.getWorkReportsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
-					jb = jbDAO.getJobsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
+					if(Boolean.TRUE.equals(oEP.getNoStamping())){
+						//Utente che non utilizza le timbrature, creo report con ore lavorative coincidenti alle ore del proprio profilo orario.
+						trsf = new ArrayList<>();
+						Integer hourProfileId =  oEP.getHourProfileId();
+						List<DateTime> dates = new ArrayList();							
+						DateTime dt = new DateTime(query.year, query.month, 1, 0, 0, 0, 0);
 
-					trs.addAll(mergeStampByDate(trsf, con));
-					trs.addAll(ManagerUtils.mergeEventByDate(ManagerUtils.createOTimetableReport(te)));
-					// aggiungere i work_report che hanno il campo timetable_hours > 0 e i jobs solo di alcune attività 
-					trs.addAll(ManagerUtils.mergeWorkReportByDate(ManagerUtils.createOTimetableReportByWorkReport(wr)));
-					trs.addAll(ManagerUtils.mergeJobByDate(ManagerUtils.createOTimetableReportByJob(jb)));
+						for(int i = 1; i <= dt.dayOfMonth().withMaximumValue().getDayOfMonth(); i++){
+							dates.add(dt.withDayOfMonth(i));
+						}
+						for(DateTime dT : dates){
+							OTimetableReport temp = new OTimetableReport();
+							temp.setDomainId(getTargetProfileId().getDomainId());
+							temp.setCompanyId(query.companyId);
+							temp.setTargetUserId(query.targetUserId);
+							temp.setDate(dT);		
+							
+							String profileHour = lhDAO.selectSumLineHourByHourProfileIdDayOfWeek(con, hourProfileId, dT.getDayOfWeek());
 					
-					trs = ManagerUtils.mergeStampAndEventByDate(con, trs, epDAO.selectEmployeeProfileByDomainUser(con, getTargetProfileId().getDomainId(), query.targetUserId).getHourProfileId());
+							if (profileHour != null) {
+								Float pH = Float.parseFloat(profileHour);
+								pH = pH/60;
+
+								temp.setWorkingHours(pH.toString());		
+							}																		
+
+							trsf.add(temp);
+						}
+
+						trs.addAll(trsf);
+					}else{
+						//Get Data for Single User Selected
+						trsf = tstmpDAO.getStampsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
+						te = teDAO.getEventsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
+						wr = wrDAO.getWorkReportsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
+						jb = jbDAO.getJobsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
+
+						trs.addAll(mergeStampByDate(trsf, con));
+						trs.addAll(ManagerUtils.mergeEventByDate(ManagerUtils.createOTimetableReport(te)));
+						// aggiungere i work_report che hanno il campo timetable_hours > 0 e i jobs solo di alcune attività 
+						trs.addAll(ManagerUtils.mergeWorkReportByDate(ManagerUtils.createOTimetableReportByWorkReport(wr)));
+						trs.addAll(ManagerUtils.mergeJobByDate(ManagerUtils.createOTimetableReportByJob(jb)));
+
+						trs = ManagerUtils.mergeStampAndEventByDate(con, trs, oEP.getHourProfileId());
+					}
 					
 					for(OTimetableReport itm : trs) {
 						itm.setTargetUserId(query.targetUserId);
