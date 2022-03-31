@@ -106,6 +106,13 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingEmployeeProfiles', {
 							dataIndex: 'onlyPresence',
 							header: me.mys.res('gpEmployeeProfile.onlyPresence.lbl'),
 							flex: 1
+						},
+						{
+							xtype: 'checkcolumn',
+							disabled: true,
+							dataIndex: 'noStamping',
+							header: me.mys.res('gpEmployeeProfile.noStamping.lbl'),
+							flex: 1
 						}
 					],
 					tbar: [

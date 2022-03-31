@@ -16,7 +16,7 @@ package com.sonicle.webtop.drm.jooq.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class EmployeeProfiles implements java.io.Serializable {
 
-	private static final long serialVersionUID = 2089173083;
+	private static final long serialVersionUID = 897913955;
 
 	private java.lang.Integer id;
 	private java.lang.String  domainId;
@@ -27,6 +27,7 @@ public class EmployeeProfiles implements java.io.Serializable {
 	private java.lang.Boolean onlyPresence;
 	private java.lang.Integer hourProfileId;
 	private java.lang.String  headquartersCode;
+	private java.lang.Boolean noStamping;
 
 	public EmployeeProfiles() {}
 
@@ -39,7 +40,8 @@ public class EmployeeProfiles implements java.io.Serializable {
 		java.lang.Boolean extraordinary,
 		java.lang.Boolean onlyPresence,
 		java.lang.Integer hourProfileId,
-		java.lang.String  headquartersCode
+		java.lang.String  headquartersCode,
+		java.lang.Boolean noStamping
 	) {
 		this.id = id;
 		this.domainId = domainId;
@@ -50,6 +52,7 @@ public class EmployeeProfiles implements java.io.Serializable {
 		this.onlyPresence = onlyPresence;
 		this.hourProfileId = hourProfileId;
 		this.headquartersCode = headquartersCode;
+		this.noStamping = noStamping;
 	}
 
 	public java.lang.Integer getId() {
@@ -122,5 +125,13 @@ public class EmployeeProfiles implements java.io.Serializable {
 
 	public void setHeadquartersCode(java.lang.String headquartersCode) {
 		this.headquartersCode = headquartersCode;
+	}
+
+	public java.lang.Boolean getNoStamping() {
+		return this.noStamping;
+	}
+
+	public void setNoStamping(java.lang.Boolean noStamping) {
+		this.noStamping = noStamping;
 	}
 }

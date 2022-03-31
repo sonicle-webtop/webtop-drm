@@ -129,6 +129,11 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 							xtype: 'checkbox',
 							bind: '{record.onlyPresence}',
 							boxLabel: me.mys.res('EmployeeProfile.fld-onlyPresence.lbl')
+						},
+						{
+							xtype: 'checkbox',
+							bind: '{record.noStamping}',
+							boxLabel: me.mys.res('EmployeeProfile.fld-noStamping.lbl')
 						}
 					]
 				}

@@ -140,6 +140,7 @@ public class EmployeeProfileDAO extends BaseDAO {
 				.set(EMPLOYEE_PROFILES.USER_ID, item.getUserId())
 				.set(EMPLOYEE_PROFILES.HOUR_PROFILE_ID, item.getHourProfileId())
 				.set(EMPLOYEE_PROFILES.HEADQUARTERS_CODE, item.getHeadquartersCode())
+				.set(EMPLOYEE_PROFILES.NO_STAMPING, item.getNoStamping())
 				.where(
 						EMPLOYEE_PROFILES.ID.equal(item.getId())
 				)

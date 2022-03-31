@@ -45,6 +45,7 @@ Ext.define('Sonicle.webtop.drm.model.GridEmployeeProfiles', {
         WTF.calcField('label', 'string', ['hourProfile'], function(v, rec) {
 			return rec.get('hourProfile');
 		}),
-		WTF.roField('headquartersCode', 'string')
+		WTF.roField('headquartersCode', 'string'),
+		WTF.roField('noStamping','bool')
 	]
 });
