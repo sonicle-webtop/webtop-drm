@@ -4676,13 +4676,13 @@ public class DrmManager extends BaseManager implements IDrmManager{
 							//Utente che non utilizza le timbrature, creo report con ore lavorative coincidenti alle ore del proprio profilo orario.
 							trsf = new ArrayList<>();
 							Integer hourProfileId =  oEP.getHourProfileId();
-							List<DateTime> dates = new ArrayList();							
-							DateTime dt = new DateTime(query.year, query.month, 1, 0, 0, 0, 0);
+							List<LocalDateTime> dates = new ArrayList();							
+							LocalDateTime dt = new LocalDateTime(query.year, query.month, 1, 0, 0, 0, 0);
 							
 							for(int i = 1; i <= dt.dayOfMonth().withMaximumValue().getDayOfMonth(); i++){
 								dates.add(dt.withDayOfMonth(i));
 							}
-							for(DateTime dT : dates){
+							for(LocalDateTime dT : dates){
 								OTimetableReport temp = new OTimetableReport();
 								temp.setDomainId(getTargetProfileId().getDomainId());
 								temp.setCompanyId(query.companyId);
@@ -4742,13 +4742,13 @@ public class DrmManager extends BaseManager implements IDrmManager{
 						//Utente che non utilizza le timbrature, creo report con ore lavorative coincidenti alle ore del proprio profilo orario.
 						trsf = new ArrayList<>();
 						Integer hourProfileId =  oEP.getHourProfileId();
-						List<DateTime> dates = new ArrayList();							
-						DateTime dt = new DateTime(query.year, query.month, 1, 0, 0, 0, 0);
+						List<LocalDateTime> dates = new ArrayList();							
+						LocalDateTime dt = new LocalDateTime(query.year, query.month, 1, 0, 0, 0, 0);
 
 						for(int i = 1; i <= dt.dayOfMonth().withMaximumValue().getDayOfMonth(); i++){
 							dates.add(dt.withDayOfMonth(i));
 						}
-						for(DateTime dT : dates){
+						for(LocalDateTime dT : dates){
 							OTimetableReport temp = new OTimetableReport();
 							temp.setDomainId(getTargetProfileId().getDomainId());
 							temp.setCompanyId(query.companyId);
