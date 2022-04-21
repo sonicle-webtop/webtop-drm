@@ -176,6 +176,7 @@ import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
 import org.joda.time.Period;
 import org.jooq.Result;
 
@@ -1072,8 +1073,8 @@ public class ManagerUtils {
 		stamp.setDomainId(oTS.getDomainId());
 		stamp.setUserId(oTS.getUserId());
 		stamp.setType(oTS.getType());
-		stamp.setEntrance(oTS.getEntrance().toDateTime());
-		stamp.setExit(oTS.getExit().toDateTime());
+		stamp.setEntrance(toDateTime(oTS.getEntrance()));
+		stamp.setExit(toDateTime(oTS.getExit()));
 		stamp.setLocation(oTS.getLocation());
 		// stamp.setActivityId(oTS.getActivityId());
 
@@ -1086,8 +1087,8 @@ public class ManagerUtils {
 			tgt.setDomainId(src.getDomainId());
 			tgt.setUserId(src.getUserId());
 			tgt.setType(src.getType());
-			tgt.setEntrance(src.getEntrance().toDateTime());
-			tgt.setExit(src.getExit().toDateTime());
+			tgt.setEntrance(toDateTime(src.getEntrance()));
+			tgt.setExit(toDateTime(src.getExit()));
 			tgt.setLocation(src.getLocation());
 			// tgt.setActivityId(src.getActivityId());
 		}
@@ -1105,8 +1106,8 @@ public class ManagerUtils {
 		oTS.setDomainId(stamp.getDomainId());
 		oTS.setUserId(stamp.getUserId());
 		oTS.setType(stamp.getType());
-		oTS.setEntrance(stamp.getEntrance().toLocalDateTime());
-		oTS.setExit(stamp.getExit().toLocalDateTime());
+		oTS.setEntrance(toLocalDateTime(stamp.getEntrance()));
+		oTS.setExit(toLocalDateTime(stamp.getExit()));
 		oTS.setLocation(stamp.getLocation());
 
 		return oTS;
@@ -1341,8 +1342,8 @@ public class ManagerUtils {
 		o.setDomainId(oOpt.getDomainId());
 		o.setCompanyId(oOpt.getCompanyId());
 		o.setOperatorId(oOpt.getOperatorId());
-		o.setStartDate(oOpt.getStartDate().toDateTime());
-		o.setEndDate(oOpt.getEndDate().toDateTime());
+		o.setStartDate(toDateTime(oOpt.getStartDate()));
+		o.setEndDate(toDateTime(oOpt.getEndDate()));
 		o.setExecutedWith(oOpt.getExecutedWith());
 		o.setCustomerId(oOpt.getCustomerId());
 		o.setCustomerStatId(oOpt.getCustomerStatId());
@@ -1433,8 +1434,8 @@ public class ManagerUtils {
 		act.setOpportunityId(oAct.getOpportunityId());
 		act.setOperatorId(oAct.getOperatorId());
 		act.setStatusId(oAct.getStatusId());
-		act.setStartDate(oAct.getStartDate().toDateTime());
-		act.setEndDate(oAct.getEndDate().toDateTime());
+		act.setStartDate(toDateTime(oAct.getStartDate()));
+		act.setEndDate(toDateTime(oAct.getEndDate()));
 		act.setDescription(oAct.getDescription());
 		act.setPlace(oAct.getPlace());
 		act.setSubsequentActions(oAct.getSubsequentActions());
@@ -2100,7 +2101,7 @@ public class ManagerUtils {
 		if(!trsf.isEmpty()){
 			List<DateTime> dates = new ArrayList();
 			for(int i = trsf.get(0).getDate().dayOfMonth().getMinimumValue(); i <= trsf.get(0).getDate().dayOfMonth().getMaximumValue(); i++){
-				dates.add(trsf.get(0).getDate().withDayOfMonth(i).toDateTime());
+				dates.add(toDateTime(trsf.get(0).getDate().withDayOfMonth(i)));
 			}
 
 			for(DateTime dt : dates){
@@ -2910,4 +2911,15 @@ public class ManagerUtils {
 		
 		return jb;
 	}
+	
+	public static DateTime toDateTime(LocalDateTime ldt) {
+		if (ldt==null) return null;
+		return ldt.toDateTime();
+	}
+	
+	public static LocalDateTime toLocalDateTime(DateTime dt) {
+		if (dt==null) return null;
+		return dt.toLocalDateTime();
+	}
+	
 }
