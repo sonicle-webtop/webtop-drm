@@ -145,14 +145,6 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableReportGenerate', {
 						},{
 							xtype: 'spacer'
 						},{
-							xtype: 'button',
-							hidden: !me.isSupervisorUser,
-							text: WT.res(me.sid, 'btn-generate.lbl'),
-							tooltip: WT.res(me.sid, 'btn-generate-tltp.lbl'),
-							handler: function () {
-								me.extractData(2);
-							}
-						},{
 							xtype: 'spacer'
 						},{
 							xtype: 'spacer'
@@ -210,7 +202,15 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableReportGenerate', {
                     maxValue: 31,
 					fieldLabel: WT.res(me.sid, 'timetableReportGenerate.fld-fromday.lbl'),
 					tabIndex: 105
-                }
+                },{
+					xtype: 'button',
+					hidden: !me.isSupervisorUser,
+					text: WT.res(me.sid, 'btn-generate.lbl'),
+					tooltip: WT.res(me.sid, 'btn-generate-tltp.lbl'),
+					handler: function () {
+						me.extractData(2);
+					}
+				}
 			]
 		});
 	},
