@@ -3131,6 +3131,13 @@ public class Service extends BaseService {
 			TimetableReportQuery trQuery = TimetableReportQuery.fromJson(query);
 			
 			trs = manager.getTimetableReport(trQuery);
+
+			Date date = new Date();
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+			String title = "report_" + formatter.format(date);
+			if(trQuery != null){
+				title = (trQuery.targetUserId != null) ? title + "_" + trQuery.targetUserId : title + "_tutti";
+			}
 			
 			for(OTimetableReport otr : trs) {
 				items.add(new RBTimetableReport(WT.getCoreManager(), manager, otr, getEnv().getProfile().getLocale()));
@@ -3140,7 +3147,7 @@ public class Service extends BaseService {
 			RptTimetableReport rpt = new RptTimetableReport(builder.build());
 			rpt.setDataSource(items);
 			
-			ServletUtils.setFileStreamHeaders(response, filename + ".pdf");
+			ServletUtils.setFileStreamHeaders(response, title + ".pdf");
 			WT.generateReportToStream(rpt, AbstractReport.OutputType.PDF, response.getOutputStream());
 			
 		} catch(Exception ex) {
@@ -3160,6 +3167,13 @@ public class Service extends BaseService {
 			TimetableReportQuery trQuery = TimetableReportQuery.fromJson(query);
 			
 			trs = manager.getTimetableReport(trQuery);
+
+			Date date = new Date();
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+			String title = "report_" + formatter.format(date);
+			if(trQuery != null){
+				title = (trQuery.targetUserId != null) ? title + "_" + trQuery.targetUserId : title + "_tutti";
+			}
 			
 			for(OTimetableReport otr : trs) {
 				items.add(new RBTimetableEncoReport(WT.getCoreManager(), manager, otr));
@@ -3169,7 +3183,7 @@ public class Service extends BaseService {
 			RptTimetableReport rpt = new RptTimetableReport(builder.build());
 			rpt.setDataSource(items);
 			
-			ServletUtils.setFileStreamHeaders(response, filename + ".pdf");
+			ServletUtils.setFileStreamHeaders(response, title + ".pdf");
 			WT.generateReportToStream(rpt, AbstractReport.OutputType.PDF, response.getOutputStream());
 			
 		} catch(Exception ex) {

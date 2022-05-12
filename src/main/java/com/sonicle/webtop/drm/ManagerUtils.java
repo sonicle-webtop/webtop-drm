@@ -1994,20 +1994,117 @@ public class ManagerUtils {
 			if(hashTr.get(otr.getDate().toLocalDate()) == null){
 				hashTr.put(otr.getDate().toLocalDate(), otr);
 			}else{
-				if(hashTr.get(otr.getDate().toLocalDate()).getOvertime() == null)
+				if(hashTr.get(otr.getDate().toLocalDate()).getOvertime() == null){
 					hashTr.get(otr.getDate().toLocalDate()).setOvertime(otr.getOvertime());
-				if(hashTr.get(otr.getDate().toLocalDate()).getPaidLeave() == null)
+				}else{
+					if(otr.getOvertime() != null  && !"".equals(otr.getOvertime())){
+						//VASI - Sommo le richieste Overtime
+						String oldRequest = hashTr.get(otr.getDate().toLocalDate()).getOvertime();
+						String newRequest = otr.getOvertime();
+						String oldHours = oldRequest.split("\\.")[0];
+						String oldMinutes = oldRequest.split("\\.")[1];
+						String newHours = newRequest.split("\\.")[0];
+						String newMinutes = newRequest.split("\\.")[1];
+						Integer totalMinutes = (Integer.parseInt(oldHours) *60) + Integer.parseInt(oldMinutes) + (Integer.parseInt(newHours) *60) + Integer.parseInt(newMinutes);
+						hashTr.get(otr.getDate().toLocalDate()).setOvertime(((int)totalMinutes/60) + "." + (((int)totalMinutes%60 == 0) ? "00" : (int)totalMinutes%60));
+					}
+				}
+
+				if(hashTr.get(otr.getDate().toLocalDate()).getPaidLeave() == null){
 					hashTr.get(otr.getDate().toLocalDate()).setPaidLeave(otr.getPaidLeave());
-				if(hashTr.get(otr.getDate().toLocalDate()).getUnpaidLeave() == null)
+				}else{
+					if(otr.getPaidLeave() != null  && !"".equals(otr.getPaidLeave())){
+						//VASI - Sommo le richieste PaidLeave
+						String oldRequest = hashTr.get(otr.getDate().toLocalDate()).getPaidLeave();
+						String newRequest = otr.getPaidLeave();
+						String oldHours = oldRequest.split("\\.")[0];
+						String oldMinutes = oldRequest.split("\\.")[1];
+						String newHours = newRequest.split("\\.")[0];
+						String newMinutes = newRequest.split("\\.")[1];
+						Integer totalMinutes = (Integer.parseInt(oldHours) *60) + Integer.parseInt(oldMinutes) + (Integer.parseInt(newHours) *60) + Integer.parseInt(newMinutes);
+						hashTr.get(otr.getDate().toLocalDate()).setPaidLeave(((int)totalMinutes/60) + "." + (((int)totalMinutes%60 == 0) ? "00" : (int)totalMinutes%60));
+					}
+				}
+
+				if(hashTr.get(otr.getDate().toLocalDate()).getUnpaidLeave() == null){
 					hashTr.get(otr.getDate().toLocalDate()).setUnpaidLeave(otr.getUnpaidLeave());
-				if(hashTr.get(otr.getDate().toLocalDate()).getHoliday() == null)
+				}else{
+					if(otr.getUnpaidLeave() != null  && !"".equals(otr.getUnpaidLeave())){
+						//VASI - Sommo le richieste UnpaidLeave
+						String oldRequest = hashTr.get(otr.getDate().toLocalDate()).getUnpaidLeave();
+						String newRequest = otr.getUnpaidLeave();
+						String oldHours = oldRequest.split("\\.")[0];
+						String oldMinutes = oldRequest.split("\\.")[1];
+						String newHours = newRequest.split("\\.")[0];
+						String newMinutes = newRequest.split("\\.")[1];
+						Integer totalMinutes = (Integer.parseInt(oldHours) *60) + Integer.parseInt(oldMinutes) + (Integer.parseInt(newHours) *60) + Integer.parseInt(newMinutes);
+						hashTr.get(otr.getDate().toLocalDate()).setUnpaidLeave(((int)totalMinutes/60) + "." + (((int)totalMinutes%60 == 0) ? "00" : (int)totalMinutes%60));
+					}
+				}
+
+				if(hashTr.get(otr.getDate().toLocalDate()).getHoliday() == null){
 					hashTr.get(otr.getDate().toLocalDate()).setHoliday(otr.getHoliday());
-				if(hashTr.get(otr.getDate().toLocalDate()).getMedicalVisit() == null)
+				}else{
+					if(otr.getHoliday() != null  && !"".equals(otr.getHoliday())){
+						//VASI - Sommo le richieste Holiday
+						String oldRequest = hashTr.get(otr.getDate().toLocalDate()).getHoliday();
+						String newRequest = otr.getHoliday();
+						String oldHours = oldRequest.split("\\.")[0];
+						String oldMinutes = oldRequest.split("\\.")[1];
+						String newHours = newRequest.split("\\.")[0];
+						String newMinutes = newRequest.split("\\.")[1];
+						Integer totalMinutes = (Integer.parseInt(oldHours) *60) + Integer.parseInt(oldMinutes) + (Integer.parseInt(newHours) *60) + Integer.parseInt(newMinutes);
+						hashTr.get(otr.getDate().toLocalDate()).setHoliday(((int)totalMinutes/60) + "." + (((int)totalMinutes%60 == 0) ? "00" : (int)totalMinutes%60));
+					}
+				}
+
+				if(hashTr.get(otr.getDate().toLocalDate()).getMedicalVisit() == null){
 					hashTr.get(otr.getDate().toLocalDate()).setMedicalVisit(otr.getMedicalVisit());
-				if(hashTr.get(otr.getDate().toLocalDate()).getContractual() == null)
+				}else{
+					if(otr.getMedicalVisit() != null  && !"".equals(otr.getMedicalVisit())){
+						//VASI - Sommo le richieste MedicalVisit
+						String oldRequest = hashTr.get(otr.getDate().toLocalDate()).getMedicalVisit();
+						String newRequest = otr.getMedicalVisit();
+						String oldHours = oldRequest.split("\\.")[0];
+						String oldMinutes = oldRequest.split("\\.")[1];
+						String newHours = newRequest.split("\\.")[0];
+						String newMinutes = newRequest.split("\\.")[1];
+						Integer totalMinutes = (Integer.parseInt(oldHours) *60) + Integer.parseInt(oldMinutes) + (Integer.parseInt(newHours) *60) + Integer.parseInt(newMinutes);
+						hashTr.get(otr.getDate().toLocalDate()).setMedicalVisit(((int)totalMinutes/60) + "." + (((int)totalMinutes%60 == 0) ? "00" : (int)totalMinutes%60));
+					}
+				}
+
+				if(hashTr.get(otr.getDate().toLocalDate()).getContractual() == null){
 					hashTr.get(otr.getDate().toLocalDate()).setContractual(otr.getContractual());
-				if(hashTr.get(otr.getDate().toLocalDate()).getSickness() == null)
+				}else{
+					if(otr.getContractual() != null  && !"".equals(otr.getContractual())){
+						//VASI - Sommo le richieste Contractual
+						String oldRequest = hashTr.get(otr.getDate().toLocalDate()).getContractual();
+						String newRequest = otr.getContractual();
+						String oldHours = oldRequest.split("\\.")[0];
+						String oldMinutes = oldRequest.split("\\.")[1];
+						String newHours = newRequest.split("\\.")[0];
+						String newMinutes = newRequest.split("\\.")[1];
+						Integer totalMinutes = (Integer.parseInt(oldHours) *60) + Integer.parseInt(oldMinutes) + (Integer.parseInt(newHours) *60) + Integer.parseInt(newMinutes);
+						hashTr.get(otr.getDate().toLocalDate()).setContractual(((int)totalMinutes/60) + "." + (((int)totalMinutes%60 == 0) ? "00" : (int)totalMinutes%60));
+					}
+				}
+
+				if(hashTr.get(otr.getDate().toLocalDate()).getSickness() == null){
 					hashTr.get(otr.getDate().toLocalDate()).setSickness(otr.getSickness());
+				}else{
+					if(otr.getSickness() != null  && !"".equals(otr.getSickness())){
+						//VASI - Sommo le richieste Sickness
+						String oldRequest = hashTr.get(otr.getDate().toLocalDate()).getSickness();
+						String newRequest = otr.getSickness();
+						String oldHours = oldRequest.split("\\.")[0];
+						String oldMinutes = oldRequest.split("\\.")[1];
+						String newHours = newRequest.split("\\.")[0];
+						String newMinutes = newRequest.split("\\.")[1];
+						Integer totalMinutes = (Integer.parseInt(oldHours) *60) + Integer.parseInt(oldMinutes) + (Integer.parseInt(newHours) *60) + Integer.parseInt(newMinutes);
+						hashTr.get(otr.getDate().toLocalDate()).setSickness(((int)totalMinutes/60) + "." + (((int)totalMinutes%60 == 0) ? "00" : (int)totalMinutes%60));
+					}
+				}
 			}
 		}
 		
@@ -2909,5 +3006,11 @@ public class ManagerUtils {
 		jb.setNumber(oJb.getNumber());
 		
 		return jb;
+	}
+
+	static String pad(int num, int size) {
+		String s = num + "";
+		while (s.length() < size) s = "0" + s;
+		return s;
 	}
 }

@@ -4638,7 +4638,8 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			WorkReportDAO wrDAO = WorkReportDAO.getInstance();
 			JobDAO jbDAO = JobDAO.getInstance();
 			EmployeeProfileDAO epDAO = EmployeeProfileDAO.getInstance();
-			LineHourDAO lhDAO = LineHourDAO.getInstance();			
+			LineHourDAO lhDAO = LineHourDAO.getInstance();	
+			CausalDAO cDAO = CausalDAO.getInstance();		
 
 			if(query != null) {				
 				Date d = new Date();
@@ -4701,6 +4702,85 @@ public class DrmManager extends BaseManager implements IDrmManager{
 							}
 
 							ttrs.addAll(trsf);
+							te = teDAO.getEventsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
+							wr = wrDAO.getWorkReportsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
+							jb = jbDAO.getJobsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
+
+							ttrs.addAll(ManagerUtils.mergeEventByDate(ManagerUtils.createOTimetableReport(te)));
+							ttrs.addAll(ManagerUtils.mergeWorkReportByDate(ManagerUtils.createOTimetableReportByWorkReport(wr)));
+							ttrs.addAll(ManagerUtils.mergeJobByDate(ManagerUtils.createOTimetableReportByJob(jb)));
+
+							ttrs = ManagerUtils.mergeStampAndEventByDate(con, ttrs, oEP.getHourProfileId());
+
+							for(OTimetableReport itm : ttrs){
+								//Calc. working hours
+								Integer wh = 0;
+								Integer ph = 0;
+								Integer uh = 0;
+								Integer mh = 0;
+								Integer ch = 0;
+								Integer sh = 0;
+								Integer ov = 0;
+								Integer hh = 0;
+								Integer ot = 0;
+								String ret;
+
+								if (itm.getWorkingHours() != null) {
+									String[] h = itm.getWorkingHours().split("\\.");
+									wh = (+Integer. parseInt(h[0])) * 60 + (+Integer. parseInt(h[1]));
+								}
+								if (itm.getPaidLeave() != null) {
+									String[] h = itm.getPaidLeave().split("\\.");
+									ph = (+Integer. parseInt(h[0])) * 60 + (+Integer. parseInt(h[1]));
+								}
+								if (itm.getUnpaidLeave() != null) {
+									String[] h = itm.getUnpaidLeave().split("\\.");
+									uh = (+Integer. parseInt(h[0])) * 60 + (+Integer. parseInt(h[1]));
+								}
+								if (itm.getMedicalVisit() != null) {
+									String[] h = itm.getMedicalVisit().split("\\.");
+									mh = (+Integer. parseInt(h[0])) * 60 + (+Integer. parseInt(h[1]));
+								}
+								if (itm.getContractual() != null) {
+									String[] h = itm.getContractual().split("\\.");
+									ch = (+Integer. parseInt(h[0])) * 60 + (+Integer. parseInt(h[1]));
+								}
+								if (itm.getSickness() != null) {
+									String[] h = itm.getSickness().split("\\.");
+									sh = (+Integer. parseInt(h[0])) * 60 + (+Integer. parseInt(h[1]));
+								}
+								if (itm.getOvertime() != null) {
+									String[] h = itm.getOvertime().split("\\.");
+									ov = (+Integer. parseInt(h[0])) * 60 + (+Integer. parseInt(h[1]));
+								}
+								if (itm.getHoliday() != null) {
+									String[] h = itm.getHoliday().split("\\.");
+									hh = (+Integer. parseInt(h[0])) * 60 + (+Integer. parseInt(h[1]));
+								}
+								if (itm.getOther() != null) {
+									String[] h = itm.getOther().split("\\.");
+									ot = (+Integer. parseInt(h[0])) * 60 + (+Integer. parseInt(h[1]));
+								}
+								
+								wh = wh - ph - uh - mh - ch - sh - hh;
+								wh = wh + ov;
+
+								OCausal oC = cDAO.selectById(con, itm.getCausalId());
+								if(oC != null){
+									if("-1".equals(oC.getSign())) wh = wh - ot;
+									else if("1".equals(oC.getSign())) wh = wh + ot;
+								}
+
+								if(wh < 0){
+									ret = "00.00";
+								}else{
+									int hours = (int) Math.floor(wh / 60);
+									int minutes = Math.abs(wh % 60);
+									ret = ManagerUtils.pad(hours, 2) + "." + ManagerUtils.pad(minutes, 2);
+								}
+
+								itm.setWorkingHours(ret);
+							}
 
 						}else{
 							trsf = tstmpDAO.getStampsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
@@ -4767,6 +4847,86 @@ public class DrmManager extends BaseManager implements IDrmManager{
 						}
 
 						trs.addAll(trsf);
+						te = teDAO.getEventsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
+						wr = wrDAO.getWorkReportsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
+						jb = jbDAO.getJobsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
+
+						trs.addAll(ManagerUtils.mergeEventByDate(ManagerUtils.createOTimetableReport(te)));
+						// aggiungere i work_report che hanno il campo timetable_hours > 0 e i jobs solo di alcune attivitÃ  
+						trs.addAll(ManagerUtils.mergeWorkReportByDate(ManagerUtils.createOTimetableReportByWorkReport(wr)));
+						trs.addAll(ManagerUtils.mergeJobByDate(ManagerUtils.createOTimetableReportByJob(jb)));
+
+						trs = ManagerUtils.mergeStampAndEventByDate(con, trs, oEP.getHourProfileId());
+
+						for(OTimetableReport itm : trs){
+							//Calc. working hours
+							Integer wh = 0;
+							Integer ph = 0;
+							Integer uh = 0;
+							Integer mh = 0;
+							Integer ch = 0;
+							Integer sh = 0;
+							Integer ov = 0;
+							Integer hh = 0;
+							Integer ot = 0;
+							String ret;
+
+							if (itm.getWorkingHours() != null) {
+								String[] h = itm.getWorkingHours().split("\\.");
+								wh = (+Integer. parseInt(h[0])) * 60 + (+Integer. parseInt(h[1]));
+							}
+							if (itm.getPaidLeave() != null) {
+								String[] h = itm.getPaidLeave().split("\\.");
+								ph = (+Integer. parseInt(h[0])) * 60 + (+Integer. parseInt(h[1]));
+							}
+							if (itm.getUnpaidLeave() != null) {
+								String[] h = itm.getUnpaidLeave().split("\\.");
+								uh = (+Integer. parseInt(h[0])) * 60 + (+Integer. parseInt(h[1]));
+							}
+							if (itm.getMedicalVisit() != null) {
+								String[] h = itm.getMedicalVisit().split("\\.");
+								mh = (+Integer. parseInt(h[0])) * 60 + (+Integer. parseInt(h[1]));
+							}
+							if (itm.getContractual() != null) {
+								String[] h = itm.getContractual().split("\\.");
+								ch = (+Integer. parseInt(h[0])) * 60 + (+Integer. parseInt(h[1]));
+							}
+							if (itm.getSickness() != null) {
+								String[] h = itm.getSickness().split("\\.");
+								sh = (+Integer. parseInt(h[0])) * 60 + (+Integer. parseInt(h[1]));
+							}
+							if (itm.getOvertime() != null) {
+								String[] h = itm.getOvertime().split("\\.");
+								ov = (+Integer. parseInt(h[0])) * 60 + (+Integer. parseInt(h[1]));
+							}
+							if (itm.getHoliday() != null) {
+								String[] h = itm.getHoliday().split("\\.");
+								hh = (+Integer. parseInt(h[0])) * 60 + (+Integer. parseInt(h[1]));
+							}
+							if (itm.getOther() != null) {
+								String[] h = itm.getOther().split("\\.");
+								ot = (+Integer. parseInt(h[0])) * 60 + (+Integer. parseInt(h[1]));
+							}
+
+							wh = wh - ph - uh - mh - ch - sh - hh;
+							wh = wh + ov;
+
+							OCausal oC = cDAO.selectById(con, itm.getCausalId());
+							if(oC != null){
+								if("-1".equals(oC.getSign())) wh = wh - ot;
+								else if("1".equals(oC.getSign())) wh = wh + ot;
+							}
+
+							if(wh < 0){
+								ret = "00.00";
+							}else{
+								int hours = (int) Math.floor(wh / 60);
+								int minutes = Math.abs(wh % 60);
+								ret = ManagerUtils.pad(hours, 2) + "." + ManagerUtils.pad(minutes, 2);
+							}
+
+							itm.setWorkingHours(ret);
+						}
 					}else{
 						//Get Data for Single User Selected
 						trsf = tstmpDAO.getStampsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
@@ -6195,7 +6355,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				ev.setAllDay(true);
 				
 				ev.setStartDate(lReq.getFromDate().toDateTimeAtStartOfDay(tz));
-				ev.setEndDate(lReq.getToDate().toDateTimeAtStartOfDay(tz));
+				ev.setEndDate(lReq.getToDate().toDateTimeAtStartOfDay(tz).withTime(23, 59, 0, 0));
 			}
 		}
 		
@@ -6218,7 +6378,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				evI.setAllDay(true);
 				
 				evI.setStartDate(lReq.getFromDate().toDateTimeAtStartOfDay(tz));
-				evI.setEndDate(lReq.getToDate().toDateTimeAtStartOfDay(tz));
+				evI.setEndDate(lReq.getToDate().toDateTimeAtStartOfDay(tz).withTime(23, 59, 0, 0));
 			}
 		}
 		
