@@ -4978,7 +4978,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					trs = trDAO.selectByDomainIdUserIdMonthYear(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), fromDate, toDate);
 				}else{
 					//Select for DomainId TargetUserId
-					trs = trDAO.selectByDomainIdTargetUserIdMonthYear(con, getTargetProfileId().getDomainId(), query.targetUserId, fromDate, toDate);
+					trs = trDAO.selectByDomainIdUserIdTargetUserIdMonthYear(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), query.targetUserId, fromDate, toDate);
 				}
 				
 			}
