@@ -274,7 +274,7 @@ public class Service extends BaseService {
 
 	public static final Logger logger = WT.getLogger(Service.class);
 	public static final String JOB_EXPORT_FILENAME = "jobs_{0}-{1}.{2}";
-	public static final String TIMETABLE_GIS_EXPORT_FILENAME = "gis_{0}-{1}.{2}";
+	public static final String TIMETABLE_GIS_EXPORT_FILENAME = "gis_{0}_{1}.{2}";
 
 	private DrmManager manager;
 	private DrmServiceSettings ss;
@@ -2304,6 +2304,14 @@ public class Service extends BaseService {
 			String op = ServletUtils.getStringParameter(request, "op", true);
 			String query = ServletUtils.getStringParameter(request, "query", null);
 			TimetableReportQuery trQuery = TimetableReportQuery.fromJson(query);
+			String dateS;
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+			dateS = formatter.format(new Date());
+			String title = "";
+
+			if(trQuery != null){
+				title = (trQuery.targetUserId != null) ? trQuery.targetUserId : "tutti";
+			}
 			
 			if (op.equals("do")) {			
 				txtWizard = new TxtExportWizard();
@@ -2321,7 +2329,7 @@ public class Service extends BaseService {
 						manager.exportTimetableReportGis(log, fos, trQuery);
 						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Ended on {0}", ymdhms.print(new DateTime())));
 						txtWizard.file = file;
-						txtWizard.filename = MessageFormat.format(TIMETABLE_GIS_EXPORT_FILENAME, up.getDomainId(), ymd2.print(txtWizard.date), "txt");
+						txtWizard.filename = MessageFormat.format(TIMETABLE_GIS_EXPORT_FILENAME, dateS, title, "txt");
 						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "File ready: {0}", txtWizard.filename));
 						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Operation completed succesfully"));
 						new JsonResult(new JsWizardData(log.print())).printTo(out);

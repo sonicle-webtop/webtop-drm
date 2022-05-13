@@ -4772,11 +4772,11 @@ public class DrmManager extends BaseManager implements IDrmManager{
 								}
 
 								if(wh < 0){
-									ret = "00.00";
+									ret = "0.00";
 								}else{
 									int hours = (int) Math.floor(wh / 60);
 									int minutes = Math.abs(wh % 60);
-									ret = ManagerUtils.pad(hours, 2) + "." + ManagerUtils.pad(minutes, 2);
+									ret = ManagerUtils.pad(hours, 1) + "." + ManagerUtils.pad(minutes, 2);
 								}
 
 								itm.setWorkingHours(ret);
@@ -4918,11 +4918,11 @@ public class DrmManager extends BaseManager implements IDrmManager{
 							}
 
 							if(wh < 0){
-								ret = "00.00";
+								ret = "0.00";
 							}else{
 								int hours = (int) Math.floor(wh / 60);
 								int minutes = Math.abs(wh % 60);
-								ret = ManagerUtils.pad(hours, 2) + "." + ManagerUtils.pad(minutes, 2);
+								ret = ManagerUtils.pad(hours, 1) + "." + ManagerUtils.pad(minutes, 2);
 							}
 
 							itm.setWorkingHours(ret);
