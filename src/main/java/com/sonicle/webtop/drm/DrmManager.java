@@ -4601,7 +4601,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					Date todayDate = new Date();
 					todayDate.setDate(1);
 
-					if(supervisor && todayDate.after(generationDate)) {
+					if (supervisor && todayDate.after(generationDate)) {
 						//Se oggi è dopo rispetto al mese da controllare, visualizzo.
 						items = getTimetableReport(query);
 					}else{
