@@ -123,22 +123,6 @@ public class TimetableReportDAO extends BaseDAO{
 				.execute();
 	}
 	
-	public List<OTimetableReport> selectByDomainIdTargetUserIdMonthYear(Connection con, String domainId, String targetUserId, LocalDate fD, LocalDate tD) throws DAOException {
-		DSLContext dsl = getDSL(con);
-		return dsl
-				.select()
-				.from(TIMETABLE_REPORT_TEMP)
-				.where(TIMETABLE_REPORT_TEMP.DOMAIN_ID.equal(domainId))
-				.and(TIMETABLE_REPORT_TEMP.TARGET_USER_ID.equal(targetUserId))
-				.and(TIMETABLE_REPORT_TEMP.DATE.between(fD.toDateTime(LocalTime.MIDNIGHT), tD.toDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59)))
-				.orderBy(
-						TIMETABLE_REPORT_TEMP.USER_ID,
-						TIMETABLE_REPORT_TEMP.TARGET_USER_ID,
-						TIMETABLE_REPORT_TEMP.DATE
-				)
-				.fetchInto(OTimetableReport.class);
-	}
-	
 	public List<OTimetableReport> selectByDomainIdUserIdTargetUserIdMonthYear(Connection con, String domainId, String userId, String targetUserId, LocalDate fD, LocalDate tD) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		return dsl
@@ -156,12 +140,14 @@ public class TimetableReportDAO extends BaseDAO{
 				.fetchInto(OTimetableReport.class);
 	}
 	
-	public int deleteByDomainIdTargetUserIdMonthYear(Connection con, String domainId, String targetUserId, LocalDate fD, LocalDate tD) {
+	public int deleteByDomainIdUserIdTargetUserIdMonthYear(Connection con, String domainId, String userId, String targetUserId, LocalDate fD, LocalDate tD) {
 		DSLContext dsl = getDSL(con);
 		return dsl
 				.delete(TIMETABLE_REPORT_TEMP)
 				.where(
 						TIMETABLE_REPORT_TEMP.DOMAIN_ID.equal(domainId)
+				).and(
+						TIMETABLE_REPORT_TEMP.USER_ID.equal(userId)
 				).and(
 						TIMETABLE_REPORT_TEMP.TARGET_USER_ID.equal(targetUserId)
 				)

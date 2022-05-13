@@ -3440,7 +3440,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 				
 				List<JsGridTimetableReport> jsGridTR = new ArrayList();
 				
-				for (OTimetableReport oTR : manager.generateOrViewTimetableReport(trQuery)) {
+				for (OTimetableReport oTR : manager.generateOrViewTimetableReport(trQuery, isSupervisorUser())) {
 
 					jsGridTR.add(new JsGridTimetableReport(oTR, manager));
 				}
