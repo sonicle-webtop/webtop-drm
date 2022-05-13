@@ -37,6 +37,7 @@ Ext.define('Sonicle.webtop.drm.store.TimetableStampHours', {
 	model: 'WTA.model.Simple',
 	data: [
 		['',''],
+		['0.00','0.00'],
 		['0.15','0.15'],
 		['0.30','0.30'],
 		['0.45','0.45'],

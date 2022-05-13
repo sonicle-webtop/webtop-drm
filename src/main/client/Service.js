@@ -1131,13 +1131,16 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							reference: 'gpTimetableReport',
                             cls: 'wtdrm-grid',
 							modelValidation: true,
+							bufferedRenderer: false,
 							viewConfig: {
 								getRowClass: function(r, rowIndex, rp, ds) {
 									var today = new Date();
+									if (r.get('date')==null) return;
+									
 									var dateParts = r.get('date').substring(0, 10).split("/");
-									var dateObject = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]); 
+									var dateObject = new Date(dateParts[2], dateParts[1] - 1, +dateParts[0]); 
 
-									if(today > dateObject){
+									if (today > dateObject){
 										var mh=r.get('missingHours');
 										if(mh === null){
 											return null;
@@ -1420,7 +1423,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 //								'-',
 								me.getAct('timetableReport', 'print'),
 								(me.getVar('integrationGis') === true) ? me.getAct('timetableReport', 'export') : null
-							],
+							]
 /*							listeners: {
 								rowdblclick: function (s, rec) {
 									var	vw = WT.createView(me.ID, 'view.UserTimetableRequests', {

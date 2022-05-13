@@ -4584,7 +4584,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		return retlr;
 	}
 
-	public List<OTimetableReport> generateOrViewTimetableReport(TimetableReportQuery query) throws WTException {
+	public List<OTimetableReport> generateOrViewTimetableReport(TimetableReportQuery query, boolean supervisor) throws WTException {
 		List<OTimetableReport> items = new ArrayList<>();
 
 		if(query != null) {
@@ -4602,11 +4602,11 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					Date todayDate = new Date();
 					todayDate.setDate(1);
 
-					if(todayDate.after(generationDate)) {
-						//Se oggi è dopo rispetto alla data da controllare, visualizzo.
+					if(supervisor && todayDate.after(generationDate)) {
+						//Se oggi è dopo rispetto al mese da controllare, visualizzo.
 						items = getTimetableReport(query);
 					}else{
-						//Altrimenti significa che oggi è uguale o prima alla data da controllare, rigenero.
+						//Altrimenti significa che oggi è uguale o prima del mese da controllare, rigenero.
 						items = generateTimetableReport(query);
 					}
 				}
@@ -4773,11 +4773,11 @@ public class DrmManager extends BaseManager implements IDrmManager{
 								}
 
 								if(wh < 0){
-									ret = "00.00";
+									ret = "0.00";
 								}else{
 									int hours = (int) Math.floor(wh / 60);
 									int minutes = Math.abs(wh % 60);
-									ret = ManagerUtils.pad(hours, 2) + "." + ManagerUtils.pad(minutes, 2);
+									ret = ManagerUtils.pad(hours, 1) + "." + ManagerUtils.pad(minutes, 2);
 								}
 
 								itm.setWorkingHours(ret);
@@ -4808,7 +4808,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					OEmployeeProfile oEP = epDAO.selectEmployeeProfileByDomainUser(con, getTargetProfileId().getDomainId(),  query.targetUserId);
 					
 					//Save "Other", "Causal", "Note" for re-set in new generation rows
-					for(OTimetableReport itm : trDAO.selectByDomainIdTargetUserIdMonthYear(con, getTargetProfileId().getDomainId(), query.targetUserId, fromDate, toDate)){
+					for(OTimetableReport itm : trDAO.selectByDomainIdUserIdTargetUserIdMonthYear(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), query.targetUserId, fromDate, toDate)){
 						vals = new HashMap();
 						vals.put("other", itm.getOther());
 						vals.put("causalId", itm.getCausalId());
@@ -4816,7 +4816,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 						hashTrs.put(itm.getDomainId() + "|" + itm.getUserId() + "|" + itm.getTargetUserId() + "|" + itm.getDate(),  vals);
 					}
 					
-					trDAO.deleteByDomainIdTargetUserIdMonthYear(con, getTargetProfileId().getDomainId(), query.targetUserId, fromDate, toDate);
+					trDAO.deleteByDomainIdUserIdTargetUserIdMonthYear(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), query.targetUserId, fromDate, toDate);
 					
 					if(Boolean.TRUE.equals(oEP.getNoStamping())){
 						//Utente che non utilizza le timbrature, creo report con ore lavorative coincidenti alle ore del proprio profilo orario.
@@ -4919,11 +4919,11 @@ public class DrmManager extends BaseManager implements IDrmManager{
 							}
 
 							if(wh < 0){
-								ret = "00.00";
+								ret = "0.00";
 							}else{
 								int hours = (int) Math.floor(wh / 60);
 								int minutes = Math.abs(wh % 60);
-								ret = ManagerUtils.pad(hours, 2) + "." + ManagerUtils.pad(minutes, 2);
+								ret = ManagerUtils.pad(hours, 1) + "." + ManagerUtils.pad(minutes, 2);
 							}
 
 							itm.setWorkingHours(ret);
@@ -4978,8 +4978,9 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					//Select for DomainId UserId
 					trs = trDAO.selectByDomainIdUserIdMonthYear(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), fromDate, toDate);
 				}else{
-					//Select for DomainId TargetUserId
-					trs = trDAO.selectByDomainIdTargetUserIdMonthYear(con, getTargetProfileId().getDomainId(), query.targetUserId, fromDate, toDate);
+					//Select for DomainId UserId and TargetUserId
+					trs = trDAO.selectByDomainIdUserIdTargetUserIdMonthYear(con, 
+						getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), query.targetUserId, fromDate, toDate);
 				}
 				
 			}
@@ -5021,7 +5022,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				if(query.targetUserId == null){
 					trs = trDao.selectByDomainIdUserIdMonthYear(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), fromDate, toDate);
 				}else{
-					trs = trDao.selectByDomainIdTargetUserIdMonthYear(con, getTargetProfileId().getDomainId(), query.targetUserId, fromDate, toDate);
+					trs = trDao.selectByDomainIdUserIdTargetUserIdMonthYear(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), query.targetUserId, fromDate, toDate);
 				}
 			}
 
