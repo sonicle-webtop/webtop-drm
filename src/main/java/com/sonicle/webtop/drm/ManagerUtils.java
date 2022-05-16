@@ -2119,8 +2119,13 @@ public class ManagerUtils {
 		//Add empty days into HashMaps
 		if(!trsf.isEmpty()){
 			List<DateTime> dates = new ArrayList();
-			for(int i = trsf.get(0).getDate().dayOfMonth().getMinimumValue(); i <= trsf.get(0).getDate().dayOfMonth().getMaximumValue(); i++){
-				dates.add(trsf.get(0).getDate().withDayOfMonth(i));
+			OTimetableReport trsf0 = trsf.get(0);
+			DateTime trsf0Date = trsf0.getDate();
+			DateTime.Property trsf0DateDayOfMonth = trsf0Date.dayOfMonth();
+			int trsf0DateMinValue = trsf0DateDayOfMonth.getMinimumValue();
+			int trsf0DateMaxValue = trsf0DateDayOfMonth.getMaximumValue();
+			for(int i = trsf0DateMinValue; i <= trsf0DateMaxValue; i++){
+				dates.add(trsf0Date.withDayOfMonth(i));
 			}
 
 			for(DateTime dt : dates){
@@ -2130,7 +2135,6 @@ public class ManagerUtils {
 				
 				if(htr == null){
 					OTimetableReport temp = new OTimetableReport();
-					OTimetableReport trsf0 = trsf.get(0);
 					temp.setDomainId(trsf0.getDomainId());
 					temp.setCompanyId(trsf0.getCompanyId());
 					temp.setUserId(trsf0.getUserId());
