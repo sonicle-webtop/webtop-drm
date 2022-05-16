@@ -97,6 +97,15 @@ public class TimetableEventDAO extends BaseDAO {
 				.and(
 						TIMETABLE_EVENTS.COMPANY_ID.equal(companyId)
 				)
+				.groupBy(
+						TIMETABLE_EVENTS.DOMAIN_ID, 
+						TIMETABLE_EVENTS.COMPANY_ID,
+						TIMETABLE_EVENTS.USER_ID, 
+						TIMETABLE_EVENTS.DATE,
+						TIMETABLE_EVENTS.HOUR,
+						TIMETABLE_EVENTS.TYPE,
+						TIMETABLE_EVENTS.LEAVE_REQUEST_ID
+				)
 				.orderBy(
 						TIMETABLE_EVENTS.USER_ID, 
 						TIMETABLE_EVENTS.DATE
