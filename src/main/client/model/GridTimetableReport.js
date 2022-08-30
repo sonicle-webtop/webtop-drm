@@ -82,6 +82,22 @@ Ext.define('Sonicle.webtop.drm.model.GridTimetableReport', {
 					rec.get('causalId'),
 					rec.get('totalLineHour')
 			);
+		}),
+		WTF.calcField('ticket', 'int', ['workingHours', 'paidLeave', 'unpaidLeave', 'medicalVisit', 'contractual', 'sickness', 'overtime', 'holiday', 'other', 'causalId', 'totalLineHour', 'userId'], function(v, rec) {
+			return Sonicle.webtop.drm.model.GridTimetableReport.calcTicket(
+					rec.get('workingHours'),
+					rec.get('paidLeave'),
+					rec.get('unpaidLeave'),
+					rec.get('medicalVisit'),
+					rec.get('contractual'),
+					rec.get('sickness'),
+					rec.get('overtime'),
+					rec.get('holiday'),
+					rec.get('other'),
+					rec.get('causalId'),
+					rec.get('totalLineHour'),
+					rec.get('userId')
+			);
 		})
 	],
 	
@@ -185,6 +201,76 @@ Ext.define('Sonicle.webtop.drm.model.GridTimetableReport', {
 					ret = '-'+Sonicle.webtop.drm.model.GridTimetableReport.pad(hours, 2) + "." + Sonicle.webtop.drm.model.GridTimetableReport.pad(minutes, 2);
 					return ret;
 				}
+			}else {
+				return null;
+			}
+		},
+		
+		calcTicket: function(workingHours, paidLeave, unpaidLeave, medicalVisit, contractual, sickness, overtime, holiday,  other, causalId, totalLineHour, userId) {
+			var mt = WT.getVar('com.sonicle.webtop.drm', 'minimumNumberOfHoursPerTicket');		
+			var hs = WT.getVar('com.sonicle.webtop.drm', 'causalsOperation');
+			var sign = hs[causalId];
+			var wh = 0;
+			var ph = 0;
+			var uh = 0;
+			var mh = 0;
+			var ch = 0;
+			var sh = 0;
+			var ov = 0;
+			var hh = 0;
+			var ot = 0;
+			
+			if (workingHours !== null) {
+				var h = workingHours.split('.');
+				wh = (+h[0]) * 60 + (+h[1]);
+			}
+			if (paidLeave !== null) {
+				var h = paidLeave.split('.');
+				ph = (+h[0]) * 60 + (+h[1]);
+			}
+			if (unpaidLeave !== null) {
+				var h = unpaidLeave.split('.');
+				uh = (+h[0]) * 60 + (+h[1]);
+			}
+			if (medicalVisit !== null) {
+				var h = medicalVisit.split('.');
+				mh = (+h[0]) * 60 + (+h[1]);
+			}
+			if (contractual !== null) {
+				var h = contractual.split('.');
+				ch = (+h[0]) * 60 + (+h[1]);
+			}
+			if (sickness !== null) {
+				var h = sickness.split('.');
+				sh = (+h[0]) * 60 + (+h[1]);
+			}
+			if (overtime !== null) {
+				var h = overtime.split('.');
+				ov = (+h[0]) * 60 + (+h[1]);
+			}
+			if (holiday !== null) {
+				var h = holiday.split('.');
+				hh = (+h[0]) * 60 + (+h[1]);
+			}
+			if (other !== null) {
+				var h = other.split('.');
+				ot = (+h[0]) * 60 + (+h[1]);
+			}
+			if(totalLineHour !== null){
+				var th = wh - ph - uh - mh - ch - sh - hh;
+				th = th + ov;
+
+				if(sign === -1) th = th - ot;
+				else if(sign === 1) th = th + ot;
+					
+				var minHTkt = mt[userId];
+				minHTkt = minHTkt * 60;
+				
+				if(th >= minHTkt){ 
+					return 1;
+				}else{ 
+					return 0;
+				}	
 			}else {
 				return null;
 			}

@@ -38,8 +38,11 @@ import com.sonicle.webtop.core.app.WT;
 import com.sonicle.webtop.core.sdk.UserProfileId;
 import com.sonicle.webtop.core.sdk.WTException;
 import com.sonicle.webtop.drm.DrmManager;
+import com.sonicle.webtop.drm.bol.OCausal;
 import com.sonicle.webtop.drm.bol.OTimetableReport;
+import com.sonicle.webtop.drm.model.Causal;
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDateTime;
@@ -77,6 +80,8 @@ public class RBTimetableReport {
 	public Float other;
 	public String gisCausalCode;
 	public String gisCausalDescription;
+	public Integer ticket;
+	public Boolean ticketManagement;
 	
 	public RBTimetableReport(CoreManager coreMgr, DrmManager drmMgr, OTimetableReport otr, Locale lcl) throws WTException, IOException {		
 		this.id = otr.getId();
@@ -108,6 +113,8 @@ public class RBTimetableReport {
 			this.gisCausalCode = drmMgr.getCausal(otr.getCausalId()).getExternalCode();
 			this.gisCausalDescription = drmMgr.getCausal(otr.getCausalId()).getDescription();
 		}
+		this.ticket = calcTicket(drmMgr, otr);
+		this.ticketManagement = drmMgr.getTimetableSetting().getTicketManagement();
 	}
 
 	private Float convertInMinutes(String hour){
@@ -125,6 +132,86 @@ public class RBTimetableReport {
 			
 			return minutes.floatValue();
 		}
+	}
+
+	private Integer calcTicket(DrmManager drmMgr, OTimetableReport otr) throws WTException{
+		Integer tkt = 0;
+		Boolean tktManagement = drmMgr.getTimetableSetting().getTicketManagement();
+		
+		if(tktManagement){
+			Integer minHourForTkt = drmMgr.getEmployeeProfile(otr.getDomainId(), otr.getUserId()).minimumNumberOfHoursPerTicket == null ? drmMgr.getTimetableSetting().getMinimumNumberOfHoursPerTicket() : drmMgr.getEmployeeProfile(otr.getDomainId(), otr.getUserId()).minimumNumberOfHoursPerTicket;
+
+			if(minHourForTkt != null){
+				Integer sign = otr.getCausalId() == null ? null : drmMgr.getCausal(otr.getCausalId()).getSign();
+				Integer wh = 0;
+				Integer ph = 0;
+				Integer uh = 0;
+				Integer mh = 0;
+				Integer ch = 0;
+				Integer sh = 0;
+				Integer ov = 0;
+				Integer hh = 0;
+				Integer ot = 0;
+
+				if (otr.getWorkingHours() != null) {
+					String[] h = otr.getWorkingHours().split("\\.");
+					wh = (+Integer.parseInt(h[0])) * 60 + (+Integer.parseInt(h[1]));
+				}
+				if (otr.getPaidLeave()!= null) {
+					String[] h = otr.getPaidLeave().split("\\.");
+					ph = (+Integer.parseInt(h[0])) * 60 + (+Integer.parseInt(h[1]));
+				}
+				if (otr.getUnpaidLeave()!= null) {
+					String[] h = otr.getUnpaidLeave().split("\\.");
+					uh = (+Integer.parseInt(h[0])) * 60 + (+Integer.parseInt(h[1]));
+				}
+				if (otr.getMedicalVisit()!= null) {
+					String[] h = otr.getMedicalVisit().split("\\.");
+					mh = (+Integer.parseInt(h[0])) * 60 + (+Integer.parseInt(h[1]));
+				}
+				if (otr.getContractual()!= null) {
+					String[] h = otr.getContractual().split("\\.");
+					ch = (+Integer.parseInt(h[0])) * 60 + (+Integer.parseInt(h[1]));
+				}
+				if (otr.getSickness()!= null) {
+					String[] h = otr.getSickness().split("\\.");
+					sh = (+Integer.parseInt(h[0])) * 60 + (+Integer.parseInt(h[1]));
+				}
+				if (otr.getOvertime()!= null) {
+					String[] h = otr.getOvertime().split("\\.");
+					ov = (+Integer.parseInt(h[0])) * 60 + (+Integer.parseInt(h[1]));
+				}
+				if (otr.getHoliday()!= null) {
+					String[] h = otr.getHoliday().split("\\.");
+					hh = (+Integer.parseInt(h[0])) * 60 + (+Integer.parseInt(h[1]));
+				}
+				if (otr.getOther()!= null) {
+					String[] h = otr.getOther().split("\\.");
+					ot = (+Integer.parseInt(h[0])) * 60 + (+Integer.parseInt(h[1]));
+				}
+				if(otr.getTotalLineHour() != null){
+					Integer th = wh - ph - uh - mh - ch - sh - hh;
+					th = th + ov;
+
+					if(sign != null){
+						if(sign == -1) th = th - ot;
+						else if(sign == 1) th = th + ot;
+					}
+
+					minHourForTkt = minHourForTkt * 60;
+
+					if(th >= minHourForTkt){ 
+						return 1;
+					}else{ 
+						return null;
+					}	
+				}else {
+					return null;
+				}
+			}	
+		}
+
+		return tkt;
 	}
 	
 	private String concatDate(LocalDateTime dtDate, Locale lcl){		
@@ -362,5 +449,21 @@ public class RBTimetableReport {
 
 	public void setGisCausalDescription(String gisCausalDescription) {
 		this.gisCausalDescription = gisCausalDescription;
+	}
+
+	public Integer getTicket() {
+		return ticket;
+	}
+
+	public void setTicket(Integer ticket) {
+		this.ticket = ticket;
+	}
+
+	public Boolean getTicketManagement() {
+		return ticketManagement;
+	}
+
+	public void setTicketManagement(Boolean ticketManagement) {
+		this.ticketManagement = ticketManagement;
 	}
 }

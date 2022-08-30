@@ -50,7 +50,8 @@ Ext.define('Sonicle.webtop.drm.model.EmployeeProfile', {
 		WTF.field('extraordinary', 'bool', true, {defaultValue: false}),
 		WTF.field('onlyPresence', 'bool', true, {defaultValue: false}),
 		WTF.field('headquartersCode', 'string', true),
-		WTF.field('noStamping', 'bool', true, {defaultValue: false})
+		WTF.field('noStamping', 'bool', true, {defaultValue: false}),
+		WTF.field('minimumNumberOfHoursPerTicket', 'int', true)
 	]
 });
 

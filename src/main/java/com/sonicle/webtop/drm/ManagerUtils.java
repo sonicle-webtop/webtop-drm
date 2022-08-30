@@ -939,6 +939,7 @@ public class ManagerUtils {
 		eProfile.setHourProfileId(oEP.getHourProfileId());
 		eProfile.setHeadquartersCode(oEP.getHeadquartersCode());
 		eProfile.setNoStamping(oEP.getNoStamping());
+		eProfile.setMinimumNumberOfHoursPerTicket(oEP.getMinimumNumberOfHoursPerTicket());
 
 		return eProfile;
 	}
@@ -959,6 +960,7 @@ public class ManagerUtils {
 		oEp.setHourProfileId(eProfile.getHourProfileId());
 		oEp.setHeadquartersCode(eProfile.getHeadquartersCode());
 		oEp.setNoStamping(eProfile.getNoStamping());
+		oEp.setMinimumNumberOfHoursPerTicket(eProfile.getMinimumNumberOfHoursPerTicket());
 
 		return oEp;
 	}
@@ -1686,6 +1688,8 @@ public class ManagerUtils {
 		oSetting.setDefaultCausalSickness(tSetting.getDefaultCausalSickness());
 		oSetting.setDefaultCausalMedicalVisit(tSetting.getDefaultCausalMedicalVisit());
 		oSetting.setDefaultCausalWorkingHours(tSetting.getDefaultCausalWorkingHours());
+		oSetting.setMinimumNumberOfHoursPerTicket(tSetting.getMinimumNumberOfHoursPerTicket());
+		oSetting.setTicketManagement(tSetting.getTicketManagement());
 		
 		return oSetting;
 	}
@@ -1722,6 +1726,8 @@ public class ManagerUtils {
 		tSetting.setDefaultCausalSickness(oTSetting.getDefaultCausalSickness());
 		tSetting.setDefaultCausalMedicalVisit(oTSetting.getDefaultCausalMedicalVisit());
 		tSetting.setDefaultCausalWorkingHours(oTSetting.getDefaultCausalWorkingHours());
+		tSetting.setMinimumNumberOfHoursPerTicket(oTSetting.getMinimumNumberOfHoursPerTicket());
+		tSetting.setTicketManagement(oTSetting.getTicketManagement());
 		
 		return tSetting;
 	}

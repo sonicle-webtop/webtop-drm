@@ -67,6 +67,8 @@ public class JsTimetableSetting {
 	public String defaultCausalHolidays;
 	public String defaultCausalSickness;
 	public String defaultCausalMedicalVisit;
+	public Integer minimumNumberOfHoursPerTicket;
+	public Boolean ticketManagement;
 
 	// public List<JsGridHolidayDate> holidayDates = new ArrayList();
 
@@ -98,6 +100,8 @@ public class JsTimetableSetting {
 		this.defaultCausalHolidays = setting.getDefaultCausalHolidays();
 		this.defaultCausalSickness = setting.getDefaultCausalSickness();
 		this.defaultCausalMedicalVisit = setting.getDefaultCausalMedicalVisit();
+		this.minimumNumberOfHoursPerTicket = setting.getMinimumNumberOfHoursPerTicket();
+		this.ticketManagement = setting.getTicketManagement();
 		
         /*
 		for (HolidayDate hd : setting.getHolidayDates()) {
@@ -136,6 +140,8 @@ public class JsTimetableSetting {
 		tt.setDefaultCausalHolidays(js.defaultCausalHolidays);
 		tt.setDefaultCausalSickness(js.defaultCausalSickness);
 		tt.setDefaultCausalMedicalVisit(js.defaultCausalMedicalVisit);
+		tt.setMinimumNumberOfHoursPerTicket(js.minimumNumberOfHoursPerTicket);
+		tt.setTicketManagement(js.ticketManagement);
 		
         /*
 		for (JsGridHolidayDate hd : js.holidayDates) {

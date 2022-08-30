@@ -4153,6 +4153,26 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			DbUtils.closeQuietly(con);
 		}
 	}
+
+	public EmployeeProfile getEmployeeProfile(String domainId, String userId) throws WTException {
+		Connection con = null;
+		EmployeeProfileDAO epDao =EmployeeProfileDAO.getInstance();
+
+		EmployeeProfile employeeProfile = null;
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+
+			employeeProfile = ManagerUtils.createEmployeeProfile(epDao.selectEmployeeProfileByDomainUser(con, domainId, userId));
+
+			return employeeProfile;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
 	
 	public String getEmployeeUserId(String number) throws WTException {
 		Connection con = null;

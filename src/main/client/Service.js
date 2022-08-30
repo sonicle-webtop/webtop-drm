@@ -1169,14 +1169,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								proxy: WTF.apiProxy(me.ID, 'ManageGridTimetableReport'),
 								groupField: 'targetUser'
 							},
-							features: [{
-								// id: 'group',
-								ftype: 'grouping',
-								// groupHeaderTpl: '{name}'
-                                groupHeaderTpl: '{name}',
-								// hideGroupedHeader: true,
-								enableGroupingMenu: false
-							}],
+							features: me.prepareFeatures(me.getVar('ticketManagement')),
 							columns: [
 								{
 									xtype: 'soiconcolumn',
@@ -1415,7 +1408,27 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									editable: true,
 									editor: 'textfield',
 									flex: 2,
-                                    cls: 'header'
+                                    cls: 'header',
+									summaryRenderer: function(value, summaryData, dataIndex) {
+										return '<B>Totale Ticket</B>';
+									}
+								}, {
+									xtype: 'soiconcolumn',
+									header: me.res('gpTimetableReport.ticket.lbl'),
+									dataIndex: 'ticket',
+									hidden: !me.getVar('ticketManagement'),
+									editable: false,
+									iconSize: WTU.imgSizeToPx('xs'),
+									menuDisabled: true,
+									width: 45,
+									cls: 'header',
+									getIconCls: function(value,rec) {
+										return value === 1 ? 'fas fa-check' : '';
+									},
+									summaryType: 'sum',
+									summaryRenderer: function(value, summaryData, dataIndex) {
+										return Ext.String.format('<B>{0}</B>', value===undefined?"undef":value);
+									}
 								}
 							],
 							tbar: [
@@ -1677,6 +1690,25 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		
 		//Opportunity Fields
 		me.opportunityRequiredFields = me.getVar('opportunityRequiredFields');
+	},
+	
+	prepareFeatures: function(tickets) {
+		var ftrs=[];
+		
+		ftrs[0]=
+				{
+					ftype: 'grouping',
+					groupHeaderTpl: '{name}',
+					enableGroupingMenu: false
+				};
+				
+		if (tickets)
+			ftrs[1]=
+				{
+					ftype: 'summary'
+				};
+		
+		return ftrs;
 	},
 	
 	filtersOpportunity: function () {

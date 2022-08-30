@@ -38,8 +38,8 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 	dockableConfig: {
 		title: '{EmployeeProfile.tit}',
 		iconCls: 'wtdrm-icon-configurationEmployeeProfiles',
-		width: 400,
-		height: 320,
+		width: 450,
+		height: 360,
 		modal: true
 	},
 	fieldTitle: 'description',
@@ -58,7 +58,7 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 			xtype: 'panel',
 			layout: 'vbox',
 			defaults: {
-				labelWidth: 180
+				labelWidth: 240
 			},
 			items: [
 				{
@@ -120,6 +120,16 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 							fieldLabel: me.mys.res('EmployeeProfile.fld-hourProfiles.lbl'),
                             width: 380
 						}),
+						{
+							xtype: 'numberfield',
+							bind: '{record.minimumNumberOfHoursPerTicket}',
+							emptyText: me.mys.getVar('defaultMinimumNumberOfHoursPerTicket'),
+							allowBlank: true,
+							minValue: 0,
+							maxValue: 12,
+							fieldLabel: me.mys.res('EmployeeProfile.fld-minimumNumberOfHoursPerTicket.lbl'),
+							width: 380
+						},
 						{
 							xtype: 'checkbox',
 							bind: '{record.extraordinary}',

@@ -36,7 +36,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingGeneral', {
 		title: '{timetable.config.general.tit}',
 		iconCls: 'wtdrm-icon-configuration',
 		width: 650,
-		height: 670
+		height: 700
 	},
 	modelName: 'Sonicle.webtop.drm.model.TimetableSettingGeneral',
 	initComponent: function () {
@@ -208,6 +208,11 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingGeneral', {
 							xtype: 'checkbox',
 							bind: '{record.sicknessAutomaticallyApproved}',
 							boxLabel: me.mys.res('timetable.settings.fld-sicknessAutomaticallyApproved.lbl')
+						},
+						{
+							xtype: 'checkbox',
+							bind: '{record.ticketManagement}',
+							boxLabel: me.mys.res('timetable.settings.fld-ticketManagement.lbl')
 						}
 					]
 				},
@@ -331,7 +336,16 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingGeneral', {
 							},
 							fieldLabel: me.mys.res('timetable.settings.fld-defaultCausalMedicalVisit.lbl'),
 							width: 500
-						})
+						}),
+						{
+							xtype: 'numberfield',
+							bind: '{record.minimumNumberOfHoursPerTicket}',
+							allowBlank: true,
+							minValue: 0,
+							maxValue: 12,
+							fieldLabel: me.mys.res('timetable.settings.fld-minimumNumberOfHoursPerTicket.lbl'),
+							width: 500
+						}
 					]
 				}
 			]

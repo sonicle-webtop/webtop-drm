@@ -364,6 +364,19 @@ public class Service extends BaseService {
 			vs.put("expenseNoteDefaultCurrency", getExpenseNoteDefaultCurrency());
 			vs.put("expenseNoteKmCost", getExpenseNoteKmCost());
 			vs.put("isSupervisorUser", isSupervisorUser());
+			vs.put("defaultMinimumNumberOfHoursPerTicket", getDefaultMinimumNumberOfHoursPerTicket());
+			vs.put("ticketManagement", getTicketManagementSetting());
+			
+			HashMap<String, Integer> mT = new HashMap<>();
+			List<OEmployeeProfile> oEs = manager.listEmployeeProfiles();
+			for(OEmployeeProfile oE : oEs){
+				if(oE.getMinimumNumberOfHoursPerTicket() == null){
+					mT.put(oE.getUserId(), getDefaultMinimumNumberOfHoursPerTicket());
+				}else{
+					mT.put(oE.getUserId(), oE.getMinimumNumberOfHoursPerTicket());
+				}	
+			}
+			vs.put("minimumNumberOfHoursPerTicket", mT);
 
 			HashMap<String, Integer> hs = new HashMap<>();
 			List<OCausal> oC = manager.listCausals(false);
@@ -444,6 +457,34 @@ public class Service extends BaseService {
 			return (value == null) ? "1" : value;	
 		} catch (Exception ex) {
 			throw new WTException("Error in getexpenseNoteKmCost", ex);
+		}
+	}
+
+	private Integer getDefaultMinimumNumberOfHoursPerTicket() throws WTException {
+		try{
+			Integer value = null;
+			
+			TimetableSetting tS = manager.getTimetableSetting();
+			if(tS != null) value = tS.getMinimumNumberOfHoursPerTicket();
+			
+			
+			return (value == null) ? 0 : value;	
+		} catch (Exception ex) {
+			throw new WTException("Error in getDefaultMinimumNumberOfHoursPerTicket", ex);
+		}
+	}
+
+	private Boolean getTicketManagementSetting() throws WTException {
+		try{
+			Boolean value = null;
+			
+			TimetableSetting tS = manager.getTimetableSetting();
+			if(tS != null) value = tS.getTicketManagement();
+			
+			
+			return (value == null) ? false : value;	
+		} catch (Exception ex) {
+			throw new WTException("Error in getTicketManagementSetting", ex);
 		}
 	}
 	

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.0.final using JasperReports Library version 6.3.0  -->
-<!-- 2022-06-06T10:38:20 -->
+<!-- 2022-07-29T11:49:24 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="timetablereport" printOrder="Horizontal" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="812" leftMargin="15" rightMargin="15" topMargin="10" bottomMargin="12" uuid="0c72a82c-982e-4a49-946e-fff85de6c39f">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
@@ -40,6 +40,8 @@
 	<field name="other" class="java.lang.Float"/>
 	<field name="gisCausalCode" class="java.lang.String"/>
 	<field name="gisCausalDescription" class="java.lang.String"/>
+	<field name="ticket" class="java.lang.Integer"/>
+	<field name="ticketManagement" class="java.lang.Boolean"/>
 	<variable name="totWorkingHours" class="java.lang.Float" resetType="Group" resetGroup="grp_targetUserId" incrementType="Group" incrementGroup="grp_date" calculation="Sum">
 		<variableExpression><![CDATA[$F{workingHours}]]></variableExpression>
 		<initialValueExpression><![CDATA[0]]></initialValueExpression>
@@ -92,6 +94,10 @@
 		<variableExpression><![CDATA[$F{other}]]></variableExpression>
 		<initialValueExpression><![CDATA[0]]></initialValueExpression>
 	</variable>
+	<variable name="totTicket" class="java.lang.Integer" resetType="Group" resetGroup="grp_targetUserId" incrementType="Group" incrementGroup="grp_date" calculation="Sum">
+		<variableExpression><![CDATA[$F{ticket}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
 	<group name="grp_targetUserId" keepTogether="true">
 		<groupExpression><![CDATA[$F{targetUserId}]]></groupExpression>
 		<groupHeader>
@@ -131,7 +137,7 @@
 					</reportElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="650" y="16" width="160" height="12" backcolor="#E8E8E8" uuid="73667f43-d366-49c0-8f12-88e0ef1b2cd2">
+					<reportElement x="630" y="16" width="150" height="12" backcolor="#E8E8E8" uuid="73667f43-d366-49c0-8f12-88e0ef1b2cd2">
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
 				</rectangle>
@@ -150,7 +156,7 @@
 					<reportElement x="82" y="16" width="32" height="12" backcolor="#E8E8E8" uuid="597008f0-c80a-437b-8dc4-b3a169cf3fda"/>
 				</rectangle>
 				<rectangle>
-					<reportElement x="480" y="16" width="170" height="12" backcolor="#E8E8E8" uuid="42131492-bd66-4379-8087-291139c97bb9">
+					<reportElement x="480" y="16" width="150" height="12" backcolor="#E8E8E8" uuid="42131492-bd66-4379-8087-291139c97bb9">
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
 				</rectangle>
@@ -194,15 +200,18 @@
 					<text><![CDATA[Fer.]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="480" y="16" width="170" height="12" uuid="683eafad-5d72-4289-ae9f-51c82b56de87"/>
+					<reportElement x="480" y="16" width="150" height="12" uuid="683eafad-5d72-4289-ae9f-51c82b56de87">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[Dettaglio]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="650" y="16" width="160" height="12" uuid="030d2c79-e89e-44e9-8d0c-2e69e27e2728">
+					<reportElement x="630" y="16" width="150" height="12" uuid="030d2c79-e89e-44e9-8d0c-2e69e27e2728">
 						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font size="8" isBold="true"/>
@@ -282,10 +291,27 @@
 					</textElement>
 					<text><![CDATA[V.M.]]></text>
 				</staticText>
+				<rectangle>
+					<reportElement x="780" y="16" width="30" height="12" backcolor="#E8E8E8" uuid="ab24d452-e82f-4c58-8fbe-4acb8495fa89">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<printWhenExpression><![CDATA[$F{ticketManagement}]]></printWhenExpression>
+					</reportElement>
+				</rectangle>
+				<staticText>
+					<reportElement x="780" y="16" width="30" height="12" uuid="369110f4-6e53-4f6c-b7f7-e9149095ad35">
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<printWhenExpression><![CDATA[$F{ticketManagement}]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Tkt]]></text>
+				</staticText>
 			</band>
 		</groupHeader>
 		<groupFooter>
-			<band height="13">
+			<band height="12">
 				<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				<rectangle>
 					<reportElement x="14" y="0" width="68" height="12" uuid="77b782e8-7ba8-4cc4-8d92-aff8921f6b3d">
@@ -313,14 +339,15 @@
 					</reportElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="480" y="0" width="170" height="12" uuid="0dd848c0-7084-4a70-9a24-898144c04825">
+					<reportElement x="480" y="0" width="150" height="12" uuid="0dd848c0-7084-4a70-9a24-898144c04825">
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="650" y="0" width="160" height="12" uuid="509e373d-9ac7-4d3e-adea-c45cb75ad7e3">
+					<reportElement x="630" y="0" width="150" height="12" uuid="509e373d-9ac7-4d3e-adea-c45cb75ad7e3">
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 					</reportElement>
 				</rectangle>
 				<staticText>
@@ -449,6 +476,23 @@ CONCATENATE(
 	LEN(new Integer(new Integer(new Float($V{totMedicalVisit}/60).toString().split("\\.")[1] )*60/100).toString() ) == 1 ? "0" : ""
 )]]></textFieldExpression>
 				</textField>
+				<rectangle>
+					<reportElement x="780" y="0" width="30" height="12" uuid="4b8c93ba-8c47-4b39-a021-2292b6154dc9">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+						<printWhenExpression><![CDATA[$F{ticketManagement}]]></printWhenExpression>
+					</reportElement>
+				</rectangle>
+				<textField pattern="">
+					<reportElement x="780" y="0" width="30" height="12" uuid="78f5780c-3025-4b79-b194-3287411bbbca">
+						<printWhenExpression><![CDATA[$F{ticketManagement}]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{totTicket} == null ? "" : $V{totTicket}]]></textFieldExpression>
+				</textField>
 			</band>
 		</groupFooter>
 	</group>
@@ -492,12 +536,12 @@ CONCATENATE(
 					</reportElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="480" y="0" width="170" height="16" uuid="125b808b-ec88-4bcb-96dc-3f868d88bbbb">
+					<reportElement x="480" y="0" width="150" height="16" uuid="125b808b-ec88-4bcb-96dc-3f868d88bbbb">
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="650" y="0" width="160" height="16" uuid="5f51202d-c4fa-4eca-9d42-82ca5ca8b2a3">
+					<reportElement x="630" y="0" width="150" height="16" uuid="5f51202d-c4fa-4eca-9d42-82ca5ca8b2a3">
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 					</reportElement>
@@ -561,7 +605,7 @@ CONCATENATE(
 )]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="480" y="0" width="170" height="16" uuid="b00fe69c-2c19-40df-9d69-b586f813d81e">
+					<reportElement x="480" y="0" width="150" height="16" uuid="b00fe69c-2c19-40df-9d69-b586f813d81e">
 						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
@@ -571,7 +615,7 @@ CONCATENATE(
 					<textFieldExpression><![CDATA[$F{detail} == null ? "" : $F{detail}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="650" y="0" width="160" height="16" uuid="2d51d650-ba05-4ea4-a34b-d9c587efec63">
+					<reportElement x="630" y="0" width="150" height="16" uuid="2d51d650-ba05-4ea4-a34b-d9c587efec63">
 						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 					</reportElement>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -650,6 +694,23 @@ CONCATENATE(
 	LEN(new Integer(new Integer(new Float($F{medicalVisit}/60).toString().split("\\.")[1] )*60/100).toString() ) == 1 ? "0" : ""
 )]]></textFieldExpression>
 				</textField>
+				<rectangle>
+					<reportElement x="780" y="0" width="30" height="16" uuid="e741235e-d8dc-40f5-86ea-d45b440bf238">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<printWhenExpression><![CDATA[$F{ticketManagement}]]></printWhenExpression>
+					</reportElement>
+				</rectangle>
+				<textField>
+					<reportElement x="780" y="0" width="30" height="16" uuid="733ddf5e-e531-4a4f-b253-1d3cd362179b">
+						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+						<printWhenExpression><![CDATA[$F{ticketManagement}]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ticket} == null ? "" : $F{ticket}]]></textFieldExpression>
+				</textField>
 			</band>
 		</groupHeader>
 	</group>
@@ -695,7 +756,7 @@ CONCATENATE(
 				<textElement textAlignment="Center" verticalAlignment="Top">
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Legenda:  Lav. -> Lavoro     Str. -> Straordinari     Per.  -> Permessi     Fer. -> Ferie     V.M. -> Visita Medica     Mal. -> Malattia"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Legenda:  Lav. -> Lavoro     Str. -> Straordinari     Per.  -> Permessi     Fer. -> Ferie     V.M. -> Visita Medica     Mal. -> Malattia    Tkt -> Ticket"]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageFooter>
