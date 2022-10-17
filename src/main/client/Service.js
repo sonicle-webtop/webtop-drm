@@ -1699,14 +1699,15 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				{
 					ftype: 'grouping',
 					groupHeaderTpl: '{name}',
-					enableGroupingMenu: false
+					enableGroupingMenu: false,
+					showSummaryRow: tickets
 				};
 				
-		if (tickets)
+/*		if (tickets)
 			ftrs[1]=
 				{
 					ftype: 'summary'
-				};
+				};*/
 		
 		return ftrs;
 	},

@@ -33,6 +33,7 @@
 package com.sonicle.webtop.drm.bol.js;
 
 import com.sonicle.webtop.core.app.WT;
+import com.sonicle.webtop.core.sdk.UserProfile.PersonalInfo;
 import com.sonicle.webtop.core.sdk.UserProfileId;
 import com.sonicle.webtop.core.sdk.WTException;
 import com.sonicle.webtop.drm.DrmManager;
@@ -77,7 +78,9 @@ public class JsGridTimetableReport {
 	public JsGridTimetableReport(OTimetableReport tr, DrmManager drmMgr) throws WTException {
 		this.id = tr.getId();
 		this.domainId = tr.getDomainId();
-		this.user = WT.getUserData(new UserProfileId(tr.getDomainId(), tr.getUserId())).getDisplayName();
+		//this.user = WT.getUserData(new UserProfileId(tr.getDomainId(), tr.getUserId())).getDisplayName();
+		PersonalInfo pinfo=WT.getUserPersonalInfo(new UserProfileId(tr.getDomainId(), tr.getUserId()));
+		this.user = (pinfo.getLastName()+" "+pinfo.getFirstName()).trim();
 		this.company = drmMgr.getCompany(tr.getCompanyId()).getName();
 		this.date = concatDate(tr);
 		this.workingHours =tr.getWorkingHours();
@@ -91,7 +94,9 @@ public class JsGridTimetableReport {
 		this.hour = tr.getHour();
 		this.detail = tr.getDetail();
 		this.note = tr.getNote();
-		this.targetUser = WT.getUserData(new UserProfileId(tr.getDomainId(), tr.getTargetUserId())).getDisplayName();
+		//this.targetUser = WT.getUserData(new UserProfileId(tr.getDomainId(), tr.getTargetUserId())).getDisplayName();
+		PersonalInfo tergetPinfo=WT.getUserPersonalInfo(new UserProfileId(tr.getDomainId(), tr.getTargetUserId()));
+		this.targetUser = (tergetPinfo.getLastName()+" "+tergetPinfo.getFirstName()).trim();;
 		this.targetUserId = tr.getTargetUserId();
 		this.workReportHours = tr.getWorkReportHours();
 		this.jobHours = tr.getJobHours();
