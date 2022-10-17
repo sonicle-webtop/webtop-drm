@@ -137,8 +137,9 @@ public class RBTimetableReport {
 	private Integer calcTicket(DrmManager drmMgr, OTimetableReport otr) throws WTException{
 		Integer tkt = 0;
 		Boolean tktManagement = drmMgr.getTimetableSetting().getTicketManagement();
+		boolean isSmart=(otr.getDetail()!=null && otr.getDetail().contains("[S]"));
 		
-		if(tktManagement){
+		if(tktManagement && !isSmart){
 			Integer minHourForTkt = drmMgr.getEmployeeProfile(otr.getDomainId(), otr.getUserId()).minimumNumberOfHoursPerTicket == null ? drmMgr.getTimetableSetting().getMinimumNumberOfHoursPerTicket() : drmMgr.getEmployeeProfile(otr.getDomainId(), otr.getUserId()).minimumNumberOfHoursPerTicket;
 
 			if(minHourForTkt != null){

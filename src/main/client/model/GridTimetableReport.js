@@ -96,7 +96,8 @@ Ext.define('Sonicle.webtop.drm.model.GridTimetableReport', {
 					rec.get('other'),
 					rec.get('causalId'),
 					rec.get('totalLineHour'),
-					rec.get('userId')
+					rec.get('userId'),
+					rec.get('detail')?rec.get('detail').includes('[S]'):false
 			);
 		})
 	],
@@ -212,7 +213,7 @@ Ext.define('Sonicle.webtop.drm.model.GridTimetableReport', {
 			//}	
 		},
 		
-		calcTicket: function(workingHours, paidLeave, unpaidLeave, medicalVisit, contractual, sickness, overtime, holiday,  other, causalId, totalLineHour, userId) {
+		calcTicket: function(workingHours, paidLeave, unpaidLeave, medicalVisit, contractual, sickness, overtime, holiday,  other, causalId, totalLineHour, userId, isSmart) {
 			var mt = WT.getVar('com.sonicle.webtop.drm', 'minimumNumberOfHoursPerTicket');		
 			var hs = WT.getVar('com.sonicle.webtop.drm', 'causalsOperation');
 			var sign = hs[causalId];
@@ -225,6 +226,8 @@ Ext.define('Sonicle.webtop.drm.model.GridTimetableReport', {
 			var ov = 0;
 			var hh = 0;
 			var ot = 0;
+			
+			if (isSmart) return 0;
 			
 			if (workingHours !== null) {
 				var h = workingHours.split('.');
