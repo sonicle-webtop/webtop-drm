@@ -1690,6 +1690,7 @@ public class ManagerUtils {
 		oSetting.setDefaultCausalWorkingHours(tSetting.getDefaultCausalWorkingHours());
 		oSetting.setMinimumNumberOfHoursPerTicket(tSetting.getMinimumNumberOfHoursPerTicket());
 		oSetting.setTicketManagement(tSetting.getTicketManagement());
+		oSetting.setAutomaticOvertime(tSetting.getAutomaticOvertime());
 		
 		return oSetting;
 	}
@@ -1728,6 +1729,7 @@ public class ManagerUtils {
 		tSetting.setDefaultCausalWorkingHours(oTSetting.getDefaultCausalWorkingHours());
 		tSetting.setMinimumNumberOfHoursPerTicket(oTSetting.getMinimumNumberOfHoursPerTicket());
 		tSetting.setTicketManagement(oTSetting.getTicketManagement());
+		tSetting.setAutomaticOvertime(oTSetting.getAutomaticOvertime());
 		
 		return tSetting;
 	}

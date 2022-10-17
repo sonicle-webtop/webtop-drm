@@ -4989,6 +4989,22 @@ public class DrmManager extends BaseManager implements IDrmManager{
 						otr.setCausalId(val.getOrDefault("causalId", null));
 						otr.setNote(val.getOrDefault("note", null));
 					}
+
+					//Se vi Ã¨ la Gestione automatica straordinari, ciclo i record per modificare Working Hours e Overtime secondo la logica
+					if(getTimetableSetting().getAutomaticOvertime() == true && otr.getWorkingHours() != null && otr.getTotalLineHour() != null){
+						Integer wh;
+						Integer lh;
+
+						String[] h1 = otr.getWorkingHours().split("\\.");
+						wh = (+Integer.parseInt(h1[0])) * 60 + (+Integer. parseInt(h1[1]));
+						lh = Integer.parseInt(otr.getTotalLineHour());
+
+						Integer delta = wh - lh;
+						if(delta > 0){
+							otr.setOvertime(ManagerUtils.pad((delta / 60), 1) + "." + ManagerUtils.pad((delta % 60),2));
+							otr.setWorkingHours(ManagerUtils.pad((wh / 60), 1) + "." + ManagerUtils.pad((wh % 60),2));
+						}
+					}
 					
 					trDAO.insert(con, otr);
 				}

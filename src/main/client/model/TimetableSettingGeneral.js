@@ -74,6 +74,7 @@ Ext.define('Sonicle.webtop.drm.model.TimetableSettingGeneral', {
 		WTF.field('defaultCausalSickness', 'string', true),
 		WTF.field('defaultCausalMedicalVisit', 'string', true),
 		WTF.field('minimumNumberOfHoursPerTicket', 'int', true),
-		WTF.field('ticketManagement', 'bool', true, {defaultValue: false})
+		WTF.field('ticketManagement', 'bool', true, {defaultValue: false}),
+		WTF.field('automaticOvertime', 'bool', true, {defaultValue: false})
 	]
 });

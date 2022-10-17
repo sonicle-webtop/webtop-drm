@@ -126,84 +126,90 @@ Ext.define('Sonicle.webtop.drm.model.GridTimetableReport', {
 		
 		calcMissingHours: function(workingHours, paidLeave, unpaidLeave, medicalVisit, contractual, sickness, overtime, holiday,  other, causalId, totalLineHour) {
 			var hs = WT.getVar('com.sonicle.webtop.drm', 'causalsOperation');
-			var sign = hs[causalId];
-			var wh = 0;
-			var ph = 0;
-			var uh = 0;
-			var mh = 0;
-			var ch = 0;
-			var sh = 0;
-			var ov = 0;
-			var hh = 0;
-			var ot = 0;
-			var ret;
+			var ao = WT.getVar('com.sonicle.webtop.drm', 'automaticOvertime');
 			
-			if (workingHours !== null) {
-				var h = workingHours.split('.');
-				wh = (+h[0]) * 60 + (+h[1]);
-			}
-			if (paidLeave !== null) {
-				var h = paidLeave.split('.');
-				ph = (+h[0]) * 60 + (+h[1]);
-			}
-			if (unpaidLeave !== null) {
-				var h = unpaidLeave.split('.');
-				uh = (+h[0]) * 60 + (+h[1]);
-			}
-			if (medicalVisit !== null) {
-				var h = medicalVisit.split('.');
-				mh = (+h[0]) * 60 + (+h[1]);
-			}
-			if (contractual !== null) {
-				var h = contractual.split('.');
-				ch = (+h[0]) * 60 + (+h[1]);
-			}
-			if (sickness !== null) {
-				var h = sickness.split('.');
-				sh = (+h[0]) * 60 + (+h[1]);
-			}
-			if (overtime !== null) {
-				var h = overtime.split('.');
-				ov = (+h[0]) * 60 + (+h[1]);
-			}
-			if (holiday !== null) {
-				var h = holiday.split('.');
-				hh = (+h[0]) * 60 + (+h[1]);
-			}
-			if (other !== null) {
-				var h = other.split('.');
-				ot = (+h[0]) * 60 + (+h[1]);
-			}
-			if(totalLineHour !== null){
-				if (wh !== 0 || ph !== 0 || uh !== 0 || mh !== 0 || ch !== 0 || sh !== 0 || hh !== 0 || ot !== 0) {
-					var th = totalLineHour - wh - ph - uh - mh - ch - sh - hh;
-					th = th + ov;
-					
-					if(sign === -1) th = th - ot;
-					else if(sign === 1) th = th + ot;
-					
-					if(th < 0){
-						th = Math.abs(th);
-						var hours = Math.floor(th / 60);
-						var minutes = Math.abs(th % 60);
-						hours = Math.abs(hours);
-						ret = '+'+Sonicle.webtop.drm.model.GridTimetableReport.pad(hours, 2) + "." + Sonicle.webtop.drm.model.GridTimetableReport.pad(minutes, 2);
-					}else{
-						var hours = Math.floor(th / 60);
-						var minutes = Math.abs(th % 60);
-						var chsign=(th===0)?'&nbsp;':'-';
-						ret = chsign+Sonicle.webtop.drm.model.GridTimetableReport.pad(hours, 2) + "." + Sonicle.webtop.drm.model.GridTimetableReport.pad(minutes, 2);
-					}
-					return ret;
-				} else {
-					var hours = Math.floor(totalLineHour / 60);
-					var minutes = Math.abs(totalLineHour % 60);
-					ret = '-'+Sonicle.webtop.drm.model.GridTimetableReport.pad(hours, 2) + "." + Sonicle.webtop.drm.model.GridTimetableReport.pad(minutes, 2);
-					return ret;
+			//if(ao !== true){
+				var sign = hs[causalId];
+				var wh = 0;
+				var ph = 0;
+				var uh = 0;
+				var mh = 0;
+				var ch = 0;
+				var sh = 0;
+				var ov = 0;
+				var hh = 0;
+				var ot = 0;
+				var ret;
+
+				if (workingHours !== null) {
+					var h = workingHours.split('.');
+					wh = (+h[0]) * 60 + (+h[1]);
 				}
-			}else {
-				return null;
-			}
+				if (paidLeave !== null) {
+					var h = paidLeave.split('.');
+					ph = (+h[0]) * 60 + (+h[1]);
+				}
+				if (unpaidLeave !== null) {
+					var h = unpaidLeave.split('.');
+					uh = (+h[0]) * 60 + (+h[1]);
+				}
+				if (medicalVisit !== null) {
+					var h = medicalVisit.split('.');
+					mh = (+h[0]) * 60 + (+h[1]);
+				}
+				if (contractual !== null) {
+					var h = contractual.split('.');
+					ch = (+h[0]) * 60 + (+h[1]);
+				}
+				if (sickness !== null) {
+					var h = sickness.split('.');
+					sh = (+h[0]) * 60 + (+h[1]);
+				}
+				if (overtime !== null) {
+					var h = overtime.split('.');
+					ov = (+h[0]) * 60 + (+h[1]);
+				}
+				if (holiday !== null) {
+					var h = holiday.split('.');
+					hh = (+h[0]) * 60 + (+h[1]);
+				}
+				if (other !== null) {
+					var h = other.split('.');
+					ot = (+h[0]) * 60 + (+h[1]);
+				}
+				if(totalLineHour !== null){
+					if (wh !== 0 || ph !== 0 || uh !== 0 || mh !== 0 || ch !== 0 || sh !== 0 || hh !== 0 || ot !== 0) {
+						var th = totalLineHour - wh - ph - uh - mh - ch - sh - hh;
+						th = th + ov;
+
+						if(sign === -1) th = th - ot;
+						else if(sign === 1) th = th + ot;
+
+						if(th < 0){
+							th = Math.abs(th);
+							var hours = Math.floor(th / 60);
+							var minutes = Math.abs(th % 60);
+							hours = Math.abs(hours);
+							ret = '+'+Sonicle.webtop.drm.model.GridTimetableReport.pad(hours, 2) + "." + Sonicle.webtop.drm.model.GridTimetableReport.pad(minutes, 2);
+						}else{
+							var hours = Math.floor(th / 60);
+							var minutes = Math.abs(th % 60);
+							var chsign=(th===0)?'&nbsp;':'-';
+							ret = chsign+Sonicle.webtop.drm.model.GridTimetableReport.pad(hours, 2) + "." + Sonicle.webtop.drm.model.GridTimetableReport.pad(minutes, 2);
+						}
+						return ret;
+					} else {
+						var hours = Math.floor(totalLineHour / 60);
+						var minutes = Math.abs(totalLineHour % 60);
+						ret = '-'+Sonicle.webtop.drm.model.GridTimetableReport.pad(hours, 2) + "." + Sonicle.webtop.drm.model.GridTimetableReport.pad(minutes, 2);
+						return ret;
+					}
+				}else {
+					return null;
+				}
+			//}else{
+			//	return null;
+			//}	
 		},
 		
 		calcTicket: function(workingHours, paidLeave, unpaidLeave, medicalVisit, contractual, sickness, overtime, holiday,  other, causalId, totalLineHour, userId) {

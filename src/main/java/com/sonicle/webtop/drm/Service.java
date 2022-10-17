@@ -366,6 +366,7 @@ public class Service extends BaseService {
 			vs.put("isSupervisorUser", isSupervisorUser());
 			vs.put("defaultMinimumNumberOfHoursPerTicket", getDefaultMinimumNumberOfHoursPerTicket());
 			vs.put("ticketManagement", getTicketManagementSetting());
+			vs.put("automaticOvertime", getAutomaticOvertimeSetting());
 			
 			HashMap<String, Integer> mT = new HashMap<>();
 			List<OEmployeeProfile> oEs = manager.listEmployeeProfiles();
@@ -485,6 +486,20 @@ public class Service extends BaseService {
 			return (value == null) ? false : value;	
 		} catch (Exception ex) {
 			throw new WTException("Error in getTicketManagementSetting", ex);
+		}
+	}
+
+	private Boolean getAutomaticOvertimeSetting() throws WTException {
+		try{
+			Boolean value = null;
+			
+			TimetableSetting tS = manager.getTimetableSetting();
+			if(tS != null) value = tS.getAutomaticOvertime();
+			
+			
+			return (value == null) ? false : value;	
+		} catch (Exception ex) {
+			throw new WTException("Error in getAutomaticOvertimeSetting", ex);
 		}
 	}
 	

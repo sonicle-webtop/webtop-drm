@@ -213,6 +213,11 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingGeneral', {
 							xtype: 'checkbox',
 							bind: '{record.ticketManagement}',
 							boxLabel: me.mys.res('timetable.settings.fld-ticketManagement.lbl')
+						},
+						{
+							xtype: 'checkbox',
+							bind: '{record.automaticOvertime}',
+							boxLabel: me.mys.res('timetable.settings.fld-automaticOvertime.lbl')
 						}
 					]
 				},
