@@ -143,61 +143,14 @@ public class RBTimetableReport {
 			Integer minHourForTkt = drmMgr.getEmployeeProfile(otr.getDomainId(), otr.getUserId()).minimumNumberOfHoursPerTicket == null ? drmMgr.getTimetableSetting().getMinimumNumberOfHoursPerTicket() : drmMgr.getEmployeeProfile(otr.getDomainId(), otr.getUserId()).minimumNumberOfHoursPerTicket;
 
 			if(minHourForTkt != null){
-				Integer sign = otr.getCausalId() == null ? null : drmMgr.getCausal(otr.getCausalId()).getSign();
 				Integer wh = 0;
-				Integer ph = 0;
-				Integer uh = 0;
-				Integer mh = 0;
-				Integer ch = 0;
-				Integer sh = 0;
-				Integer ov = 0;
-				Integer hh = 0;
-				Integer ot = 0;
 
 				if (otr.getWorkingHours() != null) {
 					String[] h = otr.getWorkingHours().split("\\.");
 					wh = (+Integer.parseInt(h[0])) * 60 + (+Integer.parseInt(h[1]));
 				}
-				if (otr.getPaidLeave()!= null) {
-					String[] h = otr.getPaidLeave().split("\\.");
-					ph = (+Integer.parseInt(h[0])) * 60 + (+Integer.parseInt(h[1]));
-				}
-				if (otr.getUnpaidLeave()!= null) {
-					String[] h = otr.getUnpaidLeave().split("\\.");
-					uh = (+Integer.parseInt(h[0])) * 60 + (+Integer.parseInt(h[1]));
-				}
-				if (otr.getMedicalVisit()!= null) {
-					String[] h = otr.getMedicalVisit().split("\\.");
-					mh = (+Integer.parseInt(h[0])) * 60 + (+Integer.parseInt(h[1]));
-				}
-				if (otr.getContractual()!= null) {
-					String[] h = otr.getContractual().split("\\.");
-					ch = (+Integer.parseInt(h[0])) * 60 + (+Integer.parseInt(h[1]));
-				}
-				if (otr.getSickness()!= null) {
-					String[] h = otr.getSickness().split("\\.");
-					sh = (+Integer.parseInt(h[0])) * 60 + (+Integer.parseInt(h[1]));
-				}
-				if (otr.getOvertime()!= null) {
-					String[] h = otr.getOvertime().split("\\.");
-					ov = (+Integer.parseInt(h[0])) * 60 + (+Integer.parseInt(h[1]));
-				}
-				if (otr.getHoliday()!= null) {
-					String[] h = otr.getHoliday().split("\\.");
-					hh = (+Integer.parseInt(h[0])) * 60 + (+Integer.parseInt(h[1]));
-				}
-				if (otr.getOther()!= null) {
-					String[] h = otr.getOther().split("\\.");
-					ot = (+Integer.parseInt(h[0])) * 60 + (+Integer.parseInt(h[1]));
-				}
 				if(otr.getTotalLineHour() != null){
-					Integer th = wh - ph - uh - mh - ch - sh - hh;
-					th = th + ov;
-
-					if(sign != null){
-						if(sign == -1) th = th - ot;
-						else if(sign == 1) th = th + ot;
-					}
+					Integer th = wh;
 
 					minHourForTkt = minHourForTkt * 60;
 
