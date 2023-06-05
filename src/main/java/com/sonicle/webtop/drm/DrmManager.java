@@ -4991,13 +4991,14 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					}
 
 					//Se vi Ã¨ la Gestione automatica straordinari, ciclo i record per modificare Working Hours e Overtime secondo la logica
-					if(getTimetableSetting().getAutomaticOvertime() == true && otr.getWorkingHours() != null && otr.getTotalLineHour() != null){
+					if(getTimetableSetting().getAutomaticOvertime() == true && otr.getWorkingHours() != null){
 						Integer wh;
 						Integer lh;
 
+						String tlh=otr.getTotalLineHour();
 						String[] h1 = otr.getWorkingHours().split("\\.");
 						wh = (+Integer.parseInt(h1[0])) * 60 + (+Integer. parseInt(h1[1]));
-						lh = Integer.parseInt(otr.getTotalLineHour());
+						lh = StringUtils.isEmpty(tlh)?0:Integer.parseInt(tlh);
 
 						Integer delta = wh - lh;
 						if(delta > 0){
