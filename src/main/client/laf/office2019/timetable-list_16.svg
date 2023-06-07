@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="16px" height="16px" viewBox="0 0 16 16" enable-background="new 0 0 16 16" xml:space="preserve">
-  <g id="icon">
-    <rect x="0.5" y="4.5" width="15" height="11" fill="#FEFFFF" stroke="#64180B" stroke-width="1" stroke-miterlimit="50"/>
-    <rect x="0.5" y="1.5" width="15" height="3" fill="#F29C8D" stroke="#A62812" stroke-width="1" stroke-linecap="round" stroke-miterlimit="50"/>
-    <rect x="3" y="6" width="10" height="7" fill="#FEFFFF"/>
-    <path d="M8,9.5H3.5V6.5h4.5V9.5zM12.5,6.5H8v3h4.5V6.5zM8,12.5H3.5V9.5h4.5V12.5zM12.5,9.5H8v3h4.5V9.5z" fill="none" stroke="#D83418" stroke-width="1" stroke-miterlimit="50" opacity="0.6"/>
+  <g id="main">
+    <g id="icon">
+      <path d="M0.5,14.5L6.8,14.5L6.8,5.8L14.5,5.8L14.5,3.5L0.5,3.5zz" fill="#FFFFFF"/>
+      <path d="M0,3.5L0,14.5L0,15L0.5,15L6.8,15L6.8,14L1,14L1,4L14,4L14,5.8L15,5.8L15,3.5L15,3L14.5,3L0.5,3L0,3zz" fill="#383838"/>
+      <path d="M0.5,3.5L14.5,3.5L14.5,0.5L0.5,0.5zz" fill="#C8C6C4"/>
+      <path d="M0,0.5L0,3.5L0,4L0.5,4L14.5,4L15,4L15,3.5L15,0.5L15,0L14.5,0L0.5,0L0,0zM14,1L14,3L1,3L1,1zz" fill="#383838"/>
+      <path d="M5,14L6,14L6,4L5,4zz" fill="#787979"/>
+      <path d="M10,5.8L11,5.8L11,4L10,4zz" fill="#787979"/>
+      <path d="M1,12L6.8,12L6.8,11L1,11zz" fill="#787979"/>
+      <path d="M1,8L6.8,8L6.8,7L1,7zz" fill="#787979"/>
+    </g>
+    <g id="overlay">
+      <rect x="8.5" y="7.5" width="7" height="8" fill="#FFFFFF" stroke="#383838" stroke-width="1" stroke-miterlimit="10"/>
+      <path d="M10,9.5h4M10,11.5h4M10,13.5h4" fill="#FFFFFF" stroke="#228BCB" stroke-width="1" stroke-miterlimit="10"/>
+    </g>
   </g>
 </svg>
