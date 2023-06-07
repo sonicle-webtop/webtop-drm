@@ -34,6 +34,7 @@
 Ext.define('Sonicle.webtop.drm.view.Configurations', {
 	extend: 'WTA.sdk.DockableView',
 	requires: [
+		'Sonicle.Utils',
 		'Sonicle.webtop.drm.model.GridDocStatuses',
 		'Sonicle.webtop.drm.model.GridCompany',
 		'Sonicle.webtop.drm.model.GridFolders',
@@ -149,7 +150,7 @@ Ext.define('Sonicle.webtop.drm.view.Configurations', {
 							],
 							listeners: {
 								itemcontextmenu: function (s, rec, itm, i, e) {
-									WT.showContextMenu(e, me.getRef('cxmGrid'), {node: rec});
+									Sonicle.Utils.showContextMenu(e, me.getRef('cxmGrid'), {node: rec});
 								},
 								itemclick: function (s, rec, itm, i, e) {
 									me.updateDisabled('editGroup');
