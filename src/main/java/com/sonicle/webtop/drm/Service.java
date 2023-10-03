@@ -4350,7 +4350,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 				IOUtils.closeQuietly(fos);
 			}
 			
-			UploadedFile upfile = addAsUploadedFile(tag, filename, "pdf", new FileInputStream(file));
+			UploadedFile upfile = addAsUploadedFile(tag, filename, "application/pdf", new FileInputStream(file));
 			items.add(new MapItem()
 					.add("uploadId", upfile.getUploadId())
 					.add("fileName", filename)
@@ -4423,7 +4423,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 				IOUtils.closeQuietly(fos);
 			}
 			
-			UploadedFile upfile = addAsUploadedFile(tag, filename, "pdf", new FileInputStream(file));
+			UploadedFile upfile = addAsUploadedFile(tag, filename, "application/pdf", new FileInputStream(file));
 			items.add(new MapItem()
 					.add("uploadId", upfile.getUploadId())
 					.add("fileName", filename)
@@ -4494,7 +4494,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 				IOUtils.closeQuietly(fos);
 			}
 			
-			UploadedFile upfile = addAsUploadedFile(tag, filename, "pdf", new FileInputStream(file));
+			UploadedFile upfile = addAsUploadedFile(tag, filename, "application/pdf", new FileInputStream(file));
 			items.add(new MapItem()
 					.add("uploadId", upfile.getUploadId())
 					.add("fileName", filename)
