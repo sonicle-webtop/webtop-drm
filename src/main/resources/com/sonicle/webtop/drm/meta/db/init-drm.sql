@@ -86,10 +86,7 @@ CREATE TABLE "drm"."business_trips" (
 "revision_status" varchar(1) NOT NULL,
 "external_id" varchar(100),
 "description" varchar(50) NOT NULL
-)
-WITH (OIDS=FALSE)
-
-;
+);
 
 -- ----------------------------
 -- Table structure for "drm"."companies"
@@ -113,10 +110,7 @@ CREATE TABLE "drm"."companies" (
 "footer_column_left" varchar(100),
 "footer_column_right" varchar(100),
 "logo_upload_id" varchar(36)
-)
-WITH (OIDS=FALSE)
-
-;
+);
 
 -- ----------------------------
 -- Table structure for "drm"."companies_users"
@@ -125,10 +119,7 @@ CREATE TABLE "drm"."companies_users" (
 "association_id" int4 DEFAULT nextval('"drm".seq_companies_users'::regclass) NOT NULL,
 "company_id" int4 NOT NULL,
 "user_id" varchar(36) NOT NULL
-)
-WITH (OIDS=FALSE)
-
-;
+);
 
 -- ----------------------------
 -- Table structure for "drm"."doc_statuses"
@@ -139,10 +130,7 @@ CREATE TABLE "drm"."doc_statuses" (
 "description" varchar(255),
 "type" varchar(1) NOT NULL,
 "built_in" bool DEFAULT false NOT NULL
-)
-WITH (OIDS=FALSE)
-
-;
+);
 
 -- ----------------------------
 -- Table structure for "drm"."doc_statuses_groups"
@@ -151,10 +139,7 @@ CREATE TABLE "drm"."doc_statuses_groups" (
 "association_id" int4 DEFAULT nextval('"drm".seq_doc_statuses_groups'::regclass) NOT NULL,
 "doc_status_id" int4 NOT NULL,
 "group_id" varchar(36) NOT NULL
-)
-WITH (OIDS=FALSE)
-
-;
+);
 
 -- ----------------------------
 -- Table structure for "drm"."enabled_programs"
@@ -165,10 +150,7 @@ CREATE TABLE "drm"."enabled_programs" (
 "program_id" varchar(50) NOT NULL,
 "parent_id" varchar(50) NOT NULL,
 "read_only" bool NOT NULL
-)
-WITH (OIDS=FALSE)
-
-;
+);
 
 -- ----------------------------
 -- Table structure for "drm"."folders"
@@ -178,10 +160,7 @@ CREATE TABLE "drm"."folders" (
 "name" varchar(100) NOT NULL,
 "description" varchar(255),
 "expired" bool DEFAULT false NOT NULL
-)
-WITH (OIDS=FALSE)
-
-;
+);
 
 -- ----------------------------
 -- Table structure for "drm"."folders_groups"
@@ -190,10 +169,7 @@ CREATE TABLE "drm"."folders_groups" (
 "association_id" int4 DEFAULT nextval('"drm".seq_folders_groups'::regclass) NOT NULL,
 "folder_id" varchar(36) NOT NULL,
 "group_id" varchar(36) NOT NULL
-)
-WITH (OIDS=FALSE)
-
-;
+);
 
 -- ----------------------------
 -- Table structure for "drm"."groups"
@@ -207,10 +183,7 @@ CREATE TABLE "drm"."groups" (
 "group_type" varchar(1) NOT NULL,
 "customer_id" varchar(36),
 "supervisior_user_id" varchar(100)
-)
-WITH (OIDS=FALSE)
-
-;
+);
 
 -- ----------------------------
 -- Table structure for "drm"."groups_users"
@@ -219,10 +192,7 @@ CREATE TABLE "drm"."groups_users" (
 "association_id" int4 DEFAULT nextval('"drm".seq_groups_users'::regclass) NOT NULL,
 "group_id" varchar(36) NOT NULL,
 "user_id" varchar(36) NOT NULL
-)
-WITH (OIDS=FALSE)
-
-;
+);
 
 -- ----------------------------
 -- Table structure for "drm"."profiles"
@@ -232,10 +202,7 @@ CREATE TABLE "drm"."profiles" (
 "domain_id" varchar(20) NOT NULL,
 "description" varchar(255) NOT NULL,
 "type" varchar(1) NOT NULL
-)
-WITH (OIDS=FALSE)
-
-;
+);
 
 -- ----------------------------
 -- Table structure for "drm"."profiles_masterdata"
@@ -244,10 +211,7 @@ CREATE TABLE "drm"."profiles_masterdata" (
 "id" int4 DEFAULT nextval('"drm".seq_profiles_masterdata'::regclass) NOT NULL,
 "profile_id" varchar(36) NOT NULL,
 "master_data_id" varchar(36) NOT NULL
-)
-WITH (OIDS=FALSE)
-
-;
+);
 
 -- ----------------------------
 -- Table structure for "drm"."profiles_supervised_users"
@@ -256,10 +220,7 @@ CREATE TABLE "drm"."profiles_supervised_users" (
 "id" int4 DEFAULT nextval('"drm".seq_profiles_supervised_users'::regclass) NOT NULL,
 "profile_id" varchar(36) NOT NULL,
 "user_id" varchar(36) NOT NULL
-)
-WITH (OIDS=FALSE)
-
-;
+);
 
 -- ----------------------------
 -- Table structure for "drm"."profiles_members"
@@ -268,10 +229,7 @@ CREATE TABLE "drm"."profiles_members" (
 "id" int4 DEFAULT nextval('"drm".seq_profiles_members'::regclass) NOT NULL,
 "profile_id" varchar(36) NOT NULL,
 "user_id" varchar(36) NOT NULL
-)
-WITH (OIDS=FALSE)
-
-;
+);
 
 -- ----------------------------
 -- Table structure for "drm"."work_reports"
@@ -302,10 +260,7 @@ CREATE TABLE "drm"."work_reports" (
 "free_support" bool,
 "business_trip_id" int4,
 "day_trasfert" int2
-)
-WITH (OIDS=FALSE)
-
-;
+);
 
 -- ----------------------------
 -- Table structure for "drm"."work_reports_attachments"
@@ -318,10 +273,7 @@ CREATE TABLE "drm"."work_reports_attachments" (
 "filename" varchar(255) NOT NULL,
 "size" int4 NOT NULL,
 "media_tpye" varchar(100) NOT NULL
-)
-WITH (OIDS=FALSE)
-
-;
+);
 
 -- ----------------------------
 -- Table structure for "drm"."work_reports_rows"
@@ -333,10 +285,7 @@ CREATE TABLE "drm"."work_reports_rows" (
 "work_type_id" int4,
 "duration" int2,
 "row_flag" varchar(1)
-)
-WITH (OIDS=FALSE)
-
-;
+);
 
 -- ----------------------------
 -- Table structure for "drm"."work_reports_settings"
@@ -345,10 +294,7 @@ CREATE TABLE "drm"."work_reports_settings" (
 "work_report_setting_id" int4 DEFAULT nextval('"drm".seq_work_reports_settings'::regclass) NOT NULL,
 "domain_id" varchar(20) NOT NULL,
 "warranty_text" varchar(1024)
-)
-WITH (OIDS=FALSE)
-
-;
+);
 
 -- ----------------------------
 -- Table structure for "drm"."work_types"
@@ -359,10 +305,7 @@ CREATE TABLE "drm"."work_types" (
 "revision_status" varchar(1) NOT NULL,
 "external_id" varchar(100),
 "description" varchar(50) NOT NULL
-)
-WITH (OIDS=FALSE)
-
-;
+);
 
 -- ----------------------------
 -- Primary Key structure for table "drm"."business_trips"
