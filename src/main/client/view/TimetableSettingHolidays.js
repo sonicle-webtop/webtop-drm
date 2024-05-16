@@ -49,11 +49,13 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingHolidays', {
 		me.add({
             region: 'center',
 			xtype: 'panel',
+			layout: 'vbox',
 			items: [
                 {
                     // title: me.mys.res('holidaydates.tit'),
                     xtype: 'grid',
                     reference: 'gpHolidayDate',
+					flex: 1,
                     store: {
                         autoLoad: true,
                         model: 'Sonicle.webtop.drm.model.GridHolidayDates',

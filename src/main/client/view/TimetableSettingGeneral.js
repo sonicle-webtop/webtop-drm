@@ -48,7 +48,8 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingGeneral', {
 			items: [
 				{
 					xtype: 'wtform',
-						title: me.mys.res('timetable.settings.tit'),
+					scrollable: true,
+					title: me.mys.res('timetable.settings.tit'),
 					defaults: {
 						labelWidth: 160
 					},

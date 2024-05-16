@@ -89,13 +89,13 @@
 
 		<permissions>
 			<permission group="CONFIGURATIONS" actions="MANAGE" />
-			<permission group="OPPORTUNITY" actions="READ,DELETE,UPDATE" />
+			<permission group="OPPORTUNITY" actions="ACCESS,READ,DELETE,UPDATE" />
 			<permission group="OPPORTUNITY_SETTINGS" actions="MANAGE" />
-			<permission group="WORK_REPORT" actions="READ,DELETE,UPDATE" />
+			<permission group="WORK_REPORT" actions="ACCESS,READ,DELETE,UPDATE" />
 			<permission group="WORK_REPORT_SETTINGS" actions="MANAGE" />
-			<permission group="EXPENSE_NOTE" actions="READ,DELETE,UPDATE" />
+			<permission group="EXPENSE_NOTE" actions="ACCESS,READ,DELETE,UPDATE" />
 			<permission group="EXPENSE_NOTE_SETTINGS" actions="MANAGE" />
-			<permission group="TIMETABLE" actions="READ,DELETE,UPDATE" />
+			<permission group="TIMETABLE" actions="ACCESS,READ,DELETE,UPDATE" />
 			<permission group="TIMETABLE_SETTINGS" actions="MANAGE" />
 			<permission group="JOB" actions="ACCESS" />
 			<permission group="JOB_SETTINGS" actions="MANAGE" />

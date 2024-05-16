@@ -964,25 +964,36 @@ public class Service extends BaseService {
 			UserProfileId pid = getEnv().getProfileId();
 			
 			ss = new DrmServiceSettings(SERVICE_ID, pid.getDomainId());
+			boolean perms = ss.isUseProgramPermissions();
 			
 			if (nodeId.equals(DrmTreeNode.TREE_NODE_ROOT)) { // Nodi livello 1
 				// + OPPORTUNITY
-				if("".equals(ss.getOpportunityGeneralTitle()) || null == ss.getOpportunityGeneralTitle())
-					nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_OPPORTUNITY, null, lookupResource(DrmTreeNode.OPPORTUNITY), true, "wtdrm-icon-opportunity"));
-				else
-					nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_OPPORTUNITY, null, ss.getOpportunityGeneralTitle(), true, "wtdrm-icon-opportunity"));				
+				if (!perms || RunContext.isPermitted(true, pid, SERVICE_ID, "OPPORTUNITY", "ACCESS")) {
+					if("".equals(ss.getOpportunityGeneralTitle()) || null == ss.getOpportunityGeneralTitle())
+						nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_OPPORTUNITY, null, lookupResource(DrmTreeNode.OPPORTUNITY), true, "wtdrm-icon-opportunity"));
+					else
+						nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_OPPORTUNITY, null, ss.getOpportunityGeneralTitle(), true, "wtdrm-icon-opportunity"));
+				}
+				
 				// + WORK REPORT
-				nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_WORKREPORT, null, lookupResource(DrmTreeNode.WORK_REPORT), true, "wtdrm-icon-workReport"));
+				if (!perms || RunContext.isPermitted(true, pid, SERVICE_ID, "WORK_REPORT", "ACCESS"))
+					nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_WORKREPORT, null, lookupResource(DrmTreeNode.WORK_REPORT), true, "wtdrm-icon-workReport"));
+				
 				// + EXPENSE NOTE
-				nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_EXPENSENOTE, null, lookupResource(DrmTreeNode.EXPENSE_NOTE), true, "wtdrm-icon-expenseNote"));
+				if (!perms || RunContext.isPermitted(true, pid, SERVICE_ID, "EXPENSE_NOTE", "ACCESS"))
+					nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_EXPENSENOTE, null, lookupResource(DrmTreeNode.EXPENSE_NOTE), true, "wtdrm-icon-expenseNote"));
+				
 				// + TIMETABLE
-				nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE, null, lookupResource(DrmTreeNode.TIMETABLE), false, "wtdrm-icon-timetable"));
+				if (!perms || RunContext.isPermitted(true, pid, SERVICE_ID, "TIMETABLE", "ACCESS"))
+					nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE, null, lookupResource(DrmTreeNode.TIMETABLE), false, "wtdrm-icon-timetable"));
+				
 				// + TICKET
-                if (RunContext.isPermitted(true, pid, SERVICE_ID, "TICKET", "ACCESS"))
-                    nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TICKET, null, lookupResource(DrmTreeNode.TICKET), true, "wtdrm-icon-ticket"));
+				if (RunContext.isPermitted(true, pid, SERVICE_ID, "TICKET", "ACCESS"))
+				    nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TICKET, null, lookupResource(DrmTreeNode.TICKET), true, "wtdrm-icon-ticket"));
+				
 				// + JOB
-                if (RunContext.isPermitted(true, pid, SERVICE_ID, "JOB", "ACCESS"))
-                    nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_JOB, null, lookupResource(DrmTreeNode.JOB), true, "wtdrm-icon-job"));
+				if (RunContext.isPermitted(true, pid, SERVICE_ID, "JOB", "ACCESS"))
+				    nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_JOB, null, lookupResource(DrmTreeNode.JOB), true, "wtdrm-icon-job"));
 			} else {
 				String tokens[] = StringUtils.split(nodeId, ".");
 				if(tokens.length == 1) {

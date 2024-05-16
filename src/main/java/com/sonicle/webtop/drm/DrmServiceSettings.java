@@ -47,6 +47,10 @@ public class DrmServiceSettings extends BaseServiceSettings {
 		super(serviceId, domainId);
 	}
 
+	public boolean isUseProgramPermissions() {
+		return getBoolean(USE_PROGRAM_PERMISSIONS, Boolean.FALSE); 
+	}
+	
 	public boolean getUseStatisticCustomer() {
 		return getBoolean(USE_STATISTIC_CUSTOMER, Boolean.FALSE); 
 	}

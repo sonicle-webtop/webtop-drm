@@ -49,10 +49,12 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingCausals', {
 		me.add({
             region: 'center',
 			xtype: 'panel',
+			layout: 'vbox',
 			items: [
                 {
                     xtype: 'grid',
                     reference: 'gpCausals',
+					flex: 1,
                     store: {
                         autoLoad: true,
                         model: 'Sonicle.webtop.drm.model.GridCausals',

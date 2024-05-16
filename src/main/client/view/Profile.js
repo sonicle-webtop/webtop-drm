@@ -89,6 +89,7 @@ Ext.define('Sonicle.webtop.drm.view.Profile', {
 					sid: me.mys.ID,
 					actionsInToolbar: false,
 					width: '100%',
+					flex: 1,
 					bind: {
 						store: '{record.associatedUsers}'
 					},
@@ -105,6 +106,7 @@ Ext.define('Sonicle.webtop.drm.view.Profile', {
 					xtype: 'panel',
 					layout: 'card',
 					width: '100%',
+					flex: 2,
 					reference: 'pnlgrid',
 					bind: {
 						activeItem: '{foActiveCard}'

@@ -38,6 +38,8 @@ package com.sonicle.webtop.drm;
  */
 public class DrmSettings {
 
+	public static final String USE_PROGRAM_PERMISSIONS = "program.permissions";
+	
 	public static final String USE_STATISTIC_CUSTOMER = "customer.usestatistic";
 
 	public static final String PRINT_DAYS_TRANSFERT = "workreport.daystrasfert.print";

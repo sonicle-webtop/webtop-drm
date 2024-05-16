@@ -49,11 +49,13 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingHourProfiles', {
 		me.add({
             region: 'center',
 			xtype: 'panel',
+			layout: 'vbox',
 			items: [
                 {
 					// title: me.mys.res('ourprofiles.tit'),
 					xtype: 'grid',
 					reference: 'gpHourProfile',
+					flex: 1,
 					store: {
 						autoLoad: true,
 						model: 'Sonicle.webtop.drm.model.GridHourProfiles',

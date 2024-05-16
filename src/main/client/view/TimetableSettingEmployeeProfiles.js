@@ -49,11 +49,13 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingEmployeeProfiles', {
 		me.add({
             region: 'center',
 			xtype: 'panel',
+			layout: 'vbox',
 			items: [
                 {
 					// title: me.mys.res('employeeprofiles.tit'),
 					xtype: 'grid',
 					reference: 'gpEmployeeProfile',
+					flex: 1,
 					store: {
 						autoLoad: true,
 						model: 'Sonicle.webtop.drm.model.GridEmployeeProfiles',

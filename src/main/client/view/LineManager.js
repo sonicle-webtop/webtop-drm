@@ -80,6 +80,7 @@ Ext.define('Sonicle.webtop.drm.view.LineManager', {
 					sid: me.mys.ID,
 					actionsInToolbar: false,
 					width: '100%',
+					flex: 1,
 					bind: {
 						store: '{record.associatedUsers}'
 					},
