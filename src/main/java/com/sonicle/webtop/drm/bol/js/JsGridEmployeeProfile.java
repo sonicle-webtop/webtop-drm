@@ -33,6 +33,7 @@
 package com.sonicle.webtop.drm.bol.js;
 
 import com.sonicle.webtop.core.app.WT;
+import com.sonicle.webtop.core.sdk.UserProfile;
 import com.sonicle.webtop.core.sdk.UserProfileId;
 import com.sonicle.webtop.drm.bol.OEmployeeProfile;
 
@@ -56,7 +57,11 @@ public class JsGridEmployeeProfile {
 	public JsGridEmployeeProfile(OEmployeeProfile ep){
 		this.id = ep.getId();
 		this.domainId = ep.getDomainId();
-		this.user = WT.getUserData(new UserProfileId(ep.getDomainId(), ep.getUserId())).getDisplayName();
+		UserProfileId upid = new UserProfileId(ep.getDomainId(), ep.getUserId());
+		UserProfile.Data ud = null;
+		if (upid != null) ud = WT.getUserData(upid);
+		if (ud != null) this.user = ud.getDisplayName();
+		else this.user = "";
 		this.number = ep.getNumber();
 		this.tolerance = ep.getTolerance();
 		this.extraordinary = ep.getExtraordinary();
