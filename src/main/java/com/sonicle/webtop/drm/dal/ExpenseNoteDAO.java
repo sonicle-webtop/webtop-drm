@@ -173,7 +173,7 @@ public class ExpenseNoteDAO extends BaseDAO {
 		}
 
 		if (query.toDate != null) {
-			searchCndt = searchCndt.and(EXPENSE_NOTE.TO_DATE.lessOrEqual(query.toDate));
+			searchCndt = searchCndt.and(EXPENSE_NOTE.FROM_DATE.lessOrEqual(query.toDate));
 		}
 		
 		if (query.statusId != null) {

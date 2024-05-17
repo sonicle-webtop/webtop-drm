@@ -311,7 +311,7 @@ public class WorkReportDAO extends BaseDAO {
 		}
 
 		if (query.toDate != null) {
-			searchCndt = searchCndt.and(VW_WORK_REPORTS.TO_DATE.lessOrEqual(query.toDate));
+			searchCndt = searchCndt.and(VW_WORK_REPORTS.FROM_DATE.lessOrEqual(query.toDate));
 		}
 		
 		if (!StringUtils.isEmpty(query.referenceNo)) {
