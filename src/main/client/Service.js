@@ -413,8 +413,10 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									header: me.res('gpWorkReport.docstatus.lbl'),
 									flex: 3
 								},{
+									xtype: 'numbercolumn',
 									dataIndex: 'totHours',
 									header: me.res('gpWorkReport.tothours.lbl'),
+									format:'0.0',
 									flex: 2
 								},
 								/*
@@ -473,7 +475,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								rowclick: function (s, rec) {
 									me.getAct('workReport', 'edit').setDisabled(false);
 									me.getAct('workReport', 'delete').setDisabled(false);
-									me.getAct('workReport', 'sendMail').setDisabled(false);
+									//me.getAct('workReport', 'sendMail').setDisabled(false);
 								},
 								rowdblclick: function (s, rec) {
 									me.editWorkReportUI(rec);

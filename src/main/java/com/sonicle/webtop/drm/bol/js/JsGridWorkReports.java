@@ -93,7 +93,7 @@ public class JsGridWorkReports {
 		this.businessTripId = report.getBusinessTripId();
 		this.businessTripDescription = report.getBusinessTripDescription();
 		this.freeSupport = report.getFreeSupport();
-		this.totHours = (report.getTotHours() != null && report.getTotHours() > 0) ? (float)(report.getTotHours() / 60) : 0;
+		this.totHours = (report.getTotHours() != null && report.getTotHours() > 0) ? (float)(report.getTotHours() / 60.0) : 0;
 		
 		this._profileId = ownerPid;
 

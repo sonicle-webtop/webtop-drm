@@ -120,6 +120,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 		me.add({
 			region: 'center',
 			xtype: 'wttabpanel',
+			reference: 'tabpanel',
 			items: [
 				{
 					xtype: 'container',
@@ -523,13 +524,12 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 												allowBlank: false,
 												minValue: 0,
 												allowDecimals: true,
-												decimalSeparator: '.',
 												decimalPrecision: 1,
 												step: 0.5
 											},
 											summaryType: 'sum',
 											summaryRenderer: function (value, summaryData, dataIndex) {
-												return Ext.String.format(me.mys.res('gpReportRows.totalHours.lbl') + ' {0}', value);
+												return Ext.String.format(me.mys.res('gpReportRows.totalHours.lbl') + ' {0}', Ext.util.Format.number(value,'0.0'));
 											},
 											header: me.mys.res('gpReportRows.duration.lbl')
 										}, {
@@ -657,7 +657,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 		me.on('viewinvalid', me.onViewInvalid);
 		me.on('viewload', me.onViewLoad);
 		me.on('viewclose', me.onViewClose);
-
+		me.on('beforemodelvalidate', me.onBeforeModelValidate, me);
 	},
 	addDetail: function () {
 		var me = this;
@@ -772,6 +772,15 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 	onViewClose: function(s) {
 		s.mys.cleanupUploadedFiles(WT.uiid(s.getId()));
 	},
+	
+	onBeforeModelValidate: function(s) {
+		var me = this,
+			mo = me.getModel();
+		if (!mo.isValid()) {
+			me.lref('tabpanel').getLayout().setActiveItem(0);
+			return false;
+		}
+	},	
 	
 	initActions: function () {
 		var me = this;

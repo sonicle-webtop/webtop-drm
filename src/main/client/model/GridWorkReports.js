@@ -59,6 +59,7 @@ Ext.define('Sonicle.webtop.drm.model.GridWorkReports', {
 		WTF.roField('description', 'string'),
 		WTF.roField('notes', 'string'),
 		WTF.roField('freeSupport', 'bool'),
+		WTF.roField('totHours', 'number'),
 		
 		WTF.roField('_profileId', 'string')
 
