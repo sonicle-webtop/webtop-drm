@@ -63,6 +63,9 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableReportGenerate', {
 					editable: false,
 					typeAhead: false,
 					selectOnFocus: false,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -171,6 +174,9 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableReportGenerate', {
 					bind: '{companyId}',
 					allowBlank: false,
 					forceSelection: true,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: false,
 						model: 'WTA.model.Simple',

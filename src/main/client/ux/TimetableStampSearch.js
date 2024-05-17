@@ -66,6 +66,9 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableStampSearch', {
 					selectOnFocus: false,
 					anyMatch: true,
 					tabIndex: 101,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',

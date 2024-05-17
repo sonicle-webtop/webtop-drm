@@ -110,6 +110,9 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 					bind: '{record.operatorId}',
 					anyMatch: true,
 					selectOnFocus: true,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -268,6 +271,9 @@ Ext.define('Sonicle.webtop.drm.view.OpportunityAction', {
 											reference: 'activity',
 											bind: '{record.activityId}',
 											autoLoadOnValue: true,
+											listConfig: {
+												escapeDisplay: true
+											},
 											store: {
 												autoLoad: true,
 												model: 'WTA.model.Simple',

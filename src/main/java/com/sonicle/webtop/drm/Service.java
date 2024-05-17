@@ -3783,29 +3783,37 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 	}
 	
 	private Integer createOrUpdateWorkReportEventIntoWorkReportCalendar(WorkReport wrkRpt) throws WTException {
-		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
+		UserProfileId targetPid = wrkRpt.getOperatorProfileId(getEnv().getProfileId().getDomainId());
+		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, targetPid);
 		Integer eventId = null;
-		Event ev = null;
 		
 		if (cm != null) {
-			Integer wrCalId = us.getWorkReportCalendarId();
-			
-			if(wrCalId == null || !cm.existCalendar(wrCalId)){
-				wrCalId = createWorkReportCalendar(cm, wrkRpt);
-				us.setWorkReportCalendarId(wrCalId);
-			}
-			
-			if(wrkRpt.getEventId() != null){
-				ev = cm.getEvent(wrkRpt.getEventId());
-				
-				if(ev != null){
-					eventId = updateWorkReportEvent(cm, wrkRpt, ev);
-				}else{
-					eventId = createWorkReportEvent(cm, wrkRpt, wrCalId);
+			eventId = WT.runPrivileged(new Callable<Integer>(){
+				public Integer call() throws WTException {
+					Integer eventId = null;
+					Event ev = null;
+					DrmUserSettings us = new DrmUserSettings(SERVICE_ID, targetPid);
+					Integer wrCalId = us.getWorkReportCalendarId();
+
+					if(wrCalId == null || !cm.existCalendar(wrCalId)){
+						wrCalId = createWorkReportCalendar(cm, wrkRpt);
+						us.setWorkReportCalendarId(wrCalId);
+					}
+
+					if(wrkRpt.getEventId() != null){
+						ev = cm.getEvent(wrkRpt.getEventId());
+
+						if(ev != null){
+							eventId = updateWorkReportEvent(cm, wrkRpt, ev);
+						}else{
+							eventId = createWorkReportEvent(cm, wrkRpt, wrCalId);
+						}
+					}else{
+						eventId = createWorkReportEvent(cm, wrkRpt, wrCalId);
+					}			
+					return eventId;
 				}
-			}else{
-				eventId = createWorkReportEvent(cm, wrkRpt, wrCalId);
-			}			
+			});
 		}
 		
 		return eventId;

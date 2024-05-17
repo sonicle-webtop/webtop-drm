@@ -66,6 +66,9 @@ Ext.define('Sonicle.webtop.drm.ux.OpportunitySearch', {
 					bind: '{operatorId}',
 					anyMatch: true,
 					tabIndex: 101,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -128,6 +131,9 @@ Ext.define('Sonicle.webtop.drm.ux.OpportunitySearch', {
 					reference: 'fldcompany',
 					bind: '{companyId}',
 					tabIndex: 102,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: false,
 						model: 'WTA.model.Simple',

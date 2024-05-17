@@ -53,6 +53,9 @@ Ext.define('Sonicle.webtop.drm.view.TimetableStamp', {
 				WTF.localCombo('id', 'desc', {
 					reference: 'flduser',
 					bind: '{record.userId}',
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',

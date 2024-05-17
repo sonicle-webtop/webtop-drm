@@ -64,6 +64,9 @@ Ext.define('Sonicle.webtop.drm.view.LineManager', {
 							reference: 'flduser',
 							anyMatch: true,
 							allowBlank: false,
+							listConfig: {
+								escapeDisplay: true
+							},
 							store: {
 								autoLoad: true,
 								model: 'WTA.model.Simple',

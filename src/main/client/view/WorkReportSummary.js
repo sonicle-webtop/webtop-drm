@@ -99,6 +99,9 @@ Ext.define('Sonicle.webtop.drm.view.WorkReportSummary', {
 							reference: 'flduser',
 							bind: '{operatorId}',
 							anyMatch: true,
+							listConfig: {
+								escapeDisplay: true
+							},
 							store: {
 								autoLoad: true,
 								model: 'WTA.model.Simple',
@@ -132,6 +135,9 @@ Ext.define('Sonicle.webtop.drm.view.WorkReportSummary', {
 						WTF.localCombo('id', 'desc', {
 							reference: 'fldcompany',
 							bind: '{companyId}',
+							listConfig: {
+								escapeDisplay: true
+							},
 							store: {
 								autoLoad: false,
 								model: 'WTA.model.Simple',

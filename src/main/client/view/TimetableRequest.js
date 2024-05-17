@@ -89,6 +89,9 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 					bind: '{record.userId}',
 					anyMatch: true,
 					selectOnFocus: true,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -145,6 +148,9 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 									reference: 'fldcompany',
 									bind: '{record.companyId}',
 									autoLoadOnValue: true,
+									listConfig: {
+										escapeDisplay: true
+									},
 									store: {
 										model: 'WTA.model.Simple',
 										proxy: WTF.proxy(me.mys.ID, 'LookupCompanies', null, {
@@ -173,6 +179,9 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 									reference: 'fldmanager',
 									bind: '{record.managerId}',
 									autoLoadOnValue: true,
+									listConfig: {
+										escapeDisplay: true
+									},
 									store: {
 										model: 'WTA.model.Simple',
 										proxy: WTF.proxy(me.mys.ID, 'LookupManagers', null, {

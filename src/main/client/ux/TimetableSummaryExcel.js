@@ -59,6 +59,9 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableSummaryExcel', {
 				WTF.localCombo('id', 'desc', {
 					reference: 'flduser',
 					bind: '{userId}',
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -123,6 +126,9 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableSummaryExcel', {
 					bind: '{companyId}',
 					allowBlank: false,
 					forceSelection: true,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: false,
 						model: 'WTA.model.Simple',

@@ -34,7 +34,7 @@ Ext.define('Sonicle.webtop.drm.ux.OpportunityValidator', {
 			}
 		});
 		
-		if(!field.required) return true;
+		if(field && !field.required) return true;
 		else return me.callParent(arguments);
 	}
 });

@@ -129,6 +129,9 @@ Ext.define('Sonicle.webtop.drm.view.TicketSetting', {
 						}),
 						WTF.localCombo('id', 'desc', {
 							bind: '{record.defaultTicketCategory}',
+							listConfig: {
+								escapeDisplay: true
+							},
 							store: {
 								autoLoad: true,
 								model: 'WTA.model.Simple',

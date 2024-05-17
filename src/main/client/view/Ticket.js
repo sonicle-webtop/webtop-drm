@@ -116,6 +116,9 @@ Ext.define('Sonicle.webtop.drm.view.Ticket', {
 					tabIndex: 200,
 					selectOnFocus: true,
 					allowBlank: false,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						model: 'WTA.model.Simple',
 						proxy: WTF.proxy(me.mys.ID, 'LookupCompanies', null, {
@@ -210,6 +213,9 @@ Ext.define('Sonicle.webtop.drm.view.Ticket', {
 							bind: '{record.toOperatorId}',
 							anyMatch: true,
 							selectOnFocus: true,
+							listConfig: {
+								escapeDisplay: true
+							},
 							store: {
 								autoLoad: true,
 								model: 'WTA.model.Simple',
@@ -230,6 +236,9 @@ Ext.define('Sonicle.webtop.drm.view.Ticket', {
 					tabIndex: 203,
 					queryMode: 'remote',
 					triggerAction: 'query',
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -392,6 +401,9 @@ Ext.define('Sonicle.webtop.drm.view.Ticket', {
 					tabIndex: 210,
 					autoLoadOnValue: true,
 					selectOnFocus: true,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',

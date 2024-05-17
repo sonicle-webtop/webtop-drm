@@ -71,6 +71,9 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 							reference: 'flduser',
 							anyMatch: true,
 							allowBlank: false,
+							listConfig: {
+								escapeDisplay: true
+							},
 							store: {
 								autoLoad: true,
 								model: 'WTA.model.Simple',
@@ -112,6 +115,9 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 							reference: 'fldhourprofile',
 							anyMatch: true,
 							allowBlank: true,
+							listConfig: {
+								escapeDisplay: true
+							},
 							store: {
 								autoLoad: true,
 								model: 'WTA.model.Simple',

@@ -116,6 +116,9 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingGeneral', {
 							anyMatch: true,
 							allowBlank: true,
 							emptyText: me.mys.res('timetable.settings.fld-calendaruserid-emptytext.lbl'),
+							listConfig: {
+								escapeDisplay: true
+							},
 							store: {
 								autoLoad: true,
 								model: 'WTA.model.Simple',
@@ -233,6 +236,9 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingGeneral', {
 							bind: '{record.defaultCausalWorkingHours}',
 							anyMatch: true,
 							allowBlank: true,
+							listConfig: {
+								escapeDisplay: true
+							},
 							store: {
 								autoLoad: true,
 								model: 'WTA.model.Simple',
@@ -252,6 +258,9 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingGeneral', {
 							bind: '{record.defaultCausalOvertime}',
 							anyMatch: true,
 							allowBlank: true,
+							listConfig: {
+								escapeDisplay: true
+							},
 							store: {
 								autoLoad: true,
 								model: 'WTA.model.Simple',
@@ -271,6 +280,9 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingGeneral', {
 							bind: '{record.defaultCausalPermits}',
 							anyMatch: true,
 							allowBlank: true,
+							listConfig: {
+								escapeDisplay: true
+							},
 							store: {
 								autoLoad: true,
 								model: 'WTA.model.Simple',
@@ -290,6 +302,9 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingGeneral', {
 							bind: '{record.defaultCausalHolidays}',
 							anyMatch: true,
 							allowBlank: true,
+							listConfig: {
+								escapeDisplay: true
+							},
 							store: {
 								autoLoad: true,
 								model: 'WTA.model.Simple',
@@ -309,6 +324,9 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingGeneral', {
 							bind: '{record.defaultCausalSickness}',
 							anyMatch: true,
 							allowBlank: true,
+							listConfig: {
+								escapeDisplay: true
+							},
 							store: {
 								autoLoad: true,
 								model: 'WTA.model.Simple',
@@ -328,6 +346,9 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingGeneral', {
 							bind: '{record.defaultCausalMedicalVisit}',
 							anyMatch: true,
 							allowBlank: true,
+							listConfig: {
+								escapeDisplay: true
+							},
 							store: {
 								autoLoad: true,
 								model: 'WTA.model.Simple',

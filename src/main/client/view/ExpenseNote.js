@@ -76,6 +76,9 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 					bind: '{record.operatorId}',
 					anyMatch: true,
 					selectOnFocus: true,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -135,6 +138,9 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNote', {
 											reference: 'fldcompany',
 											bind: '{record.companyId}',
 											autoLoadOnValue: true,
+											listConfig: {
+												escapeDisplay: true
+											},
 											store: {
 												model: 'WTA.model.Simple',
 												proxy: WTF.proxy(me.mys.ID, 'LookupCompanies', null, {

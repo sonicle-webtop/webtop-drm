@@ -71,6 +71,9 @@ Ext.define('Sonicle.webtop.drm.ux.JobSearch', {
 					bind: '{operatorId}',
 					anyMatch: true,
 					tabIndex: 101,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -122,6 +125,9 @@ Ext.define('Sonicle.webtop.drm.ux.JobSearch', {
 					tabIndex: 104,
 					queryMode: 'remote',
 					triggerAction: 'query',
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -199,6 +205,9 @@ Ext.define('Sonicle.webtop.drm.ux.JobSearch', {
 					reference: 'fldcompany',
 					bind: '{companyId}',
 					tabIndex: 102,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: false,
 						model: 'WTA.model.Simple',
@@ -260,6 +269,9 @@ Ext.define('Sonicle.webtop.drm.ux.JobSearch', {
 					bind: '{activityId}',
 					tabIndex: 109,
 					autoLoadOnValue: true,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',

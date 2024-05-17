@@ -65,6 +65,9 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 				WTF.localCombo('id', 'desc', {
 					reference: 'flduser',
 					bind: '{userId}',
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -155,6 +158,9 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 				WTF.localCombo('id', 'desc', {
 					reference: 'fldcompany',
 					bind: '{companyId}',
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: false,
 						model: 'WTA.model.Simple',

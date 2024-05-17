@@ -72,6 +72,9 @@ Ext.define('Sonicle.webtop.drm.ux.TicketSearch', {
 					reference: 'fldcompany',
 					bind: '{companyId}',
 					tabIndex: 102,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: false,
 						model: 'WTA.model.Simple',
@@ -100,6 +103,9 @@ Ext.define('Sonicle.webtop.drm.ux.TicketSearch', {
 					bind: '{fromOperatorId}',
 					anyMatch: true,
 					tabIndex: 101,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -133,6 +139,9 @@ Ext.define('Sonicle.webtop.drm.ux.TicketSearch', {
 					tabIndex: 104,
 					queryMode: 'remote',
 					triggerAction: 'query',
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -229,6 +238,9 @@ Ext.define('Sonicle.webtop.drm.ux.TicketSearch', {
 					bind: '{toOperatorId}',
 					anyMatch: true,
 					tabIndex: 101,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -280,6 +292,9 @@ Ext.define('Sonicle.webtop.drm.ux.TicketSearch', {
 					bind: '{statisticCustomerId}',
 					autoLoadOnValue: true,
 					tabIndex: 104,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -312,6 +327,9 @@ Ext.define('Sonicle.webtop.drm.ux.TicketSearch', {
 					reference: 'fldticketcategory',
 					bind: '{ticketCategoryId}',
 					tabIndex: 109,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',

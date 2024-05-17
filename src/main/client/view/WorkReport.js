@@ -82,6 +82,9 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 					bind: '{record.operatorId}',
 					anyMatch: true,
 					selectOnFocus: true,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -147,6 +150,9 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											autoLoadOnValue: true,
 											tabIndex: 201,
 											selectOnFocus: true,
+											listConfig: {
+												escapeDisplay: true
+											},
 											store: {
 												model: 'WTA.model.Simple',
 												proxy: WTF.proxy(me.mys.ID, 'LookupCompanies', null, {
@@ -177,6 +183,9 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											anyMatch: true,
 											tabIndex: 202,
 											selectOnFocus: true,
+											listConfig: {
+												escapeDisplay: true
+											},
 											store: {
 												autoLoad: true,
 												model: 'WTA.ux.data.SimpleSourceModel',
@@ -196,6 +205,9 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											autoLoadOnValue: true,
 											tabIndex: 203,
 											selectOnFocus: true,
+											listConfig: {
+												escapeDisplay: true
+											},
 											store: {
 												model: 'WTA.model.Simple',
 												proxy: WTF.proxy(me.mys.ID, 'LookupRealCustomers', null, {
@@ -348,6 +360,9 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 											autoLoadOnValue: true,
 											tabIndex: 208,
 											selectOnFocus: true,
+											listConfig: {
+												escapeDisplay: true
+											},
 											store: {
 												model: 'WTA.model.CausalLkp',
 												proxy: WTF.proxy(WT.ID, 'LookupCausals', null, {

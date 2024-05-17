@@ -110,6 +110,9 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 					selectOnFocus: true,
 					width: '420px',
 					hidden: true,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -123,6 +126,9 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 					selectOnFocus: true,
 					width: '420px',
 					hidden: true,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						model: 'WTA.model.Simple',
 						proxy: WTF.proxy(me.mys.ID, 'LookupRealCustomers', null, {
@@ -215,6 +221,9 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 					selectOnFocus: true,
 					width: '420px',
 					hidden: true,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						model: 'WTA.model.CausalLkp',
 						proxy: WTF.proxy(WT.ID, 'LookupCausals', null, {
@@ -280,6 +289,9 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 					autoLoadOnValue: true,
 					width: '420px',
 					hidden: true,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -385,6 +397,9 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 					selectOnFocus: true,
 					width: '420px',
 					hidden: true,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -432,6 +447,9 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 					bind: '{record.operatorId}',
 					anyMatch: true,
 					selectOnFocus: true,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -441,8 +459,8 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 								if (me.isMode('new')) {
 									if (s.loadCount === 1) {
 										me.lref('company').getStore().load();
-										me.lref('customer').getStore().load();
-										me.lref('causal').getStore().load();
+										if (me.lref('customer')) me.lref('customer').getStore().load();
+										if (me.lref('causal')) me.lref('causal').getStore().load();
 									}
 								}
 							}
@@ -498,6 +516,9 @@ Ext.define('Sonicle.webtop.drm.view.Opportunity', {
 											autoLoadOnValue: true,
 											tabIndex: 301,
 											selectOnFocus: true,
+											listConfig: {
+												escapeDisplay: true
+											},
 											store: {
 												model: 'WTA.model.Simple',
 												proxy: WTF.proxy(me.mys.ID, 'LookupCompanies', null, {

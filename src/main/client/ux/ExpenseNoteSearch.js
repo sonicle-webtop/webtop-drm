@@ -63,6 +63,9 @@ Ext.define('Sonicle.webtop.drm.ux.ExpenseNoteSearch', {
 				WTF.localCombo('id', 'desc', {
 					reference: 'flduser',
 					bind: '{operatorId}',
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -139,6 +142,9 @@ Ext.define('Sonicle.webtop.drm.ux.ExpenseNoteSearch', {
 				WTF.localCombo('id', 'desc', {
 					reference: 'fldcompany',
 					bind: '{companyId}',
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: false,
 						model: 'WTA.model.Simple',

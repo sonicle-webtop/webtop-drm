@@ -117,6 +117,9 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 									bind: '{record.customerId}',
 									autoLoadOnValue: true,
 									selectOnFocus: true,
+									listConfig: {
+										escapeDisplay: true
+									},
 									store: {
 										autoLoad: true,
 										model: 'WTA.model.Simple',

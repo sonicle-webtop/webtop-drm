@@ -108,6 +108,9 @@ Ext.define('Sonicle.webtop.drm.view.Job', {
 					anyMatch: true,
 					selectOnFocus: true,
 					tabIndex: 200,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -159,6 +162,9 @@ Ext.define('Sonicle.webtop.drm.view.Job', {
 					autoLoadOnValue: true,
 					tabIndex: 201,
 					selectOnFocus: true,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						model: 'WTA.model.Simple',
 						proxy: WTF.proxy(me.mys.ID, 'LookupCompanies', null, {
@@ -193,6 +199,9 @@ Ext.define('Sonicle.webtop.drm.view.Job', {
 					tabIndex: 202,
 					queryMode: 'remote',
 					triggerAction: 'query',
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -291,6 +300,9 @@ Ext.define('Sonicle.webtop.drm.view.Job', {
 					tabIndex: 205,
 					autoLoadOnValue: true,
 					// selectOnFocus: true,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
@@ -324,6 +336,9 @@ Ext.define('Sonicle.webtop.drm.view.Job', {
 					autoLoadOnValue: true,
 					tabIndex: 208,
 					selectOnFocus: true,
+					listConfig: {
+						escapeDisplay: true
+					},
 					store: {
 						model: 'WTA.model.CausalLkp',
 						proxy: WTF.proxy(WT.ID, 'LookupCausals', null, {
