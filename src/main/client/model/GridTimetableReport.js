@@ -186,7 +186,7 @@ Ext.define('Sonicle.webtop.drm.model.GridTimetableReport', {
 						}else{
 							var hours = Math.floor(th / 60);
 							var minutes = Math.abs(th % 60);
-							var chsign=(th===0)?'&nbsp;':'-';
+							var chsign=(th===0)?' ':'-';
 							ret = chsign+Sonicle.webtop.drm.model.GridTimetableReport.pad(hours, 2) + "." + Sonicle.webtop.drm.model.GridTimetableReport.pad(minutes, 2);
 						}
 						return ret;
