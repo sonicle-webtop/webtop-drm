@@ -1,8 +1,12 @@
-.wtdrm-icon-service { background-image: url('service_16.svg') !important; background-size: contain; }
-.wtdrm-icon-service-xs { background-image: url('service_16.svg') !important; background-size: contain; }
-.wtdrm-icon-service-s { background-image: url('service_16.svg') !important; background-size: contain; }
-.wtdrm-icon-service-m { background-image: url('service_32.svg') !important; background-size: contain; }
-.wtdrm-icon-service-l { background-image: url('service_32.svg') !important; background-size: contain; }
+/* Service Icons */
+.wtdrm-icon-service,
+.wtdrm-icon-service-sm { background-image: url('service@sm.svg') !important; background-size: contain; }
+.wtdrm-icon-service-off-sm { background-image: url('service@sm.svg') !important; background-size: contain; }
+.wtdrm-icon-service-md { background-image: url('service@md.svg') !important; background-size: contain; }
+.wtdrm-icon-service-off-md { background-image: url('service@md.svg') !important; background-size: contain; }
+.wtdrm-icon-service-lg { background-image: url('service@lg.svg') !important; background-size: contain; }
+.wtdrm-icon-service-off-lg { background-image: url('service@lg.svg') !important; background-size: contain; }
+/* Other Icons */
 .wtdrm-icon-opportunity { background-image: url('opportunity_16.svg') !important; background-size: contain; }
 .wtdrm-icon-opportunityAction { background-image: url('opportunityaction_16.svg') !important; background-size: contain; }
 .wtdrm-icon-workReport { background-image: url('workreport_16.svg') !important; background-size: contain; }

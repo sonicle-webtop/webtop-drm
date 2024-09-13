@@ -34,7 +34,8 @@ Ext.define('Sonicle.webtop.drm.ux.WorkReportSearch', {
 	extend: 'Ext.grid.Panel',
 	alias: 'widget.wtdrmworkreportsearch',
 	uses: [
-		'Sonicle.Date'
+		'Sonicle.Date',
+		'WTA.model.CausalLkp'
 	],
 	layout: 'column',
 	referenceHolder: true,
