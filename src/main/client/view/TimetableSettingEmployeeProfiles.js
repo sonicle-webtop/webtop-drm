@@ -165,6 +165,13 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingEmployeeProfiles', {
 		});
 	},
 	
+	setMinHrsPerTicket: function(userId, n) {
+		var me=this,
+			mt = me.mys.getVar('minimumNumberOfHoursPerTicket');
+		if (!Ext.isEmpty(n)) mt[userId] = n;
+		else mt[userId] = me.mys.getVar('defaultMinimumNumberOfHoursPerTicket');
+	},
+	
 	addEmployeeProfile: function (opts) {
 		opts = opts || {};
 		var me = this,
@@ -172,6 +179,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingEmployeeProfiles', {
 	
 		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+			if (success) me.setMinHrsPerTicket(model.get('userId'), model.get('minimumNumberOfHoursPerTicket'));
 		});	
 		vw.showView(function () {
 			vw.begin('new', {
@@ -200,6 +208,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingEmployeeProfiles', {
 				vw = WT.createView(me.mys.ID, 'view.EmployeeProfile', {swapReturn: true});
 		vw.on('viewsave', function (s, success, model) {
 			Ext.callback(opts.callback, opts.scope || me, [success, model]);
+			if (success) me.setMinHrsPerTicket(model.get('userId'), model.get('minimumNumberOfHoursPerTicket'));
 		});
 		vw.showView(function () {
             vw.begin('edit', {

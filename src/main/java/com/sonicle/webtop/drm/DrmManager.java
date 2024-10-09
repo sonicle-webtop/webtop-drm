@@ -6227,7 +6227,9 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				
 			String companyCode = StringUtils.leftPad(dss.getGisCompanyCode(), 4, '0');
 			String headquartersCode = StringUtils.leftPad(oEP.getHeadquartersCode(), 2, '0');
-			String employee = StringUtils.leftPad(oEP.getNumber(), 9, '0');
+			String employee = dss.isTSComposedEmployeeCode() ? 
+					StringUtils.leftPad(oEP.getNumber(), 15, '0') : 
+					StringUtils.leftPad(oEP.getNumber(), 9, '0');
 			
 			UserProfileId targetPid = new UserProfileId(domainId, query.targetUserId);
 			PersonalInfo targetPinfo = WT.getProfilePersonalInfo(targetPid);
@@ -6241,8 +6243,10 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			
 			osWriter = new OutputStreamWriter(os);
 			
-			osWriter.write(companyCode); //1 Codice Azienda
-			osWriter.write(headquartersCode); //2 Codice Sede
+			if (!dss.isTSComposedEmployeeCode()) {
+				osWriter.write(companyCode); //1 Codice Azienda
+				osWriter.write(headquartersCode); //2 Codice Sede
+			}
 			osWriter.write(employee); //3 Dipendente
 			osWriter.write(
 				StringUtils.rightPad(
