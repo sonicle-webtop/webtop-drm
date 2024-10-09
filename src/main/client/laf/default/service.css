@@ -1,10 +1,10 @@
 /* Service Icons */
 .wtdrm-icon-service,
-.wtdrm-icon-service-sm { background-image: url('service@sm.svg') !important; background-size: contain; }
+.wtdrm-icon-service-s, .wtdrm-icon-service-sm { background-image: url('service@sm.svg') !important; background-size: contain; }
 .wtdrm-icon-service-off-sm { background-image: url('service@sm.svg') !important; background-size: contain; }
-.wtdrm-icon-service-md { background-image: url('service@md.svg') !important; background-size: contain; }
+.wtdrm-icon-service-m, .wtdrm-icon-service-md { background-image: url('service@md.svg') !important; background-size: contain; }
 .wtdrm-icon-service-off-md { background-image: url('service@md.svg') !important; background-size: contain; }
-.wtdrm-icon-service-lg { background-image: url('service@lg.svg') !important; background-size: contain; }
+.wtdrm-icon-service-l, .wtdrm-icon-service-lg { background-image: url('service@lg.svg') !important; background-size: contain; }
 .wtdrm-icon-service-off-lg { background-image: url('service@lg.svg') !important; background-size: contain; }
 /* Other Icons */
 .wtdrm-icon-opportunity { background-image: url('opportunity_16.svg') !important; background-size: contain; }
