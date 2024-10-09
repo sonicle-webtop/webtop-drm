@@ -107,12 +107,17 @@
         "exit": {
           "type": "string",
           "description": "Exit date/time (ISO date/time YYYYMMDD'T'HHMMSS'Z')"
+        },
+        "location": {
+          "type": "string",
+          "description": "Exit date/time (ISO date/time YYYYMMDD'T'HHMMSS'Z')"
         }
       },
       "required": [
         "employeeId",
         "entrance",
-        "exit"
+        "exit",
+        "location"
       ]
     },
     "ApiError": {

@@ -40,11 +40,12 @@ import com.sonicle.webtop.core.sdk.WTException;
 import com.sonicle.webtop.drm.DrmManager;
 import com.sonicle.webtop.drm.model.TimetableStamp;
 import com.sonicle.webtop.drm.swagger.v1.api.TimetableApi;
-import com.sonicle.webtop.drm.swagger.v1.model.ApiError;
-import com.sonicle.webtop.drm.swagger.v1.model.TimetableEntry;
+import com.sonicle.webtop.drm.swagger.v1.model.ApiApiError;
+import com.sonicle.webtop.drm.swagger.v1.model.ApiTimetableEntry;
 import java.util.HashMap;
 import java.util.List;
 import javax.ws.rs.core.Response;
+import org.codehaus.plexus.util.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
@@ -61,12 +62,12 @@ public class Timetable extends TimetableApi {
 	private static final DateTimeFormatter ISO_DATETIME_FMT = DateTimeUtils.createFormatter("yyyyMMdd'T'HHmmss'Z'", DateTimeZone.UTC);
 
 	@Override
-	public Response addTimetableEntries(List<TimetableEntry> entries) {
+	public Response addTimetableEntries(List<ApiTimetableEntry> entries) {
 		UserProfileId currentProfileId = RunContext.getRunProfileId();
 		DrmManager manager = getManager();
 		HashMap<String, String> id2userId = new HashMap<>();
 		try {
-			for(TimetableEntry entry: entries) {
+			for(ApiTimetableEntry entry: entries) {
 				String employeeId=entry.getEmployeeId();
 				String userId=id2userId.get(employeeId);
 				if (userId==null) {
@@ -79,6 +80,9 @@ public class Timetable extends TimetableApi {
 				ts.setType("M");
 				ts.setEntrance(DateTimeUtils.parseDateTime(ISO_DATETIME_FMT, entry.getEntrance()));
 				ts.setExit(DateTimeUtils.parseDateTime(ISO_DATETIME_FMT, entry.getExit()));
+				String location = entry.getLocation();
+				if (StringUtils.isEmpty(location)) location = "O";
+				ts.setLocation(location);
 				manager.addTimetableStamp(ts);
 			}
 			return respOkCreated();
@@ -108,7 +112,7 @@ public class Timetable extends TimetableApi {
 	
 	@Override
 	protected Object createErrorEntity(Response.Status status, String message) {
-		return new ApiError()
+		return new ApiApiError()
 				.code(status.getStatusCode())
 				.description(message);
 	}

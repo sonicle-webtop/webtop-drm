@@ -217,6 +217,7 @@ import com.sonicle.webtop.drm.bol.js.JsJob;
 import com.sonicle.webtop.drm.bol.js.JsTicket;
 import com.sonicle.webtop.drm.bol.js.JsTicketSetting;
 import com.sonicle.webtop.drm.bol.js.JsTimetableSettingGis;
+import com.sonicle.webtop.drm.bol.js.JsTimetableSettingTS;
 import com.sonicle.webtop.drm.bol.model.RBExpenseNote;
 import com.sonicle.webtop.drm.bol.model.RBOpportunity;
 import com.sonicle.webtop.drm.bol.model.RBTimetableEncoReport;
@@ -238,6 +239,7 @@ import com.sonicle.webtop.drm.model.TicketAttachment;
 import com.sonicle.webtop.drm.model.TicketAttachmentWithStream;
 import com.sonicle.webtop.drm.model.TicketSetting;
 import com.sonicle.webtop.drm.model.TimetableSettingGis;
+import com.sonicle.webtop.drm.model.TimetableSettingTS;
 import com.sonicle.webtop.drm.model.WorkReportSummary;
 import com.sonicle.webtop.drm.rpt.RptExpenseNote;
 import com.sonicle.webtop.drm.rpt.RptOpportunity;
@@ -275,6 +277,7 @@ public class Service extends BaseService {
 	public static final Logger logger = WT.getLogger(Service.class);
 	public static final String JOB_EXPORT_FILENAME = "jobs_{0}-{1}.{2}";
 	public static final String TIMETABLE_GIS_EXPORT_FILENAME = "gis_{0}_{1}.{2}";
+	public static final String TIMETABLE_TS_EXPORT_FILENAME = "ts_{0}_{1}.{2}";
 
 	private DrmManager manager;
 	private DrmServiceSettings ss;
@@ -332,7 +335,8 @@ public class Service extends BaseService {
 
 		ServiceVars vs = new ServiceVars();
 		DateTimeFormatter hmf = DateTimeUtils.createHmFormatter();
-		
+		UserProfileId pid = getEnv().getProfileId();
+				
 		vs.put("useStatisticCustomer", ss.getUseStatisticCustomer());
 		vs.put("printDaysTransfert", ss.getPrintDaysTransfert());
 		vs.put("printTransfertDescription", ss.getPrintTransfertDescription());
@@ -358,6 +362,9 @@ public class Service extends BaseService {
 		vs.put("ticketNotifyMail", us.getTicketNotifyMail());
         vs.put("ticketDefaultTicketCategory", ss.getTicketDefaultTicketCategoryId());
 		vs.put("integrationGis", ss.getIntegrationGis());
+		vs.put("integrationTS", ss.getIntegrationTS());
+		vs.put("hasReports", RunContext.isPermitted(true, pid, SERVICE_ID, "WORK_REPORT", "ACCESS"));
+		vs.put("hasJobs", RunContext.isPermitted(true, pid, SERVICE_ID, "JOB", "ACCESS"));
 		
 		try {
 			vs.put("opportunityRequiredFields", getOpportunityRequiredFields());
@@ -2429,6 +2436,71 @@ public class Service extends BaseService {
 		}
 	}
 	
+	public void processExportTimetableReportTS(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		UserProfile up = getEnv().getProfile();
+		
+		try {
+			String op = ServletUtils.getStringParameter(request, "op", true);
+			String query = ServletUtils.getStringParameter(request, "query", null);
+			TimetableReportQuery trQuery = TimetableReportQuery.fromJson(query);
+			String dateS;
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+			dateS = formatter.format(new Date());
+			String title = "";
+
+			if(trQuery != null){
+				title = (trQuery.targetUserId != null) ? trQuery.targetUserId : "tutti";
+			}
+			
+			if (op.equals("do")) {			
+				txtWizard = new TxtExportWizard();
+				txtWizard.date = new DateTime();
+				
+				LogEntries log = new LogEntries();
+				File file = WT.createTempFile();
+				
+				try {
+					DateTimeFormatter ymd2 = DateTimeUtils.createFormatter("yyyyMMdd", up.getTimeZone());
+					DateTimeFormatter ymdhms = DateTimeUtils.createFormatter("yyyy-MM-dd HH:mm:ss", up.getTimeZone());
+					
+					try (FileOutputStream fos = new FileOutputStream(file)) {
+						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Started on {0}", ymdhms.print(new DateTime())));
+						manager.exportTimetableReportTS(log, fos, trQuery);
+						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Ended on {0}", ymdhms.print(new DateTime())));
+						txtWizard.file = file;
+						txtWizard.filename = MessageFormat.format(TIMETABLE_TS_EXPORT_FILENAME, dateS, title, "txt");
+						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "File ready: {0}", txtWizard.filename));
+						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Operation completed succesfully"));
+						new JsonResult(new JsWizardData(log.print())).printTo(out);
+					}
+					
+				} catch(Throwable t) {
+					logger.error("Error generating export for TS", t);
+					file.delete();
+					new JsonResult(new JsWizardData(log.print())).setSuccess(false).printTo(out);
+				}	
+			}
+		} catch(Exception ex) {
+			logger.error("Error in ExportTimetableReportTS", ex);
+			new JsonResult(false, ex.getMessage()).printTo(out);
+		}
+	}
+	
+	public void processExportTimetableReportTS(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			try(FileInputStream fis = new FileInputStream(txtWizard.file)) {
+				ServletUtils.setFileStreamHeaders(response, "application/octet-stream", DispositionType.ATTACHMENT, txtWizard.filename);
+				ServletUtils.setContentLengthHeader(response, txtWizard.file.length());
+				IOUtils.copy(fis, response.getOutputStream());
+			}
+			
+		} catch(Exception ex) {
+			logger.error("Error in ExportTimetableReportGis", ex);
+		} finally {
+			txtWizard = null;
+		}
+	}
+	
 	public void processManageLeaveRequest(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		JsLeaveRequest item = null;
 		try {
@@ -3018,6 +3090,38 @@ public class Service extends BaseService {
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
 			logger.error("Error in action ManageTimetableSettingGis", ex);
+		}
+	}
+	
+	public void processManageTimetableSettingTS(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		JsTimetableSettingTS item = null;
+		try {
+			String crud = ServletUtils.getStringParameter(request, "crud", true);
+
+			if (crud.equals(Crud.READ)) {
+				TimetableSettingTS ttSettingTS = new TimetableSettingTS();
+				
+				ttSettingTS.setCompanyCode(ss.getTSCompanyCode());
+				ttSettingTS.setComposedEmployeeCode(ss.isTSComposedEmployeeCode());
+				
+				item = new JsTimetableSettingTS(ttSettingTS);
+
+				new JsonResult(item).printTo(out);
+
+			} else if (crud.equals(Crud.UPDATE)) {
+				Payload<MapItem, JsTimetableSettingTS> pl = ServletUtils.getPayload(request, JsTimetableSettingTS.class);
+
+				if (pl.map.has("companyCode")) 
+					ss.setTSCompanyCode(pl.data.companyCode);
+				if (pl.map.has("isComposedEmployeeCode")) 
+					ss.setTSComposedEmployeeCode(pl.data.isComposedEmployeeCode);
+
+				new JsonResult().printTo(out);
+
+			}
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action ManageTimetableSettingTs", ex);
 		}
 	}
 	

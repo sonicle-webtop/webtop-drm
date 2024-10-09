@@ -107,4 +107,10 @@ public class DrmSettings {
 	public static final String GIS_COMPANY_CODE = "gis.company.code";
 	
 	public static final String GIS_HEADQUARTERS_CODE = "gis.headquarters.code";
+	
+	public static final String INTEGRATION_TS = "integration.ts";
+	
+	public static final String TS_COMPANY_CODE = "ts.company.code";
+
+	public static final String TS_COMPOSED_EMPLOYEE_CODE = "ts.composed.employee.code";
 }

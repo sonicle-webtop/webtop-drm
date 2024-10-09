@@ -231,11 +231,31 @@ public class DrmServiceSettings extends BaseServiceSettings {
 		return getBoolean(INTEGRATION_GIS, Boolean.FALSE);
 	}
 	
+	public boolean getIntegrationTS() {
+		return getBoolean(INTEGRATION_TS, Boolean.FALSE);
+	}
+	
 	public String getGisCompanyCode() {
 		return getString(GIS_COMPANY_CODE, ""); 
 	}
 
 	public void setGisCompanyCode(String value) {
 		setString(GIS_COMPANY_CODE, value); 
+	}
+	
+	public String getTSCompanyCode() {
+		return getString(TS_COMPANY_CODE, ""); 
+	}
+
+	public void setTSCompanyCode(String value) {
+		setString(TS_COMPANY_CODE, value); 
+	}
+	
+	public boolean isTSComposedEmployeeCode() {
+		return getBoolean(TS_COMPOSED_EMPLOYEE_CODE, false);
+	}
+	
+	public void setTSComposedEmployeeCode(Boolean b) {
+		setBoolean(TS_COMPOSED_EMPLOYEE_CODE, b);
 	}
 }

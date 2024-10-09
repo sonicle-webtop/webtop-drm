@@ -53,6 +53,7 @@ import com.sonicle.webtop.core.dal.DAOException;
 import com.sonicle.webtop.core.dal.UserDAO;
 import com.sonicle.webtop.core.sdk.BaseManager;
 import com.sonicle.webtop.core.sdk.UserProfile;
+import com.sonicle.webtop.core.sdk.UserProfile.PersonalInfo;
 import com.sonicle.webtop.core.sdk.UserProfileId;
 import com.sonicle.webtop.core.sdk.WTException;
 import com.sonicle.webtop.core.sdk.WTRuntimeException;
@@ -5123,30 +5124,39 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				}
 			}
 
-			Float wht = (float) (Float.parseFloat(otr.getWorkingHours()) + tolerance) / 60f;
+			float realMinutes = Float.parseFloat(otr.getWorkingHours());
+			Float wht = (float) (realMinutes + tolerance) / 60f;
 
 			BigDecimal bd = ManagerUtils.round(wht, 2);
 			String val = bd.toString();
 			
 			rounding = Integer.parseInt(setting.getRounding());
+			int mindex = val.length() - 2;
+			String hpart = val.substring(0, mindex);
+			int minutes100 = Integer.parseInt(val.substring(mindex));
 			
 			if(rounding == 15){
-				if(Integer.parseInt(val.substring(val.length() - 2)) >= 25 && Integer.parseInt(val.substring(val.length() - 2)) < 50)
-					val = val.substring(0, val.length() - 2) + "15";
-				else if(Integer.parseInt(val.substring(val.length() - 2)) >= 50 && Integer.parseInt(val.substring(val.length() - 2)) < 75)
-					val = val.substring(0, val.length() - 2) + "30";
-				else if(Integer.parseInt(val.substring(val.length() - 2)) >= 75 && Integer.parseInt(val.substring(val.length() - 2)) < 100)
-					val = val.substring(0, val.length() - 2) + "45";
-				else if(Integer.parseInt(val.substring(val.length() - 2)) < 25)
-					val = val.substring(0, val.length() - 2) + "00";
+				if(minutes100 >= 25 && minutes100 < 50)
+					val = hpart + "15";
+				else if(minutes100 >= 50 && minutes100 < 75)
+					val = hpart + "30";
+				else if(minutes100 >= 75 && minutes100 < 100)
+					val = hpart + "45";
+				else if(minutes100 < 25)
+					val = hpart + "00";
 			}else if(rounding == 30){
-				if(Integer.parseInt(val.substring(val.length() - 2)) >= 50)
-					val = val.substring(0, val.length() - 2) + "30";
-				else if(Integer.parseInt(val.substring(val.length() - 2)) < 50)
-					val = val.substring(0, val.length() - 2) + "00";
+				if(minutes100 >= 50)
+					val = hpart + "30";
+				else if(minutes100 < 50)
+					val = hpart + "00";
 			} else if(rounding == 60){
-				val = val.substring(0, val.length() - 2) + "00";
-			}			
+				val = hpart + "00";
+			} else {
+				int irm = (int)realMinutes;
+				int hours = irm / 60;
+				int minutes = irm % 60;
+				val = hours + "." + StringUtils.leftPad(""+minutes, 2, '0');
+			}
 
 			otr.setWorkingHours(val);
 		}
@@ -5898,41 +5908,31 @@ public class DrmManager extends BaseManager implements IDrmManager{
 	public void exportTimetableReportGis(LogEntries log, OutputStream os, TimetableReportQuery query) throws Exception {
 		Connection con = null;
 		OutputStreamWriter osWriter = null;		
-		DrmServiceSettings dss = null;
-		SimpleDateFormat sdf = null;
-		DecimalFormat df = null;
-		EmployeeProfileDAO ePDao = null;
-		OEmployeeProfile oEP = null;
-		HourProfileDAO hPDao = null;
-		OHourProfile oHP = null;
-		LineHourDAO lHDao = null;
-		TimetableSettingDAO ttsDao = null;
-		OTimetableSetting oTts = null;
-		CausalDAO cDao = null;
-		OCausal oC = null;
 		
 		try {		
 			con = WT.getConnection(SERVICE_ID, false);
 			
-			ePDao = EmployeeProfileDAO.getInstance();
-			hPDao = HourProfileDAO.getInstance();
-			lHDao = LineHourDAO.getInstance();
-			ttsDao = TimetableSettingDAO.getInstance();	
-			cDao = CausalDAO.getInstance();
+			EmployeeProfileDAO ePDao = EmployeeProfileDAO.getInstance();
+			HourProfileDAO hPDao = HourProfileDAO.getInstance();
+			LineHourDAO lHDao = LineHourDAO.getInstance();
+			TimetableSettingDAO ttsDao = TimetableSettingDAO.getInstance();	
+			CausalDAO cDao = CausalDAO.getInstance();
 		
-			dss = new DrmServiceSettings(SERVICE_ID, getTargetProfileId().getDomainId());
-			oTts = ttsDao.selectByDomainId(con, getTargetProfileId().getDomainId());
+			String domainId = getTargetProfileId().getDomainId();
+			DrmServiceSettings dss = new DrmServiceSettings(SERVICE_ID, domainId);
+			OTimetableSetting oTts = ttsDao.selectByDomainId(con, domainId);
 			
-			sdf = new SimpleDateFormat("dd/MM/yyyy");
-			df = new DecimalFormat("0.00");
+			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+			DecimalFormat df = new DecimalFormat("0.00");
 			
 			osWriter = new OutputStreamWriter(os);
 			
+			OEmployeeProfile oEP = ePDao.selectEmployeeProfileByDomainUser(con, domainId, query.targetUserId);
+			OHourProfile oHP = hPDao.selectHourProfileById(con, oEP.getHourProfileId());
+				
 			for (OTimetableReport oTR : getTimetableReport(query)) {
 				
 				//Calculate Theoretical Hours
-				oEP = ePDao.selectEmployeeProfileByDomainUser(con, oTR.getDomainId(), oTR.getTargetUserId());
-				oHP = hPDao.selectHourProfileById(con, oEP.getHourProfileId());
 				String theoreticalMinutes = lHDao.selectSumLineHourByHourProfileIdDayOfWeek(con, oHP.getId(),  oTR.getDate().getDayOfWeek());
 				String stringTheoreticalHours = "";
 				Float floatTheoreticalHours=0.0f;
@@ -5955,7 +5955,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				
 				//Working Hours
 				if(oTR.getWorkingHours() != null && !"".equals(oTR.getWorkingHours())){
-					oC = cDao.selectById(con, oTts.getDefaultCausalWorkingHours());
+					OCausal oC = cDao.selectById(con, oTts.getDefaultCausalWorkingHours());
 					String causalExternalCode = oC.getExternalCode() + StringUtils.repeat(" ", 5 - oC.getExternalCode().length());
 					
 					//Convert sexagesimal minutes to centesimal minutes
@@ -5991,7 +5991,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				}
 				//Overtime
 				if(oTR.getOvertime() != null && !"".equals(oTR.getOvertime())){
-					oC = cDao.selectById(con, oTts.getDefaultCausalOvertime());
+					OCausal oC = cDao.selectById(con, oTts.getDefaultCausalOvertime());
 					String causalExternalCode = oC.getExternalCode() + StringUtils.repeat(" ", 5 - oC.getExternalCode().length());
 					
 					//Convert sexagesimal minutes to centesimal minutes
@@ -6023,7 +6023,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				}
 				//Permits
 				if(oTR.getPaidLeave() != null && !"".equals(oTR.getPaidLeave())){
-					oC = cDao.selectById(con, oTts.getDefaultCausalPermits());
+					OCausal oC = cDao.selectById(con, oTts.getDefaultCausalPermits());
 					String causalExternalCode = oC.getExternalCode() + StringUtils.repeat(" ", 5 - oC.getExternalCode().length());
 					
 					//Convert sexagesimal minutes to centesimal minutes
@@ -6055,7 +6055,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				}
 				//Holidays
 				if(oTR.getHoliday() != null && !"".equals(oTR.getHoliday())){
-					oC = cDao.selectById(con, oTts.getDefaultCausalHolidays());
+					OCausal oC = cDao.selectById(con, oTts.getDefaultCausalHolidays());
 					String causalExternalCode = oC.getExternalCode() + StringUtils.repeat(" ", 5 - oC.getExternalCode().length());
 					
 					//Convert sexagesimal minutes to centesimal minutes
@@ -6087,7 +6087,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				}
 				//Sickness
 				if(oTR.getSickness() != null && !"".equals(oTR.getSickness())){
-					oC = cDao.selectById(con, oTts.getDefaultCausalSickness());
+					OCausal oC = cDao.selectById(con, oTts.getDefaultCausalSickness());
 					String causalExternalCode = oC.getExternalCode() + StringUtils.repeat(" ", 5 - oC.getExternalCode().length());
 					
 					//Convert sexagesimal minutes to centesimal minutes
@@ -6119,7 +6119,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				}
 				//Medical Visit
 				if(oTR.getMedicalVisit() != null && !"".equals(oTR.getMedicalVisit())){
-					oC = cDao.selectById(con, oTts.getDefaultCausalMedicalVisit());
+					OCausal oC = cDao.selectById(con, oTts.getDefaultCausalMedicalVisit());
 					String causalExternalCode = oC.getExternalCode() + StringUtils.repeat(" ", 5 - oC.getExternalCode().length());
 					
 					//Convert sexagesimal minutes to centesimal minutes
@@ -6151,7 +6151,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				}
 				//Other
 				if(oTR.getOther() != null && !"".equals(oTR.getOther())){
-					oC = cDao.selectById(con, oTR.getCausalId());
+					OCausal oC = cDao.selectById(con, oTR.getCausalId());
 					String causalExternalCode = oC.getExternalCode() + StringUtils.repeat(" ", 5 - oC.getExternalCode().length());
 					
 					//Convert sexagesimal minutes to centesimal minutes
@@ -6182,6 +6182,173 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					osWriter.write("\n"); //End of row, go to head
 				}
 			}
+			
+		} catch(Exception ex) {
+			throw new WTException(ex, "Error in creating file");
+		} finally {
+			DbUtils.closeQuietly(con);
+			try { if(osWriter != null) osWriter.close(); } catch(Exception ex) { /* Do nothing... */ }
+		}
+	}
+
+
+	private String getHundredthsHHMM(String sexagesimalHours) {
+		String HHMM;
+		if(sexagesimalHours.contains(".")){
+			String hm[] = sexagesimalHours.split("\\.");
+			String sexagesimalMinutes = hm[1];
+			Integer centesimalMinutes = (Integer.parseInt(sexagesimalMinutes) * 100)/60;
+			HHMM = StringUtils.leftPad(hm[0], 2, '0') + StringUtils.leftPad(centesimalMinutes.toString(), 2, '0');
+		}else{
+			HHMM = StringUtils.leftPad(sexagesimalHours, 2, '0') + "00";
+		}
+		return HHMM;
+	}
+	
+	public void exportTimetableReportTS(LogEntries log, OutputStream os, TimetableReportQuery query) throws Exception {
+		Connection con = null;
+		OutputStreamWriter osWriter = null;		
+		
+		try {		
+			con = WT.getConnection(SERVICE_ID, false);
+			
+			EmployeeProfileDAO ePDao = EmployeeProfileDAO.getInstance();
+			HourProfileDAO hPDao = HourProfileDAO.getInstance();
+			LineHourDAO lHDao = LineHourDAO.getInstance();
+			TimetableSettingDAO ttsDao = TimetableSettingDAO.getInstance();	
+			CausalDAO cDao = CausalDAO.getInstance();
+		
+			String domainId = getTargetProfileId().getDomainId();
+			DrmServiceSettings dss = new DrmServiceSettings(SERVICE_ID, domainId);
+			OTimetableSetting oTts = ttsDao.selectByDomainId(con, domainId);
+			
+			OEmployeeProfile oEP = ePDao.selectEmployeeProfileByDomainUser(con, domainId, query.targetUserId);
+			OHourProfile oHP = hPDao.selectHourProfileById(con, oEP.getHourProfileId());
+				
+			String companyCode = StringUtils.leftPad(dss.getGisCompanyCode(), 4, '0');
+			String headquartersCode = StringUtils.leftPad(oEP.getHeadquartersCode(), 2, '0');
+			String employee = StringUtils.leftPad(oEP.getNumber(), 9, '0');
+			
+			UserProfileId targetPid = new UserProfileId(domainId, query.targetUserId);
+			PersonalInfo targetPinfo = WT.getProfilePersonalInfo(targetPid);
+			
+			Calendar cal = Calendar.getInstance();
+			cal.set(Calendar.MONTH, query.month - 1);
+			String mmyy = StringUtils.leftPad(""+query.month, 2, '0')+
+					StringUtils.leftPad(""+(query.year%100), 2, '0');
+			String startDate = "01"+mmyy;
+			String endDate = StringUtils.leftPad(""+cal.getActualMaximum(Calendar.DAY_OF_MONTH), 2, '0')+mmyy;
+			
+			osWriter = new OutputStreamWriter(os);
+			
+			osWriter.write(companyCode); //1 Codice Azienda
+			osWriter.write(headquartersCode); //2 Codice Sede
+			osWriter.write(employee); //3 Dipendente
+			osWriter.write(
+				StringUtils.rightPad(
+					StringUtils.left(targetPinfo.getLastName(),34),
+					34,' ')
+			); //4 Cognome
+			osWriter.write(
+				StringUtils.rightPad(
+					StringUtils.left(targetPinfo.getFirstName(),34),
+					34,' ')
+			); //5 Nome
+
+			osWriter.write(startDate); //6 Data
+			osWriter.write(endDate); //7 Data
+			
+			int days = 0;
+			for (OTimetableReport oTR : getTimetableReport(query)) {
+				++days;
+				
+				//Calculate Theoretical Hours
+				String theoreticalMinutes = lHDao.selectSumLineHourByHourProfileIdDayOfWeek(con, oHP.getId(),  oTR.getDate().getDayOfWeek());
+				String stringTheoreticalHours = "";
+				Float floatTheoreticalHours=0.0f;
+				if(theoreticalMinutes != null && !"".equals(theoreticalMinutes)){
+					floatTheoreticalHours = Float.parseFloat(theoreticalMinutes) / 60;
+					stringTheoreticalHours = floatTheoreticalHours.toString();
+					stringTheoreticalHours = stringTheoreticalHours.replaceAll("\\.", "");
+				}
+				stringTheoreticalHours = StringUtils.leftPad(stringTheoreticalHours, 4, '0');
+				
+				//Working Hours
+				if(oTR.getWorkingHours() != null && !"".equals(oTR.getWorkingHours())){
+					//Convert sexagesimal minutes to centesimal minutes
+					String hours = oTR.getWorkingHours();
+					Float floatHour = Float.parseFloat(hours);
+					//TS wants hours to be maximum the theoretical hours, and then find records for the exceptions (overs or absence)
+					if (floatHour>floatTheoreticalHours) hours=floatTheoreticalHours.toString();
+					
+					osWriter.write(getHundredthsHHMM(hours));					
+				}
+				else osWriter.write("0000");
+				
+				int codes = 0;
+				
+				//Overtime
+				if(oTR.getOvertime() != null && !"".equals(oTR.getOvertime())){
+					OCausal oC = cDao.selectById(con, oTts.getDefaultCausalOvertime());
+					String causalExternalCode = StringUtils.rightPad(oC.getExternalCode(), 4, ' ');
+							
+					osWriter.write(causalExternalCode);					
+					osWriter.write(getHundredthsHHMM(oTR.getOvertime()));					
+					++codes;
+				}
+				//Permits
+				if(oTR.getPaidLeave() != null && !"".equals(oTR.getPaidLeave())){
+					OCausal oC = cDao.selectById(con, oTts.getDefaultCausalPermits());
+					String causalExternalCode = StringUtils.rightPad(oC.getExternalCode(), 4, ' ');
+					
+					osWriter.write(causalExternalCode);					
+					osWriter.write(getHundredthsHHMM(oTR.getPaidLeave()));					
+					++codes;
+				}
+				//Holidays
+				if(oTR.getHoliday() != null && !"".equals(oTR.getHoliday())){
+					OCausal oC = cDao.selectById(con, oTts.getDefaultCausalHolidays());
+					String causalExternalCode = StringUtils.rightPad(oC.getExternalCode(), 4, ' ');
+					
+					osWriter.write(causalExternalCode);					
+					osWriter.write(getHundredthsHHMM(oTR.getHoliday()));					
+					++codes;
+				}
+				//Medical Visit
+				if(oTR.getMedicalVisit() != null && !"".equals(oTR.getMedicalVisit())){
+					OCausal oC = cDao.selectById(con, oTts.getDefaultCausalMedicalVisit());
+					String causalExternalCode = StringUtils.rightPad(oC.getExternalCode(), 4, ' ');
+					
+					osWriter.write(causalExternalCode);					
+					osWriter.write(getHundredthsHHMM(oTR.getMedicalVisit()));					
+					++codes;
+				}
+				//Sickness
+				if(oTR.getSickness() != null && !"".equals(oTR.getSickness())){
+					OCausal oC = cDao.selectById(con, oTts.getDefaultCausalSickness());
+					String causalExternalCode = StringUtils.rightPad(oC.getExternalCode(), 4, ' ');
+					
+					osWriter.write(causalExternalCode);					
+					osWriter.write(getHundredthsHHMM(oTR.getSickness()));					
+					++codes;
+				}
+				//Other
+				if(oTR.getOther() != null && !"".equals(oTR.getOther())){
+					OCausal oC = cDao.selectById(con, oTR.getCausalId());
+					String causalExternalCode = StringUtils.rightPad(oC.getExternalCode(), 4, ' ');
+					
+					osWriter.write(causalExternalCode);					
+					osWriter.write(getHundredthsHHMM(oTR.getOther()));					
+					++codes;
+				}
+				//fill up to 6 codes
+				while(codes++ < 6) osWriter.write("    0000");					
+			}
+			//fill up to 31 days
+			while(days++ < 31) {
+				osWriter.write("0000    0000    0000    0000    0000    0000    0000");					
+			}
+			
 			
 		} catch(Exception ex) {
 			throw new WTException(ex, "Error in creating file");

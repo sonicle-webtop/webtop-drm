@@ -1,24 +1,32 @@
 package com.sonicle.webtop.drm.swagger.v1.model;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 import javax.validation.Valid;
-
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 
-public class TimetableEntry   {
-  
-  private @Valid String employeeId = null;
-  private @Valid String entrance = null;
-  private @Valid String exit = null;
+
+@JsonTypeName("TimetableEntry")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2024-10-07T15:48:23.458+02:00[Europe/Berlin]")
+public class ApiTimetableEntry   {
+  private @Valid String employeeId;
+  private @Valid String entrance;
+  private @Valid String exit;
+  private @Valid String location;
 
   /**
    * Employee id
    **/
-  public TimetableEntry employeeId(String employeeId) {
+  public ApiTimetableEntry employeeId(String employeeId) {
     this.employeeId = employeeId;
     return this;
   }
@@ -30,6 +38,8 @@ public class TimetableEntry   {
   public String getEmployeeId() {
     return employeeId;
   }
+
+  @JsonProperty("employeeId")
   public void setEmployeeId(String employeeId) {
     this.employeeId = employeeId;
   }
@@ -37,7 +47,7 @@ public class TimetableEntry   {
   /**
    * Entrance date/time (ISO date/time YYYYMMDD&#39;T&#39;HHMMSS&#39;Z&#39;)
    **/
-  public TimetableEntry entrance(String entrance) {
+  public ApiTimetableEntry entrance(String entrance) {
     this.entrance = entrance;
     return this;
   }
@@ -49,6 +59,8 @@ public class TimetableEntry   {
   public String getEntrance() {
     return entrance;
   }
+
+  @JsonProperty("entrance")
   public void setEntrance(String entrance) {
     this.entrance = entrance;
   }
@@ -56,7 +68,7 @@ public class TimetableEntry   {
   /**
    * Exit date/time (ISO date/time YYYYMMDD&#39;T&#39;HHMMSS&#39;Z&#39;)
    **/
-  public TimetableEntry exit(String exit) {
+  public ApiTimetableEntry exit(String exit) {
     this.exit = exit;
     return this;
   }
@@ -68,38 +80,63 @@ public class TimetableEntry   {
   public String getExit() {
     return exit;
   }
+
+  @JsonProperty("exit")
   public void setExit(String exit) {
     this.exit = exit;
   }
 
+  /**
+   * Exit date/time (ISO date/time YYYYMMDD&#39;T&#39;HHMMSS&#39;Z&#39;)
+   **/
+  public ApiTimetableEntry location(String location) {
+    this.location = location;
+    return this;
+  }
+
+  
+  @ApiModelProperty(required = true, value = "Exit date/time (ISO date/time YYYYMMDD'T'HHMMSS'Z')")
+  @JsonProperty("location")
+  @NotNull
+  public String getLocation() {
+    return location;
+  }
+
+  @JsonProperty("location")
+  public void setLocation(String location) {
+    this.location = location;
+  }
+
 
   @Override
-  public boolean equals(java.lang.Object o) {
+  public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    TimetableEntry timetableEntry = (TimetableEntry) o;
-    return Objects.equals(employeeId, timetableEntry.employeeId) &&
-        Objects.equals(entrance, timetableEntry.entrance) &&
-        Objects.equals(exit, timetableEntry.exit);
+    ApiTimetableEntry timetableEntry = (ApiTimetableEntry) o;
+    return Objects.equals(this.employeeId, timetableEntry.employeeId) &&
+        Objects.equals(this.entrance, timetableEntry.entrance) &&
+        Objects.equals(this.exit, timetableEntry.exit) &&
+        Objects.equals(this.location, timetableEntry.location);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(employeeId, entrance, exit);
+    return Objects.hash(employeeId, entrance, exit, location);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class TimetableEntry {\n");
+    sb.append("class ApiTimetableEntry {\n");
     
     sb.append("    employeeId: ").append(toIndentedString(employeeId)).append("\n");
     sb.append("    entrance: ").append(toIndentedString(entrance)).append("\n");
     sb.append("    exit: ").append(toIndentedString(exit)).append("\n");
+    sb.append("    location: ").append(toIndentedString(location)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -108,11 +145,13 @@ public class TimetableEntry   {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(java.lang.Object o) {
+  private String toIndentedString(Object o) {
     if (o == null) {
       return "null";
     }
     return o.toString().replace("\n", "\n    ");
   }
+
+
 }
 
