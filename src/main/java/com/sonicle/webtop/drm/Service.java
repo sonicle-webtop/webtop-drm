@@ -374,17 +374,24 @@ public class Service extends BaseService {
 			vs.put("defaultMinimumNumberOfHoursPerTicket", getDefaultMinimumNumberOfHoursPerTicket());
 			vs.put("ticketManagement", getTicketManagementSetting());
 			vs.put("automaticOvertime", getAutomaticOvertimeSetting());
+			vs.put("defaultStampingMode", getDefaultStampingMode());
 			
 			HashMap<String, Integer> mT = new HashMap<>();
+			HashMap<String, String> mSM = new HashMap<>();
 			List<OEmployeeProfile> oEs = manager.listEmployeeProfiles();
 			for(OEmployeeProfile oE : oEs){
-				if(oE.getMinimumNumberOfHoursPerTicket() == null){
+				if(oE.getMinimumNumberOfHoursPerTicket() == null)
 					mT.put(oE.getUserId(), getDefaultMinimumNumberOfHoursPerTicket());
-				}else{
+				else
 					mT.put(oE.getUserId(), oE.getMinimumNumberOfHoursPerTicket());
-				}	
+				
+				if (StringUtils.isEmpty(oE.getStampingMode()))
+					mSM.put(oE.getUserId(), getDefaultStampingMode());
+				else
+					mSM.put(oE.getUserId(), oE.getStampingMode());
 			}
 			vs.put("minimumNumberOfHoursPerTicket", mT);
+			vs.put("stampingMode", mSM);
 
 			HashMap<String, Integer> hs = new HashMap<>();
 			List<OCausal> oC = manager.listCausals(false);
@@ -507,6 +514,20 @@ public class Service extends BaseService {
 			return (value == null) ? false : value;	
 		} catch (Exception ex) {
 			throw new WTException("Error in getAutomaticOvertimeSetting", ex);
+		}
+	}
+	
+	private String getDefaultStampingMode() throws WTException {
+		try{
+			String value = null;
+			
+			TimetableSetting tS = manager.getTimetableSetting();
+			if(tS != null) value = tS.getDefaultStampingMode();
+			
+			
+			return (value == null) ? "B" : value;	
+		} catch (Exception ex) {
+			throw new WTException("Error in getDefaultStampingMode", ex);
 		}
 	}
 	

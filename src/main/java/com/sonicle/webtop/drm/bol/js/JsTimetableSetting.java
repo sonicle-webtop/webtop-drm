@@ -70,6 +70,7 @@ public class JsTimetableSetting {
 	public Integer minimumNumberOfHoursPerTicket;
 	public Boolean ticketManagement;
 	public Boolean automaticOvertime;
+	public String defaultStampingMode;
 
 	// public List<JsGridHolidayDate> holidayDates = new ArrayList();
 
@@ -104,6 +105,7 @@ public class JsTimetableSetting {
 		this.minimumNumberOfHoursPerTicket = setting.getMinimumNumberOfHoursPerTicket();
 		this.ticketManagement = setting.getTicketManagement();
 		this.automaticOvertime = setting.getAutomaticOvertime();
+		this.defaultStampingMode = setting.getDefaultStampingMode();
 		
         /*
 		for (HolidayDate hd : setting.getHolidayDates()) {
@@ -145,6 +147,7 @@ public class JsTimetableSetting {
 		tt.setMinimumNumberOfHoursPerTicket(js.minimumNumberOfHoursPerTicket);
 		tt.setTicketManagement(js.ticketManagement);
 		tt.setAutomaticOvertime(js.automaticOvertime);
+		tt.setDefaultStampingMode(js.defaultStampingMode);
 		
         /*
 		for (JsGridHolidayDate hd : js.holidayDates) {

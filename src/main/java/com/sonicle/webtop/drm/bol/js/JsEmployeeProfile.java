@@ -51,6 +51,7 @@ public class JsEmployeeProfile {
 	public String headquartersCode;
 	public Boolean noStamping;
 	public Integer minimumNumberOfHoursPerTicket;
+	public String stampingMode;
 
 
 	public JsEmployeeProfile(EmployeeProfile ep) {
@@ -65,6 +66,7 @@ public class JsEmployeeProfile {
 		this.headquartersCode = ep.getHeadquartersCode();
 		this.noStamping = ep.getNoStamping();
 		this.minimumNumberOfHoursPerTicket = ep.getMinimumNumberOfHoursPerTicket();
+		this.stampingMode = ep.getStampingMode();
 	}
 
 	public static EmployeeProfile createEmployeeProfile(JsEmployeeProfile js) {
@@ -82,6 +84,7 @@ public class JsEmployeeProfile {
 		newHp.setHeadquartersCode(js.headquartersCode);
 		newHp.setNoStamping(js.noStamping);
 		newHp.setMinimumNumberOfHoursPerTicket(js.minimumNumberOfHoursPerTicket);
+		newHp.setStampingMode(js.stampingMode);
 
 		return newHp;
 	}

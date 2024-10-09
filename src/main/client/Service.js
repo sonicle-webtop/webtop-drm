@@ -706,43 +706,48 @@ Ext.define('Sonicle.webtop.drm.Service', {
 																	}
 																});
 															}else{
-																var wnd = Ext.create('Ext.window.Window', {
-																	title: me.res('gpTimetable.mainstamp.wnd.workplace.lbl'),
-																	height: 135,
-																	width: 400,
-																	modal: true,
-																	resizable: false,
-																	layout: {
-																		type: 'hbox',
-																		align: 'middle'
-																	},
-																	items:[
-																		{
-																			xtype: 'button',
-																			width: 200,
-																			height: 100,
-																			scale: 'large',
-																			text: me.res('gpTimetable.mainstamp.wnd.workplaceoffice.lbl'),
-																			iconCls: 'wtdrm-icon-office',
-																			handler: function () {
-																				me.setTimetable("O");
-																				wnd.destroy();
-																			}
+																var stampingMode = WT.getVar('com.sonicle.webtop.drm',"stampingMode")[WT.getVar("userId")];
+																if (stampingMode == 'S') me.setTimetable("S");
+																else if (stampingMode == 'O') me.setTimetable("O");
+																else if (stampingMode == 'B') {
+																	var wnd = Ext.create('Ext.window.Window', {
+																		title: me.res('gpTimetable.mainstamp.wnd.workplace.lbl'),
+																		height: 135,
+																		width: 400,
+																		modal: true,
+																		resizable: false,
+																		layout: {
+																			type: 'hbox',
+																			align: 'middle'
 																		},
-																		{
-																			xtype: 'button',
-																			width: 200,
-																			height: 100,
-																			scale: 'large',
-																			text: me.res('gpTimetable.mainstamp.wnd.workplacesmartworking.lbl'),
-																			iconCls: 'wtdrm-icon-smartworking',
-																			handler: function () {
-																				me.setTimetable("S");
-																				wnd.destroy();
+																		items:[
+																			{
+																				xtype: 'button',
+																				width: 200,
+																				height: 100,
+																				scale: 'large',
+																				text: me.res('gpTimetable.mainstamp.wnd.workplaceoffice.lbl'),
+																				iconCls: 'wtdrm-icon-office',
+																				handler: function () {
+																					me.setTimetable("O");
+																					wnd.destroy();
+																				}
+																			},
+																			{
+																				xtype: 'button',
+																				width: 200,
+																				height: 100,
+																				scale: 'large',
+																				text: me.res('gpTimetable.mainstamp.wnd.workplacesmartworking.lbl'),
+																				iconCls: 'wtdrm-icon-smartworking',
+																				handler: function () {
+																					me.setTimetable("S");
+																					wnd.destroy();
+																				}
 																			}
-																		}
-																	] 
-																}).show();
+																		] 
+																	}).show();
+																}
 															}
 														}
 													}
@@ -3535,7 +3540,15 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	},
 	enablingStampButtons: function () {
 		//Bottoni di timbratura standard
-		var me = this;
+		var me = this,
+			stampingMode = WT.getVar('com.sonicle.webtop.drm',"stampingMode");
+		
+		if (stampingMode && stampingMode[WT.getVar('userId')] === 'N') {
+			me.getMainComponent().lookupReference('btnMainStamp').setDisabled(true);
+			me.getMainComponent().lookupReference('btnCompanyStamp').setHidden(true);
+			return;
+		}
+		
 		WT.ajaxReq(me.ID, 'ChekIpAddressNetwork', {
 			params: {},
 			callback: function (success, json) {

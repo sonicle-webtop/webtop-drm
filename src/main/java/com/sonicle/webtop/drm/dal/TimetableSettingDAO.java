@@ -119,6 +119,7 @@ public class TimetableSettingDAO extends BaseDAO {
 				.set(TIMETABLE_SETTINGS.MINIMUM_NUMBER_OF_HOURS_PER_TICKET, item.getMinimumNumberOfHoursPerTicket())
 				.set(TIMETABLE_SETTINGS.TICKET_MANAGEMENT, item.getTicketManagement())
 				.set(TIMETABLE_SETTINGS.AUTOMATIC_OVERTIME, item.getAutomaticOvertime())
+				.set(TIMETABLE_SETTINGS.DEFAULT_STAMPING_MODE, item.getDefaultStampingMode())
 				.where(
 						TIMETABLE_SETTINGS.TIMETABLE_SETTING_ID.equal(item.getTimetableSettingId())
 				)

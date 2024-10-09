@@ -222,7 +222,19 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingGeneral', {
 							xtype: 'checkbox',
 							bind: '{record.automaticOvertime}',
 							boxLabel: me.mys.res('timetable.settings.fld-automaticOvertime.lbl')
-						}
+						},
+						WTF.lookupCombo('id', 'desc', {
+							bind: '{record.defaultStampingMode}',
+							store: Ext.create('Sonicle.webtop.drm.store.StampingMode', {
+								autoLoad: true
+							}),
+							triggers: {
+								clear: WTF.clearTrigger()
+							},
+							fieldLabel: me.mys.res('timetable.settings.fld-stampingMode.lbl'),
+							selectOnFocus: true,
+							editable: true
+						}),
 					]
 				},
 				{

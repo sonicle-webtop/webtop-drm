@@ -940,6 +940,7 @@ public class ManagerUtils {
 		eProfile.setHeadquartersCode(oEP.getHeadquartersCode());
 		eProfile.setNoStamping(oEP.getNoStamping());
 		eProfile.setMinimumNumberOfHoursPerTicket(oEP.getMinimumNumberOfHoursPerTicket());
+		eProfile.setStampingMode(oEP.getStampingMode());
 
 		return eProfile;
 	}
@@ -961,6 +962,7 @@ public class ManagerUtils {
 		oEp.setHeadquartersCode(eProfile.getHeadquartersCode());
 		oEp.setNoStamping(eProfile.getNoStamping());
 		oEp.setMinimumNumberOfHoursPerTicket(eProfile.getMinimumNumberOfHoursPerTicket());
+		oEp.setStampingMode(eProfile.getStampingMode());
 
 		return oEp;
 	}
@@ -1691,7 +1693,7 @@ public class ManagerUtils {
 		oSetting.setMinimumNumberOfHoursPerTicket(tSetting.getMinimumNumberOfHoursPerTicket());
 		oSetting.setTicketManagement(tSetting.getTicketManagement());
 		oSetting.setAutomaticOvertime(tSetting.getAutomaticOvertime());
-		
+		oSetting.setDefaultStampingMode(tSetting.getDefaultStampingMode());
 		return oSetting;
 	}
 
@@ -1730,6 +1732,7 @@ public class ManagerUtils {
 		tSetting.setMinimumNumberOfHoursPerTicket(oTSetting.getMinimumNumberOfHoursPerTicket());
 		tSetting.setTicketManagement(oTSetting.getTicketManagement());
 		tSetting.setAutomaticOvertime(oTSetting.getAutomaticOvertime());
+		tSetting.setDefaultStampingMode(oTSetting.getDefaultStampingMode());
 		
 		return tSetting;
 	}

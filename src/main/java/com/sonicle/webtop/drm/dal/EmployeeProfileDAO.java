@@ -142,6 +142,7 @@ public class EmployeeProfileDAO extends BaseDAO {
 				.set(EMPLOYEE_PROFILES.HEADQUARTERS_CODE, item.getHeadquartersCode())
 				.set(EMPLOYEE_PROFILES.NO_STAMPING, item.getNoStamping())
 				.set(EMPLOYEE_PROFILES.MINIMUM_NUMBER_OF_HOURS_PER_TICKET, item.getMinimumNumberOfHoursPerTicket())
+				.set(EMPLOYEE_PROFILES.STAMPING_MODE, item.getStampingMode())
 				.where(
 						EMPLOYEE_PROFILES.ID.equal(item.getId())
 				)

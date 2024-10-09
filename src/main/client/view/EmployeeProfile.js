@@ -39,7 +39,7 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 		title: '{EmployeeProfile.tit}',
 		iconCls: 'wtdrm-icon-configurationEmployeeProfiles',
 		width: 450,
-		height: 360,
+		height: 400,
 		modal: true
 	},
 	fieldTitle: 'description',
@@ -136,6 +136,19 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 							fieldLabel: me.mys.res('EmployeeProfile.fld-minimumNumberOfHoursPerTicket.lbl'),
 							width: 380
 						},
+						WTF.lookupCombo('id', 'desc', {
+							bind: '{record.stampingMode}',
+							store: Ext.create('Sonicle.webtop.drm.store.StampingMode', {
+								autoLoad: true
+							}),
+							triggers: {
+								clear: WTF.clearTrigger()
+							},
+							fieldLabel: me.mys.res('timetable.settings.fld-stampingMode.lbl'),
+							emptyText: me.mys.res('store.stampingMode.'+me.mys.getVar("defaultStampingMode")),
+							selectOnFocus: true,
+							editable: true
+						}),
 						{
 							xtype: 'checkbox',
 							bind: '{record.extraordinary}',
