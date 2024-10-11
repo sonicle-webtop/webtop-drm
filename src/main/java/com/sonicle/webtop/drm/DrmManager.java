@@ -267,6 +267,7 @@ import java.util.Set;
 import javax.imageio.ImageIO;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Session;
+import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -286,6 +287,7 @@ import org.joda.time.LocalTime;
 import org.joda.time.Minutes;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.slf4j.Logger;
 import org.supercsv.io.ICsvMapWriter;
 import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
@@ -299,8 +301,14 @@ import org.supercsv.prefs.CsvPreference;
  */
 public class DrmManager extends BaseManager implements IDrmManager{
 
+	public static final Logger logger = WT.getLogger(DrmManager.class);
+	private DrmServiceSettings dss;
+	TimetableSetting tts;
+	
 	public DrmManager(boolean fastInit, UserProfileId targetProfileId) {
 		super(fastInit, targetProfileId);
+		dss = new DrmServiceSettings(SERVICE_ID, targetProfileId.getDomainId());
+		tts = getTimetableSetting();
 	}
 
 	private DateTime createRevisionTimestamp() {
@@ -3266,8 +3274,13 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			DbUtils.closeQuietly(con);
 		}
 	}
+	public TimetableSetting getTimetableSetting() {
+		return getTimetableSetting(false);
+	}
 	
-	public TimetableSetting getTimetableSetting() throws WTException {
+	public TimetableSetting getTimetableSetting(boolean doUpdate) {
+		if (!doUpdate && tts != null) return tts;
+		
 		Connection con = null;
 		TimetableSettingDAO tSettDao = TimetableSettingDAO.getInstance();
 		HolidayDateDAO hdDao = HolidayDateDAO.getInstance();
@@ -3284,10 +3297,12 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					setting.getHolidayDates().add(ManagerUtils.createHolidayDate(oHd));
 				}
 			}
+			tts = setting;
 			return setting;
 
 		} catch (SQLException | DAOException ex) {
-			throw new WTException(ex, "DB error");
+			logger.error("Error creating TimetableSetting", ex);
+			return null;
 		} finally {
 			DbUtils.closeQuietly(con);
 		}
@@ -3337,12 +3352,13 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				setting.setDomainId(getTargetProfileId().getDomainId());
 
 				tDao.insert(con, setting);
-
 			} else {
 				tDao.update(con, setting);
 			}
-            
 			DbUtils.commitQuietly(con);
+			
+			//force update
+			getTimetableSetting(true);
 
 		} catch (SQLException | DAOException ex) {
 			throw new WTException(ex, "DB error");
@@ -5196,19 +5212,19 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		
 		String servicePublicUrl = WT.getServicePublicUrl(lr.getDomainId(), SERVICE_ID);
 		
-		Session session = getMailSession();
-
 		try {
 			boolean answer = (lr.getResult() == null);
 			
 			String bodyHeader = TplHelper.buildLeaveRequestTitle(udTo.getLocale(), lr);
 			String html = TplHelper.buildLeaveRequestBody(udTo.getLocale(), lr, to.getAddress(), answer, servicePublicUrl);
+			String htmlHR = TplHelper.buildHRLeaveRequestBody(udTo.getLocale(), lr, to.getAddress());
 			String source = EmailNotification.buildSource(udTo.getLocale(), SERVICE_ID);
 			String because = WT.lookupResource(SERVICE_ID, udTo.getLocale(), DrmLocale.EMAIL_REMINDER_SUPERVISOR_FOOTER_BECAUSE);
 
 			String msgSubject = EmailNotification.buildSubject(udTo.getLocale(), SERVICE_ID, bodyHeader);
 			
 			EmailNotification.BecauseBuilder builder = new EmailNotification.BecauseBuilder().withCustomBody(bodyHeader, html);
+			EmailNotification.BecauseBuilder builderHR = new EmailNotification.BecauseBuilder().withCustomBody(bodyHeader, htmlHR);
 			
 			if(lr.getResult() != null){
 				from = udTo.getPersonalEmail();
@@ -5218,15 +5234,18 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				
 				if (lr.getResult() == true) {
 					builder.greenMessage(lookupResource(udTo.getLocale(), DrmLocale.TPL_EMAIL_RESPONSEUPDATE_MSG_APPROVE));
+					builderHR.greenMessage(lookupResource(udTo.getLocale(), DrmLocale.TPL_EMAIL_RESPONSEUPDATE_MSG_APPROVE));
 				} else if (lr.getResult() == false) {
 					builder.redMessage(lookupResource(udTo.getLocale(), DrmLocale.TPL_EMAIL_RESPONSEUPDATE_MSG_DECLINE));
+					builderHR.redMessage(lookupResource(udTo.getLocale(), DrmLocale.TPL_EMAIL_RESPONSEUPDATE_MSG_DECLINE));
 				}
 			}
 			
 			String msgBody = builder.build(udTo.getLocale(), source, because, to.getAddress()).write();
+			String msgBodyHR = builderHR.build(udTo.getLocale(), source, because, to.getAddress()).write();
 			
-			WT.sendEmail(session, true, from, to, msgSubject, msgBody);
-
+			sendLeaveRequestEmail(lr, udTo.getLocale(), from, to, msgSubject, msgBody, msgBodyHR, bodyHeader, source, because, answer);
+			
 		} catch (IOException | TemplateException | MessagingException ex) {
 			logger.error("Unable to notify recipient after leave request [{}]", ex, to.getAddress());
 		}
@@ -5240,19 +5259,19 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		
 		String servicePublicUrl = WT.getServicePublicUrl(lr.getDomainId(), SERVICE_ID);
 		
-		Session session = getMailSession();
-
 		try {
 			boolean answer = (lr.getCancResult() == null);
 			
 			String bodyHeader = TplHelper.buildLeaveRequestCancellationTitle(udTo.getLocale(), lr);
 			String html = TplHelper.buildLeaveRequestCancellationBody(udTo.getLocale(), lr, to.getAddress(), answer, servicePublicUrl);
+			String htmlHR = TplHelper.buildHRLeaveRequestCancellationBody(udTo.getLocale(), lr, to.getAddress());
 			String source = EmailNotification.buildSource(udTo.getLocale(), SERVICE_ID);
 			String because = WT.lookupResource(SERVICE_ID, udTo.getLocale(), DrmLocale.EMAIL_REMINDER_SUPERVISOR_FOOTER_BECAUSE);
 
 			String msgSubject = EmailNotification.buildSubject(udTo.getLocale(), SERVICE_ID, bodyHeader);
 			
 			EmailNotification.BecauseBuilder builder = new EmailNotification.BecauseBuilder().withCustomBody(bodyHeader, html);
+			EmailNotification.BecauseBuilder builderHR = new EmailNotification.BecauseBuilder().withCustomBody(bodyHeader, htmlHR);
 				
 			if(lr.getCancResult() != null){
 				from = udTo.getPersonalEmail();
@@ -5262,18 +5281,48 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				
 				if (lr.getCancResult() == true) {
 					builder.greenMessage(lookupResource(udTo.getLocale(), DrmLocale.TPL_EMAIL_RESPONSEUPDATE_MSG_APPROVE));
+					builderHR.greenMessage(lookupResource(udTo.getLocale(), DrmLocale.TPL_EMAIL_RESPONSEUPDATE_MSG_APPROVE));
 				} else if (lr.getCancResult() == false) {
 					builder.redMessage(lookupResource(udTo.getLocale(), DrmLocale.TPL_EMAIL_RESPONSEUPDATE_MSG_DECLINE));
+					builderHR.redMessage(lookupResource(udTo.getLocale(), DrmLocale.TPL_EMAIL_RESPONSEUPDATE_MSG_DECLINE));
 				}
 			}
 			
 			String msgBody = builder.build(udTo.getLocale(), source, because, to.getAddress()).write();
+			String msgBodyHR = builderHR.build(udTo.getLocale(), source, because, to.getAddress()).write();
 			
-			WT.sendEmail(session, true, from, to, msgSubject, msgBody);
+			sendLeaveRequestEmail(lr, udTo.getLocale(), from, to, msgSubject, msgBody, msgBodyHR, bodyHeader, source, because, answer);
 
 		} catch (IOException | TemplateException | MessagingException ex) {
 			logger.error("Unable to notify recipient after leave request cancellation [{}]", ex, to.getAddress());
 		}
+	}
+	
+	private void sendLeaveRequestEmail(OLeaveRequest lr, Locale locale, InternetAddress from, InternetAddress to, String msgSubject, String msgBody, String msgBodyHR, String bodyHeader, String source, String because, boolean answer) 
+			throws MessagingException, IOException, TemplateException {
+		Session session = getMailSession();
+		InternetAddress tos[] = new InternetAddress[]{ to };
+		InternetAddress ccs[] = null;
+		String hrEmail = getTimetableSetting().getStaffOfficeEmail();
+		if (!answer && !StringUtils.isEmpty(hrEmail)) {
+			try {
+				ccs = new InternetAddress[]{ new InternetAddress(hrEmail) };					
+			} catch(AddressException exc) {
+				logger.error("Error creating HR internet address", exc);
+			}
+		}
+		WT.sendEmail(session, true, from, tos, ccs, null, msgSubject, msgBody, null);
+
+		if (answer && !StringUtils.isEmpty(hrEmail)) {
+
+			try {
+				to = new InternetAddress(hrEmail);
+				WT.sendEmail(session, true, from, to, msgSubject, msgBodyHR);
+			} catch(AddressException exc) {
+				logger.error("Error creating HR internet address", exc);
+			}
+		}
+
 	}
 	
 	public List<OOpportunityField> getOpportunityFieldsByDomainIdTabId(String domainId, String tabId) throws WTException {
@@ -5428,8 +5477,6 @@ public class DrmManager extends BaseManager implements IDrmManager{
 
 			tcktDao.insert(con, newTckt);
 			
-			DrmServiceSettings dss = new DrmServiceSettings(SERVICE_ID, newTckt.getDomainId());
-			
 			notifyTicket(tcktDao.selectViewById(con, newTckt.getTicketId()), dss.getTicketDefaultCloseDocStatusId(), close);
 			automaticCloseTicket(con, tcktDao.selectViewById(con, newTckt.getTicketId()), dss.getTicketDefaultCloseDocStatusId());
 			
@@ -5498,8 +5545,6 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			for (TicketAttachment att : changeSet.deleted) {
 				attDao.deleteById(con, att.getTicketAttachmentId());
 			}
-			
-			DrmServiceSettings dss = new DrmServiceSettings(SERVICE_ID, item.getDomainId());
 			
 			notifyTicket(tcktDao.selectViewById(con, tckt.getTicketId()), dss.getTicketDefaultCloseDocStatusId(), close);
 			automaticCloseTicket(con, tcktDao.selectViewById(con, tckt.getTicketId()), dss.getTicketDefaultCloseDocStatusId());
@@ -5919,7 +5964,6 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			CausalDAO cDao = CausalDAO.getInstance();
 		
 			String domainId = getTargetProfileId().getDomainId();
-			DrmServiceSettings dss = new DrmServiceSettings(SERVICE_ID, domainId);
 			OTimetableSetting oTts = ttsDao.selectByDomainId(con, domainId);
 			
 			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -6219,7 +6263,6 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			CausalDAO cDao = CausalDAO.getInstance();
 		
 			String domainId = getTargetProfileId().getDomainId();
-			DrmServiceSettings dss = new DrmServiceSettings(SERVICE_ID, domainId);
 			OTimetableSetting oTts = ttsDao.selectByDomainId(con, domainId);
 			
 			OEmployeeProfile oEP = ePDao.selectEmployeeProfileByDomainUser(con, domainId, query.targetUserId);

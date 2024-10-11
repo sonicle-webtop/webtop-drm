@@ -51,6 +51,7 @@ public class DrmLocale {
 	public static final String EMAIL_REMINDER_USER_FOOTER_BECAUSE = "email.reminder.user.footer.because";
 	public static final String EMAIL_REMINDER_SUPERVISOR_FOOTER_BECAUSE = "email.reminder.supervisor.footer.because";
 	public static final String TPL_EMAIL_REQUEST_APPROVE = "tpl.email.request.approve";
+	public static final String TPL_EMAIL_REQUEST_APPROVEHR = "tpl.email.request.approvehr";
 	public static final String TPL_EMAIL_REQUEST_APPROVE_YES = "tpl.email.request.approve.yes";
 	public static final String TPL_EMAIL_REQUEST_APPROVE_NO = "tpl.email.request.approve.no";
 	
