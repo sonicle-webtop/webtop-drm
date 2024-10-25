@@ -79,7 +79,7 @@ public class JsGridTimetableReport {
 		this.id = tr.getId();
 		this.domainId = tr.getDomainId();
 		//this.user = WT.getUserData(new UserProfileId(tr.getDomainId(), tr.getUserId())).getDisplayName();
-		PersonalInfo pinfo=WT.getUserPersonalInfo(new UserProfileId(tr.getDomainId(), tr.getUserId()));
+		PersonalInfo pinfo=WT.getProfilePersonalInfo(new UserProfileId(tr.getDomainId(), tr.getUserId()));
 		this.user = (pinfo.getLastName()+" "+pinfo.getFirstName()).trim();
 		this.company = drmMgr.getCompany(tr.getCompanyId()).getName();
 		this.date = concatDate(tr);

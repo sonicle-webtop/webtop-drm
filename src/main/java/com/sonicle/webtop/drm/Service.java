@@ -250,6 +250,7 @@ import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.concurrent.Callable;
 import javax.imageio.ImageIO;
@@ -591,15 +592,38 @@ public class Service extends BaseService {
 		}
 	}
 	
+	private class Operator {
+		String usr;
+		String dn;
+		
+		Operator(String usr, String dn) {
+			this.usr = usr;
+			this.dn = dn;
+		}
+	}
+	
 	public void processLookupOperators(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			List<JsSimple> jsUser = new ArrayList();
 			Data uD;
 			
+			ArrayList<Operator> ops = new ArrayList<>();
 			for (String usr : manager.listOperators()) {
-				uD = WT.getUserData(new UserProfileId(getEnv().getProfileId().getDomain(), usr));
-				if(uD != null)
-					jsUser.add(new JsSimple(usr, uD.getDisplayName()));
+				UserProfile.PersonalInfo pinfo = WT.getProfilePersonalInfo(new UserProfileId(getEnv().getProfileId().getDomain(), usr));
+				if (pinfo!=null) {
+					ops.add(new Operator(usr, pinfo.getLastName()+" "+pinfo.getFirstName()));
+				}
+			}
+			
+			ops.sort(new Comparator<Operator>() {
+				@Override
+				public int compare(Operator op1, Operator op2) {
+					return op1.dn.compareTo(op2.dn);
+				}
+			});
+			
+			for (Operator op : ops) {
+				jsUser.add(new JsSimple(op.usr, op.dn));
 			}
 			
 			ResultMeta meta = new LookupMeta().setSelected(jsUser.get(0).id);
