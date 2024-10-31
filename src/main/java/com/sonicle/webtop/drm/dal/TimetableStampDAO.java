@@ -251,6 +251,36 @@ public class TimetableStampDAO extends BaseDAO{
 			.execute();
 	}
 
+	public int deleteRangeByUserIds(Connection con, String domainId, List<String> userIds, DateTime fromDate, DateTime toDate, String location) {
+		DSLContext dsl = getDSL(con);
+		return dsl
+			.delete(TIMETABLE_STAMP)
+			.where(
+				TIMETABLE_STAMP.DOMAIN_ID.eq(domainId).and(
+					TIMETABLE_STAMP.USER_ID.in(userIds)
+				).and(
+					TIMETABLE_STAMP.ENTRANCE.between(fromDate.toLocalDateTime(), toDate.toLocalDateTime()).or(
+						TIMETABLE_STAMP.EXIT.between(fromDate.toLocalDateTime(), toDate.toLocalDateTime())
+					)
+				).and(TIMETABLE_STAMP.LOCATION.eq(location))
+			)
+			.execute();
+	}
+	
+	public int deleteRange(Connection con, String domainId, DateTime fromDate, DateTime toDate, String location) {
+		DSLContext dsl = getDSL(con);
+		return dsl
+			.delete(TIMETABLE_STAMP)
+			.where(
+				TIMETABLE_STAMP.DOMAIN_ID.eq(domainId).and(
+					TIMETABLE_STAMP.ENTRANCE.between(fromDate.toLocalDateTime(), toDate.toLocalDateTime()).or(
+						TIMETABLE_STAMP.EXIT.between(fromDate.toLocalDateTime(), toDate.toLocalDateTime())
+					)
+				).and(TIMETABLE_STAMP.LOCATION.eq(location))
+			)
+			.execute();
+	}
+
 	public List<OTimetableStamp> getUsersStampsByDomainUserIdDate(Connection con, String domainId, String userId, DateTime date) {
 		DSLContext dsl = getDSL(con);
 		return dsl

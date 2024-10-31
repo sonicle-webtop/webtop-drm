@@ -92,6 +92,9 @@ public class Timetable extends TimetableApi {
 		}
 	}
 
+	/*
+	 * Delete only "Office" entries, keep "Smart" entries.
+	 */
 	@Override
 	public Response deleteTimetableEntries(String fromDate, String toDate, List<String> employeeIds) {
 		UserProfileId currentProfileId = RunContext.getRunProfileId();
@@ -101,7 +104,8 @@ public class Timetable extends TimetableApi {
 			manager.deleteTimetableStamp(
 				userIds, 
 				DateTimeUtils.parseDateTime(ISO_DATETIME_FMT, fromDate),
-				DateTimeUtils.parseDateTime(ISO_DATETIME_FMT, toDate)
+				DateTimeUtils.parseDateTime(ISO_DATETIME_FMT, toDate),
+				"O"
 			);
 			return respOk();
 		} catch(WTException exc) {

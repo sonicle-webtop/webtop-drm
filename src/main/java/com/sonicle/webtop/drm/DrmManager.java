@@ -4586,6 +4586,32 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		}
 	}
 	
+	public void deleteTimetableStamp(List<String> userIds, DateTime fromDate, DateTime toDate, String location) throws WTException {
+
+		Connection con = null;
+		TimetableStampDAO tsDao = TimetableStampDAO.getInstance();
+		try {
+			con = WT.getConnection(SERVICE_ID, false);
+
+			String domainId = getTargetProfileId().getDomainId();
+			if (userIds == null || userIds.size()==0)
+				tsDao.deleteRange(con, domainId, fromDate, toDate, location);
+			else
+				tsDao.deleteRangeByUserIds(con, domainId, userIds, fromDate, toDate, location);
+
+			DbUtils.commitQuietly(con);
+
+		} catch (SQLException | DAOException ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex, "DB error");
+		} catch (Exception ex) {
+			DbUtils.rollbackQuietly(con);
+			throw new WTException(ex);
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
 	public LeaveRequest timetableRequestCancellation(Integer id, String cancellationReason) throws WTException {
 		Connection con = null;
 		LeaveRequest retlr=null;
