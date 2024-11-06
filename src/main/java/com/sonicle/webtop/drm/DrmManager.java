@@ -2818,11 +2818,13 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		
 		try {
 			con = WT.getConnection(SERVICE_ID);
+			UserProfileId tpid = getTargetProfileId();
+			String domainId = tpid.getDomainId();
+			if (StringUtils.isEmpty(query.userId)) query.userId = tpid.getUserId();
+			oLm = lmDao.selectLineManagerByDomainUserId(con, domainId, query.userId);
+			lrs = lrDao.selectLeaveRequests(con, query, domainId, (oLm != null) ? true : false);
 			
-			oLm = lmDao.selectLineManagerByDomainUserId(con, getTargetProfileId().getDomainId(), query.userId);
-			lrs = lrDao.selectLeaveRequests(con, query, getTargetProfileId().getDomainId(), (oLm != null) ? true : false);
-			
-			if((oLm != null)) lrs.addAll(lrDao.selectLeaveRequestsForManager(con, query, getTargetProfileId().getDomainId()));
+			if((oLm != null)) lrs.addAll(lrDao.selectLeaveRequestsForManager(con, query, domainId));
 
 			return lrs;
 			

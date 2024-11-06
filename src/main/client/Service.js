@@ -1385,8 +1385,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 //								me.getAct('timetableReport', 'save'),
 //								'-',
 								me.getAct('timetableReport', 'print'),
-								(me.getVar('integrationGis') === true) ? me.getAct('timetableReport', 'exportgis') : null,
-								(me.getVar('integrationTS') === true) ? me.getAct('timetableReport', 'exportts') : null,
+								(me.getVar('isSupervisorUser') && me.getVar('integrationGis') === true) ? me.getAct('timetableReport', 'exportgis') : null,
+								(me.getVar('isSupervisorUser') && me.getVar('integrationTS') === true) ? me.getAct('timetableReport', 'exportts') : null,
 							]
 /*							listeners: {
 								rowdblclick: function (s, rec) {
@@ -3578,7 +3578,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	enablingManageStampsButtons: function () {
 		//Bottoni di inserimento/cancellazione timbratura manuale
 		var me = this;
-		WT.ajaxReq(me.ID, 'ChekManageStampsButtons', {
+		WT.ajaxReq(me.ID, 'CheckManageStampsButtons', {
 			params: {},
 			callback: function (success, json) {
 				if(success){

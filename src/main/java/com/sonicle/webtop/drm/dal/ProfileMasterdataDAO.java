@@ -70,6 +70,7 @@ public class ProfileMasterdataDAO extends BaseDAO {
 				.where(
 						PROFILES_MASTERDATA.PROFILE_ID.equal(profileId)
 				)
+				.orderBy(PROFILES_MASTERDATA.MASTER_DATA_ID)
 				.fetchInto(OProfileMasterdata.class);
 	}
 

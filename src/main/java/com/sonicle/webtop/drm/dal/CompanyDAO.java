@@ -81,6 +81,7 @@ public class CompanyDAO extends BaseDAO{
 				)
 				.where(COMPANIES.DOMAIN_ID.equal(domain))
 				.and(COMPANIES_USERS.USER_ID.equal(user))
+				.orderBy(COMPANIES.COMPANY_ID)
 				.fetchInto(OCompany.class);
 	}
 	
@@ -90,6 +91,7 @@ public class CompanyDAO extends BaseDAO{
 				.select()
 				.from(COMPANIES)
 				.where(COMPANIES.DOMAIN_ID.equal(domain))
+				.orderBy(COMPANIES.COMPANY_ID)
 				.fetchInto(OCompany.class);
 	}
 

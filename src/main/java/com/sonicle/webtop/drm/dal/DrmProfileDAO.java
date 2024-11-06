@@ -75,6 +75,7 @@ public class DrmProfileDAO extends BaseDAO {
 				.where(
 						PROFILES.DOMAIN_ID.equal(domainId)
 				)
+				.orderBy(PROFILES.DESCRIPTION)
 				.fetchInto(ODrmProfile.class);
 	}
 

@@ -626,7 +626,7 @@ public class Service extends BaseService {
 				jsUser.add(new JsSimple(op.usr, op.dn));
 			}
 			
-			ResultMeta meta = new LookupMeta().setSelected(jsUser.get(0).id);
+			ResultMeta meta = new LookupMeta().setSelected(manager.getTargetProfileId().getUserId());
 			
 			new JsonResult(jsUser, meta, jsUser.size()).printTo(out);
 		} catch (Exception ex) {
@@ -640,10 +640,14 @@ public class Service extends BaseService {
 			String operator = ServletUtils.getStringParameter(request, "operator", null);
 			List<JsSimple> companies = new ArrayList();
 			
-			if(operator != null){
+			if(!StringUtils.isEmpty(operator)){
 				DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID, new UserProfileId(getEnv().getProfileId().getDomain(), operator));
 
 				for (OCompany com : manager.listCompaniesByDomainUser()) {
+					companies.add(new JsSimple(com.getCompanyId(), com.getName()));
+				}
+			} else {
+				for (OCompany com : manager.listCompaniesByDomain()) {
 					companies.add(new JsSimple(com.getCompanyId(), com.getName()));
 				}
 			}
@@ -3456,16 +3460,16 @@ public class Service extends BaseService {
 		}
 	}
 	
-	public void processChekManageStampsButtons(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+	public void processCheckManageStampsButtons(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
-			new JsonResult(ChekManageStampsButtons()).printTo(out);
+			new JsonResult(checkManageStampsButtons()).printTo(out);
 		} catch (Exception ex) {
 			new JsonResult(ex).printTo(out);
-			logger.error("Error in action ChekManageStampsButtons", ex);
+			logger.error("Error in action CheckManageStampsButtons", ex);
 		}
 	}
 	
-	private boolean ChekManageStampsButtons() throws WTException, UnknownHostException, SQLException{
+	private boolean checkManageStampsButtons() throws WTException, UnknownHostException, SQLException{
 		boolean enabling = false;
 		TimetableSetting ts = manager.getTimetableSetting();
 		
@@ -3474,10 +3478,10 @@ public class Service extends BaseService {
 			
 			if(!enabling){
 				//Attivo solo se chi è loggato è supervisore
-				if(manager.getDrmProfileMemberByUserId(getEnv().getProfileId().getUserId()).size() > 0) enabling = true;
+				if (manager.getDrmLineManager(getEnv().getProfileId().getUserId())!=null) enabling = true;
 			}
 		}else{
-			if(manager.getDrmProfileMemberByUserId(getEnv().getProfileId().getUserId()).size() > 0) enabling = true;
+			if (manager.getDrmLineManager(getEnv().getProfileId().getUserId())!=null) enabling = true;
 		}
 		
 		return enabling;

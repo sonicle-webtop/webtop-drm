@@ -104,6 +104,7 @@ public class DrmUserForManagerDAO extends BaseDAO {
 				).and(
 						LINE_MANAGER_USERS.LINE_MANAGER_USER_ID.equal(userId)
 				)
+				.orderBy(LINE_MANAGER_USERS.USER_ID)
 				.fetchInto(ODrmLineManagerUsers.class);
 	}
 	

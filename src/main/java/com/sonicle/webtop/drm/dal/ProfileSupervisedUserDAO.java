@@ -69,6 +69,7 @@ public class ProfileSupervisedUserDAO extends BaseDAO {
 				.where(
 						PROFILES_SUPERVISED_USERS.PROFILE_ID.equal(profileId)
 				)
+				.orderBy(PROFILES_SUPERVISED_USERS.USER_ID)
 				.fetchInto(OProfileSupervisedUser.class);
 	}
 

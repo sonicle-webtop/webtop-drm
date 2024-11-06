@@ -71,6 +71,7 @@ public class DrmLineManagerDAO extends BaseDAO {
 				.where(
 						LINE_MANAGERS.DOMAIN_ID.equal(domainId)
 				)
+				.orderBy(LINE_MANAGERS.USER_ID)
 				.fetchInto(ODrmLineManager.class);
 	}
 	

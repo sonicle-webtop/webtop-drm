@@ -97,18 +97,29 @@ public class PublicService extends BasePublicService {
 							if (responseStatus == null) throw new WTException("Invalid resp [{0}]", resp);
 							
 							LeaveRequest lr = adminDrmMgr.getLeaveRequest(Integer.valueOf(lrUrlPath.getPublicUid()));
-							
+
 							if(lr != null){
-								if("new".equals(crud)){
-									lr.setResult(responseStatus);
-									adminDrmMgr.updateLeaveRequest(lr, true);
-								} else if("delete".equals(crud)){
-									lr=adminDrmMgr.updateCancellationLeaveRequest(Integer.valueOf(lrUrlPath.getPublicUid()), responseStatus);
-								} else{
-									throw new WTException("Invalid crud [{0}]", crud);
+								if (lr.getStatus().equals("C")) {
+									if("delete".equals(crud)){
+										lr=adminDrmMgr.updateCancellationLeaveRequest(Integer.valueOf(lrUrlPath.getPublicUid()), responseStatus);
+									} else {
+										logger.trace("Closed id [{}]", lrUrlPath.getPublicUid());
+										writeErrorPage(request, response, domainId, wts, "managed");
+										return;
+									}
+								} else {
+									if("new".equals(crud)){
+										lr.setResult(responseStatus);
+										adminDrmMgr.updateLeaveRequest(lr, true);
+									} else if("delete".equals(crud)){
+										logger.trace("Closed id [{}]", lrUrlPath.getPublicUid());
+										writeErrorPage(request, response, domainId, wts, "managed");
+										return;
+									} else {
+										throw new WTException("Invalid crud [{0}]", crud);
+									}
 								}
 								adminDrmMgr.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
-								
 								writeLeaveRequestPage(request, response, domainId, wts, resp);
 							} else {
 								logger.trace("Invalid id [{}]", lrUrlPath.getPublicUid());

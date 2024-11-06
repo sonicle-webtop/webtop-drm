@@ -45,7 +45,7 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 			userId: null,
 			companyId: null,
 			type: null,
-			fromDate: new Date(),
+			fromDate: Ext.Date.add(new Date(), Ext.Date.DAY, -30),
 			toDate: null,
 			status: null,
 			result: null
@@ -65,6 +65,7 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 				WTF.localCombo('id', 'desc', {
 					reference: 'flduser',
 					bind: '{userId}',
+					emptyText: WT.res(me.sid, 'timetableRequestSearch.operator-emptytext.lbl'),
 					listConfig: {
 						escapeDisplay: true
 					},
@@ -87,9 +88,14 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 						}
 					},
 					listeners: {
-						select: function (s, r) {
+						select: function (cmb, r) {
 							WTU.loadWithExtraParams(me.lookupReference('fldcompany').getStore(), {
 								operator: r.id
+							});
+						},
+						change: function (cmb, newval, oldaval) {
+							WTU.loadWithExtraParams(me.lookupReference('fldcompany').getStore(), {
+								operator: null
 							});
 						}
 					},
@@ -158,6 +164,7 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 				WTF.localCombo('id', 'desc', {
 					reference: 'fldcompany',
 					bind: '{companyId}',
+					emptyText: WT.res(me.sid, 'timetableRequestSearch.company-emptytext.lbl'),
 					listConfig: {
 						escapeDisplay: true
 					},
@@ -173,7 +180,9 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 							load: function (s) {
 								var meta = s.getProxy().getReader().metaData;
 								if (meta.selected) {
-									me.getViewModel().set('companyId', meta.selected);
+									Ext.defer(function() {
+										me.getViewModel().set('companyId', meta.selected);	
+									},100);
 								}
 							}
 						}

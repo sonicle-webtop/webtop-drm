@@ -61,6 +61,7 @@ public class ProfileMemberDAO extends BaseDAO {
 				.where(
 						PROFILES_MEMBERS.PROFILE_ID.equal(profileId)
 				)
+				.orderBy(PROFILES_MEMBERS.USER_ID)
 				.fetchInto(OProfileMember.class);
 	}
 	
