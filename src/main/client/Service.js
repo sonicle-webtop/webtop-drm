@@ -820,7 +820,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 										ftype: 'grouping',
 										groupHeaderTpl: '{name}',
 										hideGroupedHeader: true,
-										enableGroupingMenu: false
+										enableGroupingMenu: false,
+										expandTip: null,
+										collapseTip: null
 									}],
 									columns: [
 										{
@@ -1059,18 +1061,20 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									me.editTimetableRequestUI(rec);
 								},
 								afterrender: function (t) {
-									WT.ajaxReq(me.ID, 'IsLineManagerLogged', {
-										params: {},
-										callback: function (success, json) {
-											if(success){
-												if(json.data == true){
-													me.getAct('timetableRequest', 'approve').setHidden(false);
-													me.getAct('timetableRequest', 'decline').setHidden(false);
-													me.getAct('timetableRequest', 'cancel').setHidden(false);
+									if (!me.getVar("isSupervisorUser")) {
+										WT.ajaxReq(me.ID, 'IsLineManagerLogged', {
+											params: {},
+											callback: function (success, json) {
+												if(success){
+													if(!json.data){
+														me.getAct('timetableRequest', 'approve').setHidden(true);
+														me.getAct('timetableRequest', 'decline').setHidden(true);
+														me.getAct('timetableRequest', 'cancel').setHidden(true);
+													}
 												}
 											}
-										}
-									});
+										});
+									}
 								},
 								render: function(grid) {
 									var view = grid.getView();
@@ -2112,7 +2116,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			tooltip: null,
 			iconCls: 'wtdrm-icon-timetableRequest-approved',
 			disabled: true,
-			hidden: true,
 			handler: function () {
 				var sel = me.gpTimetableRequestSelected();
 				me.approveDeclineTimetableRequestUI(sel, true);
@@ -2123,7 +2126,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			tooltip: null,
 			iconCls: 'wtdrm-icon-timetableRequest-declined',
 			disabled: true,
-			hidden: true,
 			handler: function () {
 				var sel = me.gpTimetableRequestSelected();
 				me.approveDeclineTimetableRequestUI(sel, false);
@@ -2134,7 +2136,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			tooltip: null,
 			iconCls: 'wtdrm-icon-timetableCancRequest-approved',
 			disabled: true,
-			hidden: true,
 			handler: function () {
 				var sel = me.gpTimetableRequestSelected();
 				me.cancelTimetableRequestUI(sel);
@@ -3183,7 +3184,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 						me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
 					}
 				}
-			}else if(sel.get("managerId") === WT.getVar('userId')){
+			} else if (me.getVar("isSupervisorUser") || sel.get("managerId") === WT.getVar('userId')) {
 				//se sono l'utente loggato ad essere il supervisore
 				if(sel.get("userId") !== WT.getVar('userId')){
 					//e se non sono su una mia richiesta

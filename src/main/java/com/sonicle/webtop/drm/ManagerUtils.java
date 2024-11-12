@@ -38,6 +38,8 @@ import com.sonicle.commons.PathUtils;
 import com.sonicle.webtop.core.app.WT;
 import com.sonicle.webtop.core.dal.BaseDAO;
 import com.sonicle.webtop.core.dal.DAOException;
+import com.sonicle.webtop.core.sdk.UserProfile;
+import com.sonicle.webtop.core.sdk.UserProfileId;
 import com.sonicle.webtop.drm.bol.OActivity;
 import com.sonicle.webtop.drm.bol.OActivityGroup;
 import com.sonicle.webtop.drm.bol.OBusinessTrip;
@@ -1091,6 +1093,8 @@ public class ManagerUtils {
 			tgt.setId(src.getId());
 			tgt.setDomainId(src.getDomainId());
 			tgt.setUserId(src.getUserId());
+			UserProfile.Data data = WT.getProfileData(new UserProfileId(src.getDomainId(), src.getUserId()));
+			if (data!=null) tgt.setUserName(data.getDisplayName());
 			tgt.setType(src.getType());
 			tgt.setEntrance(toDateTime(src.getEntrance()));
 			tgt.setExit(toDateTime(src.getExit()));

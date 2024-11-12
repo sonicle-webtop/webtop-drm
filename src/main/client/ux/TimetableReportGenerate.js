@@ -96,7 +96,7 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableReportGenerate', {
 						},
 						change: function (cmb, newval, oldaval) {
 							WTU.loadWithExtraParams(me.lookupReference('fldcompany').getStore(), {
-								operator: null
+								operator: newval
 							});
 						}
 					},

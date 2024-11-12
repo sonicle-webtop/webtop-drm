@@ -39,6 +39,9 @@ import static com.sonicle.webtop.core.jooq.core.Tables.USERS;
 import static com.sonicle.webtop.drm.jooq.Tables.PROFILES;
 import static com.sonicle.webtop.drm.jooq.Tables.PROFILES_MEMBERS;
 import static com.sonicle.webtop.drm.jooq.Tables.PROFILES_SUPERVISED_USERS;
+import static com.sonicle.webtop.drm.jooq.Tables.LINE_MANAGERS;
+import static com.sonicle.webtop.drm.jooq.Tables.LINE_MANAGER_USERS;
+import static com.sonicle.webtop.drm.jooq.Tables.EMPLOYEE_PROFILES;
 
 import java.sql.Connection;
 import java.util.List;
@@ -79,4 +82,52 @@ public class UserDAO extends BaseDAO {
 				.fetchInto(String.class);
 	}
 	
+	public List<String> selectUserSupervisedStampingByDomain(Connection con, String domain, String user) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.select(
+					PROFILES_SUPERVISED_USERS.USER_ID
+				)
+				.from(PROFILES)
+				.join(PROFILES_MEMBERS).on(
+					PROFILES.PROFILE_ID.equal(PROFILES_MEMBERS.PROFILE_ID)
+				)
+				.join(PROFILES_SUPERVISED_USERS).on(
+					PROFILES.PROFILE_ID.equal(PROFILES_SUPERVISED_USERS.PROFILE_ID)
+				)
+				.join(EMPLOYEE_PROFILES).on(
+					PROFILES.DOMAIN_ID.equal(EMPLOYEE_PROFILES.DOMAIN_ID)
+					.and(PROFILES_SUPERVISED_USERS.USER_ID.equal(EMPLOYEE_PROFILES.USER_ID))
+				)
+				.where(
+						PROFILES.DOMAIN_ID.equal(domain)
+						.and(PROFILES_MEMBERS.USER_ID.equal(user)
+						.and(EMPLOYEE_PROFILES.NO_STAMPING.isFalse())
+				))
+				.groupBy(
+					PROFILES_SUPERVISED_USERS.USER_ID
+				)
+				.fetchInto(String.class);
+	}
+	
+	public List<String> selectManagedUsersByDomainAndUser(Connection con, String domain, String user) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.select(
+					LINE_MANAGER_USERS.USER_ID
+				)
+				.from(LINE_MANAGERS)
+				.join(LINE_MANAGER_USERS).on(
+					LINE_MANAGERS.DOMAIN_ID.equal(LINE_MANAGER_USERS.DOMAIN_ID)
+					.and(LINE_MANAGERS.USER_ID.equal(LINE_MANAGER_USERS.LINE_MANAGER_USER_ID))
+				)
+				.where(
+					LINE_MANAGERS.DOMAIN_ID.equal(domain)
+					.and(LINE_MANAGER_USERS.LINE_MANAGER_USER_ID.equal(user)
+				))
+				.groupBy(
+					LINE_MANAGER_USERS.USER_ID
+				)
+				.fetchInto(String.class);
+	}
 }

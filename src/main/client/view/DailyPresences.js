@@ -108,6 +108,7 @@ Ext.define('Sonicle.webtop.drm.view.DailyPresences', {
 					xtype: 'grid',
 					reference: 'gpDailyPresences',
 					store: {
+						sorters: [{ property: 'userName' }],
 						autoLoad: true,
 						model: 'Sonicle.webtop.drm.model.GridTimetable',
 						proxy: WTF.apiProxy(me.mys.ID, 'ManageGridTimetableListUsers')
@@ -123,15 +124,12 @@ Ext.define('Sonicle.webtop.drm.view.DailyPresences', {
 							iconSize: WTU.imgSizeToPx('xs'),
 							width: 30
 						}, {
-							xtype: 'solookupcolumn',
 							dataIndex: 'userId',
-							store: {
-								autoLoad: true,
-								model: 'WTA.model.Simple',
-								proxy: WTF.proxy(me.mys.ID, 'LookupOperators')
-							},
+							hidden: true,
 							header: me.res('dailyPresences.user.lbl'),
-							displayField: 'desc',
+						}, {
+							dataIndex: 'userName',
+							header: me.res('dailyPresences.user.lbl'),
 							flex: 3
 						}, {
 							header: me.res('dailyPresences.entrance.lbl'),

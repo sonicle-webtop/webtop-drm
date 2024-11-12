@@ -104,6 +104,19 @@ public class HolidayDateDAO extends BaseDAO {
             .fetchOneInto(OHolidayDate.class);
 	}
 	
+	public Map<LocalDate, List<OHolidayDate>> selectByDomainYear(Connection con, String domainId, int year) throws DAOException {
+		DSLContext dsl = getDSL(con);
+        
+		return dsl
+            .select()
+            .from(HOLIDAY_DATE)
+            .where(
+                    HOLIDAY_DATE.DOMAIN_ID.equal(domainId)
+            ).and(
+                    HOLIDAY_DATE.DATE.between(new LocalDate(year, 1, 1), new LocalDate(year, 12, 31))  
+            )
+            .fetchGroups(HOLIDAY_DATE.DATE, OHolidayDate.class);
+	}
     /*
 	public OHolidayDate selectByDomainDateWithoutYear(Connection con, String domainId, DateTime date) throws DAOException {
 		String pattern = "MM-dd";

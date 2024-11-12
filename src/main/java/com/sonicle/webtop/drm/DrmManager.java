@@ -275,6 +275,7 @@ import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -2820,11 +2821,25 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			con = WT.getConnection(SERVICE_ID);
 			UserProfileId tpid = getTargetProfileId();
 			String domainId = tpid.getDomainId();
-			if (StringUtils.isEmpty(query.userId)) query.userId = tpid.getUserId();
-			oLm = lmDao.selectLineManagerByDomainUserId(con, domainId, query.userId);
-			lrs = lrDao.selectLeaveRequests(con, query, domainId, (oLm != null) ? true : false);
+			List<String> operators;
+			if (query.userId != null) {
+				operators = new ArrayList<String>();
+				operators.add(query.userId);
+			}
+			else {
+				//add both managed and supervised
+				List<String> ops = listManagedOperators();
+				ops.addAll(listOperators());
+				//unique
+				operators = new ArrayList<String>();
+				for (String op : ops) {
+					if (!operators.contains(op)) {
+						operators.add(op);
+					}
+				}
+			}
 			
-			if((oLm != null)) lrs.addAll(lrDao.selectLeaveRequestsForManager(con, query, domainId));
+			lrs = lrDao.selectLeaveRequestsForUsers(con, query, domainId, operators);
 
 			return lrs;
 			
@@ -3575,6 +3590,45 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			con = WT.getConnection(SERVICE_ID);
 			users = userDao.selectUserSupervisedByDomain(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
 			users.add(0, getTargetProfileId().getUserId());
+			
+			return users;
+			
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	List<String> listStampingOperators() throws WTException {
+		Connection con = null;
+		com.sonicle.webtop.drm.dal.UserDAO userDao = com.sonicle.webtop.drm.dal.UserDAO.getInstance();
+		List<String> users = null;
+		try {			
+			con = WT.getConnection(SERVICE_ID);
+			users = userDao.selectUserSupervisedStampingByDomain(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId());
+			users.add(0, getTargetProfileId().getUserId());
+			
+			return users;
+			
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	List<String> listManagedOperators() throws WTException {
+		Connection con = null;
+		com.sonicle.webtop.drm.dal.UserDAO userDao = com.sonicle.webtop.drm.dal.UserDAO.getInstance();
+		UserProfileId pid = getTargetProfileId();
+		String domainId = pid.getDomainId();
+		String userId = pid.getUserId();
+		List<String> users = null;
+		try {			
+			con = WT.getConnection(SERVICE_ID);
+			users = userDao.selectManagedUsersByDomainAndUser(con, domainId, userId);
+			if (!users.contains(userId)) users.add(0, userId);
 			
 			return users;
 			
@@ -4706,6 +4760,11 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			EmployeeProfileDAO epDAO = EmployeeProfileDAO.getInstance();
 			LineHourDAO lhDAO = LineHourDAO.getInstance();	
 			CausalDAO cDAO = CausalDAO.getInstance();		
+			HolidayDateDAO hdDAO = HolidayDateDAO.getInstance();
+			
+			UserProfileId tpid = getTargetProfileId();
+			String tpDomainId = tpid.getDomainId();
+			String tpUserId = tpid.getUserId();
 
 			if(query != null) {				
 				Date d = new Date();
@@ -4720,7 +4779,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				if(query.targetUserId == null) {
 					
 					//Save "Other", "Causal", "Note" for re-set in new generation rows
-					for(OTimetableReport itm : trDAO.selectByDomainIdUserIdMonthYear(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), fromDate, toDate)){
+					for(OTimetableReport itm : trDAO.selectByDomainIdUserIdMonthYear(con, tpDomainId, tpUserId, fromDate, toDate)){
 						vals = new HashMap();
 						vals.put("other", itm.getOther());
 						vals.put("causalId", itm.getCausalId());
@@ -4728,7 +4787,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 						hashTrs.put(itm.getDomainId() + "|" + itm.getUserId() + "|" + itm.getTargetUserId() + "|" + itm.getDate(),  vals);
 					}
 					
-					trDAO.deleteByDomainIdUserIdMonthYear(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), fromDate, toDate);
+					trDAO.deleteByDomainIdUserIdMonthYear(con, tpDomainId, tpUserId, fromDate, toDate);
 					
 					//Get Data for All Users for Company by TargetProfileId.UserId if supervisor or himself
 					List<OUser> users = listCompanyProfileSupervisedUsers(query.companyId);
@@ -4736,7 +4795,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					for (OUser usr : users) {
 						ttrs = new ArrayList();
 					
-						OEmployeeProfile oEP = epDAO.selectEmployeeProfileByDomainUser(con, getTargetProfileId().getDomainId(),  usr.getUserId());
+						OEmployeeProfile oEP = epDAO.selectEmployeeProfileByDomainUser(con, tpDomainId,  usr.getUserId());
 						
 						if(Boolean.TRUE.equals(oEP.getNoStamping())){
 							//Utente che non utilizza le timbrature, creo report con ore lavorative coincidenti alle ore del proprio profilo orario.
@@ -4750,7 +4809,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 							}
 							for(LocalDateTime dT : dates){
 								OTimetableReport temp = new OTimetableReport();
-								temp.setDomainId(getTargetProfileId().getDomainId());
+								temp.setDomainId(tpDomainId);
 								temp.setCompanyId(query.companyId);
 								temp.setTargetUserId(usr.getUserId());
 								temp.setDate(dT);		
@@ -4768,9 +4827,9 @@ public class DrmManager extends BaseManager implements IDrmManager{
 							}
 
 							ttrs.addAll(trsf);
-							te = teDAO.getEventsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
-							wr = wrDAO.getWorkReportsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
-							jb = jbDAO.getJobsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
+							te = teDAO.getEventsByDomainUserDateRange(con, tpDomainId, query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
+							wr = wrDAO.getWorkReportsByDomainUserDateRange(con, tpDomainId, query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
+							jb = jbDAO.getJobsByDomainUserDateRange(con, tpDomainId, query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
 
 							ttrs.addAll(ManagerUtils.mergeEventByDate(ManagerUtils.createOTimetableReport(te)));
 							ttrs.addAll(ManagerUtils.mergeWorkReportByDate(ManagerUtils.createOTimetableReportByWorkReport(wr)));
@@ -4849,10 +4908,10 @@ public class DrmManager extends BaseManager implements IDrmManager{
 							}
 
 						}else{
-							trsf = tstmpDAO.getStampsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
-							te = teDAO.getEventsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
-							wr = wrDAO.getWorkReportsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
-							jb = jbDAO.getJobsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
+							trsf = tstmpDAO.getStampsByDomainUserDateRange(con, tpDomainId, query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
+							te = teDAO.getEventsByDomainUserDateRange(con, tpDomainId, query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
+							wr = wrDAO.getWorkReportsByDomainUserDateRange(con, tpDomainId, query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
+							jb = jbDAO.getJobsByDomainUserDateRange(con, tpDomainId, query.companyId, usr.getUserId(), query.fromDay, query.month, query.year);
 
 							ttrs.addAll(mergeStampByDate(trsf, con));
 							ttrs.addAll(ManagerUtils.mergeEventByDate(ManagerUtils.createOTimetableReport(te)));
@@ -4870,10 +4929,10 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					}
 				}else {
 					
-					OEmployeeProfile oEP = epDAO.selectEmployeeProfileByDomainUser(con, getTargetProfileId().getDomainId(),  query.targetUserId);
+					OEmployeeProfile oEP = epDAO.selectEmployeeProfileByDomainUser(con, tpDomainId,  query.targetUserId);
 					
 					//Save "Other", "Causal", "Note" for re-set in new generation rows
-					for(OTimetableReport itm : trDAO.selectByDomainIdUserIdTargetUserIdMonthYear(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), query.targetUserId, fromDate, toDate)){
+					for(OTimetableReport itm : trDAO.selectByDomainIdUserIdTargetUserIdMonthYear(con, tpDomainId, tpUserId, query.targetUserId, fromDate, toDate)){
 						vals = new HashMap();
 						vals.put("other", itm.getOther());
 						vals.put("causalId", itm.getCausalId());
@@ -4881,7 +4940,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 						hashTrs.put(itm.getDomainId() + "|" + itm.getUserId() + "|" + itm.getTargetUserId() + "|" + itm.getDate(),  vals);
 					}
 					
-					trDAO.deleteByDomainIdUserIdTargetUserIdMonthYear(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), query.targetUserId, fromDate, toDate);
+					trDAO.deleteByDomainIdUserIdTargetUserIdMonthYear(con, tpDomainId, tpUserId, query.targetUserId, fromDate, toDate);
 					
 					if(Boolean.TRUE.equals(oEP.getNoStamping())){
 						//Utente che non utilizza le timbrature, creo report con ore lavorative coincidenti alle ore del proprio profilo orario.
@@ -4895,7 +4954,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 						}
 						for(LocalDateTime dT : dates){
 							OTimetableReport temp = new OTimetableReport();
-							temp.setDomainId(getTargetProfileId().getDomainId());
+							temp.setDomainId(tpDomainId);
 							temp.setCompanyId(query.companyId);
 							temp.setTargetUserId(query.targetUserId);
 							temp.setDate(dT);		
@@ -4913,9 +4972,9 @@ public class DrmManager extends BaseManager implements IDrmManager{
 						}
 
 						trs.addAll(trsf);
-						te = teDAO.getEventsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
-						wr = wrDAO.getWorkReportsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
-						jb = jbDAO.getJobsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
+						te = teDAO.getEventsByDomainUserDateRange(con, tpDomainId, query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
+						wr = wrDAO.getWorkReportsByDomainUserDateRange(con, tpDomainId, query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
+						jb = jbDAO.getJobsByDomainUserDateRange(con, tpDomainId, query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
 
 						trs.addAll(ManagerUtils.mergeEventByDate(ManagerUtils.createOTimetableReport(te)));
 						// aggiungere i work_report che hanno il campo timetable_hours > 0 e i jobs solo di alcune attivitÃ  
@@ -4995,10 +5054,10 @@ public class DrmManager extends BaseManager implements IDrmManager{
 						}
 					}else{
 						//Get Data for Single User Selected
-						trsf = tstmpDAO.getStampsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
-						te = teDAO.getEventsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
-						wr = wrDAO.getWorkReportsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
-						jb = jbDAO.getJobsByDomainUserDateRange(con, getTargetProfileId().getDomainId(), query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
+						trsf = tstmpDAO.getStampsByDomainUserDateRange(con, tpDomainId, query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
+						te = teDAO.getEventsByDomainUserDateRange(con, tpDomainId, query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
+						wr = wrDAO.getWorkReportsByDomainUserDateRange(con, tpDomainId, query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
+						jb = jbDAO.getJobsByDomainUserDateRange(con, tpDomainId, query.companyId, query.targetUserId, query.fromDay, query.month, query.year);
 
 						trs.addAll(mergeStampByDate(trsf, con));
 						trs.addAll(ManagerUtils.mergeEventByDate(ManagerUtils.createOTimetableReport(te)));
@@ -5014,6 +5073,9 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					}
 				}
 				
+				//Load Holidays
+				Map<LocalDate, List<OHolidayDate>> hdMap = hdDAO.selectByDomainYear(con, tpDomainId, query.year);
+				
 				//Insert Data in Table
 				for(OTimetableReport otr : trs){
 					if (otr.getHasRequests()==null) otr.setHasRequests(false);
@@ -5022,9 +5084,13 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					otr.setUserId(getTargetProfileId().getUserId());
 					
 					//VASI SETTO PROFILO ORARIO
-					Integer hourProfileId =  epDAO.selectEmployeeProfileByDomainUser(con, getTargetProfileId().getDomainId(), otr.getTargetUserId()).getHourProfileId();
-					String profileHour = lhDAO.selectSumLineHourByHourProfileIdDayOfWeek(con, hourProfileId, otr.getDate().toLocalDate().dayOfWeek().get());
-					otr.setTotalLineHour(profileHour);
+					// ma prima verifica se non è una festività
+					LocalDate localDate = otr.getDate().toLocalDate();
+					if (!hdMap.containsKey(localDate)) {
+						Integer hourProfileId =  epDAO.selectEmployeeProfileByDomainUser(con, tpDomainId, otr.getTargetUserId()).getHourProfileId();
+						String profileHour = lhDAO.selectSumLineHourByHourProfileIdDayOfWeek(con, hourProfileId, localDate.dayOfWeek().get());
+						otr.setTotalLineHour(profileHour);
+					}
 					//VASI FINE
 	
 					//Set if present other, causal, note from old generation
@@ -5035,20 +5101,25 @@ public class DrmManager extends BaseManager implements IDrmManager{
 						otr.setNote(val.getOrDefault("note", null));
 					}
 
+					TimetableSetting tts = getTimetableSetting();
 					//Se vi Ã¨ la Gestione automatica straordinari, ciclo i record per modificare Working Hours e Overtime secondo la logica
-					if(getTimetableSetting().getAutomaticOvertime() == true && otr.getWorkingHours() != null){
+					if(tts.getAutomaticOvertime() == true && otr.getWorkingHours() != null){
 						Integer wh;
 						Integer lh;
 
 						String tlh=otr.getTotalLineHour();
 						String[] h1 = otr.getWorkingHours().split("\\.");
-						wh = (+Integer.parseInt(h1[0])) * 60 + (+Integer. parseInt(h1[1]));
+						wh = (Integer.parseInt(h1[0])) * 60 + (Integer.parseInt(h1[1]));
 						lh = StringUtils.isEmpty(tlh)?0:Integer.parseInt(tlh);
 
 						Integer delta = wh - lh;
-						if(delta > 0){
+						String smin = tts.getMinimumExtraordinary();
+						int minimum = StringUtils.isEmpty(smin) ? 0 : Integer.parseInt(tts.getMinimumExtraordinary());
+						if(delta >= minimum){
 							otr.setOvertime(ManagerUtils.pad((delta / 60), 1) + "." + ManagerUtils.pad((delta % 60),2));
 							otr.setWorkingHours(ManagerUtils.pad((wh / 60), 1) + "." + ManagerUtils.pad((wh % 60),2));
+						} else {
+							otr.setWorkingHours(ManagerUtils.pad((lh / 60), 1) + "." + ManagerUtils.pad((lh % 60),2));
 						}
 					}
 					
@@ -5058,11 +5129,11 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				
 				if(query.targetUserId == null) {
 					//Select for DomainId UserId
-					trs = trDAO.selectByDomainIdUserIdMonthYear(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), fromDate, toDate);
+					trs = trDAO.selectByDomainIdUserIdMonthYear(con, tpDomainId, tpUserId, fromDate, toDate);
 				}else{
 					//Select for DomainId UserId and TargetUserId
 					trs = trDAO.selectByDomainIdUserIdTargetUserIdMonthYear(con, 
-						getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), query.targetUserId, fromDate, toDate);
+						tpDomainId, tpUserId, query.targetUserId, fromDate, toDate);
 				}
 				
 			}
@@ -5203,6 +5274,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			}
 
 			otr.setWorkingHours(val);
+			otr.setDetail("T: "+val+" ("+otr.getDetail()+")");
 		}
 		
 		return trsf;
@@ -6680,8 +6752,8 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				title+="["+getInitials(WT.getUserData(lReqPid).getDisplayName())+"] ";
 			title += "["+lookupResource(locale, "leaverequest.type." + lReq.getType()) + "] ";
 		}
-		if(lReq.getNotes()!= null) 
-			ev.setDescription(lReq.getNotes());
+		//if(lReq.getNotes()!= null) 
+		//	ev.setDescription(lReq.getNotes());
 		if(LangUtils.value(lReq.getCancResult(), Boolean.FALSE))
 			title += lookupResource(locale, "leaverequest.calendar.requesttype.D");
 		else if(LangUtils.value(lReq.getCancRequest(), Boolean.FALSE))
