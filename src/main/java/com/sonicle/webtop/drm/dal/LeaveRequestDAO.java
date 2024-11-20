@@ -94,6 +94,8 @@ public class LeaveRequestDAO extends BaseDAO {
 						searchCndt
 				).and(
 						LEAVE_REQUESTS.DOMAIN_ID.equal(domainId)
+				).orderBy(
+					LEAVE_REQUESTS.FROM_DATE, LEAVE_REQUESTS.FROM_HOUR
 				)
 				.fetchInto(OLeaveRequest.class);
 	}
@@ -197,7 +199,12 @@ public class LeaveRequestDAO extends BaseDAO {
 		}
 		
 		if (query.fromDate != null) {
-			searchCndt = searchCndt.and(LEAVE_REQUESTS.FROM_DATE.greaterOrEqual(query.fromDate));
+			Condition dateCond = LEAVE_REQUESTS.FROM_DATE.greaterOrEqual(query.fromDate);
+			//if no specific status, include also previous open requests
+			if (query.status == null) {
+				dateCond = dateCond.or(LEAVE_REQUESTS.STATUS.equal("O"));
+			}
+			searchCndt = searchCndt.and(dateCond);
 		}
 
 		if (query.toDate != null) {

@@ -1221,21 +1221,21 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									header: me.res('gpTimetableReport.workingHours.lbl'),
 									dataIndex: 'workingHours',
 									editable: me.getVar('isSupervisorUser'),
-									editor: me.createTTSLookupComboEditor(),
+									editor: me.getVar('isSupervisorUser')?me.createTTSLookupComboEditor():null,
                                     width: 70,
                                     cls: 'header'
 								}, {
 									header: me.res('gpTimetableReport.overtime.lbl'),
 									dataIndex: 'overtime',
 									editable: me.getVar('isSupervisorUser'),
-									editor: me.createTTSLookupComboEditor(),
+									editor: me.getVar('isSupervisorUser')?me.createTTSLookupComboEditor():null,
                                     width: 70,
                                     cls: 'header'
 								}, {
 									header: me.res('gpTimetableReport.paidLeave.lbl'),
 									dataIndex: 'paidLeave',
 									editable: me.getVar('isSupervisorUser'),
-									editor: me.createTTSLookupComboEditor(),
+									editor: me.getVar('isSupervisorUser')?me.createTTSLookupComboEditor():null,
                                     width: 80,
                                     cls: 'header'
 								}, 
@@ -1259,15 +1259,15 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									header: me.res('gpTimetableReport.holiday.lbl'),
 									dataIndex: 'holiday',
 									editable: me.getVar('isSupervisorUser'),
-									editor: me.createTTSLookupComboEditor(),
+									editor: me.getVar('isSupervisorUser')?me.createTTSLookupComboEditor():null,
                                     width: 70,
                                     cls: 'header'
 								},
 								{
 									header: me.res('gpTimetableReport.medicalVisit.lbl'),
 									dataIndex: 'medicalVisit',
-									editable: true,
-									editor: me.createTTSLookupComboEditor(),
+									editable: me.getVar('isSupervisorUser'),
+									editor: me.getVar('isSupervisorUser')?me.createTTSLookupComboEditor():null,
                                     width: 80,
                                     cls: 'header'
 								}, 
@@ -1275,21 +1275,21 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									header: me.res('gpTimetableReport.sickness.lbl'),
 									dataIndex: 'sickness',
 									editable: me.getVar('isSupervisorUser'),
-									editor: me.createTTSLookupComboEditor(),
+									editor: me.getVar('isSupervisorUser')?me.createTTSLookupComboEditor():null,
                                     width: 80,
                                     cls: 'header'
 								}, {
 									header: me.res('gpTimetableReport.other.lbl'),
 									dataIndex: 'other',
-									editable: true,
-									editor: me.createTTSLookupComboEditor(),
+									editable: me.getVar('isSupervisorUser'),
+									editor: me.getVar('isSupervisorUser')?me.createTTSLookupComboEditor():null,
                                     width: 60,
                                     cls: 'header'
 								}, {
 									xtype: 'solookupcolumn',
 									header: me.res('gpTimetableReport.causalId.lbl'),
 									dataIndex: 'causalId',
-									editable: true,
+									editable: me.getVar('isSupervisorUser'),
 									store: Ext.create('Ext.data.Store', {
 										autoLoad: true,
 										model: 'WTA.model.Simple',
@@ -1299,7 +1299,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											}
 										})
 									}),
-									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
+									editor: me.getVar('isSupervisorUser')?Ext.create(WTF.lookupCombo('id', 'desc', {
 										ignoreNoChange: true,
 										allowBlank: true,
 										editable: true,
@@ -1316,7 +1316,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 										triggers: {
 											clear: WTF.clearTrigger()
 										}
-									})),
+									})):null,
 									displayField: 'desc',
                                     flex: 2,
                                     cls: 'header'
@@ -1352,8 +1352,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								}, {
 									header: me.res('gpTimetableReport.detail.lbl'),
 									dataIndex: 'detail',
-									editable: true,
-									editor: 'textfield',
+									editable: me.getVar('isSupervisorUser'),
+									editor: me.getVar('isSupervisorUser')?'textfield':null,
 									flex: 2,
                                     cls: 'header'
 								}, {

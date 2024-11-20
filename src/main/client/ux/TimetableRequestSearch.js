@@ -45,7 +45,7 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 			userId: null,
 			companyId: null,
 			type: null,
-			fromDate: Ext.Date.add(new Date(), Ext.Date.DAY, -30),
+			fromDate: new Date(),
 			toDate: null,
 			status: null,
 			result: null
@@ -231,6 +231,7 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 						clear: WTF.clearTrigger()
 					},
 					fieldLabel: WT.res(me.sid, 'timetableRequestSearch.status.lbl'),
+					emptyText: WT.res(me.sid, 'timetableRequestSearch.status.emptytext.lbl'),
 					width: '420px',
 					tabIndex: 106
 				})

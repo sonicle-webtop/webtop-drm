@@ -4767,6 +4767,9 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			String tpUserId = tpid.getUserId();
 
 			if(query != null) {				
+				//Load Holidays
+				Map<LocalDate, List<OHolidayDate>> hdMap = hdDAO.selectByDomainYear(con, tpDomainId, query.year);
+				
 				Date d = new Date();
 				d.setDate(1);
 				d.setMonth(query.month-1);
@@ -4807,22 +4810,24 @@ public class DrmManager extends BaseManager implements IDrmManager{
 							for(int i = 1; i <= dt.dayOfMonth().withMaximumValue().getDayOfMonth(); i++){
 								dates.add(dt.withDayOfMonth(i));
 							}
+
 							for(LocalDateTime dT : dates){
 								OTimetableReport temp = new OTimetableReport();
 								temp.setDomainId(tpDomainId);
 								temp.setCompanyId(query.companyId);
 								temp.setTargetUserId(usr.getUserId());
 								temp.setDate(dT);		
+								//add hours if not holiday and in work profile
+								if (!hdMap.containsKey(dT.toLocalDate())) {
+									String profileHour = lhDAO.selectSumLineHourByHourProfileIdDayOfWeek(con, hourProfileId, dT.getDayOfWeek());
 
-								String profileHour = lhDAO.selectSumLineHourByHourProfileIdDayOfWeek(con, hourProfileId, dT.getDayOfWeek());
-								
-								if (profileHour != null) {
-									Float pH = Float.parseFloat(profileHour);
-									pH = pH/60;
+									if (profileHour != null) {
+										Float pH = Float.parseFloat(profileHour);
+										pH = pH/60;
 
-									temp.setWorkingHours(pH.toString());	
-								}																	
-
+										temp.setWorkingHours(pH.toString());	
+									}								 }
+															
 								trsf.add(temp);
 							}
 
@@ -4952,6 +4957,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 						for(int i = 1; i <= dt.dayOfMonth().withMaximumValue().getDayOfMonth(); i++){
 							dates.add(dt.withDayOfMonth(i));
 						}
+						
 						for(LocalDateTime dT : dates){
 							OTimetableReport temp = new OTimetableReport();
 							temp.setDomainId(tpDomainId);
@@ -4959,14 +4965,16 @@ public class DrmManager extends BaseManager implements IDrmManager{
 							temp.setTargetUserId(query.targetUserId);
 							temp.setDate(dT);		
 							
-							String profileHour = lhDAO.selectSumLineHourByHourProfileIdDayOfWeek(con, hourProfileId, dT.getDayOfWeek());
-					
-							if (profileHour != null) {
-								Float pH = Float.parseFloat(profileHour);
-								pH = pH/60;
+							if (!hdMap.containsKey(dT.toLocalDate())) {
+								String profileHour = lhDAO.selectSumLineHourByHourProfileIdDayOfWeek(con, hourProfileId, dT.getDayOfWeek());
 
-								temp.setWorkingHours(pH.toString());		
-							}																		
+								if (profileHour != null) {
+									Float pH = Float.parseFloat(profileHour);
+									pH = pH/60;
+
+									temp.setWorkingHours(pH.toString());		
+								}
+							}
 
 							trsf.add(temp);
 						}
@@ -5072,9 +5080,6 @@ public class DrmManager extends BaseManager implements IDrmManager{
 						itm.setTargetUserId(query.targetUserId);
 					}
 				}
-				
-				//Load Holidays
-				Map<LocalDate, List<OHolidayDate>> hdMap = hdDAO.selectByDomainYear(con, tpDomainId, query.year);
 				
 				//Insert Data in Table
 				for(OTimetableReport otr : trs){
@@ -6721,25 +6726,32 @@ public class DrmManager extends BaseManager implements IDrmManager{
 	
 	private int updateLeaveRequestEvent(UserProfileId upid, ICalendarManager cm, LeaveRequest lReq, Event ev, boolean ownCalendar) throws WTException{
 		EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
-		DateTimeZone tz = WT.getUserData(upid).getTimeZone();
-		if(lReq.getFromDate() != null && lReq.getToDate() != null){			
-			if(lReq.getFromHour() != null && lReq.getToHour() != null){
-				evI.setAllDay(false);
-				
-				evI.setDatesAndTimes(false, tz.getID(), lReq.getFromDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(lReq.getFromHour().split(":")[0]), Integer.parseInt(lReq.getFromHour().split(":")[1]), 0, 0), lReq.getToDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(lReq.getToHour().split(":")[0]), Integer.parseInt(lReq.getToHour().split(":")[1]), 0, 0));
-			}else{
-				evI.setAllDay(true);
-				
-				evI.setStartDate(lReq.getFromDate().toDateTimeAtStartOfDay(tz));
-				evI.setEndDate(lReq.getToDate().toDateTimeAtStartOfDay(tz).withTime(23, 59, 0, 0));
-			}
-		}
 		
-		evI.setTitle(getLeaveReqestTitle(upid, evI, lReq, ownCalendar));
+		//Non approvata?
+		if (!LangUtils.value(lReq.getResult(), Boolean.TRUE)) {
+			cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, evI.getKey(), false);
+			return 0;
+		} else {
+			DateTimeZone tz = WT.getUserData(upid).getTimeZone();
+			if(lReq.getFromDate() != null && lReq.getToDate() != null){			
+				if(lReq.getFromHour() != null && lReq.getToHour() != null){
+					evI.setAllDay(false);
 
-		cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false, false);
-		
-		return evI.getEventId();
+					evI.setDatesAndTimes(false, tz.getID(), lReq.getFromDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(lReq.getFromHour().split(":")[0]), Integer.parseInt(lReq.getFromHour().split(":")[1]), 0, 0), lReq.getToDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(lReq.getToHour().split(":")[0]), Integer.parseInt(lReq.getToHour().split(":")[1]), 0, 0));
+				}else{
+					evI.setAllDay(true);
+
+					evI.setStartDate(lReq.getFromDate().toDateTimeAtStartOfDay(tz));
+					evI.setEndDate(lReq.getToDate().toDateTimeAtStartOfDay(tz).withTime(23, 59, 0, 0));
+				}
+			}
+
+			evI.setTitle(getLeaveReqestTitle(upid, evI, lReq, ownCalendar));
+
+			cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false, false);
+
+			return evI.getEventId();
+		}
 	}
 	
 	private String getLeaveReqestTitle(UserProfileId upid, Event ev, LeaveRequest lReq, boolean ownCalendar) {

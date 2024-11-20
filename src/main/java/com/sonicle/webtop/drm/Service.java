@@ -34,6 +34,7 @@ package com.sonicle.webtop.drm;
 
 import com.sonicle.commons.EnumUtils;
 import com.sonicle.commons.LangUtils;
+import com.sonicle.commons.db.DbUtils;
 import com.sonicle.commons.net.IPUtils;
 import com.sonicle.commons.time.DateTimeUtils;
 import com.sonicle.commons.web.Crud;
@@ -222,6 +223,7 @@ import com.sonicle.webtop.drm.bol.model.RBExpenseNote;
 import com.sonicle.webtop.drm.bol.model.RBOpportunity;
 import com.sonicle.webtop.drm.bol.model.RBTimetableEncoReport;
 import com.sonicle.webtop.drm.bol.model.RBWorkReportSummary;
+import com.sonicle.webtop.drm.dal.EmployeeProfileDAO;
 import com.sonicle.webtop.drm.model.Activity;
 import com.sonicle.webtop.drm.model.CostType;
 import com.sonicle.webtop.drm.model.ExpenseNote;
@@ -940,13 +942,19 @@ public class Service extends BaseService {
 	
 	public void processLookupLeaveRequestType(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
+			UserProfileId upid = getEnv().getProfileId();
+			DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID, upid);
+			EmployeeProfile ep = manager.getEmployeeProfile(upid.getDomainId(), upid.getUserId());
+			
 			TimetableSetting ts = manager.getTimetableSetting();
 			
 			List<JsSimple> types = new ArrayList();
 			
 			types.add(createLeaveRequestJsSimple(OLeaveRequestType.HOLIDAY));
 			types.add(createLeaveRequestJsSimple(OLeaveRequestType.PAID_LEAVE));
-			types.add(createLeaveRequestJsSimple(OLeaveRequestType.OVERTIME));
+			
+			if (ep.getExtraordinary())
+				types.add(createLeaveRequestJsSimple(OLeaveRequestType.OVERTIME));
 			
 			if(ts != null){
 				if(ts.getRequestsPermitsNotRemunered())types.add(createLeaveRequestJsSimple(OLeaveRequestType.UNPAID_LEAVE));
@@ -1088,6 +1096,7 @@ public class Service extends BaseService {
 		ExtTreeNode node = new ExtTreeNode(id, text, leaf);
 		node.put("_type", type);
 		node.setIconClass(iconClass);
+		node.setExpanded(true);
 		return node;
 	}
 	
@@ -2662,8 +2671,11 @@ public class Service extends BaseService {
 					lr.getDocuments().add(doc);
 				}
 
-				Integer eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
-				lr.setEventId(eventId);
+				//Do not add calendar event for overtime requests
+				if (!lr.getType().equals(OLeaveRequestType.OVERTIME)) {
+					Integer eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+					lr.setEventId(eventId);
+				}
 				
 				manager.addLeaveRequest(lr, ss.getMedicalVisitsAutomaticallyApproved(), ss.getSicknessAutomaticallyApproved());
 
@@ -2727,7 +2739,8 @@ public class Service extends BaseService {
 			lr.setResult(choice);
 			
 			Integer eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
-			lr.setEventId(eventId);
+			if (eventId>0) lr.setEventId(eventId);
+			else lr.setEventId(null);
 			
 			manager.updateLeaveRequest(lr, true);
 
