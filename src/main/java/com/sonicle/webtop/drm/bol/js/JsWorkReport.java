@@ -53,7 +53,7 @@ public class JsWorkReport {
 	public Integer companyId;
 	public String operatorId;
 	public Integer docStatusId;
-	public Integer contactId;
+	public String contactId;
 	public String customerId;
 	public String customerStatId;
 	public String fromDate;
@@ -69,7 +69,7 @@ public class JsWorkReport {
 	public Boolean freeSupport;
 	public Integer businessTripId;
 	public Integer businessTripDays;
-	public Integer eventId;
+	public String eventId;
 	public Float timetableHours;
 	public String domainId;
 	

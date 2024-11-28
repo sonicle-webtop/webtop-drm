@@ -60,7 +60,7 @@ public class JsLeaveRequest {
 	public Boolean cancRequest;
 	public String cancReason;
 	public Boolean canceResult;
-	public Integer eventId;
+	public String eventId;
 
 	public List<Document> documents = new ArrayList();
 

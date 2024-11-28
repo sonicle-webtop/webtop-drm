@@ -41,7 +41,7 @@ public class JsGridOpportunityInterlocutor {
 
 	public Integer id;
 	public Integer opportunityId;
-	public Integer contactId;
+	public String contactId;
 	public String desc;
 
 	public JsGridOpportunityInterlocutor(OpportunityInterlocutor oI) {

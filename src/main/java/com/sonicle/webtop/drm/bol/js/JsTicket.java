@@ -59,7 +59,7 @@ public class JsTicket {
 	public Integer ticketCategoryId;
 	public String title;
 	public String description;
-	public Integer eventId;
+	public String eventId;
 	public String domainId;
 	public Integer statusId;
 	public String priorityId;

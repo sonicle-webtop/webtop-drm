@@ -56,7 +56,7 @@ public class JsOpportunityAction {
 	public String place;
 	public String subsequentActions;
 	public Integer activityId;
-	public Integer eventId;	
+	public String eventId;	
 	
 	private List<JsGridOpportunityActionInterlocutor> actionInterlocutors = new ArrayList();
 	public List<Document> actionDocuments = new ArrayList();

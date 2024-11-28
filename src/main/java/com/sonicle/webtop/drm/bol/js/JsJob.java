@@ -59,7 +59,7 @@ public class JsJob {
 	public Integer activityId;
 	public String title;
 	public String description;
-	public Integer eventId;
+	public String eventId;
 	public String domainId;
 	public String ticketId;
 	public String number;

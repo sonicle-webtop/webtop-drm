@@ -72,7 +72,7 @@ public class JsOpportunity {
 	public String signedBy;
 	public Boolean signature;
 	public Boolean success;
-	public Integer eventId;
+	public String eventId;
 
 	public List<JsGridOpportunityInterlocutor> interlocutors = new ArrayList();
 	public List<Document> documents = new ArrayList();

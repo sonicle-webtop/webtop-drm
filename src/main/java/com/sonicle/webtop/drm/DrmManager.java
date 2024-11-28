@@ -6510,7 +6510,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 	}
     
     
-	public Integer createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(LeaveRequest lReq) throws WTException {
+	public String createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(LeaveRequest lReq) throws WTException {
 		TimetableSetting ts = getTimetableSetting();
  		UserProfileId cupid = null;
  		Integer activityId = null; 
@@ -6560,14 +6560,14 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		return eventId;*/
 	}
 	
-	private Integer catchEventId(final UserProfileId targetPid, final LeaveRequest lReq, final Integer activityId, final boolean ownCalendar) throws WTException {
+	private String catchEventId(final UserProfileId targetPid, final LeaveRequest lReq, final Integer activityId, final boolean ownCalendar) throws WTException {
 		final ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, targetPid);
 		
-		Integer eventId = null;
+		String eventId = null;
 		
 		if (cm != null) {
-			eventId = WT.runPrivileged(new Callable<Integer>(){
-				public Integer call() throws WTException {
+			eventId = WT.runPrivileged(new Callable<String>(){
+				public String call() throws WTException {
 					UserProfileId lReqPid=new UserProfileId(targetPid.getDomainId(), lReq.getUserId());
 					DrmUserSettings rus=new DrmUserSettings(SERVICE_ID,lReqPid);
 					Integer lrCalId = rus.getLeaveRequestCalendarId();
@@ -6583,7 +6583,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					}
 
 					if(lReq.getEventId() != null){
-						Event ev = cm.getEvent(lReq.getEventId());
+						Event ev = cm.getEvent(String.valueOf(lReq.getEventId()));
 
 						if(ev != null){
 							return updateLeaveRequestEvent(targetPid, cm, lReq, ev, ownCalendar);
@@ -6615,7 +6615,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		return cal.getCalendarId();
 	}
 	
-	private int createLeaveRequestEvent(UserProfileId upid, ICalendarManager cm, LeaveRequest lReq, int lrCalId, Integer activityId, boolean ownCalendar) throws WTException{
+	private String createLeaveRequestEvent(UserProfileId upid, ICalendarManager cm, LeaveRequest lReq, int lrCalId, Integer activityId, boolean ownCalendar) throws WTException{
 		DateTimeZone tz = WT.getUserData(upid).getTimeZone();
 		Event ev = new Event();
 		
@@ -6647,7 +6647,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		return ev.getEventId();
 	}
 	
-	private int updateLeaveRequestEvent(UserProfileId upid, ICalendarManager cm, LeaveRequest lReq, Event ev, boolean ownCalendar) throws WTException{
+	private String updateLeaveRequestEvent(UserProfileId upid, ICalendarManager cm, LeaveRequest lReq, Event ev, boolean ownCalendar) throws WTException{
 		EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
 		DateTimeZone tz = WT.getUserData(upid).getTimeZone();
 		if(lReq.getFromDate() != null && lReq.getToDate() != null){			
@@ -6737,9 +6737,10 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				WTException exc=WT.runPrivileged(new Callable<WTException>(){
 					public WTException call() {
 						try {
-							Event ev = cm.getEvent(lReq.getEventId());
+							Event ev = cm.getEvent(String.valueOf(lReq.getEventId()));
 							if(ev != null) {
-								cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(lReq.getEventId(), null), false);
+								String key = EventKey.buildKey(String.valueOf(lReq.getEventId()), null);
+								cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, key, false);
 							}
 						} catch(WTException exc) {
 							return exc;

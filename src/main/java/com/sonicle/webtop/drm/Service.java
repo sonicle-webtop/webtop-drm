@@ -1840,7 +1840,7 @@ public class Service extends BaseService {
 					o.getDocuments().add(doc);
 				}
 				
-				Integer eventId = createOrUpdateOpportunityEventIntoOpportunityCalendar(o);
+				String eventId = createOrUpdateOpportunityEventIntoOpportunityCalendar(o);
 				o.setEventId(eventId);
 				
 				manager.addOpportunity(o);
@@ -1871,7 +1871,7 @@ public class Service extends BaseService {
 					}
 				}
 
-				Integer eventId = createOrUpdateOpportunityEventIntoOpportunityCalendar(o);
+				String eventId = createOrUpdateOpportunityEventIntoOpportunityCalendar(o);
 				o.setEventId(eventId);
 				
 				for(OpportunityAction oAct : o.getActions())
@@ -1936,7 +1936,7 @@ public class Service extends BaseService {
 				Integer opportunityId = manager.addOpportunityAction(oAct);
 				oAct = manager.getOpportunityAction(opportunityId);
 				
-				Integer eventId = createOrUpdateOpportunityActionEventIntoOpportunityCalendar(oAct);
+				String eventId = createOrUpdateOpportunityActionEventIntoOpportunityCalendar(oAct);
 				oAct.setEventId(eventId);				
 				
 				manager.updateOpportunityAction(oAct);
@@ -1967,7 +1967,7 @@ public class Service extends BaseService {
 					}
 				}								
 								
-				Integer eventId = createOrUpdateOpportunityActionEventIntoOpportunityCalendar(oAct);
+				String eventId = createOrUpdateOpportunityActionEventIntoOpportunityCalendar(oAct);
 				oAct.setEventId(eventId);
 				
 				manager.updateOpportunityAction(oAct);
@@ -2005,7 +2005,7 @@ public class Service extends BaseService {
 				Integer oAId = manager.addOpportunityAction(act);
 				act = manager.getOpportunityAction(oAId);
 				
-				Integer eventId = createOrUpdateOpportunityActionEventIntoOpportunityCalendar(act);
+				String eventId = createOrUpdateOpportunityActionEventIntoOpportunityCalendar(act);
 				act.setEventId(eventId);
 				
 				manager.updateOpportunityAction(act);
@@ -2207,7 +2207,7 @@ public class Service extends BaseService {
 				String wrId = manager.addWorkReport(wrkRpt);
 				wrkRpt = manager.getWorkReport(wrId);
 				
-				Integer eventId = createOrUpdateWorkReportEventIntoWorkReportCalendar(wrkRpt);
+				String eventId = createOrUpdateWorkReportEventIntoWorkReportCalendar(wrkRpt);
 				wrkRpt.setEventId(eventId);
 				
 				manager.updateWorkReport(wrkRpt);
@@ -2238,7 +2238,7 @@ public class Service extends BaseService {
 					}
 				}
 
-				Integer eventId = createOrUpdateWorkReportEventIntoWorkReportCalendar(wrkRpt);
+				String eventId = createOrUpdateWorkReportEventIntoWorkReportCalendar(wrkRpt);
 				wrkRpt.setEventId(eventId);
 				
 				manager.updateWorkReport(wrkRpt);
@@ -2298,7 +2298,7 @@ public class Service extends BaseService {
 				String jobId = manager.addJob(job);
 				job = manager.getJob(jobId);
 				
-				Integer eventId = createOrUpdateJobEventIntoJobCalendar(job);
+				String eventId = createOrUpdateJobEventIntoJobCalendar(job);
 				job.setEventId(eventId);
 				
 				manager.updateJob(job);
@@ -2328,7 +2328,7 @@ public class Service extends BaseService {
 					}
 				}
 
-				Integer eventId = createOrUpdateJobEventIntoJobCalendar(job);
+				String eventId = createOrUpdateJobEventIntoJobCalendar(job);
 				job.setEventId(eventId);
 				
 				manager.updateJob(job);
@@ -2581,7 +2581,7 @@ public class Service extends BaseService {
 					lr.getDocuments().add(doc);
 				}
 
-				Integer eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+				String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
 				lr.setEventId(eventId);
 				
 				manager.addLeaveRequest(lr, ss.getMedicalVisitsAutomaticallyApproved(), ss.getSicknessAutomaticallyApproved());
@@ -2612,7 +2612,7 @@ public class Service extends BaseService {
 					}
 				}
 				
-				Integer eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+				String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
 				lr.setEventId(eventId);
 
 				manager.updateLeaveRequest(lr, false);
@@ -2645,7 +2645,7 @@ public class Service extends BaseService {
 			LeaveRequest lr = manager.getLeaveRequest(ids.get(0));
 			lr.setResult(choice);
 			
-			Integer eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+			String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
 			lr.setEventId(eventId);
 			
 			manager.updateLeaveRequest(lr, true);
@@ -2668,7 +2668,7 @@ public class Service extends BaseService {
 			
 			LeaveRequest lr = manager.getLeaveRequest(ids.get(0));
 			
-			Integer eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+			String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
 			lr.setEventId(eventId);
 
 			new JsonResult().printTo(out);
@@ -3935,15 +3935,15 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 				.printedBy(ud.getDisplayName());
 	}
 	
-	private Integer createOrUpdateWorkReportEventIntoWorkReportCalendar(WorkReport wrkRpt) throws WTException {
+	private String createOrUpdateWorkReportEventIntoWorkReportCalendar(WorkReport wrkRpt) throws WTException {
 		UserProfileId targetPid = wrkRpt.getOperatorProfileId(getEnv().getProfileId().getDomainId());
 		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, targetPid);
-		Integer eventId = null;
+		String eventId = null;
 		
 		if (cm != null) {
-			eventId = WT.runPrivileged(new Callable<Integer>(){
-				public Integer call() throws WTException {
-					Integer eventId = null;
+			eventId = WT.runPrivileged(new Callable<String>(){
+				public String call() throws WTException {
+					String eventId = null;
 					Event ev = null;
 					DrmUserSettings us = new DrmUserSettings(SERVICE_ID, targetPid);
 					Integer wrCalId = us.getWorkReportCalendarId();
@@ -3954,7 +3954,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 					}
 
 					if(wrkRpt.getEventId() != null){
-						ev = cm.getEvent(wrkRpt.getEventId());
+						ev = cm.getEvent(String.valueOf(wrkRpt.getEventId()));
 
 						if(ev != null){
 							eventId = updateWorkReportEvent(cm, wrkRpt, ev);
@@ -3972,9 +3972,9 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		return eventId;
 	}
 	
-	private Integer createOrUpdateJobEventIntoJobCalendar(Job job) throws WTException {
+	private String createOrUpdateJobEventIntoJobCalendar(Job job) throws WTException {
 		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
-		Integer eventId = null;
+		String eventId = null;
 		Event ev = null;
 		
 		if (cm != null) {
@@ -3986,7 +3986,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 			}
 			
 			if(job.getEventId() != null){
-				ev = cm.getEvent(job.getEventId());
+				ev = cm.getEvent(String.valueOf(job.getEventId()));
 				
 				if(ev != null){
 					eventId = updateJobEvent(cm, job, ev);
@@ -4023,7 +4023,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		return cal.getCalendarId();
 	}
 	
-	private int createWorkReportEvent(ICalendarManager cm, WorkReport wrkRpt, int wrCalId) throws WTException{
+	private String createWorkReportEvent(ICalendarManager cm, WorkReport wrkRpt, int wrCalId) throws WTException{
 		DateTimeZone tz = getEnv().getProfile().getTimeZone();
 		Event ev = new Event();
 		String title = "";
@@ -4061,7 +4061,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		return ev.getEventId();
 	}
 	
-	private int createJobEvent(ICalendarManager cm, Job job, int wrCalId) throws WTException{
+	private String createJobEvent(ICalendarManager cm, Job job, int wrCalId) throws WTException{
 		Event ev = new Event();
 		String title = "";
 		
@@ -4097,7 +4097,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		return ev.getEventId();
 	}
 	
-	private int updateWorkReportEvent(ICalendarManager cm, WorkReport wrkRpt, Event ev) throws WTException{
+	private String updateWorkReportEvent(ICalendarManager cm, WorkReport wrkRpt, Event ev) throws WTException{
 		EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
 		DateTimeZone tz = getEnv().getProfile().getTimeZone();
 		String title = "";
@@ -4129,7 +4129,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		return evI.getEventId();
 	}
 	
-	private int updateJobEvent(ICalendarManager cm, Job job, Event ev) throws WTException{
+	private String updateJobEvent(ICalendarManager cm, Job job, Event ev) throws WTException{
 		EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
 		String title = "";
 		
@@ -4164,9 +4164,11 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		
 		if (cm != null) {
 			if(wrkRpt.getEventId() != null){
-				Event ev = cm.getEvent(wrkRpt.getEventId());
-				if(ev != null)
-					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(wrkRpt.getEventId(), null), false);
+				Event ev = cm.getEvent(String.valueOf(wrkRpt.getEventId()));
+				if(ev != null) {
+					String key = EventKey.buildKey(String.valueOf(wrkRpt.getEventId()), null);
+					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, key, false);
+				}
 			}
 		}
 	}
@@ -4176,16 +4178,18 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		
 		if (cm != null) {
 			if(job.getEventId() != null){
-				Event ev = cm.getEvent(job.getEventId());
-				if(ev != null)
-					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(job.getEventId(), null), false);
+				Event ev = cm.getEvent(String.valueOf(job.getEventId()));
+				if(ev != null) {
+					String key = EventKey.buildKey(String.valueOf(job.getEventId()), null);
+					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, key, false);
+				}
 			}
 		}
 	}
 	
-	private Integer createOrUpdateOpportunityEventIntoOpportunityCalendar(Opportunity o) throws WTException {
+	private String createOrUpdateOpportunityEventIntoOpportunityCalendar(Opportunity o) throws WTException {
 		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
-		Integer eventId = null;
+		String eventId = null;
 		Event ev = null;
 		
 		if (cm != null) {
@@ -4197,7 +4201,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 			}
 			
 			if(o.getEventId() != null){
-				ev = cm.getEvent(o.getEventId());
+				ev = cm.getEvent(String.valueOf(o.getEventId()));
 				
 				if(ev != null){
 					eventId = updateOpportunityEvent(cm, o, ev);
@@ -4223,7 +4227,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		return cal.getCalendarId();
 	}
 	
-	private int createOpportunityEvent(ICalendarManager cm, Opportunity o, int oCalId) throws WTException{
+	private String createOpportunityEvent(ICalendarManager cm, Opportunity o, int oCalId) throws WTException{
 		DateTimeZone tz = getEnv().getProfile().getTimeZone();
 		Event ev = new Event();
 
@@ -4260,7 +4264,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		return ev.getEventId();
 	}
 	
-	private int updateOpportunityEvent(ICalendarManager cm, Opportunity o, Event ev) throws WTException{
+	private String updateOpportunityEvent(ICalendarManager cm, Opportunity o, Event ev) throws WTException{
 		EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
 		DateTimeZone tz = getEnv().getProfile().getTimeZone();
 
@@ -4299,16 +4303,16 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		
 		if (cm != null) {
 			if(o.getEventId() != null){
-				Event ev = cm.getEvent(o.getEventId());
+				Event ev = cm.getEvent(String.valueOf(o.getEventId()));
 				if(ev != null)
-					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(o.getEventId(), null), false);
+					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(String.valueOf(o.getEventId()), null), false);
 			}
 		}
 	}
 	
-	private Integer createOrUpdateOpportunityActionEventIntoOpportunityCalendar(OpportunityAction oAct) throws WTException {
+	private String createOrUpdateOpportunityActionEventIntoOpportunityCalendar(OpportunityAction oAct) throws WTException {
 		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
-		Integer eventId = null;
+		String eventId = null;
 		Event ev = null;
 		
 		Opportunity o = manager.getOpportunity(oAct.getOpportunityId());
@@ -4322,7 +4326,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 			}
 			
 			if(oAct.getEventId() != null){
-				ev = cm.getEvent(oAct.getEventId());
+				ev = cm.getEvent(String.valueOf(oAct.getEventId()));
 				
 				if(ev != null){
 					eventId = updateOpportunityActionEvent(cm, oAct, o, ev);
@@ -4337,7 +4341,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		return eventId;
 	}
 	
-	private int createOpportunityActionEvent(ICalendarManager cm, OpportunityAction oAct, Opportunity o, int oCalId) throws WTException{
+	private String createOpportunityActionEvent(ICalendarManager cm, OpportunityAction oAct, Opportunity o, int oCalId) throws WTException{
 		DateTimeZone tz = getEnv().getProfile().getTimeZone();
 		Event ev = new Event();
 		String title = "";
@@ -4377,7 +4381,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		return ev.getEventId();
 	}
 	
-	private int updateOpportunityActionEvent(ICalendarManager cm, OpportunityAction oAct, Opportunity o, Event ev) throws WTException{
+	private String updateOpportunityActionEvent(ICalendarManager cm, OpportunityAction oAct, Opportunity o, Event ev) throws WTException{
 		EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
 		DateTimeZone tz = getEnv().getProfile().getTimeZone();
 		String title = "";
@@ -4424,7 +4428,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 				title += oAct.getDescription();
 			
 			if(oAct.getEventId() != null){
-				ev = cm.getEvent(oAct.getEventId());
+				ev = cm.getEvent(String.valueOf(oAct.getEventId()));
 				
 				if(ev != null){
 					EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
@@ -4440,9 +4444,14 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		
 		if (cm != null) {
 			if(oAct.getEventId() != null){
-				Event ev = cm.getEvent(oAct.getEventId());
-				if(ev != null)
-					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(oAct.getEventId(), null), false);
+				Event ev = cm.getEvent(String.valueOf(oAct.getEventId()));
+				if(ev != null) {
+					String key = EventKey.buildKey(String.valueOf(oAct.getEventId()), null);
+					cm.deleteEventInstance(
+							UpdateEventTarget.ALL_SERIES,
+							key,
+							false);
+				}
 			}
 		}
 	}

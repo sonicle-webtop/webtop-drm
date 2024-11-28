@@ -70,7 +70,7 @@ public class RBWorkReport {
 	public Integer revisionSequence;
 	public Integer docStatusId;
 	public String docStatusDescription;
-	public Integer contactId;
+	public String contactId;
 	public String contactDescription;
 	public String customerId;
 	public String customerDescription;
@@ -271,11 +271,11 @@ public class RBWorkReport {
 		this.docStatusDescription = docStatusDescription;
 	}
 
-	public Integer getContactId() {
+	public String getContactId() {
 		return contactId;
 	}
 
-	public void setContactId(Integer contactId) {
+	public void setContactId(String contactId) {
 		this.contactId = contactId;
 	}
 
