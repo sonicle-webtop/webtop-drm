@@ -38,6 +38,8 @@ import com.sonicle.commons.PathUtils;
 import com.sonicle.webtop.core.app.WT;
 import com.sonicle.webtop.core.dal.BaseDAO;
 import com.sonicle.webtop.core.dal.DAOException;
+import com.sonicle.webtop.core.sdk.UserProfile;
+import com.sonicle.webtop.core.sdk.UserProfileId;
 import com.sonicle.webtop.drm.bol.OActivity;
 import com.sonicle.webtop.drm.bol.OActivityGroup;
 import com.sonicle.webtop.drm.bol.OBusinessTrip;
@@ -1091,6 +1093,8 @@ public class ManagerUtils {
 			tgt.setId(src.getId());
 			tgt.setDomainId(src.getDomainId());
 			tgt.setUserId(src.getUserId());
+			UserProfile.Data data = WT.getProfileData(new UserProfileId(src.getDomainId(), src.getUserId()));
+			if (data!=null) tgt.setUserName(data.getDisplayName());
 			tgt.setType(src.getType());
 			tgt.setEntrance(toDateTime(src.getEntrance()));
 			tgt.setExit(toDateTime(src.getExit()));
@@ -2017,6 +2021,7 @@ public class ManagerUtils {
 				htr.setMedicalVisit(addHours(otr.getMedicalVisit(), htr.getMedicalVisit()));
 				htr.setContractual(addHours(otr.getContractual(), htr.getContractual()));
 				htr.setSickness(addHours(otr.getSickness(), htr.getSickness()));
+				htr.setWorkAbsence(addHours(otr.getWorkAbsence(), htr.getWorkAbsence()));
 			}
 		}
 		
@@ -2093,6 +2098,7 @@ public class ManagerUtils {
 			OTimetableReport htr=hashTr.get(otr.getDate().toLocalDate());
 			
 			if(htr == null){
+				otr.setWorkingHours(addHours(otr.getWorkingHours(), otr.getWorkAbsence()));
 				hashTr.put(otrLocalDate, otr);
 			}else{
 				if(htr.getWorkingHours() == null)
@@ -2125,6 +2131,12 @@ public class ManagerUtils {
 					htr.setSickness(otr.getSickness());
 				if (htr.getHasRequests()==null || !htr.getHasRequests())
 					htr.setHasRequests(otr.getHasRequests());
+
+				if (otr.getWorkAbsence() != null) {
+					htr.setWorkAbsence(addHours(htr.getWorkAbsence(), otr.getWorkAbsence()));
+					htr.setWorkingHours(addHours(htr.getWorkingHours(), otr.getWorkAbsence()));
+				}
+
 			}
 		}
 		
@@ -2317,6 +2329,8 @@ public class ManagerUtils {
 				tr.setOvertime(String.format("%d.%02d", h, m));
 			}else if(OLeaveRequestType.SICKNESS.equals(requestType)){
 				tr.setSickness(String.format("%d.%02d", h, m));
+			}else if(OLeaveRequestType.WORK_ABSENCE.equals(requestType)){
+				tr.setWorkAbsence(String.format("%d.%02d", h, m));
 			}
 			tr.setHasRequests(Boolean.TRUE);
 			trl.add(tr);
@@ -2385,6 +2399,7 @@ public class ManagerUtils {
 		oTr.setSickness(tr.getSickness());
 		oTr.setOther(tr.getOther());
 		oTr.setCausalId(tr.getCausalId());
+		oTr.setTicket(tr.getTicket());
 		
 		return oTr;
 	}

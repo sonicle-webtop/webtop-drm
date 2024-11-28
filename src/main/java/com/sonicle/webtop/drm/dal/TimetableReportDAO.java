@@ -85,6 +85,7 @@ public class TimetableReportDAO extends BaseDAO{
 				.set(TIMETABLE_REPORT_TEMP.NOTE, item.getNote())
 				.set(TIMETABLE_REPORT_TEMP.SICKNESS, item.getSickness())
 				.set(TIMETABLE_REPORT_TEMP.OTHER, item.getOther())
+				.set(TIMETABLE_REPORT_TEMP.TICKET, item.getTicket())
 				.set(TIMETABLE_REPORT_TEMP.CAUSAL_ID, item.getCausalId())
 				.where(
 						TIMETABLE_REPORT_TEMP.ID.equal(item.getId())
@@ -99,6 +100,23 @@ public class TimetableReportDAO extends BaseDAO{
 				.from(TIMETABLE_REPORT_TEMP)
 				.where(TIMETABLE_REPORT_TEMP.DOMAIN_ID.equal(domainId))
 				.and(TIMETABLE_REPORT_TEMP.USER_ID.equal(userId))
+				.and(TIMETABLE_REPORT_TEMP.DATE.between(fD.toLocalDateTime(LocalTime.MIDNIGHT), tD.toLocalDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59)))
+				.orderBy(
+						TIMETABLE_REPORT_TEMP.USER_ID,
+						TIMETABLE_REPORT_TEMP.TARGET_USER_ID,
+						TIMETABLE_REPORT_TEMP.DATE
+				)
+				.fetchInto(OTimetableReport.class);
+	}
+	
+	public List<OTimetableReport> selectByDomainIdUserIdCompanyIdMonthYear(Connection con, String domainId, String userId, Integer companyId, LocalDate fD, LocalDate tD) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.select()
+				.from(TIMETABLE_REPORT_TEMP)
+				.where(TIMETABLE_REPORT_TEMP.DOMAIN_ID.equal(domainId))
+				.and(TIMETABLE_REPORT_TEMP.USER_ID.equal(userId))
+				.and(TIMETABLE_REPORT_TEMP.COMPANY_ID.equal(companyId))
 				.and(TIMETABLE_REPORT_TEMP.DATE.between(fD.toLocalDateTime(LocalTime.MIDNIGHT), tD.toLocalDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59)))
 				.orderBy(
 						TIMETABLE_REPORT_TEMP.USER_ID,
@@ -130,6 +148,24 @@ public class TimetableReportDAO extends BaseDAO{
 				.from(TIMETABLE_REPORT_TEMP)
 				.where(TIMETABLE_REPORT_TEMP.DOMAIN_ID.equal(domainId))
 				.and(TIMETABLE_REPORT_TEMP.USER_ID.equal(userId))
+				.and(TIMETABLE_REPORT_TEMP.TARGET_USER_ID.equal(targetUserId))
+				.and(TIMETABLE_REPORT_TEMP.DATE.between(fD.toLocalDateTime(LocalTime.MIDNIGHT), tD.toLocalDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59)))
+				.orderBy(
+						TIMETABLE_REPORT_TEMP.USER_ID,
+						TIMETABLE_REPORT_TEMP.TARGET_USER_ID,
+						TIMETABLE_REPORT_TEMP.DATE
+				)
+				.fetchInto(OTimetableReport.class);
+	}
+	
+	public List<OTimetableReport> selectByDomainIdUserIdCompanyIdTargetUserIdMonthYear(Connection con, String domainId, String userId, Integer companyId, String targetUserId, LocalDate fD, LocalDate tD) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.select()
+				.from(TIMETABLE_REPORT_TEMP)
+				.where(TIMETABLE_REPORT_TEMP.DOMAIN_ID.equal(domainId))
+				.and(TIMETABLE_REPORT_TEMP.USER_ID.equal(userId))
+				.and(TIMETABLE_REPORT_TEMP.COMPANY_ID.equal(companyId))
 				.and(TIMETABLE_REPORT_TEMP.TARGET_USER_ID.equal(targetUserId))
 				.and(TIMETABLE_REPORT_TEMP.DATE.between(fD.toLocalDateTime(LocalTime.MIDNIGHT), tD.toLocalDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59)))
 				.orderBy(

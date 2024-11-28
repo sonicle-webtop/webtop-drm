@@ -148,9 +148,9 @@ public class TimetableStampDAO extends BaseDAO{
 				.and(
 						TIMETABLE_STAMP.ENTRANCE.between(new DateTime().withYear(year).withMonthOfYear(month).withDayOfMonth(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).toLocalDateTime(), new DateTime().withYear(year).withMonthOfYear(month).dayOfMonth().withMaximumValue().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toLocalDateTime())
 				)
-				.and(
+				/*.and(
 						TIMETABLE_STAMP.EXIT.between(new DateTime().withYear(year).withMonthOfYear(month).withDayOfMonth(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).toLocalDateTime(), new DateTime().withYear(year).withMonthOfYear(month).dayOfMonth().withMaximumValue().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toLocalDateTime())
-				)
+				)*/
 				.fetchInto(OTimetableStamp.class);
 	}
 	

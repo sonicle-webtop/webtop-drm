@@ -34,6 +34,7 @@ package com.sonicle.webtop.drm;
 
 import com.sonicle.commons.EnumUtils;
 import com.sonicle.commons.LangUtils;
+import com.sonicle.commons.db.DbUtils;
 import com.sonicle.commons.net.IPUtils;
 import com.sonicle.commons.time.DateTimeUtils;
 import com.sonicle.commons.web.Crud;
@@ -222,6 +223,7 @@ import com.sonicle.webtop.drm.bol.model.RBExpenseNote;
 import com.sonicle.webtop.drm.bol.model.RBOpportunity;
 import com.sonicle.webtop.drm.bol.model.RBTimetableEncoReport;
 import com.sonicle.webtop.drm.bol.model.RBWorkReportSummary;
+import com.sonicle.webtop.drm.dal.EmployeeProfileDAO;
 import com.sonicle.webtop.drm.model.Activity;
 import com.sonicle.webtop.drm.model.CostType;
 import com.sonicle.webtop.drm.model.ExpenseNote;
@@ -635,6 +637,87 @@ public class Service extends BaseService {
 		}
 	}
 
+	public void processLookupStampingOperators(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			List<JsSimple> jsUser = new ArrayList();
+			Data uD;
+			
+			ArrayList<Operator> ops = new ArrayList<>();
+			for (String usr : manager.listStampingOperators()) {
+				UserProfile.PersonalInfo pinfo = WT.getProfilePersonalInfo(new UserProfileId(getEnv().getProfileId().getDomain(), usr));
+				if (pinfo!=null) {
+					ops.add(new Operator(usr, pinfo.getLastName()+" "+pinfo.getFirstName()));
+				}
+			}
+			
+			ops.sort(new Comparator<Operator>() {
+				@Override
+				public int compare(Operator op1, Operator op2) {
+					return op1.dn.compareTo(op2.dn);
+				}
+			});
+			
+			for (Operator op : ops) {
+				jsUser.add(new JsSimple(op.usr, op.dn));
+			}
+			
+			ResultMeta meta = new LookupMeta().setSelected(manager.getTargetProfileId().getUserId());
+			
+			new JsonResult(jsUser, meta, jsUser.size()).printTo(out);
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupOperators", ex);
+		}
+	}
+
+	public void processLookupManagedOperators(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		try {
+			List<JsSimple> jsUser = new ArrayList();
+			Data uD;
+			
+			ArrayList<Operator> ops = new ArrayList<>();
+			
+			//add managed users
+			for (String usr : manager.listManagedOperators()) {
+				UserProfile.PersonalInfo pinfo = WT.getProfilePersonalInfo(new UserProfileId(getEnv().getProfileId().getDomain(), usr));
+				if (pinfo!=null) {
+					ops.add(new Operator(usr, pinfo.getLastName()+" "+pinfo.getFirstName()));
+				}
+			}
+			
+			//add supervised users
+			for (String usr : manager.listOperators()) {
+				UserProfile.PersonalInfo pinfo = WT.getProfilePersonalInfo(new UserProfileId(getEnv().getProfileId().getDomain(), usr));
+				if (pinfo!=null) {
+					ops.add(new Operator(usr, pinfo.getLastName()+" "+pinfo.getFirstName()));
+				}
+			}
+			
+			ops.sort(new Comparator<Operator>() {
+				@Override
+				public int compare(Operator op1, Operator op2) {
+					return op1.dn.compareTo(op2.dn);
+				}
+			});
+			
+			//add unique
+			ArrayList<String> added = new ArrayList<>();
+			for (Operator op : ops) {
+				if (!added.contains(op.usr)) {
+					jsUser.add(new JsSimple(op.usr, op.dn));
+					added.add(op.usr);
+				}
+			}
+			
+			ResultMeta meta = new LookupMeta().setSelected(manager.getTargetProfileId().getUserId());
+			
+			new JsonResult(jsUser, meta, jsUser.size()).printTo(out);
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LookupOperators", ex);
+		}
+	}
+
 	public void processLookupCompanies(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			String operator = ServletUtils.getStringParameter(request, "operator", null);
@@ -859,13 +942,19 @@ public class Service extends BaseService {
 	
 	public void processLookupLeaveRequestType(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
+			UserProfileId upid = getEnv().getProfileId();
+			DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID, upid);
+			EmployeeProfile ep = manager.getEmployeeProfile(upid.getDomainId(), upid.getUserId());
+			
 			TimetableSetting ts = manager.getTimetableSetting();
 			
 			List<JsSimple> types = new ArrayList();
 			
 			types.add(createLeaveRequestJsSimple(OLeaveRequestType.HOLIDAY));
 			types.add(createLeaveRequestJsSimple(OLeaveRequestType.PAID_LEAVE));
-			types.add(createLeaveRequestJsSimple(OLeaveRequestType.OVERTIME));
+			
+			if (ep.getExtraordinary())
+				types.add(createLeaveRequestJsSimple(OLeaveRequestType.OVERTIME));
 			
 			if(ts != null){
 				if(ts.getRequestsPermitsNotRemunered())types.add(createLeaveRequestJsSimple(OLeaveRequestType.UNPAID_LEAVE));
@@ -873,6 +962,7 @@ public class Service extends BaseService {
 				if(ts.getRequestsPermitsContractuals())types.add(createLeaveRequestJsSimple(OLeaveRequestType.CONTRACTUAL));
 				if(ts.getRequestsSickness())types.add(createLeaveRequestJsSimple(OLeaveRequestType.SICKNESS));
 			}
+			if (!ep.getNoStamping()) types.add(createLeaveRequestJsSimple(OLeaveRequestType.WORK_ABSENCE));
 			
 			String selected = types.isEmpty() ? null : (String) types.get(0).id;
 			ResultMeta meta = new LookupMeta().setSelected(selected);
@@ -1007,6 +1097,7 @@ public class Service extends BaseService {
 		ExtTreeNode node = new ExtTreeNode(id, text, leaf);
 		node.put("_type", type);
 		node.setIconClass(iconClass);
+		node.setExpanded(true);
 		return node;
 	}
 	
@@ -2581,8 +2672,11 @@ public class Service extends BaseService {
 					lr.getDocuments().add(doc);
 				}
 
-				String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
-				lr.setEventId(eventId);
+				//Do not add calendar event for overtime requests
+				if (!lr.getType().equals(EnumUtils.toSerializedName(OLeaveRequestType.OVERTIME))) {
+					String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+					lr.setEventId(eventId);
+				}
 				
 				manager.addLeaveRequest(lr, ss.getMedicalVisitsAutomaticallyApproved(), ss.getSicknessAutomaticallyApproved());
 
@@ -2646,7 +2740,8 @@ public class Service extends BaseService {
 			lr.setResult(choice);
 			
 			String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
-			lr.setEventId(eventId);
+			if (!StringUtils.isEmpty(eventId)) lr.setEventId(eventId);
+			else lr.setEventId(null);
 			
 			manager.updateLeaveRequest(lr, true);
 
@@ -3472,19 +3567,24 @@ public class Service extends BaseService {
 	private boolean checkManageStampsButtons() throws WTException, UnknownHostException, SQLException{
 		boolean enabling = false;
 		TimetableSetting ts = manager.getTimetableSetting();
-		
+		String userId = getEnv().getProfileId().getUserId();
 		if(ts != null){
 			enabling = ts.getManageStamp();
 			
 			if(!enabling){
 				//Attivo solo se chi è loggato è supervisore
-				if (manager.getDrmLineManager(getEnv().getProfileId().getUserId())!=null) enabling = true;
+				enabling = isSupervisor(userId);
 			}
 		}else{
-			if (manager.getDrmLineManager(getEnv().getProfileId().getUserId())!=null) enabling = true;
+			enabling = isSupervisor(userId);
 		}
 		
 		return enabling;
+	}
+	
+	public boolean isSupervisor(String userId) throws WTException, SQLException {
+		List<OProfileMember> members = manager.getDrmProfileMemberByUserId(userId);
+		return members != null && members.size() > 0;
 	}
 	
 	public void processChekCompanyExitAuthorization(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
@@ -3669,7 +3769,6 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 				List<JsGridTimetableReport> jsGridTR = new ArrayList();
 				
 				for (OTimetableReport oTR : manager.generateOrViewTimetableReport(trQuery, isSupervisorUser())) {
-
 					jsGridTR.add(new JsGridTimetableReport(oTR, manager));
 				}
 				

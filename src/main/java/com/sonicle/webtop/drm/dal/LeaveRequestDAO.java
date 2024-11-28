@@ -39,8 +39,10 @@ import com.sonicle.webtop.drm.bol.OLeaveRequest;
 import com.sonicle.webtop.drm.jooq.Sequences;
 import static com.sonicle.webtop.drm.jooq.Sequences.SEQ_LEAVE_REQUESTS;
 import static com.sonicle.webtop.drm.jooq.Tables.LEAVE_REQUESTS;
+import static com.sonicle.webtop.drm.jooq.Tables.COMPANIES;
 import com.sonicle.webtop.drm.jooq.tables.records.LeaveRequestsRecord;
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -77,18 +79,23 @@ public class LeaveRequestDAO extends BaseDAO {
 				.execute();
 	}
 
-	public List<OLeaveRequest> selectLeaveRequests(Connection con, LeaveRequestQuery query, String domainId, boolean isManager) throws DAOException {
+	public List<OLeaveRequest> selectLeaveRequestsForUsers(Connection con, LeaveRequestQuery query, String domainId, List<String> userIds) throws DAOException {
 		DSLContext dsl = getDSL(con);
 
-		Condition searchCndt = ensureCondition(query, isManager);
+		Condition searchCndt = ensureCondition(query, userIds);
 
 		return dsl
-				.select()
+				.select(LEAVE_REQUESTS.asterisk(), COMPANIES.NAME.as("COMPANY_DESCRIPTION"))
 				.from(LEAVE_REQUESTS)
+				.innerJoin(COMPANIES).on(
+					LEAVE_REQUESTS.COMPANY_ID.equal(COMPANIES.COMPANY_ID)
+				)
 				.where(
 						searchCndt
 				).and(
 						LEAVE_REQUESTS.DOMAIN_ID.equal(domainId)
+				).orderBy(
+					LEAVE_REQUESTS.FROM_DATE, LEAVE_REQUESTS.FROM_HOUR
 				)
 				.fetchInto(OLeaveRequest.class);
 	}
@@ -183,16 +190,21 @@ public class LeaveRequestDAO extends BaseDAO {
 		return nextID;
 	}
 
-	private Condition ensureCondition(LeaveRequestQuery query, boolean isManager) {
+	private Condition ensureCondition(LeaveRequestQuery query, List<String> userIds) {
 								
-		Condition searchCndt = (isManager) ? LEAVE_REQUESTS.MANAGER_ID.equal(query.userId) : LEAVE_REQUESTS.USER_ID.equal(query.userId);
+		Condition searchCndt = LEAVE_REQUESTS.USER_ID.in(userIds);
 		
 		if (query.companyId != null) {
 			searchCndt = searchCndt.and(LEAVE_REQUESTS.COMPANY_ID.equal(query.companyId));
 		}
 		
 		if (query.fromDate != null) {
-			searchCndt = searchCndt.and(LEAVE_REQUESTS.FROM_DATE.greaterOrEqual(query.fromDate));
+			Condition dateCond = LEAVE_REQUESTS.FROM_DATE.greaterOrEqual(query.fromDate);
+			//if no specific status, include also previous open requests
+			if (query.status == null) {
+				dateCond = dateCond.or(LEAVE_REQUESTS.STATUS.equal("O"));
+			}
+			searchCndt = searchCndt.and(dateCond);
 		}
 
 		if (query.toDate != null) {

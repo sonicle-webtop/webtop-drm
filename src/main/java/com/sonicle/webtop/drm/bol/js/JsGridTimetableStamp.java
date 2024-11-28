@@ -43,6 +43,7 @@ public class JsGridTimetableStamp {
 	public int id;
 	public String domainId;
 	public String userId;
+	public String userName;
 	public String type;
 	public String entrance;
 	public String exit;
@@ -52,6 +53,7 @@ public class JsGridTimetableStamp {
 		this.id = ts.getId();
 		this.domainId = ts.getDomainId();
 		this.userId = ts.getUserId();
+		this.userName = ts.getUserName();
 		this.type = ts.getType();
 		this.entrance = (null != ts.getEntrance()) ? ((ts.getEntrance().getHourOfDay() < 10 ? "0" + ts.getEntrance().getHourOfDay() : ts.getEntrance().getHourOfDay()) + ":" + (ts.getEntrance().getMinuteOfHour() < 10 ? "0" + ts.getEntrance().getMinuteOfHour() : ts.getEntrance().getMinuteOfHour())) : ("");
 		this.exit = (null != ts.getExit()) ? ((ts.getExit().getHourOfDay() < 10 ? "0" + ts.getExit().getHourOfDay() : ts.getExit().getHourOfDay()) + ":" + (ts.getExit().getMinuteOfHour() < 10 ? "0" + ts.getExit().getMinuteOfHour() : ts.getExit().getMinuteOfHour())) : ("");

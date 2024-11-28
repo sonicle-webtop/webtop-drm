@@ -72,7 +72,7 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableStampSearch', {
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
-						proxy: WTF.proxy(me.sid, 'LookupOperators'),
+						proxy: WTF.proxy(me.sid, 'LookupStampingOperators'),
 						listeners: {
 							load: function (s) {
 								if (s.loadCount === 1) {

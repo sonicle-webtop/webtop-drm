@@ -40,5 +40,5 @@ import com.sonicle.webtop.drm.jooq.tables.pojos.LeaveRequests;
  */
 public class OLeaveRequest extends LeaveRequests {
 	
-
+	String companyDescription;
 }

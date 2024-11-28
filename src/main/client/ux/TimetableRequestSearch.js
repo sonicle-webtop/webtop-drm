@@ -45,7 +45,7 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 			userId: null,
 			companyId: null,
 			type: null,
-			fromDate: Ext.Date.add(new Date(), Ext.Date.DAY, -30),
+			fromDate: new Date(),
 			toDate: null,
 			status: null,
 			result: null
@@ -72,20 +72,29 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
-						proxy: WTF.proxy(me.sid, 'LookupOperators'),
+						proxy: WTF.proxy(me.sid, 'LookupManagedOperators'),
 						listeners: {
 							load: function (s) {
 								if (s.loadCount === 1) {
-									var meta = s.getProxy().getReader().metaData;
-									if(meta.selected) {
-										me.getViewModel().set('userId', meta.selected);
-										WTU.loadWithExtraParams(me.lookupReference('fldcompany').getStore(), {
-											operator: meta.selected
-										});
+									//count unfiltered
+									var count = s.getData().getSource() ? s.getData().getSource().getCount() : s.getData().getCount();
+									if (count === 1) {
+										var meta = s.getProxy().getReader().metaData;
+										if(meta.selected) {
+											me.getViewModel().set('userId', meta.selected);
+											WTU.loadWithExtraParams(me.lookupReference('fldcompany').getStore(), {
+												operator: meta.selected
+											});
+										}
 									}
 								}
 							}
 						}
+					},
+					clearValue: function() {
+						var s = this.getStore(),
+							count = s.getData().getSource() ? s.getData().getSource().getCount() : s.getData().getCount();
+						if (count > 1) this.setValue(null);
 					},
 					listeners: {
 						select: function (cmb, r) {
@@ -95,7 +104,7 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 						},
 						change: function (cmb, newval, oldaval) {
 							WTU.loadWithExtraParams(me.lookupReference('fldcompany').getStore(), {
-								operator: null
+								operator: newval
 							});
 						}
 					},
@@ -178,14 +187,20 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 						}),
 						listeners: {
 							load: function (s) {
-								var meta = s.getProxy().getReader().metaData;
-								if (meta.selected) {
+								var count = s.getData().getCount();
+								if (count == 1) {
+									var meta = s.getProxy().getReader().metaData;
 									Ext.defer(function() {
-										me.getViewModel().set('companyId', meta.selected);	
+										me.getViewModel().set('companyId', meta.selected);
 									},100);
 								}
 							}
 						}
+					},
+					clearValue: function() {
+						var s = this.getStore(),
+							count = s.getData().getSource() ? s.getData().getSource().getCount() : s.getData().getCount();
+						if (count > 1) this.setValue(null);
 					},
 					triggers: {
 						clear: WTF.clearTrigger()
@@ -216,6 +231,7 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableRequestSearch', {
 						clear: WTF.clearTrigger()
 					},
 					fieldLabel: WT.res(me.sid, 'timetableRequestSearch.status.lbl'),
+					emptyText: WT.res(me.sid, 'timetableRequestSearch.status.emptytext.lbl'),
 					width: '420px',
 					tabIndex: 106
 				})

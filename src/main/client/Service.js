@@ -820,7 +820,10 @@ Ext.define('Sonicle.webtop.drm.Service', {
 										ftype: 'grouping',
 										groupHeaderTpl: '{name}',
 										hideGroupedHeader: true,
-										enableGroupingMenu: false
+										enableGroupingMenu: false,
+										expandTip: null,
+										collapseTip: null,
+										showSummaryRow: true
 									}],
 									columns: [
 										{
@@ -856,6 +859,19 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											flex: 1,
 											hideable: false,
 											align: 'center'
+										}, {
+											header: me.res('gpTimetable.time.lbl'),
+											dataIndex: 'minutes',
+											flex: 1,
+											hideable: false,
+											align: 'center',
+											renderer: function(v, r) {
+												return me.minutesToTime(v);
+											},
+											summaryType: 'sum',
+											summaryRenderer: function(v) {
+												return "<b>"+me.minutesToTime(v)+"</b>";
+											}
 										}, {
 											xtype: 'soiconcolumn',
 											hideable: false,
@@ -985,6 +1001,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											case 'S':
 												return me.res('gpTimetableRequest.type.S.lbl');
 												break;
+											case 'W':
+												return me.res('gpTimetableRequest.type.W.lbl');
+												break;
 											default:
 												return '';
 												break;
@@ -1059,18 +1078,20 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									me.editTimetableRequestUI(rec);
 								},
 								afterrender: function (t) {
-									WT.ajaxReq(me.ID, 'IsLineManagerLogged', {
-										params: {},
-										callback: function (success, json) {
-											if(success){
-												if(json.data == true){
-													me.getAct('timetableRequest', 'approve').setHidden(false);
-													me.getAct('timetableRequest', 'decline').setHidden(false);
-													me.getAct('timetableRequest', 'cancel').setHidden(false);
+									if (!me.getVar("isSupervisorUser")) {
+										WT.ajaxReq(me.ID, 'IsLineManagerLogged', {
+											params: {},
+											callback: function (success, json) {
+												if(success){
+													if(!json.data){
+														me.getAct('timetableRequest', 'approve').setHidden(true);
+														me.getAct('timetableRequest', 'decline').setHidden(true);
+														me.getAct('timetableRequest', 'cancel').setHidden(true);
+													}
 												}
 											}
-										}
-									});
+										});
+									}
 								},
 								render: function(grid) {
 									var view = grid.getView();
@@ -1113,10 +1134,13 @@ Ext.define('Sonicle.webtop.drm.Service', {
 										me.timetableReportGenerateQuery = query;
 										me.reloadTimetableReport(query);
 									}else if(query.mode === 2){
-										WT.confirm(me.res('gpTimetableReport.regeneratereport.lbl'), function (bid) {
-											if (bid === 'yes') {
-												me.timetableReportGenerateQuery = query;
-												me.reloadTimetableReport(query);
+										WT.warn(me.res('gpTimetableReport.regeneratereport.lbl'), {
+											buttons: Ext.MessageBox.YESNO,
+											fn: function (bid) {
+												if (bid === 'yes') {
+													me.timetableReportGenerateQuery = query;
+													me.reloadTimetableReport(query);
+												}
 											}
 										});
 									}
@@ -1145,6 +1169,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								getRowClass: function(r, rowIndex, rp, ds) {
 									var today = new Date();
 									if (r.get('date')==null) return;
+									if (!me.getVar('isSupervisorUser')) return;
 									
 									var dateParts = r.get('date').substring(0, 10).split("/");
 									var dateObject = new Date(dateParts[2], dateParts[1] - 1, +dateParts[0]); 
@@ -1176,7 +1201,20 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								autoSync: true,
 								model: 'Sonicle.webtop.drm.model.GridTimetableReport',
 								proxy: WTF.apiProxy(me.ID, 'ManageGridTimetableReport'),
-								groupField: 'targetUser'
+								groupField: 'targetUser',
+								listeners: {
+									update: function(st, rec, op, modifiedFieldNames, details, eOpts ) {
+										if (modifiedFieldNames && modifiedFieldNames.includes('workingHours')) {
+											var ticket = Sonicle.webtop.drm.model.GridTimetableReport.calcTicket(
+												rec.get('workingHours'),
+												rec.get('totalLineHour'),
+												rec.get('targetUserId'),
+												rec.get('detail')?rec.get('detail').includes('[S]'):false
+											);
+											rec.set('ticket',ticket);
+										}
+									}
+								}
 							},
 							features: me.prepareFeatures(me.getVar('ticketManagement')),
 							columns: [
@@ -1217,21 +1255,21 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									header: me.res('gpTimetableReport.workingHours.lbl'),
 									dataIndex: 'workingHours',
 									editable: me.getVar('isSupervisorUser'),
-									editor: me.createTTSLookupComboEditor(),
+									editor: me.getVar('isSupervisorUser')?me.createTTSLookupComboEditor():null,
                                     width: 70,
                                     cls: 'header'
 								}, {
 									header: me.res('gpTimetableReport.overtime.lbl'),
 									dataIndex: 'overtime',
 									editable: me.getVar('isSupervisorUser'),
-									editor: me.createTTSLookupComboEditor(),
+									editor: me.getVar('isSupervisorUser')?me.createTTSLookupComboEditor():null,
                                     width: 70,
                                     cls: 'header'
 								}, {
 									header: me.res('gpTimetableReport.paidLeave.lbl'),
 									dataIndex: 'paidLeave',
 									editable: me.getVar('isSupervisorUser'),
-									editor: me.createTTSLookupComboEditor(),
+									editor: me.getVar('isSupervisorUser')?me.createTTSLookupComboEditor():null,
                                     width: 80,
                                     cls: 'header'
 								}, 
@@ -1255,15 +1293,15 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									header: me.res('gpTimetableReport.holiday.lbl'),
 									dataIndex: 'holiday',
 									editable: me.getVar('isSupervisorUser'),
-									editor: me.createTTSLookupComboEditor(),
+									editor: me.getVar('isSupervisorUser')?me.createTTSLookupComboEditor():null,
                                     width: 70,
                                     cls: 'header'
 								},
 								{
 									header: me.res('gpTimetableReport.medicalVisit.lbl'),
 									dataIndex: 'medicalVisit',
-									editable: true,
-									editor: me.createTTSLookupComboEditor(),
+									editable: me.getVar('isSupervisorUser'),
+									editor: me.getVar('isSupervisorUser')?me.createTTSLookupComboEditor():null,
                                     width: 80,
                                     cls: 'header'
 								}, 
@@ -1271,21 +1309,21 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									header: me.res('gpTimetableReport.sickness.lbl'),
 									dataIndex: 'sickness',
 									editable: me.getVar('isSupervisorUser'),
-									editor: me.createTTSLookupComboEditor(),
+									editor: me.getVar('isSupervisorUser')?me.createTTSLookupComboEditor():null,
                                     width: 80,
                                     cls: 'header'
 								}, {
 									header: me.res('gpTimetableReport.other.lbl'),
 									dataIndex: 'other',
-									editable: true,
-									editor: me.createTTSLookupComboEditor(),
+									editable: me.getVar('isSupervisorUser'),
+									editor: me.getVar('isSupervisorUser')?me.createTTSLookupComboEditor():null,
                                     width: 60,
                                     cls: 'header'
 								}, {
 									xtype: 'solookupcolumn',
 									header: me.res('gpTimetableReport.causalId.lbl'),
 									dataIndex: 'causalId',
-									editable: true,
+									editable: me.getVar('isSupervisorUser'),
 									store: Ext.create('Ext.data.Store', {
 										autoLoad: true,
 										model: 'WTA.model.Simple',
@@ -1295,7 +1333,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											}
 										})
 									}),
-									editor: Ext.create(WTF.lookupCombo('id', 'desc', {
+									editor: me.getVar('isSupervisorUser')?Ext.create(WTF.lookupCombo('id', 'desc', {
 										ignoreNoChange: true,
 										allowBlank: true,
 										editable: true,
@@ -1312,7 +1350,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 										triggers: {
 											clear: WTF.clearTrigger()
 										}
-									})),
+									})):null,
 									displayField: 'desc',
                                     flex: 2,
                                     cls: 'header'
@@ -1341,6 +1379,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								{
 									header: me.res('gpTimetableReport.missingHours.lbl'),
 									dataIndex: 'missingHours',
+									hidden: !me.getVar('isSupervisorUser'),
 									editable: false,	
                                     width: 100,
 									align: 'right',
@@ -1348,8 +1387,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 								}, {
 									header: me.res('gpTimetableReport.detail.lbl'),
 									dataIndex: 'detail',
-									editable: true,
-									editor: 'textfield',
+									editable: me.getVar('isSupervisorUser'),
+									editor: me.getVar('isSupervisorUser')?'textfield':null,
 									flex: 2,
                                     cls: 'header'
 								}, {
@@ -1366,25 +1405,27 @@ Ext.define('Sonicle.webtop.drm.Service', {
 									xtype: 'soiconcolumn',
 									header: me.res('gpTimetableReport.ticket.lbl'),
 									dataIndex: 'ticket',
-									hidden: !me.getVar('ticketManagement'),
+									hidden: !me.getVar('ticketManagement') || !me.getVar('isSupervisorUser'),
+									hideable: me.getVar('ticketManagement') && me.getVar('isSupervisorUser'),
 									editable: false,
 									iconSize: WTU.imgSizeToPx('xs'),
-									menuDisabled: true,
 									width: 45,
-									cls: 'header',
 									getIconCls: function(value,rec) {
 										return value === 1 ? 'fas fa-check' : '';
 									},
 									summaryType: 'sum',
 									summaryRenderer: function(value, summaryData, dataIndex) {
 										return Ext.String.format('<B>{0}</B>', value===undefined?"undef":value);
-									}
+									},
+									handler: function(g, ridx, cidx, evt, rec) {
+										rec.set('ticket', 1 - rec.get('ticket'));
+									}									
 								}
 							],
 							tbar: [
 //								me.getAct('timetableReport', 'save'),
 //								'-',
-								me.getAct('timetableReport', 'print'),
+								me.getVar('isSupervisorUser')?me.getAct('timetableReport', 'print'):null,
 								(me.getVar('isSupervisorUser') && me.getVar('integrationGis') === true) ? me.getAct('timetableReport', 'exportgis') : null,
 								(me.getVar('isSupervisorUser') && me.getVar('integrationTS') === true) ? me.getAct('timetableReport', 'exportts') : null,
 							]
@@ -1641,6 +1682,11 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		
 		//Opportunity Fields
 		me.opportunityRequiredFields = me.getVar('opportunityRequiredFields');
+	},
+	
+	minutesToTime: function(m) {
+		var h = Math.floor(m/60);
+		return Ext.String.leftPad(h,2,'0')+':'+Ext.String.leftPad((m-(h*60)),2,'0');
 	},
 	
 	prepareFeatures: function(tickets) {
@@ -2112,7 +2158,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			tooltip: null,
 			iconCls: 'wtdrm-icon-timetableRequest-approved',
 			disabled: true,
-			hidden: true,
 			handler: function () {
 				var sel = me.gpTimetableRequestSelected();
 				me.approveDeclineTimetableRequestUI(sel, true);
@@ -2123,7 +2168,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			tooltip: null,
 			iconCls: 'wtdrm-icon-timetableRequest-declined',
 			disabled: true,
-			hidden: true,
 			handler: function () {
 				var sel = me.gpTimetableRequestSelected();
 				me.approveDeclineTimetableRequestUI(sel, false);
@@ -2134,7 +2178,6 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			tooltip: null,
 			iconCls: 'wtdrm-icon-timetableCancRequest-approved',
 			disabled: true,
-			hidden: true,
 			handler: function () {
 				var sel = me.gpTimetableRequestSelected();
 				me.cancelTimetableRequestUI(sel);
@@ -3183,7 +3226,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 						me.getAct('timetableRequest', 'requestcancellation').setDisabled(true);
 					}
 				}
-			}else if(sel.get("managerId") === WT.getVar('userId')){
+			} else if (me.getVar("isSupervisorUser") || sel.get("managerId") === WT.getVar('userId')) {
 				//se sono l'utente loggato ad essere il supervisore
 				if(sel.get("userId") !== WT.getVar('userId')){
 					//e se non sono su una mia richiesta
@@ -3239,7 +3282,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		vw.showView(function () {
 					vw.begin('new', {
 						data: {
-							userId: ftr.getOperatorId()
+							userId: ftr.getOperatorId() || WT.getVar('userId')
 						}
 					});
 				});

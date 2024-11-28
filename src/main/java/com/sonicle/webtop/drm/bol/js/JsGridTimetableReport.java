@@ -74,13 +74,15 @@ public class JsGridTimetableReport {
 	public String userId;
 	public String dateObj;
 	public boolean hasRequests;
+	public Integer ticket;
 
 	public JsGridTimetableReport(OTimetableReport tr, DrmManager drmMgr) throws WTException {
 		this.id = tr.getId();
 		this.domainId = tr.getDomainId();
 		//this.user = WT.getUserData(new UserProfileId(tr.getDomainId(), tr.getUserId())).getDisplayName();
-		PersonalInfo pinfo=WT.getProfilePersonalInfo(new UserProfileId(tr.getDomainId(), tr.getUserId()));
-		this.user = (pinfo.getLastName()+" "+pinfo.getFirstName()).trim();
+		//PersonalInfo pinfo=WT.getProfilePersonalInfo(new UserProfileId(tr.getDomainId(), tr.getUserId()));
+		//this.user = (pinfo.getLastName()+" "+pinfo.getFirstName()).trim();
+		this.user = tr.getUserId();
 		this.company = drmMgr.getCompany(tr.getCompanyId()).getName();
 		this.date = concatDate(tr);
 		this.workingHours =tr.getWorkingHours();
@@ -107,6 +109,7 @@ public class JsGridTimetableReport {
 		this.userId = tr.getUserId();
 		this.dateObj = tr.getDate().toString();
 		this.hasRequests = tr.getHasRequests();
+		this.ticket = tr.getTicket()!=null ? Integer.parseInt(tr.getTicket()) : 0;
 	}
 	
 	public static TimetableReport createTimetableReport(JsGridTimetableReport js) {
@@ -129,6 +132,7 @@ public class JsGridTimetableReport {
 		tr.setSickness(js.sickness);
 		tr.setOther(js.other);
 		tr.setCausalId(js.causalId);
+		tr.setTicket(js.ticket != null ? js.ticket.toString() : "0");
 		
 		return tr;
 	}

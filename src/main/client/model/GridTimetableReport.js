@@ -62,6 +62,7 @@ Ext.define('Sonicle.webtop.drm.model.GridTimetableReport', {
 		WTF.field('userId', 'string', false),
 		WTF.field('dateObj', 'string'),
 		WTF.field('hasRequest', 'boolean',true),
+		WTF.field('ticket', 'int',true),
 //		WTF.calcField('totHours', 'string', ['workingHours', 'overtime'], function(v, rec) {
 //			return Sonicle.webtop.drm.model.GridTimetableReport.calcTotHours(
 //					rec.get('workingHours'),
@@ -82,15 +83,15 @@ Ext.define('Sonicle.webtop.drm.model.GridTimetableReport', {
 					rec.get('causalId'),
 					rec.get('totalLineHour')
 			);
-		}),
-		WTF.calcField('ticket', 'int', ['workingHours', 'totalLineHour', 'userId'], function(v, rec) {
+		})/*,
+		WTF.calcField('faketicket', 'int', ['workingHours', 'totalLineHour', 'userId'], function(v, rec) {
 			return Sonicle.webtop.drm.model.GridTimetableReport.calcTicket(
 					rec.get('workingHours'),
 					rec.get('totalLineHour'),
-					rec.get('userId'),
+					rec.get('targetUserId'),
 					rec.get('detail')?rec.get('detail').includes('[S]'):false
 			);
-		})
+		})*/
 	],
 	
 	statics: {

@@ -44,6 +44,7 @@ public class JsGridLeaveRequest {
 
 	public Integer leaveRequestId;
 	public String domainId;
+	public Integer companyId;
 	public String userId;
 	public String user;
 	public String managerId;
@@ -61,6 +62,7 @@ public class JsGridLeaveRequest {
 		this.leaveRequestId = lr.getLeaveRequestId();
 		this.user = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getUserId())).getDisplayName();
 		this.manager = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getManagerId())).getDisplayName();
+		this.companyId = lr.getCompanyId();
 		this.userId = lr.getUserId();
 		this.managerId = lr.getManagerId();
 		this.type = lr.getType();

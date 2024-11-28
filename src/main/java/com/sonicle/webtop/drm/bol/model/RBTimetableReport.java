@@ -88,7 +88,7 @@ public class RBTimetableReport {
 		this.companyId = otr.getCompanyId();
 		this.companyDescription = drmMgr.getCompany(otr.getCompanyId()).getName();
 		this.userId = otr.getUserId();
-		this.userDescription = WT.getUserData(new UserProfileId(otr.getDomainId(), otr.getUserId())).getDisplayName();
+		this.userDescription = ""; //WT.getUserData(new UserProfileId(otr.getDomainId(), otr.getUserId())).getDisplayName();
 		this.date = concatDate(otr.getDate(), lcl);
 		this.workingHours = convertInMinutes(otr.getWorkingHours());
 		this.overtime = convertInMinutes(otr.getOvertime());
@@ -113,7 +113,7 @@ public class RBTimetableReport {
 			this.gisCausalCode = drmMgr.getCausal(otr.getCausalId()).getExternalCode();
 			this.gisCausalDescription = drmMgr.getCausal(otr.getCausalId()).getDescription();
 		}
-		this.ticket = calcTicket(drmMgr, otr);
+		this.ticket = otr.getTicket() != null ? Integer.parseInt(otr.getTicket()) : 0; //calcTicket(drmMgr, otr);
 		this.ticketManagement = drmMgr.getTimetableSetting().getTicketManagement();
 	}
 
