@@ -126,6 +126,9 @@ Ext.define('Sonicle.webtop.drm.view.UserTimetableRequests', {
 									case 'S':
 										return me.mys.res('gpTimetableRequest.type.S.lbl');
 										break;
+									case 'W':
+										return me.mys.res('gpTimetableRequest.type.W.lbl');
+										break;
 									default:
 										return '';
 										break;

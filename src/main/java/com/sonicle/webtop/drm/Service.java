@@ -962,6 +962,7 @@ public class Service extends BaseService {
 				if(ts.getRequestsPermitsContractuals())types.add(createLeaveRequestJsSimple(OLeaveRequestType.CONTRACTUAL));
 				if(ts.getRequestsSickness())types.add(createLeaveRequestJsSimple(OLeaveRequestType.SICKNESS));
 			}
+			if (!ep.getNoStamping()) types.add(createLeaveRequestJsSimple(OLeaveRequestType.WORK_ABSENCE));
 			
 			String selected = types.isEmpty() ? null : (String) types.get(0).id;
 			ResultMeta meta = new LookupMeta().setSelected(selected);
@@ -2672,7 +2673,7 @@ public class Service extends BaseService {
 				}
 
 				//Do not add calendar event for overtime requests
-				if (!lr.getType().equals(OLeaveRequestType.OVERTIME)) {
+				if (!lr.getType().equals(EnumUtils.toSerializedName(OLeaveRequestType.OVERTIME))) {
 					Integer eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
 					lr.setEventId(eventId);
 				}
@@ -3768,7 +3769,6 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 				List<JsGridTimetableReport> jsGridTR = new ArrayList();
 				
 				for (OTimetableReport oTR : manager.generateOrViewTimetableReport(trQuery, isSupervisorUser())) {
-
 					jsGridTR.add(new JsGridTimetableReport(oTR, manager));
 				}
 				

@@ -40,4 +40,13 @@ import com.sonicle.webtop.drm.jooq.tables.pojos.TimetableReportTemp;
  */
 public class OTimetableReport extends TimetableReportTemp{
 	
+	private String workAbsence;
+	
+	public void setWorkAbsence(String wa) {
+		this.workAbsence = wa;
+	}
+	
+	public String getWorkAbsence() {
+		return workAbsence;
+	}
 }

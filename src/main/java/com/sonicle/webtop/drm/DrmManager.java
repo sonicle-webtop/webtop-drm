@@ -4726,19 +4726,19 @@ public class DrmManager extends BaseManager implements IDrmManager{
 						items = getTimetableReport(query);
 					}else{
 						//Altrimenti significa che oggi è uguale o prima del mese da controllare, rigenero.
-						items = generateTimetableReport(query);
+						items = generateTimetableReport(query, supervisor);
 					}
 				}
 			}else if(query.mode.equals("2")){
 				//Bottone Forza Ricalcolo
-				items = generateTimetableReport(query);
+				items = generateTimetableReport(query, supervisor);
 			}
 		}
 
 		return items;
 	}
 	
-	private List<OTimetableReport> generateTimetableReport(TimetableReportQuery query) throws WTException {
+	private List<OTimetableReport> generateTimetableReport(TimetableReportQuery query, boolean supervisor) throws WTException {
 		Connection con = null;
 		List<OTimetableReport> trs = new ArrayList();
 		List<OTimetableReport> ttrs;
@@ -4765,6 +4765,10 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			UserProfileId tpid = getTargetProfileId();
 			String tpDomainId = tpid.getDomainId();
 			String tpUserId = tpid.getUserId();
+			//if supervisor, target user is first supervisor profile id
+			//prepending @ to avoid user duplicate which cannot contain @
+			List<OProfileMember> items = getDrmProfileMemberByUserId(tpUserId);
+			if (items.size() > 0) tpUserId = "@"+items.get(0).getProfileId();
 
 			if(query != null) {				
 				//Load Holidays
@@ -5086,7 +5090,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					if (otr.getHasRequests()==null) otr.setHasRequests(false);
 					
 					otr.setId(trDAO.getTimetableReportTempSequence(con).intValue());
-					otr.setUserId(getTargetProfileId().getUserId());
+					otr.setUserId(tpUserId);
 					
 					//VASI SETTO PROFILO ORARIO
 					// ma prima verifica se non è una festività
@@ -5108,7 +5112,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 
 					TimetableSetting tts = getTimetableSetting();
 					//Se vi Ã¨ la Gestione automatica straordinari, ciclo i record per modificare Working Hours e Overtime secondo la logica
-					if(tts.getAutomaticOvertime() == true && otr.getWorkingHours() != null){
+					if(supervisor && tts.getAutomaticOvertime() == true && otr.getWorkingHours() != null){
 						Integer wh;
 						Integer lh;
 
@@ -5124,9 +5128,11 @@ public class DrmManager extends BaseManager implements IDrmManager{
 							otr.setOvertime(ManagerUtils.pad((delta / 60), 1) + "." + ManagerUtils.pad((delta % 60),2));
 							otr.setWorkingHours(ManagerUtils.pad((wh / 60), 1) + "." + ManagerUtils.pad((wh % 60),2));
 						} else {
-							otr.setWorkingHours(ManagerUtils.pad((lh / 60), 1) + "." + ManagerUtils.pad((lh % 60),2));
+							//otr.setWorkingHours(ManagerUtils.pad((lh / 60), 1) + "." + ManagerUtils.pad((lh % 60),2));
 						}
 					}
+					
+					otr.setTicket(calcTicket(otr));
 					
 					trDAO.insert(con, otr);
 				}
@@ -5158,6 +5164,38 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		}
 	}
 	
+	private String calcTicket(OTimetableReport otr) throws WTException {
+		
+		boolean isSmart = otr.getDetail() != null ? otr.getDetail().contains("[S]") : false;
+		if (isSmart) return "0";
+		
+		EmployeeProfile ep = getEmployeeProfile(otr.getDomainId(), otr.getTargetUserId());
+		Integer minhpt = ep.getMinimumNumberOfHoursPerTicket();
+		TimetableSetting tts = getTimetableSetting();
+		if (minhpt == null && tts != null) minhpt = tts.getMinimumNumberOfHoursPerTicket();
+		if (minhpt == null) minhpt = 0;
+		
+		int wh = 0;
+
+		if (otr.getWorkingHours() != null) {
+			String h[] = StringUtils.split(otr.getWorkingHours(), '.');
+			wh = Integer.parseInt(h[0]) * 60 + Integer.parseInt(h[1]);
+		}
+		if (otr.getTotalLineHour() != null){
+			int th = wh;
+
+			int minmpt = minhpt * 60;
+
+			if(th >= minmpt){ 
+				return "1";
+			}else{ 
+				return "0";
+			}	
+		} else {
+			return "0";
+		}
+	}
+	
 	public List<OTimetableReport> getTimetableReport(TimetableReportQuery query) throws WTException{
 		Connection con = null;
 		List<OTimetableReport> trs = new ArrayList();
@@ -5165,6 +5203,14 @@ public class DrmManager extends BaseManager implements IDrmManager{
 
 		try {
 			con = WT.getConnection(SERVICE_ID);
+			
+			UserProfileId tpid = getTargetProfileId();
+			String tpDomainId = tpid.getDomainId();
+			String tpUserId = tpid.getUserId();
+			//if supervisor, target user is first supervisor profile id
+			//prepending @ to avoid user duplicate which cannot contain @
+			List<OProfileMember> items = getDrmProfileMemberByUserId(tpUserId);
+			if (items.size() > 0) tpUserId = "@"+items.get(0).getProfileId();
 			
 			if(query != null){
 				
@@ -5178,9 +5224,15 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				LocalDate toDate = LocalDate.fromDateFields(d);
 				
 				if(query.targetUserId == null){
-					trs = trDao.selectByDomainIdUserIdMonthYear(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), fromDate, toDate);
+					if (query.companyId == null)
+						trs = trDao.selectByDomainIdUserIdMonthYear(con, tpDomainId, tpUserId, fromDate, toDate);
+					else
+						trs = trDao.selectByDomainIdUserIdCompanyIdMonthYear(con, tpDomainId, tpUserId, query.companyId, fromDate, toDate);
 				}else{
-					trs = trDao.selectByDomainIdUserIdTargetUserIdMonthYear(con, getTargetProfileId().getDomainId(), getTargetProfileId().getUserId(), query.targetUserId, fromDate, toDate);
+					if (query.companyId == null)
+						trs = trDao.selectByDomainIdUserIdTargetUserIdMonthYear(con, tpDomainId, tpUserId, query.targetUserId, fromDate, toDate);
+					else
+						trs = trDao.selectByDomainIdUserIdCompanyIdTargetUserIdMonthYear(con, tpDomainId, tpUserId, query.companyId, query.targetUserId, fromDate, toDate);
 				}
 			}
 
@@ -5254,6 +5306,11 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			int mindex = val.length() - 2;
 			String hpart = val.substring(0, mindex);
 			int minutes100 = Integer.parseInt(val.substring(mindex));
+
+			int irm = (int)realMinutes;
+			int hours = irm / 60;
+			int minutes = irm % 60;
+			String realVal = hours + "." + StringUtils.leftPad(""+minutes, 2, '0');
 			
 			if(rounding == 15){
 				if(minutes100 >= 25 && minutes100 < 50)
@@ -5272,14 +5329,11 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			} else if(rounding == 60){
 				val = hpart + "00";
 			} else {
-				int irm = (int)realMinutes;
-				int hours = irm / 60;
-				int minutes = irm % 60;
-				val = hours + "." + StringUtils.leftPad(""+minutes, 2, '0');
+				val = realVal;
 			}
 
 			otr.setWorkingHours(val);
-			otr.setDetail("T: "+val+" ("+otr.getDetail()+")");
+			otr.setDetail("T: "+realVal+" ("+otr.getDetail()+")");
 		}
 		
 		return trsf;
