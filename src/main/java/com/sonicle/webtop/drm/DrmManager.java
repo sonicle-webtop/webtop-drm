@@ -5134,7 +5134,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 							otr.setOvertime(ManagerUtils.pad((delta / 60), 1) + "." + ManagerUtils.pad((delta % 60),2));
 							otr.setWorkingHours(ManagerUtils.pad((wh / 60), 1) + "." + ManagerUtils.pad((wh % 60),2));
 						} else {
-							//otr.setWorkingHours(ManagerUtils.pad((lh / 60), 1) + "." + ManagerUtils.pad((lh % 60),2));
+							if (delta>0) otr.setWorkingHours(ManagerUtils.pad((lh / 60), 1) + "." + ManagerUtils.pad((lh % 60),2));
 						}
 					}
 					
@@ -5146,7 +5146,10 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				
 				if(query.targetUserId == null) {
 					//Select for DomainId UserId
-					trs = trDAO.selectByDomainIdUserIdMonthYear(con, tpDomainId, tpUserId, fromDate, toDate);
+                                        if (query.companyId == null)
+                                            trs = trDAO.selectByDomainIdUserIdMonthYear(con, tpDomainId, tpUserId, fromDate, toDate);
+                                        else
+                                            trs = trDAO.selectByDomainIdUserIdCompanyIdMonthYear(con, tpDomainId, tpUserId, query.companyId, fromDate, toDate);
 				}else{
 					//Select for DomainId UserId and TargetUserId
 					trs = trDAO.selectByDomainIdUserIdTargetUserIdMonthYear(con, 

@@ -50,6 +50,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -137,7 +138,15 @@ public class TimetableStampDAO extends BaseDAO{
 		DSLContext dsl = getDSL(con);
 		
 		return dsl
-				.select()
+				.select(
+                                        TIMETABLE_STAMP.ID,
+                                        TIMETABLE_STAMP.DOMAIN_ID,
+                                        TIMETABLE_STAMP.USER_ID,
+                                        TIMETABLE_STAMP.LOCATION,
+                                        TIMETABLE_STAMP.TYPE,
+                                        DSL.field("DATE_TRUNC('minutes', {0})", LocalDateTime.class, TIMETABLE_STAMP.ENTRANCE).as("entrance"),
+                                        DSL.field("DATE_TRUNC('minutes', {0})", LocalDateTime.class, TIMETABLE_STAMP.EXIT).as("exit")
+                                )
 				.from(TIMETABLE_STAMP)
 				.where(
 						TIMETABLE_STAMP.DOMAIN_ID.equal(domainId)
