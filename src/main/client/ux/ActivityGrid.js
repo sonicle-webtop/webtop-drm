@@ -151,7 +151,7 @@ Ext.define('Sonicle.webtop.drm.ux.ActivityGrid', {
 					valueField: 'id', 
 					displayField: 'description',
 					searchField: 'description',
-					emptyText: WT.res('grid.empty'),
+					emptyText: WT.res(me.sid, 'grid.empty'),
 					searchText: WT.res(me.sid, 'groupactivity.picker.search'),
 					okText: WT.res('act-ok.lbl'),
 					cancelText: WT.res('act-cancel.lbl'),

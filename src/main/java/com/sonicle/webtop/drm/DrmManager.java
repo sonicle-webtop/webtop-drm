@@ -4794,8 +4794,11 @@ public class DrmManager extends BaseManager implements IDrmManager{
 						hashTrs.put(itm.getDomainId() + "|" + itm.getUserId() + "|" + itm.getTargetUserId() + "|" + itm.getDate(),  vals);
 					}
 					
-					trDAO.deleteByDomainIdUserIdMonthYear(con, tpDomainId, tpUserId, fromDate, toDate);
-					
+                                        if (query.companyId == null)
+                                            trDAO.deleteByDomainIdUserIdMonthYear(con, tpDomainId, tpUserId, fromDate, toDate);
+                                        else
+                                            trDAO.deleteByDomainIdUserIdCompanyIdMonthYear(con, tpDomainId, tpUserId, query.companyId, fromDate, toDate);
+                                        
 					//Get Data for All Users for Company by TargetProfileId.UserId if supervisor or himself
 					List<OUser> users = listCompanyProfileSupervisedUsers(query.companyId);
 					
@@ -4949,7 +4952,10 @@ public class DrmManager extends BaseManager implements IDrmManager{
 						hashTrs.put(itm.getDomainId() + "|" + itm.getUserId() + "|" + itm.getTargetUserId() + "|" + itm.getDate(),  vals);
 					}
 					
-					trDAO.deleteByDomainIdUserIdTargetUserIdMonthYear(con, tpDomainId, tpUserId, query.targetUserId, fromDate, toDate);
+                                        if (query.companyId == null)
+                                            trDAO.deleteByDomainIdUserIdTargetUserIdMonthYear(con, tpDomainId, tpUserId, query.targetUserId, fromDate, toDate);
+                                        else
+                                            trDAO.deleteByDomainIdUserIdCompanyIdTargetUserIdMonthYear(con, tpDomainId, tpUserId, query.companyId, query.targetUserId, fromDate, toDate);
 					
 					if(Boolean.TRUE.equals(oEP.getNoStamping())){
 						//Utente che non utilizza le timbrature, creo report con ore lavorative coincidenti alle ore del proprio profilo orario.

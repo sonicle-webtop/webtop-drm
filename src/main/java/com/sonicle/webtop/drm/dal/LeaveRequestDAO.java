@@ -203,6 +203,11 @@ public class LeaveRequestDAO extends BaseDAO {
 			//if no specific status, include also previous open requests
 			if (query.status == null) {
 				dateCond = dateCond.or(LEAVE_REQUESTS.STATUS.equal("O"));
+                                dateCond = dateCond.or(
+                                        LEAVE_REQUESTS.EMPLOYEE_CANC_REQ.isTrue().and(
+                                                LEAVE_REQUESTS.CANC_RESULT.isNull()
+                                        )
+                                );
 			}
 			searchCndt = searchCndt.and(dateCond);
 		}

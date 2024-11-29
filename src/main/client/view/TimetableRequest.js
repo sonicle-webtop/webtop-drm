@@ -359,7 +359,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 		var me = this,
 				mo = me.getModel();
 	
-		if(mo.get('userId') === null) me.lref('flduser').setReadOnly(false);
+		/*if(mo.get('userId') === null)*/ me.lref('flduser').setReadOnly(false);
 		if(mo.get('cancRequest') === true) me.lref('fldcancellationreason').setHidden(false);
 	
 		WT.ajaxReq(me.mys.ID, 'IsTimetableRequestPreviousDate', {
