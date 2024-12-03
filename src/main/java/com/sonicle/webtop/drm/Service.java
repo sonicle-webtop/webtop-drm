@@ -953,7 +953,7 @@ public class Service extends BaseService {
 			types.add(createLeaveRequestJsSimple(OLeaveRequestType.HOLIDAY));
 			types.add(createLeaveRequestJsSimple(OLeaveRequestType.PAID_LEAVE));
 			
-			if (ep.getExtraordinary())
+			if (ep != null && ep.getExtraordinary())
 				types.add(createLeaveRequestJsSimple(OLeaveRequestType.OVERTIME));
 			
 			if(ts != null){
@@ -962,7 +962,7 @@ public class Service extends BaseService {
 				if(ts.getRequestsPermitsContractuals())types.add(createLeaveRequestJsSimple(OLeaveRequestType.CONTRACTUAL));
 				if(ts.getRequestsSickness())types.add(createLeaveRequestJsSimple(OLeaveRequestType.SICKNESS));
 			}
-			if (!ep.getNoStamping()) types.add(createLeaveRequestJsSimple(OLeaveRequestType.WORK_ABSENCE));
+			if (ep != null && !ep.getNoStamping()) types.add(createLeaveRequestJsSimple(OLeaveRequestType.WORK_ABSENCE));
 			
 			String selected = types.isEmpty() ? null : (String) types.get(0).id;
 			ResultMeta meta = new LookupMeta().setSelected(selected);
@@ -4053,7 +4053,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 					}
 
 					if(wrkRpt.getEventId() != null){
-						ev = cm.getEvent(String.valueOf(wrkRpt.getEventId()));
+						ev = cm.getEvent(wrkRpt.getEventId());
 
 						if(ev != null){
 							eventId = updateWorkReportEvent(cm, wrkRpt, ev);
@@ -4085,7 +4085,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 			}
 			
 			if(job.getEventId() != null){
-				ev = cm.getEvent(String.valueOf(job.getEventId()));
+				ev = cm.getEvent(job.getEventId());
 				
 				if(ev != null){
 					eventId = updateJobEvent(cm, job, ev);
@@ -4263,11 +4263,9 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		
 		if (cm != null) {
 			if(wrkRpt.getEventId() != null){
-				Event ev = cm.getEvent(String.valueOf(wrkRpt.getEventId()));
-				if(ev != null) {
-					String key = EventKey.buildKey(String.valueOf(wrkRpt.getEventId()), null);
-					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, key, false);
-				}
+				Event ev = cm.getEvent(wrkRpt.getEventId());
+				if(ev != null)
+					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(wrkRpt.getEventId(), null), false);
 			}
 		}
 	}
@@ -4277,11 +4275,9 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		
 		if (cm != null) {
 			if(job.getEventId() != null){
-				Event ev = cm.getEvent(String.valueOf(job.getEventId()));
-				if(ev != null) {
-					String key = EventKey.buildKey(String.valueOf(job.getEventId()), null);
-					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, key, false);
-				}
+				Event ev = cm.getEvent(job.getEventId());
+				if(ev != null)
+					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(job.getEventId(), null), false);
 			}
 		}
 	}
@@ -4300,7 +4296,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 			}
 			
 			if(o.getEventId() != null){
-				ev = cm.getEvent(String.valueOf(o.getEventId()));
+				ev = cm.getEvent(o.getEventId());
 				
 				if(ev != null){
 					eventId = updateOpportunityEvent(cm, o, ev);
@@ -4402,9 +4398,9 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		
 		if (cm != null) {
 			if(o.getEventId() != null){
-				Event ev = cm.getEvent(String.valueOf(o.getEventId()));
+				Event ev = cm.getEvent(o.getEventId());
 				if(ev != null)
-					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(String.valueOf(o.getEventId()), null), false);
+					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(o.getEventId(), null), false);
 			}
 		}
 	}
@@ -4425,7 +4421,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 			}
 			
 			if(oAct.getEventId() != null){
-				ev = cm.getEvent(String.valueOf(oAct.getEventId()));
+				ev = cm.getEvent(oAct.getEventId());
 				
 				if(ev != null){
 					eventId = updateOpportunityActionEvent(cm, oAct, o, ev);
@@ -4527,7 +4523,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 				title += oAct.getDescription();
 			
 			if(oAct.getEventId() != null){
-				ev = cm.getEvent(String.valueOf(oAct.getEventId()));
+				ev = cm.getEvent(oAct.getEventId());
 				
 				if(ev != null){
 					EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
@@ -4543,14 +4539,9 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		
 		if (cm != null) {
 			if(oAct.getEventId() != null){
-				Event ev = cm.getEvent(String.valueOf(oAct.getEventId()));
-				if(ev != null) {
-					String key = EventKey.buildKey(String.valueOf(oAct.getEventId()), null);
-					cm.deleteEventInstance(
-							UpdateEventTarget.ALL_SERIES,
-							key,
-							false);
-				}
+				Event ev = cm.getEvent(oAct.getEventId());
+				if(ev != null)
+					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(oAct.getEventId(), null), false);
 			}
 		}
 	}

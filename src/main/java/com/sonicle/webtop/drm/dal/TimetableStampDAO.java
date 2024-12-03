@@ -50,6 +50,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -137,7 +138,15 @@ public class TimetableStampDAO extends BaseDAO{
 		DSLContext dsl = getDSL(con);
 		
 		return dsl
-				.select()
+				.select(
+                                        TIMETABLE_STAMP.ID,
+                                        TIMETABLE_STAMP.DOMAIN_ID,
+                                        TIMETABLE_STAMP.USER_ID,
+                                        TIMETABLE_STAMP.LOCATION,
+                                        TIMETABLE_STAMP.TYPE,
+                                        DSL.field("DATE_TRUNC('minutes', {0})", LocalDateTime.class, TIMETABLE_STAMP.ENTRANCE).as("entrance"),
+                                        DSL.field("DATE_TRUNC('minutes', {0})", LocalDateTime.class, TIMETABLE_STAMP.EXIT).as("exit")
+                                )
 				.from(TIMETABLE_STAMP)
 				.where(
 						TIMETABLE_STAMP.DOMAIN_ID.equal(domainId)
@@ -157,8 +166,9 @@ public class TimetableStampDAO extends BaseDAO{
 	public List<OTimetableReport> getStampsByDomainUserDateRange(Connection con, String domainId, Integer companyId, String userId, Integer fromDay, Integer month, Integer year) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		
-		Field<Integer> workingHours = DSL.field("((DATE_PART('day', {0} - {1}) * 24 + DATE_PART('hour', {0} - {1})) * 60 + DATE_PART('minute', {0} - {1}))", Integer.class, TIMETABLE_STAMP.EXIT, TIMETABLE_STAMP.ENTRANCE);
-		Field<String> detail = DSL.field("'e ' || to_char({0}, 'HH24:MI') || ' u ' || to_char({1}, 'HH24:MI') || ' [' || CASE WHEN {2} = 'O' THEN 'U' WHEN {2} IS NULL THEN '' ELSE {2} END || '] '", String.class, TIMETABLE_STAMP.ENTRANCE, TIMETABLE_STAMP.EXIT, TIMETABLE_STAMP.LOCATION);
+		//Field<Integer> workingHours = DSL.field("((DATE_PART('day', {0} - {1}) * 24 + DATE_PART('hour', {0} - {1})) * 60 + DATE_PART('minute', {0} - {1}))", Integer.class, TIMETABLE_STAMP.EXIT, TIMETABLE_STAMP.ENTRANCE);
+		Field<Integer> workingHours = DSL.field("extract(epoch from date_trunc('minutes', {0}) - date_trunc('minutes', {1}))/60", Integer.class, TIMETABLE_STAMP.EXIT, TIMETABLE_STAMP.ENTRANCE);
+                Field<String> detail = DSL.field("'e ' || to_char({0}, 'HH24:MI') || ' u ' || to_char({1}, 'HH24:MI') || ' [' || CASE WHEN {2} = 'O' THEN 'U' WHEN {2} IS NULL THEN '' ELSE {2} END || '] '", String.class, TIMETABLE_STAMP.ENTRANCE, TIMETABLE_STAMP.EXIT, TIMETABLE_STAMP.LOCATION);
 		
 		return dsl
 				.select(

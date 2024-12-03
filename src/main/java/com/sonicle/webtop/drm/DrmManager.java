@@ -4794,8 +4794,11 @@ public class DrmManager extends BaseManager implements IDrmManager{
 						hashTrs.put(itm.getDomainId() + "|" + itm.getUserId() + "|" + itm.getTargetUserId() + "|" + itm.getDate(),  vals);
 					}
 					
-					trDAO.deleteByDomainIdUserIdMonthYear(con, tpDomainId, tpUserId, fromDate, toDate);
-					
+                                        if (query.companyId == null)
+                                            trDAO.deleteByDomainIdUserIdMonthYear(con, tpDomainId, tpUserId, fromDate, toDate);
+                                        else
+                                            trDAO.deleteByDomainIdUserIdCompanyIdMonthYear(con, tpDomainId, tpUserId, query.companyId, fromDate, toDate);
+                                        
 					//Get Data for All Users for Company by TargetProfileId.UserId if supervisor or himself
 					List<OUser> users = listCompanyProfileSupervisedUsers(query.companyId);
 					
@@ -4949,7 +4952,10 @@ public class DrmManager extends BaseManager implements IDrmManager{
 						hashTrs.put(itm.getDomainId() + "|" + itm.getUserId() + "|" + itm.getTargetUserId() + "|" + itm.getDate(),  vals);
 					}
 					
-					trDAO.deleteByDomainIdUserIdTargetUserIdMonthYear(con, tpDomainId, tpUserId, query.targetUserId, fromDate, toDate);
+                                        if (query.companyId == null)
+                                            trDAO.deleteByDomainIdUserIdTargetUserIdMonthYear(con, tpDomainId, tpUserId, query.targetUserId, fromDate, toDate);
+                                        else
+                                            trDAO.deleteByDomainIdUserIdCompanyIdTargetUserIdMonthYear(con, tpDomainId, tpUserId, query.companyId, query.targetUserId, fromDate, toDate);
 					
 					if(Boolean.TRUE.equals(oEP.getNoStamping())){
 						//Utente che non utilizza le timbrature, creo report con ore lavorative coincidenti alle ore del proprio profilo orario.
@@ -5128,7 +5134,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 							otr.setOvertime(ManagerUtils.pad((delta / 60), 1) + "." + ManagerUtils.pad((delta % 60),2));
 							otr.setWorkingHours(ManagerUtils.pad((wh / 60), 1) + "." + ManagerUtils.pad((wh % 60),2));
 						} else {
-							//otr.setWorkingHours(ManagerUtils.pad((lh / 60), 1) + "." + ManagerUtils.pad((lh % 60),2));
+							if (delta>0) otr.setWorkingHours(ManagerUtils.pad((lh / 60), 1) + "." + ManagerUtils.pad((lh % 60),2));
 						}
 					}
 					
@@ -5140,7 +5146,10 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				
 				if(query.targetUserId == null) {
 					//Select for DomainId UserId
-					trs = trDAO.selectByDomainIdUserIdMonthYear(con, tpDomainId, tpUserId, fromDate, toDate);
+                                        if (query.companyId == null)
+                                            trs = trDAO.selectByDomainIdUserIdMonthYear(con, tpDomainId, tpUserId, fromDate, toDate);
+                                        else
+                                            trs = trDAO.selectByDomainIdUserIdCompanyIdMonthYear(con, tpDomainId, tpUserId, query.companyId, fromDate, toDate);
 				}else{
 					//Select for DomainId UserId and TargetUserId
 					trs = trDAO.selectByDomainIdUserIdTargetUserIdMonthYear(con, 
@@ -6714,7 +6723,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					}
 
 					if(lReq.getEventId() != null){
-						Event ev = cm.getEvent(String.valueOf(lReq.getEventId()));
+						Event ev = cm.getEvent(lReq.getEventId());
 
 						if(ev != null){
 							return updateLeaveRequestEvent(targetPid, cm, lReq, ev, ownCalendar);
@@ -6875,10 +6884,9 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				WTException exc=WT.runPrivileged(new Callable<WTException>(){
 					public WTException call() {
 						try {
-							Event ev = cm.getEvent(String.valueOf(lReq.getEventId()));
+							Event ev = cm.getEvent(lReq.getEventId());
 							if(ev != null) {
-								String key = EventKey.buildKey(String.valueOf(lReq.getEventId()), null);
-								cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, key, false);
+								cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(lReq.getEventId(), null), false);
 							}
 						} catch(WTException exc) {
 							return exc;

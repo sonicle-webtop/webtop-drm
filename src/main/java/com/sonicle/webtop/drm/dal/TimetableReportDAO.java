@@ -141,7 +141,24 @@ public class TimetableReportDAO extends BaseDAO{
 				.execute();
 	}
 	
-	public List<OTimetableReport> selectByDomainIdUserIdTargetUserIdMonthYear(Connection con, String domainId, String userId, String targetUserId, LocalDate fD, LocalDate tD) throws DAOException {
+	public int deleteByDomainIdUserIdCompanyIdMonthYear(Connection con, String domainId, String userId, Integer companyId, LocalDate fD, LocalDate tD) {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.delete(TIMETABLE_REPORT_TEMP)
+				.where(
+						TIMETABLE_REPORT_TEMP.DOMAIN_ID.equal(domainId)
+				).and(
+						TIMETABLE_REPORT_TEMP.USER_ID.equal(userId)
+				).and(
+						TIMETABLE_REPORT_TEMP.COMPANY_ID.equal(companyId)
+				)
+				.and(
+						TIMETABLE_REPORT_TEMP.DATE.between(fD.toLocalDateTime(LocalTime.MIDNIGHT), tD.toLocalDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
+				)
+				.execute();
+	}
+
+        public List<OTimetableReport> selectByDomainIdUserIdTargetUserIdMonthYear(Connection con, String domainId, String userId, String targetUserId, LocalDate fD, LocalDate tD) throws DAOException {
 		DSLContext dsl = getDSL(con);
 		return dsl
 				.select()
@@ -184,6 +201,25 @@ public class TimetableReportDAO extends BaseDAO{
 						TIMETABLE_REPORT_TEMP.DOMAIN_ID.equal(domainId)
 				).and(
 						TIMETABLE_REPORT_TEMP.USER_ID.equal(userId)
+				).and(
+						TIMETABLE_REPORT_TEMP.TARGET_USER_ID.equal(targetUserId)
+				)
+				.and(
+						TIMETABLE_REPORT_TEMP.DATE.between(fD.toLocalDateTime(LocalTime.MIDNIGHT), tD.toLocalDateTime(LocalTime.MIDNIGHT).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59))
+				)
+				.execute();
+	}
+	
+	public int deleteByDomainIdUserIdCompanyIdTargetUserIdMonthYear(Connection con, String domainId, String userId, Integer companyId, String targetUserId, LocalDate fD, LocalDate tD) {
+		DSLContext dsl = getDSL(con);
+		return dsl
+				.delete(TIMETABLE_REPORT_TEMP)
+				.where(
+						TIMETABLE_REPORT_TEMP.DOMAIN_ID.equal(domainId)
+				).and(
+						TIMETABLE_REPORT_TEMP.USER_ID.equal(userId)
+				).and(
+						TIMETABLE_REPORT_TEMP.COMPANY_ID.equal(companyId)
 				).and(
 						TIMETABLE_REPORT_TEMP.TARGET_USER_ID.equal(targetUserId)
 				)
