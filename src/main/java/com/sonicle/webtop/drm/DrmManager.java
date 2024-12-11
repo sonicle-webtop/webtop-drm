@@ -6139,11 +6139,18 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			
 			osWriter = new OutputStreamWriter(os);
 			
-			OEmployeeProfile oEP = ePDao.selectEmployeeProfileByDomainUser(con, domainId, query.targetUserId);
-			OHourProfile oHP = hPDao.selectHourProfileById(con, oEP.getHourProfileId());
-				
+			String currentTuid = null;
+			OEmployeeProfile oEP = null;
+			OHourProfile oHP = null;
 			for (OTimetableReport oTR : getTimetableReport(query)) {
 				
+				//Reload profile on target user id change
+				if (!StringUtils.equals(oTR.getTargetUserId(), currentTuid)) {
+					currentTuid = oTR.getTargetUserId();
+					
+					oEP = ePDao.selectEmployeeProfileByDomainUser(con, domainId, currentTuid);
+					oHP = hPDao.selectHourProfileById(con, oEP.getHourProfileId());
+				}
 				//Calculate Theoretical Hours
 				String theoreticalMinutes = lHDao.selectSumLineHourByHourProfileIdDayOfWeek(con, oHP.getId(),  oTR.getDate().getDayOfWeek());
 				String stringTheoreticalHours = "";
@@ -6432,49 +6439,69 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		
 			String domainId = getTargetProfileId().getDomainId();
 			OTimetableSetting oTts = ttsDao.selectByDomainId(con, domainId);
-			
-			OEmployeeProfile oEP = ePDao.selectEmployeeProfileByDomainUser(con, domainId, query.targetUserId);
-			OHourProfile oHP = hPDao.selectHourProfileById(con, oEP.getHourProfileId());
-				
-			String companyCode = StringUtils.leftPad(dss.getGisCompanyCode(), 4, '0');
-			String headquartersCode = StringUtils.leftPad(oEP.getHeadquartersCode(), 2, '0');
-			String employee = dss.isTSComposedEmployeeCode() ? 
-					StringUtils.leftPad(oEP.getNumber(), 15, '0') : 
-					StringUtils.leftPad(oEP.getNumber(), 9, '0');
-			
-			UserProfileId targetPid = new UserProfileId(domainId, query.targetUserId);
-			PersonalInfo targetPinfo = WT.getProfilePersonalInfo(targetPid);
-			
-			Calendar cal = Calendar.getInstance();
-			cal.set(Calendar.MONTH, query.month - 1);
-			String mmyy = StringUtils.leftPad(""+query.month, 2, '0')+
-					StringUtils.leftPad(""+(query.year%100), 2, '0');
-			String startDate = "01"+mmyy;
-			String endDate = StringUtils.leftPad(""+cal.getActualMaximum(Calendar.DAY_OF_MONTH), 2, '0')+mmyy;
-			
+						
 			osWriter = new OutputStreamWriter(os);
-			
-			if (!dss.isTSComposedEmployeeCode()) {
-				osWriter.write(companyCode); //1 Codice Azienda
-				osWriter.write(headquartersCode); //2 Codice Sede
-			}
-			osWriter.write(employee); //3 Dipendente
-			osWriter.write(
-				StringUtils.rightPad(
-					StringUtils.left(targetPinfo.getLastName(),34),
-					34,' ')
-			); //4 Cognome
-			osWriter.write(
-				StringUtils.rightPad(
-					StringUtils.left(targetPinfo.getFirstName(),34),
-					34,' ')
-			); //5 Nome
 
-			osWriter.write(startDate); //6 Data
-			osWriter.write(endDate); //7 Data
-			
 			int days = 0;
+			String currentTuid = null;
+			OEmployeeProfile oEP = null;
+			OHourProfile oHP = null;
 			for (OTimetableReport oTR : getTimetableReport(query)) {
+
+				//Restart header on target user id change
+				if (!StringUtils.equals(oTR.getTargetUserId(), currentTuid)) {
+					
+					//fill up to 31 days if days have been output
+					if (days>0) {
+						while(days++ < 31) {
+							osWriter.write("0000    0000    0000    0000    0000    0000    0000");					
+						}
+						days = 0;
+					}
+					
+					currentTuid = oTR.getTargetUserId();
+					
+					oEP = ePDao.selectEmployeeProfileByDomainUser(con, domainId, currentTuid);
+					oHP = hPDao.selectHourProfileById(con, oEP.getHourProfileId());
+
+					String companyCode = StringUtils.leftPad(dss.getGisCompanyCode(), 4, '0');
+					String headquartersCode = StringUtils.leftPad(oEP.getHeadquartersCode(), 2, '0');
+					String employee = dss.isTSComposedEmployeeCode() ? 
+							StringUtils.leftPad(oEP.getNumber(), 15, '0') : 
+							StringUtils.leftPad(oEP.getNumber(), 9, '0');
+
+					UserProfileId targetPid = new UserProfileId(domainId, currentTuid);
+					PersonalInfo targetPinfo = WT.getProfilePersonalInfo(targetPid);
+
+					Calendar cal = Calendar.getInstance();
+					cal.set(Calendar.MONTH, query.month - 1);
+					String mmyy = StringUtils.leftPad(""+query.month, 2, '0')+
+							StringUtils.leftPad(""+(query.year%100), 2, '0');
+					String startDate = "01"+mmyy;
+					String endDate = StringUtils.leftPad(""+cal.getActualMaximum(Calendar.DAY_OF_MONTH), 2, '0')+mmyy;
+
+					if (!dss.isTSComposedEmployeeCode()) {
+						osWriter.write(companyCode); //1 Codice Azienda
+						osWriter.write(headquartersCode); //2 Codice Sede
+					}
+					osWriter.write(employee); //3 Dipendente
+					osWriter.write(
+						StringUtils.rightPad(
+							StringUtils.left(targetPinfo.getLastName(),34),
+							34,' ')
+					); //4 Cognome
+					osWriter.write(
+						StringUtils.rightPad(
+							StringUtils.left(targetPinfo.getFirstName(),34),
+							34,' ')
+					); //5 Nome
+
+					osWriter.write(startDate); //6 Data
+					osWriter.write(endDate); //7 Data
+				}
+				
+				
+
 				++days;
 				
 				//Calculate Theoretical Hours
@@ -6559,11 +6586,14 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				//fill up to 6 codes
 				while(codes++ < 6) osWriter.write("    0000");					
 			}
-			//fill up to 31 days
-			while(days++ < 31) {
-				osWriter.write("0000    0000    0000    0000    0000    0000    0000");					
+			//fill up to 31 days if days have been output
+			if (days>0) {
+				while(days++ < 31) {
+					osWriter.write("0000    0000    0000    0000    0000    0000    0000");					
+				}
+				days = 0;
 			}
-			
+
 			
 		} catch(Exception ex) {
 			throw new WTException(ex, "Error in creating file");

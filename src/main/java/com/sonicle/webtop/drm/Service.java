@@ -2518,14 +2518,14 @@ public class Service extends BaseService {
 			String op = ServletUtils.getStringParameter(request, "op", true);
 			String query = ServletUtils.getStringParameter(request, "query", null);
 			TimetableReportQuery trQuery = TimetableReportQuery.fromJson(query);
+			if (trQuery == null) {
+				new JsonResult(false, lookupResource("timetablereport.nodata")).printTo(out);
+				return;
+			}
 			String dateS;
 			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
 			dateS = formatter.format(new Date());
-			String title = "";
-
-			if(trQuery != null){
-				title = (trQuery.targetUserId != null) ? trQuery.targetUserId : "tutti";
-			}
+			String title = (trQuery.targetUserId != null) ? trQuery.targetUserId : "tutti";
 			
 			if (op.equals("do")) {			
 				txtWizard = new TxtExportWizard();
@@ -2583,14 +2583,15 @@ public class Service extends BaseService {
 			String op = ServletUtils.getStringParameter(request, "op", true);
 			String query = ServletUtils.getStringParameter(request, "query", null);
 			TimetableReportQuery trQuery = TimetableReportQuery.fromJson(query);
+			if (trQuery == null) {
+				new JsonResult(false, lookupResource("timetablereport.nodata")).printTo(out);
+				return;
+			}
+			
 			String dateS;
 			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
 			dateS = formatter.format(new Date());
-			String title = "";
-
-			if(trQuery != null){
-				title = (trQuery.targetUserId != null) ? trQuery.targetUserId : "tutti";
-			}
+			String title = (trQuery.targetUserId != null) ? trQuery.targetUserId : "tutti";
 			
 			if (op.equals("do")) {			
 				txtWizard = new TxtExportWizard();
