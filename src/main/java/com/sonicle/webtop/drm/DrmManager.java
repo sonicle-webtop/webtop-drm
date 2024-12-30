@@ -5098,15 +5098,18 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					otr.setId(trDAO.getTimetableReportTempSequence(con).intValue());
 					otr.setUserId(tpUserId);
 					
-					//VASI SETTO PROFILO ORARIO
-					// ma prima verifica se non è una festività
+					// se non è una festività setto il profilo orario
 					LocalDate localDate = otr.getDate().toLocalDate();
 					if (!hdMap.containsKey(localDate)) {
 						Integer hourProfileId =  epDAO.selectEmployeeProfileByDomainUser(con, tpDomainId, otr.getTargetUserId()).getHourProfileId();
 						String profileHour = lhDAO.selectSumLineHourByHourProfileIdDayOfWeek(con, hourProfileId, localDate.dayOfWeek().get());
 						otr.setTotalLineHour(profileHour);
+					} else {
+						//altrimenti svuoto eventuali ferie e/o permessi
+						otr.setHoliday("");
+						otr.setPaidLeave("");
 					}
-					//VASI FINE
+					
 	
 					//Set if present other, causal, note from old generation
 					val = hashTrs.getOrDefault(otr.getDomainId() + "|" + otr.getUserId() + "|" + otr.getTargetUserId() + "|" + otr.getDate(), null);
@@ -6819,9 +6822,9 @@ public class DrmManager extends BaseManager implements IDrmManager{
 	
 	private int updateLeaveRequestEvent(UserProfileId upid, ICalendarManager cm, LeaveRequest lReq, Event ev, boolean ownCalendar) throws WTException{
 		EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
-		
-		//Non approvata?
-		if (!LangUtils.value(lReq.getResult(), Boolean.TRUE)) {
+
+		//Non approvata o cancellata?
+		if (!LangUtils.value(lReq.getResult(), Boolean.TRUE) || (lReq.getCancResult()!=null && lReq.getCancResult()==true)) {
 			cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, evI.getKey(), false);
 			return 0;
 		} else {

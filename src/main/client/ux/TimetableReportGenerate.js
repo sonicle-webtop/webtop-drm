@@ -234,8 +234,10 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableReportGenerate', {
 
 		var query = {
 			companyId: me.lookupReference('fldcompany').getValue(),
+			companyDescription: me.lookupReference('fldcompany').getSelection().get('desc'),
 			targetUserId: me.lookupReference('flduser').getValue(),
 			month: me.lookupReference('fldmonth').getValue(),
+			monthDescription: me.lookupReference('fldmonth').getSelection().get('desc'),
 			year: me.lookupReference('fldyear').getValue(),
 			fromDay: me.lookupReference('fldfromday').getValue(),
 			mode: mode

@@ -131,6 +131,7 @@ public class TimetableStampDAO extends BaseDAO{
 				.and(
 						TIMETABLE_STAMP.ENTRANCE.between(new DateTime().withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).toLocalDateTime(), new DateTime().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toLocalDateTime())
 				)
+				.orderBy(TIMETABLE_STAMP.ENTRANCE)
 				.fetchInto(OTimetableStamp.class);
 	}
 	

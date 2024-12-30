@@ -95,7 +95,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 					store: {
 						autoLoad: true,
 						model: 'WTA.model.Simple',
-						proxy: WTF.proxy(me.mys.ID, 'LookupOperators'),
+						proxy: WTF.proxy(me.mys.ID, 'LookupManagedOperators'),
 						listeners: {
 							load: function (s) {
 								if (me.isMode('new')) {
@@ -270,7 +270,21 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 									hidden: true,
 									reference: 'hours',
 									items: [
-										WTF.localCombo('id', 'desc', {
+										{ 
+											xtype: 'timefield',
+											reference: 'fldfromhour',
+											bind: '{record.fromHour}',
+											format: 'H:i',
+											fieldLabel: me.mys.res('timetableRequest.fld-fromHour.lbl')
+										},
+										{ 
+											xtype: 'timefield',
+											reference: 'fldtohour',
+											bind: '{record.toHour}',
+											format: 'H:i',
+											fieldLabel: me.mys.res('timetableRequest.fld-toHour.lbl')
+										}
+										/*WTF.localCombo('id', 'desc', {
 											reference: 'fldfromhour',
 											bind: '{record.fromHour}',
 											store: Ext.create('Sonicle.webtop.drm.store.WorkingHours', {
@@ -287,7 +301,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 											}),
 											fieldLabel: me.mys.res('timetableRequest.fld-toHour.lbl'),
 											editable: true
-										})
+										})*/
 									]
 								},
 								{

@@ -1338,6 +1338,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 										allowBlank: true,
 										editable: true,
 										anyMatch: true,
+										matchFieldWidth: false,
+										listConfig: { width: 300 },
 										store: Ext.create('Ext.data.Store', {
 											autoLoad: true,
 											model: 'WTA.model.Simple',
@@ -3769,6 +3771,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	    // Replace typos with "."
 	    value = value.replace(":", ".");
 		value = value.replace(",", ".");
+		
+		//Add zeros at end if hour has a typo and ends with '.'
+		if (value.endsWith(".")) value += "00";
 	
 	    // Format "2" to "2.00"
 	    if (/^\d+(\.\d+)?$/.test(value)) {
