@@ -5098,6 +5098,14 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					otr.setId(trDAO.getTimetableReportTempSequence(con).intValue());
 					otr.setUserId(tpUserId);
 					
+					//Set if present other, causal, note from old generation
+					val = hashTrs.getOrDefault(otr.getDomainId() + "|" + otr.getUserId() + "|" + otr.getTargetUserId() + "|" + otr.getDate(), null);
+					if(val != null){
+						otr.setOther(val.getOrDefault("other", null));
+						otr.setCausalId(val.getOrDefault("causalId", null));
+						otr.setNote(val.getOrDefault("note", null));
+					}
+
 					// se non è una festività setto il profilo orario
 					LocalDate localDate = otr.getDate().toLocalDate();
 					if (!hdMap.containsKey(localDate)) {
@@ -5108,17 +5116,13 @@ public class DrmManager extends BaseManager implements IDrmManager{
 						//altrimenti svuoto eventuali ferie e/o permessi
 						otr.setHoliday("");
 						otr.setPaidLeave("");
+						if (StringUtils.isEmpty(otr.getNote())) {
+							List<OHolidayDate> lhd = hdMap.get(localDate);
+							otr.setNote(lhd.get(0).getDescription());
+						}
 					}
 					
 	
-					//Set if present other, causal, note from old generation
-					val = hashTrs.getOrDefault(otr.getDomainId() + "|" + otr.getUserId() + "|" + otr.getTargetUserId() + "|" + otr.getDate(), null);
-					if(val != null){
-						otr.setOther(val.getOrDefault("other", null));
-						otr.setCausalId(val.getOrDefault("causalId", null));
-						otr.setNote(val.getOrDefault("note", null));
-					}
-
 					TimetableSetting tts = getTimetableSetting();
 					//Se vi Ã¨ la Gestione automatica straordinari, ciclo i record per modificare Working Hours e Overtime secondo la logica
 					if(supervisor && tts.getAutomaticOvertime() == true && otr.getWorkingHours() != null){
