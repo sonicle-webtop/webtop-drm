@@ -41,7 +41,9 @@ import com.sonicle.commons.web.json.JsonResult;
 public class TimetableReportQuery {
 
 	public Integer companyId;
+	public String companyDescription;
 	public Integer month;
+	public String monthDescription;
 	public Integer year;
 	public Integer fromDay;
 	public String crud;

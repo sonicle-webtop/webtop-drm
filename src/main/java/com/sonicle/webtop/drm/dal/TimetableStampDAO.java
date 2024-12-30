@@ -131,6 +131,7 @@ public class TimetableStampDAO extends BaseDAO{
 				.and(
 						TIMETABLE_STAMP.ENTRANCE.between(new DateTime().withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).toLocalDateTime(), new DateTime().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toLocalDateTime())
 				)
+				.orderBy(TIMETABLE_STAMP.ENTRANCE)
 				.fetchInto(OTimetableStamp.class);
 	}
 	
@@ -160,6 +161,7 @@ public class TimetableStampDAO extends BaseDAO{
 				/*.and(
 						TIMETABLE_STAMP.EXIT.between(new DateTime().withYear(year).withMonthOfYear(month).withDayOfMonth(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).toLocalDateTime(), new DateTime().withYear(year).withMonthOfYear(month).dayOfMonth().withMaximumValue().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toLocalDateTime())
 				)*/
+				.orderBy(TIMETABLE_STAMP.ENTRANCE)
 				.fetchInto(OTimetableStamp.class);
 	}
 	
@@ -311,6 +313,7 @@ public class TimetableStampDAO extends BaseDAO{
 							.where(PROFILES_MEMBERS.USER_ID.eq(userId))
 						)
 				)
+				.orderBy(TIMETABLE_STAMP.USER_ID, TIMETABLE_STAMP.ENTRANCE)
 				.fetchInto(OTimetableStamp.class);
 	}
 }

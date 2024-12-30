@@ -5098,16 +5098,6 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					otr.setId(trDAO.getTimetableReportTempSequence(con).intValue());
 					otr.setUserId(tpUserId);
 					
-					//VASI SETTO PROFILO ORARIO
-					// ma prima verifica se non è una festività
-					LocalDate localDate = otr.getDate().toLocalDate();
-					if (!hdMap.containsKey(localDate)) {
-						Integer hourProfileId =  epDAO.selectEmployeeProfileByDomainUser(con, tpDomainId, otr.getTargetUserId()).getHourProfileId();
-						String profileHour = lhDAO.selectSumLineHourByHourProfileIdDayOfWeek(con, hourProfileId, localDate.dayOfWeek().get());
-						otr.setTotalLineHour(profileHour);
-					}
-					//VASI FINE
-	
 					//Set if present other, causal, note from old generation
 					val = hashTrs.getOrDefault(otr.getDomainId() + "|" + otr.getUserId() + "|" + otr.getTargetUserId() + "|" + otr.getDate(), null);
 					if(val != null){
@@ -5116,6 +5106,23 @@ public class DrmManager extends BaseManager implements IDrmManager{
 						otr.setNote(val.getOrDefault("note", null));
 					}
 
+					// se non è una festività setto il profilo orario
+					LocalDate localDate = otr.getDate().toLocalDate();
+					if (!hdMap.containsKey(localDate)) {
+						Integer hourProfileId =  epDAO.selectEmployeeProfileByDomainUser(con, tpDomainId, otr.getTargetUserId()).getHourProfileId();
+						String profileHour = lhDAO.selectSumLineHourByHourProfileIdDayOfWeek(con, hourProfileId, localDate.dayOfWeek().get());
+						otr.setTotalLineHour(profileHour);
+					} else {
+						//altrimenti svuoto eventuali ferie e/o permessi
+						otr.setHoliday("");
+						otr.setPaidLeave("");
+						if (StringUtils.isEmpty(otr.getNote())) {
+							List<OHolidayDate> lhd = hdMap.get(localDate);
+							otr.setNote(lhd.get(0).getDescription());
+						}
+					}
+					
+	
 					TimetableSetting tts = getTimetableSetting();
 					//Se vi Ã¨ la Gestione automatica straordinari, ciclo i record per modificare Working Hours e Overtime secondo la logica
 					if(supervisor && tts.getAutomaticOvertime() == true && otr.getWorkingHours() != null){
@@ -6819,9 +6826,9 @@ public class DrmManager extends BaseManager implements IDrmManager{
 	
 	private String updateLeaveRequestEvent(UserProfileId upid, ICalendarManager cm, LeaveRequest lReq, Event ev, boolean ownCalendar) throws WTException{
 		EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
-		
-		//Non approvata?
-		if (!LangUtils.value(lReq.getResult(), Boolean.TRUE)) {
+
+		//Non approvata o cancellata?
+		if (!LangUtils.value(lReq.getResult(), Boolean.TRUE) || (lReq.getCancResult()!=null && lReq.getCancResult()==true)) {
 			cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, evI.getKey(), false);
 			return null;
 		} else {

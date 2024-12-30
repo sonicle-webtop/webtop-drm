@@ -279,8 +279,8 @@ public class Service extends BaseService {
 
 	public static final Logger logger = WT.getLogger(Service.class);
 	public static final String JOB_EXPORT_FILENAME = "jobs_{0}-{1}.{2}";
-	public static final String TIMETABLE_GIS_EXPORT_FILENAME = "gis_{0}_{1}.{2}";
-	public static final String TIMETABLE_TS_EXPORT_FILENAME = "ts_{0}_{1}.{2}";
+	public static final String TIMETABLE_GIS_EXPORT_FILENAME = "GIS_{0}_{1}_{2}.{3}";
+	public static final String TIMETABLE_TS_EXPORT_FILENAME = "TS_{0}_{1}_{2}.{3}";
 
 	private DrmManager manager;
 	private DrmServiceSettings ss;
@@ -2522,9 +2522,7 @@ public class Service extends BaseService {
 				new JsonResult(false, lookupResource("timetablereport.nodata")).printTo(out);
 				return;
 			}
-			String dateS;
-			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-			dateS = formatter.format(new Date());
+
 			String title = (trQuery.targetUserId != null) ? trQuery.targetUserId : "tutti";
 			
 			if (op.equals("do")) {			
@@ -2535,7 +2533,6 @@ public class Service extends BaseService {
 				File file = WT.createTempFile();
 				
 				try {
-					DateTimeFormatter ymd2 = DateTimeUtils.createFormatter("yyyyMMdd", up.getTimeZone());
 					DateTimeFormatter ymdhms = DateTimeUtils.createFormatter("yyyy-MM-dd HH:mm:ss", up.getTimeZone());
 					
 					try (FileOutputStream fos = new FileOutputStream(file)) {
@@ -2543,7 +2540,7 @@ public class Service extends BaseService {
 						manager.exportTimetableReportGis(log, fos, trQuery);
 						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Ended on {0}", ymdhms.print(new DateTime())));
 						txtWizard.file = file;
-						txtWizard.filename = MessageFormat.format(TIMETABLE_GIS_EXPORT_FILENAME, dateS, title, "txt");
+						txtWizard.filename = MessageFormat.format(TIMETABLE_GIS_EXPORT_FILENAME, trQuery.companyDescription, trQuery.monthDescription, title, "txt");
 						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "File ready: {0}", txtWizard.filename));
 						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Operation completed succesfully"));
 						new JsonResult(new JsWizardData(log.print())).printTo(out);
@@ -2588,9 +2585,6 @@ public class Service extends BaseService {
 				return;
 			}
 			
-			String dateS;
-			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-			dateS = formatter.format(new Date());
 			String title = (trQuery.targetUserId != null) ? trQuery.targetUserId : "tutti";
 			
 			if (op.equals("do")) {			
@@ -2601,7 +2595,6 @@ public class Service extends BaseService {
 				File file = WT.createTempFile();
 				
 				try {
-					DateTimeFormatter ymd2 = DateTimeUtils.createFormatter("yyyyMMdd", up.getTimeZone());
 					DateTimeFormatter ymdhms = DateTimeUtils.createFormatter("yyyy-MM-dd HH:mm:ss", up.getTimeZone());
 					
 					try (FileOutputStream fos = new FileOutputStream(file)) {
@@ -2609,7 +2602,7 @@ public class Service extends BaseService {
 						manager.exportTimetableReportTS(log, fos, trQuery);
 						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Ended on {0}", ymdhms.print(new DateTime())));
 						txtWizard.file = file;
-						txtWizard.filename = MessageFormat.format(TIMETABLE_TS_EXPORT_FILENAME, dateS, title, "txt");
+						txtWizard.filename = MessageFormat.format(TIMETABLE_TS_EXPORT_FILENAME, trQuery.companyDescription, trQuery.monthDescription, title, "txt");
 						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "File ready: {0}", txtWizard.filename));
 						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Operation completed succesfully"));
 						new JsonResult(new JsWizardData(log.print())).printTo(out);
@@ -5168,7 +5161,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 			List<JsSimple> jsC = new ArrayList();
 
 			for (OCausal c : manager.listCausals(filter)) {
-				jsC.add(new JsSimple(c.getId(), "[" + c.getExternalCode() + "] " + c.getDescription()));
+				jsC.add(new JsSimple(c.getId(), c.getDescription() + " [" + c.getExternalCode() + "]"));
 			}
 			
 			new JsonResult(jsC, jsC.size()).printTo(out);
