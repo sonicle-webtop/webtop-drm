@@ -44,6 +44,7 @@ import com.sonicle.webtop.drm.model.Causal;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
@@ -120,7 +121,7 @@ public class RBTimetableReport {
 	private Float convertInMinutes(String hour){
 		Integer minutes;
 		
-		if(null == hour){
+		if(StringUtils.isEmpty(hour)){
 			return null;
 		}
 		else {
