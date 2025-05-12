@@ -32,6 +32,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		'Sonicle.webtop.drm.ux.TimetableStampSearch',
 		'Sonicle.webtop.drm.model.GridTimetableList',
 		'Sonicle.webtop.drm.view.TimetableStamp',
+		'Sonicle.webtop.drm.ux.TimetableLeavesChart',
+		'Sonicle.webtop.drm.model.LeaveEvent',
 		'Sonicle.webtop.drm.model.GridJobs',
 		'Sonicle.webtop.drm.ux.JobSearch',
 		'Sonicle.webtop.drm.view.Job',		
@@ -1448,7 +1450,11 @@ Ext.define('Sonicle.webtop.drm.Service', {
 							}*/
 						}
 					]
-				},{
+				}, {
+					xtype: 'wtdrmtimetableleaveschart',
+					itemId: 'tmtb.leaveschart',
+					sid: me.ID
+				}, {
 					xtype: 'container',
 					itemId: 'tmtb.sumx',
 					layout: 'border',
@@ -1809,6 +1815,10 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	
 	gpTimetableStampSelected: function () {
 		return this.getMainComponent().lookupReference('gpTimetableStamp').getSelection()[0];
+	},
+	
+	timetableLeavesChart: function () {
+		return this.getMainComponent().lookupReference('timetableLeavesChart');
 	},
 	
 	itemActive: function () {
@@ -3755,6 +3765,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 				break;
 			case 'tmtb.rprt':
 				me.reloadTimetableReport(null);
+				break;
+			case 'tmtb.leaveschart':
+				me.getMainComponent().getComponent(id).reload();
 				break;
 			case 'job':
 				me.reloadJob(me.filtersJob().getData());

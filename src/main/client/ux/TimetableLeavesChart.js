@@ -1,0 +1,195 @@
+/* 
+ * Copyright (C) 2017 Sonicle S.r.l.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by
+ * the Free Software Foundation with the addition of the following permission
+ * added to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED
+ * WORK IN WHICH THE COPYRIGHT IS OWNED BY SONICLE, SONICLE DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, see http://www.gnu.org/licenses or write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301 USA.
+ *
+ * You can contact Sonicle S.r.l. at email address sonicle[at]sonicle[dot]com
+ *
+ * The interactive user interfaces in modified source and object code versions
+ * of this program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU Affero General Public License version 3.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * Sonicle logo and Sonicle copyright notice. If the display of the logo is not
+ * reasonably feasible for technical reasons, the Appropriate Legal Notices must
+ * display the words "Copyright (C) 2017 Sonicle S.r.l.".
+ */
+Ext.define('Sonicle.webtop.drm.ux.TimetableLeavesChart', {
+	extend: 'WTA.sdk.BaseView',
+	alias: 'widget.wtdrmtimetableleaveschart',
+	requires: [
+		'Sonicle.Data',
+		'Sonicle.String',
+		'Sonicle.Utils',
+		'Sonicle.VMUtils',
+		'Sonicle.webtop.drm.model.LeaveEvent'
+	],
+	mixins: [
+		'WTA.mixin.PanelUtil',
+		'WTA.mixin.Waitable'
+	],
+	
+	layout: 'fit',
+	referenceHolder: true,
+	
+	viewModel: {
+		data: {
+			data: {
+				date: null
+			}
+		}
+	},
+	
+	initComponent: function () {
+		var me = this;
+		me.setVMData('date', new Date());
+		me.callParent(arguments);
+		me.add({
+			xtype: 'sofullcalendarpanel',
+			reference: 'fullcalendar',
+			border: false,
+			store: {
+				model: 'Sonicle.webtop.drm.model.LeaveEvent',
+				proxy: WTF.apiProxy(me.sid, 'LeavesChart', 'events', {
+					autoAbort: true
+				})
+			},
+			showResources: true,
+			resources: function(fetchInfo, successCallback, failureCallback) {
+				WT.ajaxReq(me.sid, 'LeavesChart', {
+					params: {
+						type: 'resources'
+					},
+					callback: function (success, json) {
+						if (success) {
+							successCallback(json.data);
+						} else {
+							failureCallback();
+						}
+					}
+				});
+			},
+			eventsForceSolidDisplay: false,
+			locale: WT.getLanguageCode(),
+			startDay: WT.getStartDay(),
+			use24HourTime: WT.getUse24HourTime(),
+			initialDate: me.getVMData('date'),
+			initialView: 'monthtimeline',
+			//initialView: me.toFullCalendarViewName(me.getVar('view')),
+			//slotResolution: me.getVar('timeResolution'),
+			businessHours: {
+				daysOfWeek: [1,2,3,4,5],
+				startTime: '00:00',
+				endTime: '24:00'
+			},
+			//scrollTime: Ext.String.leftPad(Math.max(me.getVar('workdayStart').getHours()-1, 0), 2, '0') + ':00',
+			dayView: false,
+			week5View: false,
+			weekView: false,
+			biweekView: false,
+			monthView: false,
+			yearView: false,
+			dayTimelineView: true,
+			weekTimelineView: true,
+			monthTimelineView: true,
+			extraViewConfig: {
+				monthtimeline: {
+					slotLabelFormat: {day: '2-digit', weekday: 'narrow', omitCommas: true}
+				}
+			},
+			toolbarLayout: ['extraItems', '-', 'controlButtons', '->', 'headerText', '->', 'viewButtons'],
+			toolbarExtraItems: [
+				{
+					xtype: 'datefield',
+					bind: '{data.date}',
+					editable: false,
+					startDay: WT.getStartDay(),
+					format: WT.getShortDateFmt(),
+					listeners: {
+						select: function(s, v) {
+							me.fullcalendar().moveTo(v);
+						}
+					},
+					fieldLabel: WT.res(me.sid, 'timetableLeavesChart.fld-goToDate.lbl'),
+					width: 250
+				}
+			],
+			buttonConfigs: {
+				today: { ui: '{segmented|toolbar}' },
+				previous: { ui: '{segmented|toolbar}' },
+				next: { ui: '{segmented|toolbar}' },
+				dayTimelineView: { ui: '{segmented|toolbar}' },
+				weekTimelineView: { ui: '{segmented|toolbar}' },
+				monthTimelineView: { ui: '{segmented|toolbar}' }
+			},
+			buttonTexts: {
+				reload: { tooltip: WT.res('act-refresh.lbl') },
+				today: { text: WT.res('sofullcalendarpanel.goToday.lbl'), tooltip: WT.res('sofullcalendarpanel.goToday.tip') },
+				previous: { tooltip: WT.res('sofullcalendarpanel.goPrevious.tip') },
+				next: { tooltip: WT.res('sofullcalendarpanel.goNext.tip') },
+				daytimelineView: { text: WT.res('sofullcalendarpanel.view.daytimeline.lbl'), tooltip: WT.res('sofullcalendarpanel.view.daytimeline.tip') },
+				weektimelineView: { text: WT.res('sofullcalendarpanel.view.weektimeline.lbl'), tooltip: WT.res('sofullcalendarpanel.view.weektimeline.tip') },
+				monthtimelineView: { text: WT.res('sofullcalendarpanel.view.monthtimeline.lbl'), tooltip: WT.res('sofullcalendarpanel.view.monthtimeline.tip') }
+			},
+			texts: {
+				weekShort: WT.res('sofullcalendarpanel.weekShort'),
+				resourcesAreaTitle: WT.res(me.sid, 'timetableLeavesChart.resourcesareatitle.lbl')
+			},
+			eventClassNamesFunction: function(fcViewType, fcEvent, fcArg, context) {
+				var ret = Sonicle.fullcalendar.Panel.appointmentEventClassNamesFunction.apply(this, arguments),
+					exProps = fcEvent.extendedProps;
+				if (Sonicle.String.isIn(exProps.reqStatus, ['S', 'RD'])) {
+					ret.push('fc-event-style-slashed');
+				} else if (Sonicle.String.isIn(exProps.reqStatus, ['D'])) {
+					ret.push('fc-event-style-crossed');
+				}
+				return ret;
+			},
+			eventContentRenderer: Sonicle.fullcalendar.Panel.appointmentEventContentRenderer,
+			eventTooltipRenderer: function(fcViewType, fcEvent, fcArg, context) {
+				var ret = Sonicle.fullcalendar.Panel.appointmentEventTooltipRenderer.apply(this, arguments),
+					exProps = fcEvent.extendedProps,
+					newTitle = exProps.reqTypeText + " " + exProps.reqStatusText;
+				
+				return ret.text.replace(/(<div\s+class="so-cal-appo-hov-title">)(.*?)(<\/div>)/g, '$1' + newTitle + '$3');
+			},
+			resourceLabelContentRenderer: Sonicle.fullcalendar.Panel.resourceLabelWithSwatchContentRenderer,
+			resourceAreaWidth: 'auto',
+			listeners: {
+				scope: me,
+				reloadclick: function(s) {
+					s.getStore().load();
+				},
+				viewchange: function(s, name, info) {
+					me.setVMData('date', info.start);
+				}
+			},
+			editable: false
+		});
+	},
+	
+	fullcalendar: function() {
+		return this.lref('fullcalendar');
+	},
+	
+	reload: function() {
+		this.fullcalendar().getStore().load();
+	}
+});
+

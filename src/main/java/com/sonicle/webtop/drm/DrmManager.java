@@ -39,6 +39,7 @@ import com.sonicle.commons.LangUtils.CollectionChangeSet;
 import static com.sonicle.commons.LangUtils.getCollectionChanges;
 import com.sonicle.commons.PathUtils;
 import com.sonicle.commons.db.DbUtils;
+import com.sonicle.commons.time.DateWindow;
 import com.sonicle.webtop.calendar.ICalendarManager;
 import com.sonicle.webtop.calendar.model.Event;
 import com.sonicle.webtop.calendar.model.EventInstance;
@@ -48,6 +49,7 @@ import com.sonicle.webtop.contacts.IContactsManager;
 import com.sonicle.webtop.contacts.model.Contact;
 import com.sonicle.webtop.core.CoreManager;
 import com.sonicle.webtop.core.app.WT;
+import com.sonicle.webtop.core.app.util.ExceptionUtils;
 import com.sonicle.webtop.core.bol.OUser;
 import com.sonicle.webtop.core.dal.DAOException;
 import com.sonicle.webtop.core.dal.UserDAO;
@@ -2845,6 +2847,21 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			
 		} catch (SQLException | DAOException ex) {
 			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public Map<String, OLeaveRequest> listLeaveRequestsByEvent(final DateWindow dateWindow) throws WTException {
+		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
+		Connection con = null;
+		
+		try {
+			con = WT.getConnection(SERVICE_ID);
+			return lrDao.selectByDateWindow(con, getTargetProfileId().getDomainId(), dateWindow);
+			
+		} catch (Exception ex) {
+			throw ExceptionUtils.wrapThrowable(ex);
 		} finally {
 			DbUtils.closeQuietly(con);
 		}

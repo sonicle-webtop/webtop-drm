@@ -17,6 +17,7 @@ public class DrmTreeNode {
 	public static final String TIMETABLE_STAMP = "timetablestamp.tit";
 	public static final String TIMETABLE_REQUEST = "timetablerequest.tit";
 	public static final String TIMETABLE_REPORT = "timetablereport.tit";
+	public static final String TIMETABLE_LEAVESCHART = "timetableleaveschart.tit";
 	public static final String TIMETABLE_SUMMARY = "timetablesummary.tit";
 	public static final String CONFIGURATION = "configuration.tit";
 	public static final String TICKET = "ticket.tit";
@@ -35,6 +36,7 @@ public class DrmTreeNode {
 	public static final String TREE_NODE_TIMETABLE_STAMP = "tmtb.stmp";
 	public static final String TREE_NODE_TIMETABLE_REQUEST = "tmtb.rqst";
 	public static final String TREE_NODE_TIMETABLE_REPORT = "tmtb.rprt";
+	public static final String TREE_NODE_TIMETABLE_LEAVESCHART = "tmtb.leaveschart";
 	public static final String TREE_NODE_TIMETABLE_SUMMARY = "tmtb.sumx";
 	public static final String TREE_NODE_TICKET = "tckt";
 	public static final String TREE_NODE_JOB = "job";

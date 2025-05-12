@@ -34,9 +34,13 @@ package com.sonicle.webtop.drm;
 
 import com.sonicle.commons.EnumUtils;
 import com.sonicle.commons.LangUtils;
+import com.sonicle.commons.cache.AbstractBulkCache;
 import com.sonicle.commons.db.DbUtils;
 import com.sonicle.commons.net.IPUtils;
 import com.sonicle.commons.time.DateTimeUtils;
+import com.sonicle.commons.time.DateTimeWindow;
+import com.sonicle.commons.time.DateWindow;
+import com.sonicle.commons.time.JodaTimeUtils;
 import com.sonicle.commons.web.Crud;
 import com.sonicle.commons.web.DispositionType;
 import com.sonicle.commons.web.ServletUtils;
@@ -215,6 +219,8 @@ import com.sonicle.webtop.drm.bol.js.JsGridJobs;
 import com.sonicle.webtop.drm.bol.js.JsGridTickets;
 import com.sonicle.webtop.drm.bol.js.JsHolidayDate;
 import com.sonicle.webtop.drm.bol.js.JsJob;
+import com.sonicle.webtop.drm.bol.js.JsLeaveChartEvent;
+import com.sonicle.webtop.drm.bol.js.JsLeaveChartResource;
 import com.sonicle.webtop.drm.bol.js.JsTicket;
 import com.sonicle.webtop.drm.bol.js.JsTicketSetting;
 import com.sonicle.webtop.drm.bol.js.JsTimetableSettingGis;
@@ -252,8 +258,10 @@ import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import javax.imageio.ImageIO;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -940,6 +948,123 @@ public class Service extends BaseService {
 		return new JsSimple(id, lookupResource("leaveRequestType." + id));
 	}
 	
+	private final CacheTimetableLeavesSharedCalendar timetableLeavesSharedCalendarCache = new CacheTimetableLeavesSharedCalendar();
+	
+	private class CacheTimetableLeavesSharedCalendar extends AbstractBulkCache {
+		private Map<Integer, com.sonicle.webtop.calendar.model.Calendar> calendarsById = new HashMap<>();
+		
+		@Override
+		protected void internalBuildCache() {
+			UserProfile up = getEnv().getProfile();
+			TimetableSetting ts = manager.getTimetableSetting();
+			
+			try {
+				logger.debug("[CacheTimetableLeavesSharedCalendar] Building cache...");
+				if (!StringUtils.isBlank(ts.getCalendarUserId())) {
+					UserProfileId sharedPid = new UserProfileId(up.getDomainId(), ts.getCalendarUserId());
+					ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, up.getId());
+					
+					for (com.sonicle.webtop.calendar.model.CalendarFSFolder folder : cm.listIncomingCalendarFolders(sharedPid).values()) {
+						calendarsById.put(folder.getFolderId(), folder.getCalendar());
+					}
+				}
+			} catch (Exception ex) {
+				logger.error("[CacheTimetableLeavesSharedCalendar] Unable to build cache", ex);
+			}
+		}
+		
+		@Override
+		protected void internalCleanupCache() {
+			logger.debug("[CacheTimetableLeavesSharedCalendar] Cleaning-up cache...");
+			this.calendarsById = new HashMap<>();
+		}
+		
+		public Set<Integer> getCalendarIds() {
+			this.internalCheckBeforeGetDoNotLockThis();
+			long stamp = this.readLock();
+			try {
+				return this.calendarsById.keySet();
+			} finally {
+				this.unlockRead(stamp);
+			}
+		}
+		
+		public Collection<com.sonicle.webtop.calendar.model.Calendar> getCalendars() {
+			this.internalCheckBeforeGetDoNotLockThis();
+			long stamp = this.readLock();
+			try {
+				return this.calendarsById.values();
+			} finally {
+				this.unlockRead(stamp);
+			}
+		}
+		
+		public com.sonicle.webtop.calendar.model.Calendar getCalendar(final int calendarId) {
+			this.internalCheckBeforeGetDoNotLockThis();
+			long stamp = this.readLock();
+			try {
+				return this.calendarsById.get(calendarId);
+			} finally {
+				this.unlockRead(stamp);
+			}
+		}
+	}
+	
+	public void processLeavesChart(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+		UserProfile up = getEnv().getProfile();
+		DateTimeZone utz = up.getTimeZone();
+		
+		try {
+			TimetableSetting ts = manager.getTimetableSetting();
+			String type = ServletUtils.getStringParameter(request, "type", null);
+			if ("resources".equals(type)) {
+				if (!StringUtils.isBlank(ts.getCalendarUserId())) {
+					ArrayList<JsLeaveChartResource> items = new ArrayList<>();
+					for (com.sonicle.webtop.calendar.model.Calendar calendar : timetableLeavesSharedCalendarCache.getCalendars()) {
+						items.add(new JsLeaveChartResource(calendar));
+					}
+					new JsonResult(items).printTo(out);
+					
+				} else {
+					new JsonResult(new ArrayList<>()).printTo(out);
+				}
+				
+			} else {
+				if (!StringUtils.isBlank(ts.getCalendarUserId())) {
+					String from = ServletUtils.getStringParameter(request, "startDate", true);
+					String to = ServletUtils.getStringParameter(request, "endDate", true);
+					
+					DateWindow dateWindow = DateWindow.builder()
+						.withStart(JodaTimeUtils.parseISOLocalDate(from))
+						.withEnd(JodaTimeUtils.parseISOLocalDate(to))
+						.build();
+					Map<String, OLeaveRequest> requestsByEvent = manager.listLeaveRequestsByEvent(dateWindow);
+					
+					DateTimeWindow timeWindow = DateTimeWindow.builder()
+						.withStart(DateTimeUtils.parseYmdHmsWithZone(from, "00:00:00", up.getTimeZone()))
+						.withEnd(DateTimeUtils.parseYmdHmsWithZone(to, "23:59:59", up.getTimeZone()))
+						.build();
+					
+					ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, up.getId());
+					ArrayList<JsLeaveChartEvent> items = new ArrayList<>();
+					
+					for (com.sonicle.webtop.calendar.model.SchedEventInstance instance : cm.listEventInstances(timetableLeavesSharedCalendarCache.getCalendarIds(), timeWindow, utz, false)) {
+						com.sonicle.webtop.calendar.model.Calendar calendar = timetableLeavesSharedCalendarCache.getCalendar(instance.getCalendarId());
+						items.add(new JsLeaveChartEvent(instance, calendar, requestsByEvent.get(instance.getEventId()), utz, up.getLocale()));
+					}
+					new JsonResult("events", items).printTo(out);
+					
+				} else {
+					new JsonResult("events", new ArrayList<>()).printTo(out);
+				}
+			}
+			
+		} catch (Exception ex) {
+			new JsonResult(ex).printTo(out);
+			logger.error("Error in action LeavesWallChart", ex);
+		}
+	}
+	
 	public void processLookupLeaveRequestType(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			UserProfileId upid = getEnv().getProfileId();
@@ -1151,6 +1276,8 @@ public class Service extends BaseService {
 						nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE_REQUEST, null, lookupResource(DrmTreeNode.TIMETABLE_REQUEST), true, "wtdrm-icon-timetableRequests"));
 						// + TIMETABLE REPORT
 						nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE_REPORT, null, lookupResource(DrmTreeNode.TIMETABLE_REPORT), true, "wtdrm-icon-timetableReport"));
+						// + TIMETABLE LEAVESCHART
+						nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE_LEAVESCHART, null, lookupResource(DrmTreeNode.TIMETABLE_LEAVESCHART), true, "wtdrm-icon-timetableLeavesChart"));
 						// + TIMETABLE SUMMARY
 						//nodes.add(createTreeNode(DrmTreeNode.TREE_NODE_TIMETABLE_SUMMARY, null, lookupResource(DrmTreeNode.TIMETABLE_SUMMARY), true, "wtdrm-icon-timetable4"));
 					}

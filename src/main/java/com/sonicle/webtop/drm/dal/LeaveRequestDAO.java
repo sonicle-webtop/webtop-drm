@@ -32,6 +32,7 @@
  */
 package com.sonicle.webtop.drm.dal;
 
+import com.sonicle.commons.time.DateWindow;
 import com.sonicle.webtop.core.dal.BaseDAO;
 import com.sonicle.webtop.core.dal.DAOException;
 import com.sonicle.webtop.drm.LeaveRequestQuery;
@@ -44,6 +45,7 @@ import com.sonicle.webtop.drm.jooq.tables.records.LeaveRequestsRecord;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.jooq.Condition;
@@ -77,6 +79,23 @@ public class LeaveRequestDAO extends BaseDAO {
 				.insertInto(LEAVE_REQUESTS)
 				.set(record)
 				.execute();
+	}
+	
+	public Map<String, OLeaveRequest> selectByDateWindow(Connection con, String domainId, DateWindow dateWindow) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		return dsl
+			.select()
+			.from(LEAVE_REQUESTS)
+			.where(
+				LEAVE_REQUESTS.DOMAIN_ID.equal(domainId)
+				.and(LEAVE_REQUESTS.EVENT_ID.isNotNull())
+				.and(
+					LEAVE_REQUESTS.FROM_DATE.greaterOrEqual(dateWindow.getStart()).and(LEAVE_REQUESTS.FROM_DATE.lessOrEqual(dateWindow.getEnd()))
+					.or(LEAVE_REQUESTS.TO_DATE.greaterOrEqual(dateWindow.getStart()).and(LEAVE_REQUESTS.TO_DATE.lessOrEqual(dateWindow.getEnd())))
+					.or(LEAVE_REQUESTS.FROM_DATE.lessThan(dateWindow.getStart()).and(LEAVE_REQUESTS.TO_DATE.greaterThan(dateWindow.getEnd())))
+				)
+			)
+			.fetchMap(LEAVE_REQUESTS.EVENT_ID, OLeaveRequest.class);
 	}
 
 	public List<OLeaveRequest> selectLeaveRequestsForUsers(Connection con, LeaveRequestQuery query, String domainId, List<String> userIds) throws DAOException {

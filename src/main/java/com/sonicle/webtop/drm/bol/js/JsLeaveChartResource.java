@@ -30,44 +30,25 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.webtop.drm.bol;
+package com.sonicle.webtop.drm.bol.js;
 
-import com.sonicle.commons.time.JodaTimeUtils;
-import com.sonicle.webtop.drm.jooq.tables.pojos.LeaveRequests;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import com.sonicle.webtop.core.app.WT;
+import com.sonicle.webtop.core.sdk.UserProfile;
+import com.sonicle.webtop.core.sdk.UserProfileId;
+import java.util.HashMap;
 
 /**
  *
- * @author lssndrvs
+ * @author malbinola
  */
-public class OLeaveRequest extends LeaveRequests {
+public class JsLeaveChartResource {
+	public String id;
+	public String title;
+	public HashMap<String, Object> extendedProps = new HashMap<>();
 	
-	String companyDescription;
-	
-	public DateTime getStart(DateTimeZone timezone) {
-		DateTime dt = null;
-		if (this.getFromDate() != null) {
-			if (this.getFromHour() != null) {
-				// Replicate same split like done in DrmManager
-				dt = JodaTimeUtils.withTimeAtStartOfDay(this.getFromDate(), timezone).withTime(Integer.parseInt(this.getFromHour().split(":")[0]), Integer.parseInt(this.getFromHour().split(":")[1]), 0, 0);
-			} else {
-				dt = JodaTimeUtils.withTimeAtStartOfDay(this.getFromDate(), timezone);
-			}
-		}
-		return dt;
-	}
-	
-	public DateTime getEnd(DateTimeZone timezone) {
-		DateTime dt = null;
-		if (this.getToDate() != null) {
-			if (this.getToHour() != null) {
-				// Replicate same split like done in DrmManager
-				dt = JodaTimeUtils.withTimeAtStartOfDay(this.getToDate(), timezone).withTime(Integer.parseInt(this.getToHour().split(":")[0]), Integer.parseInt(this.getToHour().split(":")[1]), 0, 0);
-			} else {
-				dt = JodaTimeUtils.withTimeAtEndOfDay(this.getToDate(), timezone);
-			}
-		}
-		return dt;
+	public JsLeaveChartResource(com.sonicle.webtop.calendar.model.Calendar calendar) {
+		this.id = String.valueOf(calendar.getCalendarId());
+		this.title = calendar.getName();
+		this.extendedProps.put("color", calendar.getColor());
 	}
 }
