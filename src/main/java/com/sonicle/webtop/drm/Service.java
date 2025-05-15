@@ -345,7 +345,7 @@ public class Service extends BaseService {
 	public ServiceVars returnServiceVars() {
 
 		ServiceVars vs = new ServiceVars();
-		DateTimeFormatter hmf = DateTimeUtils.createHmFormatter();
+		DateTimeFormatter hmf = JodaTimeUtils.createFormatterHM();
 		UserProfileId pid = getEnv().getProfileId();
 				
 		vs.put("useStatisticCustomer", ss.getUseStatisticCustomer());
@@ -1035,8 +1035,8 @@ public class Service extends BaseService {
 					String to = ServletUtils.getStringParameter(request, "endDate", true);
 					
 					DateWindow dateWindow = DateWindow.builder()
-						.withStart(JodaTimeUtils.parseISOLocalDate(from))
-						.withEnd(JodaTimeUtils.parseISOLocalDate(to))
+						.withStart(JodaTimeUtils.parseLocalDateYMD(from))
+						.withEnd(JodaTimeUtils.parseLocalDateYMD(to))
 						.build();
 					Map<String, OLeaveRequest> requestsByEvent = manager.listLeaveRequestsByEvent(dateWindow);
 					
