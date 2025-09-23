@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2017 Sonicle S.r.l.
+ * Copyright (C) 2025 Sonicle S.r.l.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by
@@ -28,15 +28,16 @@
  * version 3, these Appropriate Legal Notices must retain the display of the
  * Sonicle logo and Sonicle copyright notice. If the display of the logo is not
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
- * display the words "Copyright (C) 2017 Sonicle S.r.l.".
+ * display the words "Copyright (C) 2025 Sonicle S.r.l.".
  */
-Ext.define('Sonicle.webtop.drm.view.pub.LeaveRequest', {
-	extend: 'Sonicle.webtop.core.view.pub.Error',
+Ext.define('Sonicle.webtop.drm.view-public.LeaveRequest', {
+	extend: 'WTA.sdk.BaseViewPublicMessage',
+	
+	type: 'info',
 	
 	initComponent: function() {
 		var me = this;
-		me.message = me.mys.res('pub.leaverequest.approve.' + me.mys.getVar('reskey'));
+		me.message = me.res('pub.leaverequest.approve.' + me.mys.getVar('reskey'));
 		me.callParent(arguments);
 	}
 });
-
