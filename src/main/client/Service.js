@@ -94,6 +94,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 					xtype: 'treepanel',
 					reference: 'tree',
 					rootVisible: false,
+					useArrows: true,
 					store: {
 						autoLoad: true,
 						model: 'Sonicle.webtop.drm.model.TreeNode',
