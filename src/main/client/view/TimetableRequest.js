@@ -43,7 +43,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableRequest', {
 		title: '{timetableRequest.tit}',
 		iconCls: 'wtdrm-icon-timetableRequests',
 		width: 580,
-		height: 360
+		height: 430
 	},
 	fieldTitle: 'leaveRequestId',
 	modelName: 'Sonicle.webtop.drm.model.TimetableRequest',

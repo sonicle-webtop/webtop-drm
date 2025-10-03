@@ -40,7 +40,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableStamp', {
 		title: '{timetableStamp.tit}',
 		iconCls: 'wtdrm-icon-timetable-stamps',
 		width: 460,
-		height: 180
+		height: 230
 	},
 	fieldTitle: 'leaveRequestId',
 	modelName: 'Sonicle.webtop.drm.model.TimetableStamp',

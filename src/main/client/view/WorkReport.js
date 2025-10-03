@@ -43,7 +43,7 @@ Ext.define('Sonicle.webtop.drm.view.WorkReport', {
 		title: '{workReport.tit}',
 		iconCls: 'wtdrm-icon-workReport',
 		width: 920,
-		height: 500
+		height: 670
 	},
 	fieldTitle: 'number',
 	modelName: 'Sonicle.webtop.drm.model.WorkReport',

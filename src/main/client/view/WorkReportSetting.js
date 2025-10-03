@@ -35,8 +35,8 @@ Ext.define('Sonicle.webtop.drm.view.WorkReportSetting', {
 	dockableConfig: {
 		title: '{workreport.config.tit}',
 		iconCls: 'wtdrm-icon-configuration',
-		width: 500,
-		height: 500
+		width: 530,
+		height: 550
 	},
 	modelName: 'Sonicle.webtop.drm.model.WorkReportSetting',
 	reloadOnClose: false,

@@ -46,7 +46,7 @@ Ext.define('Sonicle.webtop.drm.view.ExpenseNoteDetail', {
 		title: '{expenseNoteDetail.tit}',
 		iconCls: 'wtdrm-icon-expenseNote',
 		width: 450,
-		height: 390,
+		height: 500,
 		modal: true
 	},
 	fieldTitle: 'name',
