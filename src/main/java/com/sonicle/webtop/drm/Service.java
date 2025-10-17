@@ -2827,8 +2827,10 @@ public class Service extends BaseService {
 					}
 				}
 				
-				String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
-				lr.setEventId(eventId);
+				if (!lr.getType().equals(EnumUtils.toSerializedName(OLeaveRequestType.OVERTIME))) {
+					String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+					lr.setEventId(eventId);
+				}
 
 				manager.updateLeaveRequest(lr, false);
 
@@ -2860,9 +2862,11 @@ public class Service extends BaseService {
 			LeaveRequest lr = manager.getLeaveRequest(ids.get(0));
 			lr.setResult(choice);
 			
-			String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
-			if (!StringUtils.isEmpty(eventId)) lr.setEventId(eventId);
-			else lr.setEventId(null);
+			if (!lr.getType().equals(EnumUtils.toSerializedName(OLeaveRequestType.OVERTIME))) {
+				String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+				if (!StringUtils.isEmpty(eventId)) lr.setEventId(eventId);
+				else lr.setEventId(null);
+			}
 			
 			manager.updateLeaveRequest(lr, true);
 
@@ -2884,8 +2888,10 @@ public class Service extends BaseService {
 			
 			LeaveRequest lr = manager.getLeaveRequest(ids.get(0));
 			
-			String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
-			lr.setEventId(eventId);
+			if (!lr.getType().equals(EnumUtils.toSerializedName(OLeaveRequestType.OVERTIME))) {
+				String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+				lr.setEventId(eventId);
+			}
 
 			new JsonResult().printTo(out);
 		} catch (Exception ex) {
@@ -3423,7 +3429,9 @@ public class Service extends BaseService {
 			String cancellationReason = ServletUtils.getStringParameter(request, "cancellationReason", true);
 
 			LeaveRequest lr=manager.timetableRequestCancellation(id, cancellationReason);
-			manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+			if (!lr.getType().equals(EnumUtils.toSerializedName(OLeaveRequestType.OVERTIME))) {
+				manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+			}
 
 			new JsonResult().printTo(out);
 		} catch (Exception ex) {

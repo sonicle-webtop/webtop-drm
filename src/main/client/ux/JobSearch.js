@@ -188,6 +188,7 @@ Ext.define('Sonicle.webtop.drm.ux.JobSearch', {
 				},
 				{
 					xtype: 'button',
+					ui: '{secondary|default}',
 					text: WT.res(me.sid, 'btn-search.lbl'),
 					handler: function () {
 						me.extractData();
