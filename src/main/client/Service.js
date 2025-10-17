@@ -2132,7 +2132,8 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			}
 		});
 		me.addAct('timetableRequest', 'add', {
-			text: WT.res('act-add.lbl'),
+			ui: '{primary|default}',
+			text: me.res('timetablerequest.add.lbl'),
 			tooltip: null,
 			iconCls: 'wt-icon-add',
 			handler: function () {
