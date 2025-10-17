@@ -72,13 +72,24 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableLeavesChart', {
 			},
 			showResources: true,
 			resources: function(fetchInfo, successCallback, failureCallback) {
+				var filterFld = me.resfilterfield(),
+					sfilter = filterFld ? filterFld.getValue() : undefined;
+				
 				WT.ajaxReq(me.sid, 'LeavesChart', {
 					params: {
 						type: 'resources'
 					},
 					callback: function (success, json) {
 						if (success) {
-							successCallback(json.data);
+							if (!Ext.isEmpty(sfilter)) {
+								var data = [];
+								Ext.iterate(json.data, function(item) {
+									if (Sonicle.String.contains(item.title, sfilter, true)) data.push(item);
+								});
+								successCallback(data);
+							} else {
+								successCallback(json.data);
+							}
 						} else {
 							failureCallback();
 						}
@@ -110,7 +121,8 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableLeavesChart', {
 			monthTimelineView: true,
 			extraViewConfig: {
 				monthtimeline: {
-					slotLabelFormat: {day: '2-digit', weekday: 'narrow', omitCommas: true}
+					slotLabelFormat: {day: '2-digit', weekday: 'narrow', omitCommas: true},
+					slotMinWidth: 50
 				}
 			},
 			toolbarLayout: ['extraItems', '-', 'controlButtons', '->', 'headerText', '->', 'viewButtons'],
@@ -152,16 +164,22 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableLeavesChart', {
 				resourcesAreaTitle: WT.res(me.sid, 'timetableLeavesChart.resourcesareatitle.lbl')
 			},
 			eventClassNamesFunction: function(fcViewType, fcEvent, fcArg, context) {
-				var ret = Sonicle.fullcalendar.Panel.appointmentEventClassNamesFunction.apply(this, arguments),
+				var SoS = Sonicle.String,
+					ret = Sonicle.fullcalendar.Panel.appointmentEventClassNamesFunction.apply(this, arguments),
 					exProps = fcEvent.extendedProps;
-				if (Sonicle.String.isIn(exProps.reqStatus, ['S', 'RD'])) {
+				if (SoS.isIn(exProps.reqStatus, ['S', 'RD'])) {
 					ret.push('fc-event-style-slashed');
-				} else if (Sonicle.String.isIn(exProps.reqStatus, ['D'])) {
+				} else if (SoS.isIn(exProps.reqStatus, ['D'])) {
 					ret.push('fc-event-style-crossed');
 				}
 				return ret;
 			},
-			eventContentRenderer: Sonicle.fullcalendar.Panel.appointmentEventContentRenderer,
+			eventContentRenderer: function(fcViewType, fcEvent, fcArg, context) {
+				var SoD = Sonicle.Date,
+					ret = Sonicle.fullcalendar.Panel.appointmentEventContentRenderer.apply(this, arguments);
+				
+				return ret.replace(/(<\/div>)$/g, ' ' + SoD.humanReadableDuration(SoD.diff(fcEvent.start, SoD.idate(fcEvent.end, fcEvent.start), 'seconds', true)) + '$1');
+			},
 			eventTooltipRenderer: function(fcViewType, fcEvent, fcArg, context) {
 				var ret = Sonicle.fullcalendar.Panel.appointmentEventTooltipRenderer.apply(this, arguments),
 					exProps = fcEvent.extendedProps,
@@ -180,12 +198,38 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableLeavesChart', {
 					me.setVMData('date', info.start);
 				}
 			},
+			tbar: [
+				{
+					xtype: 'textfield',
+					reference: 'fldresfilter',
+					triggers: {
+						clear: WTF.clearTrigger()
+					},
+					fieldLabel: WT.res(me.sid, 'timetableLeavesChart.fld-recourcesFilter.lbl'),
+					listeners: {
+						specialkey: function(s, e) {
+							if (e.getKey() === e.ENTER) {
+								me.fullcalendar().refreshResources();
+							}
+						},
+						clear: function() {
+							me.resfilterfield().setValue(null); // Cleanup field now, otherwise it will still be full at refresh time!
+							me.fullcalendar().refreshResources();
+						}
+					},
+					width: 250
+				}
+			],
 			editable: false
 		});
 	},
 	
 	fullcalendar: function() {
 		return this.lref('fullcalendar');
+	},
+	
+	resfilterfield: function() {
+		return this.lref('fldresfilter');
 	},
 	
 	reload: function() {
