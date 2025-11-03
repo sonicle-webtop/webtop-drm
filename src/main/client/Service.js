@@ -2132,7 +2132,7 @@ Ext.define('Sonicle.webtop.drm.Service', {
 			}
 		});
 		me.addAct('timetableRequest', 'add', {
-			ui: '{primary|default}',
+			ui: '{primary}',
 			text: me.res('timetablerequest.add.lbl'),
 			tooltip: null,
 			iconCls: 'wt-icon-add',
@@ -3295,7 +3295,9 @@ Ext.define('Sonicle.webtop.drm.Service', {
 		vw.showView(function () {
 					vw.begin('new', {
 						data: {
-							userId: ftr.getOperatorId() || WT.getVar('userId')
+							userId: ftr.getOperatorId() || WT.getVar('userId'),
+							fromDate: new Date(),
+							toDate: new Date()
 						}
 					});
 				});
