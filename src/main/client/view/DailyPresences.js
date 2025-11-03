@@ -49,7 +49,7 @@ Ext.define('Sonicle.webtop.drm.view.DailyPresences', {
 	
 	viewModel: {
 		data: {
-			date: new Date()
+			date: null
 		}
 	},
 	defaultButton: 'btnok',
@@ -58,6 +58,7 @@ Ext.define('Sonicle.webtop.drm.view.DailyPresences', {
 		var me = this;
 		
 		me.callParent([cfg]);
+		me.getViewModel().set('date', new Date());
 	},
 	
 	initComponent: function () {

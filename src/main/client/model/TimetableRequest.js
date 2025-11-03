@@ -51,8 +51,8 @@ Ext.define('Sonicle.webtop.drm.model.TimetableRequest', {
 		WTF.field('userId', 'string', false),
 		WTF.field('managerId', 'string', false),
 		WTF.field('type', 'string', false),
-		WTF.field('fromDate', 'date', false, {dateFormat: 'Y-m-d', defaultValue: new Date()}),
-		WTF.field('toDate', 'date', false, {dateFormat: 'Y-m-d', defaultValue: new Date()}),
+		WTF.field('fromDate', 'date', false, {dateFormat: 'Y-m-d'}),
+		WTF.field('toDate', 'date', false, {dateFormat: 'Y-m-d'}),
 		WTF.field('fromHour', 'date', true, {
 			dateFormat: 'H:i',
 			validators: [{
