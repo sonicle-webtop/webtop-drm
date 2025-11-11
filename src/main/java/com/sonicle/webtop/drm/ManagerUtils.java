@@ -1582,6 +1582,33 @@ public class ManagerUtils {
 		return hourDiff + "." + minutesDiff;
     }
 	
+	static String getHourRange(String start, String end, OHourProfile hp) {
+        String[] fractions1 = start.split(":");
+		String[] fractions2 = end.split(":");
+		
+		Integer hours1 = Integer.parseInt(fractions1[0]);
+		Integer hours2 = Integer.parseInt(fractions2[0]);
+		Integer minutes1 = Integer.parseInt(fractions1[1]);
+		Integer minutes2 = Integer.parseInt(fractions2[1]); 
+		
+		int hourDiff = hours2- hours1;
+		
+		int minutesDiff = minutes2 - minutes1;
+		
+		if (minutesDiff < 0) {
+			minutesDiff = 60 + minutesDiff;
+			hourDiff--;
+		}
+		if (hourDiff < 0) {
+			hourDiff = 24 + hourDiff ;
+		}
+		
+		if (hp!=null) {
+			
+		}
+		return hourDiff + "." + minutesDiff;
+    }
+	
 	static LeaveRequest createLeaveRequest(OLeaveRequest oLr) {
 		if (oLr == null) {
 			return null;
