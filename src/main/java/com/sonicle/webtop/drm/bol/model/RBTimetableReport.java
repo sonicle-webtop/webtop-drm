@@ -35,6 +35,7 @@ package com.sonicle.webtop.drm.bol.model;
 import com.sonicle.commons.time.DateTimeUtils;
 import com.sonicle.webtop.core.CoreManager;
 import com.sonicle.webtop.core.app.WT;
+import com.sonicle.webtop.core.sdk.UserProfile;
 import com.sonicle.webtop.core.sdk.UserProfileId;
 import com.sonicle.webtop.core.sdk.WTException;
 import com.sonicle.webtop.drm.DrmManager;
@@ -103,7 +104,9 @@ public class RBTimetableReport {
 		this.detail = otr.getDetail();
 		this.note = otr.getNote();
 		this.targetUserId = otr.getTargetUserId();
-		this.targetUserDescription = WT.getUserData(new UserProfileId(otr.getDomainId(), otr.getTargetUserId())).getDisplayName();
+		//this.targetUserDescription = WT.getUserData(new UserProfileId(otr.getDomainId(), otr.getTargetUserId())).getDisplayName();
+		UserProfile.PersonalInfo tergetPinfo=WT.getUserPersonalInfo(new UserProfileId(otr.getDomainId(), otr.getTargetUserId()));
+		this.targetUserDescription = (tergetPinfo.getLastName()+" "+tergetPinfo.getFirstName()).trim();
 		this.workReportHours = convertInMinutes(otr.getWorkReportHours());
 		this.jobHours = convertInMinutes(otr.getJobHours());
 		this.totHours = ((this.workingHours == null) ? 0 : this.workingHours) + ((this.overtime == null) ? 0 : this.overtime);

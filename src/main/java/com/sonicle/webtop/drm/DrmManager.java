@@ -2910,231 +2910,226 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		}
 	}
 
-	public void addLeaveRequest(LeaveRequest lv, Boolean medicalVisitsAutomaticallyApproved, Boolean sicknessAutomaticallyApproved) throws WTException {
-		Connection con = null;
-		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
-		TimetableEventDAO teDao = TimetableEventDAO.getInstance();
-		EmployeeProfileDAO epDao = EmployeeProfileDAO.getInstance();
-		HourProfileDAO hpDao = HourProfileDAO.getInstance();
-		LineHourDAO lhDao = LineHourDAO.getInstance();
+    // Extracted method to create Timetable Events
+    private void createTimetableEvents(Connection con, OLeaveRequest lr, TimetableEventDAO teDao, 
+                                       EmployeeProfileDAO epDao, HourProfileDAO hpDao, 
+                                       LineHourDAO lhDao, HolidayDateDAO hdDAO) throws SQLException, DAOException {
+        List<LocalDate> dts = ManagerUtils.getDateRange(lr.getFromDate(), lr.getToDate());
+
+        for (LocalDate ld : dts) {
+            String hRange = calculateHourRange(con, lr, ld, epDao, hpDao, lhDao, hdDAO);
+            
+            if (hRange != null) {
+                OTimetableEvent oTe = new OTimetableEvent();
+                oTe.setTimetableEventId(teDao.getSequence(con).intValue());
+                oTe.setDomainId(lr.getDomainId());
+                oTe.setCompanyId(lr.getCompanyId());
+                oTe.setUserId(lr.getUserId());
+                oTe.setType(lr.getType());
+                oTe.setDate(ld);
+                oTe.setLeaveRequestId(lr.getLeaveRequestId());
+                oTe.setHour(hRange);
+                
+                teDao.insert(con, oTe);
+            }
+        }
+    }
+
+    // Extracted method to calculate hour range
+    private String calculateHourRange(Connection con, OLeaveRequest lr, LocalDate ld, 
+                                      EmployeeProfileDAO epDao, HourProfileDAO hpDao, 
+                                      LineHourDAO lhDao, HolidayDateDAO hdDAO) throws SQLException, DAOException {
+        // Check if it's a holiday
+        OHolidayDate oHD = hdDAO.selectByDomainDate(con, lr.getDomainId(), ld.toDateTimeAtStartOfDay());
+        
+        if (oHD != null) {
+            return null;
+        }
+
+        OEmployeeProfile ep = epDao.selectEmployeeProfileByDomainUser(con, lr.getDomainId(), lr.getUserId());
+        OHourProfile hp = null;
+		if (ep!=null) hp = hpDao.selectHourProfileById(con, ep.getHourProfileId());		
+		
+        // If from/to hours are specified, use them
+        if (lr.getFromHour() != null && lr.getToHour() != null) {
+			if (hp!=null) {
+				int minutes = lhDao.selectHourRangeIntersectionWithLineHoursInMinutes(con, hp.getId(), ld, lr.getFromHour(), lr.getToHour());
+				// Convert minutes to hour:minute format
+				int h = minutes / 60;
+				int m = minutes % 60;
+				return String.format("%d.%02d", h, m);				
+			}
+            return ManagerUtils.getHourRange(lr.getFromHour(), lr.getToHour());
+        }
+
+        // Get hours from employee profile and hour profile
+        if (ep == null) {
+            return "8"; // Default to 8 hours if no profile found
+        }
+
+        if (hp == null) {
+            return "8"; // Default to 8 hours if no hour profile found
+        }
+
+        // Get hours from line hour for the specific day of week
+        String hRange = lhDao.selectSumLineHourByHourProfileIdDayOfWeek(con, hp.getId(), ld.getDayOfWeek());
+        
+        if (hRange == null || hRange.isEmpty() || hRange.equals("0")) {
+            return "8"; // Default to 8 hours
+        }
+
+        // Convert minutes to hour:minute format
+        int h = Integer.parseInt(hRange) / 60;
+        int m = Integer.parseInt(hRange) % 60;
+        return String.format("%d.%02d", h, m);
+    }
+
+    public void addLeaveRequest(LeaveRequest lv, Boolean medicalVisitsAutomaticallyApproved, 
+                                Boolean sicknessAutomaticallyApproved) throws WTException {
+        Connection con = null;
+        LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
+        TimetableEventDAO teDao = TimetableEventDAO.getInstance();
+        EmployeeProfileDAO epDao = EmployeeProfileDAO.getInstance();
+        HourProfileDAO hpDao = HourProfileDAO.getInstance();
+        LineHourDAO lhDao = LineHourDAO.getInstance();
         HolidayDateDAO hdDAO = HolidayDateDAO.getInstance();
         
-		try {
-			con = WT.getConnection(SERVICE_ID, false);
+        try {
+            con = WT.getConnection(SERVICE_ID, false);
 
-			DateTime employeeReqTimestamp = createRevisionTimestamp();
+            DateTime employeeReqTimestamp = createRevisionTimestamp();
 
-			OLeaveRequest newLr = ManagerUtils.createOLeaveRequest(lv);
-			newLr.setLeaveRequestId(lrDao.getLeaveRequestSequence(con).intValue());
-			newLr.setDomainId(getTargetProfileId().getDomainId());
-			newLr.setEmployeeReqTimestamp(employeeReqTimestamp);
-			
-			if ((EnumUtils.toSerializedName(OLeaveRequestType.MEDICAL_VISIT).equals(lv.getType()) && medicalVisitsAutomaticallyApproved) 
-					|| (EnumUtils.toSerializedName(OLeaveRequestType.SICKNESS).equals(lv.getType()) && sicknessAutomaticallyApproved)) {
-				newLr.setStatus("C");
-				newLr.setResult(true);
-			}
-			else {
-				newLr.setStatus("O");
-			}
-			
-			newLr.setEmployeeCancReq(false);
-
-			ArrayList<OLeaveRequestDocument> oDocs = new ArrayList<>();
-			
-			for (LeaveRequestDocument doc : lv.getDocuments()) {
-				if (!(doc instanceof LeaveRequestDocumentWithStream)) throw new IOException("Attachment stream not available [" + doc.getLeaveRequestDocumentId()+ "]");
-				oDocs.add(ManagerUtils.doLeaveRequestDocumentInsert(con, newLr.getLeaveRequestId(), (LeaveRequestDocumentWithStream)doc));
-			}
-
-			lrDao.insert(con, newLr, employeeReqTimestamp);
-
-			if ((EnumUtils.toSerializedName(OLeaveRequestType.MEDICAL_VISIT).equals(lv.getType()) && medicalVisitsAutomaticallyApproved) || 
-					(EnumUtils.toSerializedName(OLeaveRequestType.SICKNESS).equals(lv.getType()) && sicknessAutomaticallyApproved)) {
-				//Insert in TimetableEvents
-				List<LocalDate> dts = ManagerUtils.getDateRange(newLr.getFromDate(), newLr.getToDate());
-
-				for(LocalDate ld : dts) {
-					OTimetableEvent oTe = new OTimetableEvent();
-					oTe.setTimetableEventId(teDao.getSequence(con).intValue());
-					oTe.setDomainId(newLr.getDomainId());
-					oTe.setCompanyId(newLr.getCompanyId());
-					oTe.setUserId(newLr.getUserId());
-					oTe.setType(newLr.getType());
-					oTe.setDate(ld);
-					oTe.setLeaveRequestId(newLr.getLeaveRequestId());
-
-					String hRange = null;
-                    
-                    OHolidayDate oHD = hdDAO.selectByDomainDate(con, newLr.getDomainId(), ld.toDateTimeAtStartOfDay());
-                    
-                    if (oHD == null) {
-                        if(newLr.getFromHour() == null || newLr.getToHour() == null) {
-                            //Get Hours from Template
-                            OEmployeeProfile ep = epDao.selectEmployeeProfileByDomainUser(con, newLr.getDomainId(), newLr.getUserId());
-
-                            if(ep != null) {
-                                OHourProfile hp = hpDao.selectHourProfileById(con, ep.getHourProfileId());
-
-                                if(hp != null) {
-                                    hRange = lhDao.selectSumLineHourByHourProfileIdDayOfWeek(con, hp.getId(), ld.getDayOfWeek());
-                                    // i have to convert minutes of hourprofile (recently update) in hour format
-                                    if (hRange != null) {
-                                        if (!hRange.isEmpty() || !hRange.equals("0")) {
-                                            int h = Integer.parseInt(hRange) / 60;
-                                            int m = Integer.parseInt(hRange) % 60;
-                                            hRange = String.format("%d.%02d", h, m);
-                                        }
-                                    }
-                                } else {
-                                    hRange = "8";
-                                }
-                            }
-                        } else {
-                            hRange = ManagerUtils.getHourRange(newLr.getFromHour(), newLr.getToHour());
-                        }
-                    }
-
-					// if(hRange == null) hRange = "8";
-                    if (hRange != null) {
-                        oTe.setHour(hRange);
-                        teDao.insert(con, oTe);
-                    }
-                }
-			} else {
-				notifyLeaveRequest(newLr);
-			}
-			
-			DbUtils.commitQuietly(con);
-
-		} catch (SQLException | DAOException ex) {
-			DbUtils.rollbackQuietly(con);
-			throw new WTException(ex, "DB error");
-		} catch (Exception ex) {
-			DbUtils.rollbackQuietly(con);
-			throw new WTException(ex);
-		} finally {
-			DbUtils.closeQuietly(con);
-		}
-	}
-
-	public OLeaveRequest updateLeaveRequest(LeaveRequest item, boolean sendMail) throws WTException, MessagingException, TemplateException {
-		Connection con = null;
-		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
-		LeaveRequestDocumentDAO docDao = LeaveRequestDocumentDAO.getInstance();
-		TimetableEventDAO teDao = TimetableEventDAO.getInstance();
-		EmployeeProfileDAO epDao = EmployeeProfileDAO.getInstance();
-		HourProfileDAO hpDao = HourProfileDAO.getInstance();
-		LineHourDAO lhDao = LineHourDAO.getInstance();
-		HolidayDateDAO hdDAO = HolidayDateDAO.getInstance();
-        
-		try {
-			DateTime revisionTimestamp = createRevisionTimestamp();
-
-			LeaveRequest oldLr = getLeaveRequest(item.getLeaveRequestId());
-
-			con = WT.getConnection(SERVICE_ID, false);
-
-			OLeaveRequest lr = ManagerUtils.createOLeaveRequest(item);
-			lr.setEmployeeReqTimestamp(revisionTimestamp);
-			if(lr.getEmployeeCancReq()) lr.setEmployeeCancReqTimestamp(revisionTimestamp);
-			if(lr.getResult() != null){
-				lr.setManagerRespTimestamp(revisionTimestamp);
-				lr.setStatus("C");
-				
-				if(lr.getResult() == true){
-					//Insert in TimetableEvents
-					List<LocalDate> dts = ManagerUtils.getDateRange(lr.getFromDate(), lr.getToDate());
-
-					for(LocalDate ld : dts){
-						OTimetableEvent oTe = new OTimetableEvent();
-						oTe.setTimetableEventId(teDao.getSequence(con).intValue());
-						oTe.setDomainId(lr.getDomainId());
-						oTe.setCompanyId(lr.getCompanyId());
-						oTe.setUserId(lr.getUserId());
-						oTe.setType(lr.getType());
-						oTe.setDate(ld);
-						oTe.setLeaveRequestId(lr.getLeaveRequestId());
-
-						String hRange = null;
-						
-                        OHolidayDate oHD = hdDAO.selectByDomainDate(con, lr.getDomainId(), ld.toDateTimeAtStartOfDay());
-                        
-                        if (oHD == null) {
-                            if (lr.getFromHour() == null || lr.getToHour() == null) {
-                                //Get Hours from Template
-                                OEmployeeProfile ep = epDao.selectEmployeeProfileByDomainUser(con, lr.getDomainId(), lr.getUserId());
-
-                                if (ep != null) {
-                                    OHourProfile hp = hpDao.selectHourProfileById(con, ep.getHourProfileId());
-
-                                    if (hp != null) {
-                                        hRange = lhDao.selectSumLineHourByHourProfileIdDayOfWeek(con, hp.getId(), ld.getDayOfWeek());
-                                        if (hRange != null) {
-                                            if (!hRange.isEmpty() || !hRange.equals("0")) {                                    
-                                                // i have to convert minutes of hourprofile (recently update) in hour format
-                                                int h = Integer.parseInt(hRange) / 60;
-                                                int m = Integer.parseInt(hRange) % 60;
-                                                hRange = String.format("%d.%02d", h, m);
-                                            }
-                                        }
-                                    } else {
-                                        hRange = "8";
-                                    }
-                                }
-                            } else {
-                                hRange = ManagerUtils.getHourRange(lr.getFromHour(), lr.getToHour());
-                            }
-                        }
-                        
-						// if(hRange == null) hRange = "8";
-						if (hRange != null) {
-                            oTe.setHour(hRange);						
-                            teDao.insert(con, oTe);
-                        }
-					}
-				}
-			}
+            OLeaveRequest newLr = ManagerUtils.createOLeaveRequest(lv);
+            newLr.setLeaveRequestId(lrDao.getLeaveRequestSequence(con).intValue());
+            newLr.setDomainId(getTargetProfileId().getDomainId());
+            newLr.setEmployeeReqTimestamp(employeeReqTimestamp);
             
-			if(lr.getCancResult() != null){
-				lr.setManagerCancRespTimetamp(revisionTimestamp);
-				if(lr.getCancResult() == true){
-					lr.setStatus("D");
-				}
-			}
+            // Determine automatic approval status
+            boolean isAutomaticallyApproved = 
+                (EnumUtils.toSerializedName(OLeaveRequestType.MEDICAL_VISIT).equals(lv.getType()) && medicalVisitsAutomaticallyApproved) ||
+                (EnumUtils.toSerializedName(OLeaveRequestType.SICKNESS).equals(lv.getType()) && sicknessAutomaticallyApproved);
+            
+            newLr.setStatus(isAutomaticallyApproved ? "C" : "O");
+            if (isAutomaticallyApproved) newLr.setResult(true);
+            newLr.setEmployeeCancReq(false);
 
-			lrDao.update(con, lr);
-			
-			List<LeaveRequestDocument> oldDocs = ManagerUtils.createLeaveRequestDocumentList(docDao.selectByLeaveRequest(con, item.getLeaveRequestId()));
-			CollectionChangeSet<LeaveRequestDocument> changeSet = LangUtils.getCollectionChanges(oldDocs, item.getDocuments());
+            // Handle documents
+            ArrayList<OLeaveRequestDocument> oDocs = new ArrayList<>();
+            for (LeaveRequestDocument doc : lv.getDocuments()) {
+                if (!(doc instanceof LeaveRequestDocumentWithStream)) {
+                    throw new IOException("Attachment stream not available [" + doc.getLeaveRequestDocumentId() + "]");
+                }
+                oDocs.add(ManagerUtils.doLeaveRequestDocumentInsert(con, newLr.getLeaveRequestId(), (LeaveRequestDocumentWithStream)doc));
+            }
 
-			for (LeaveRequestDocument doc : changeSet.inserted) {
-				if (!(doc instanceof LeaveRequestDocumentWithStream)) throw new IOException("Attachment stream not available [" + doc.getLeaveRequestDocumentId()+ "]");
-				ManagerUtils.doLeaveRequestDocumentInsert(con, lr.getLeaveRequestId(), (LeaveRequestDocumentWithStream)doc);
-			}
-			for (LeaveRequestDocument doc : changeSet.updated) {
-				if (!(doc instanceof LeaveRequestDocumentWithStream)) continue;
-				ManagerUtils.doLeaveRequestDocumentUpdate(con, (LeaveRequestDocumentWithStream)doc);
-			}
-			for (LeaveRequestDocument doc : changeSet.deleted) {
-				docDao.deleteById(con, doc.getLeaveRequestDocumentId());
-			}
-			
-			DbUtils.commitQuietly(con);
-			
-			if(sendMail) notifyLeaveRequest(lr);
-			
-			return lr;
+            lrDao.insert(con, newLr, employeeReqTimestamp);
 
-		} catch (SQLException | DAOException ex) {
-			throw new WTException(ex, "DB error");
-		} catch (IOException ex) {
-			throw new WTException(ex, "DB error");
-		} finally {
-			DbUtils.closeQuietly(con);
-		}
-	}
-	
+            // Create timetable events if automatically approved
+            if (isAutomaticallyApproved) {
+                createTimetableEvents(con, newLr, teDao, epDao, hpDao, lhDao, hdDAO);
+            } else {
+                notifyLeaveRequest(newLr);
+            }
+            
+            DbUtils.commitQuietly(con);
+
+        } catch (SQLException | DAOException ex) {
+            DbUtils.rollbackQuietly(con);
+            throw new WTException(ex, "DB error");
+        } catch (Exception ex) {
+            DbUtils.rollbackQuietly(con);
+            throw new WTException(ex);
+        } finally {
+            DbUtils.closeQuietly(con);
+        }
+    }
+
+    public OLeaveRequest updateLeaveRequest(LeaveRequest item, boolean sendMail) throws WTException, MessagingException, TemplateException {
+        Connection con = null;
+        LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
+        LeaveRequestDocumentDAO docDao = LeaveRequestDocumentDAO.getInstance();
+        TimetableEventDAO teDao = TimetableEventDAO.getInstance();
+        EmployeeProfileDAO epDao = EmployeeProfileDAO.getInstance();
+        HourProfileDAO hpDao = HourProfileDAO.getInstance();
+        LineHourDAO lhDao = LineHourDAO.getInstance();
+        HolidayDateDAO hdDAO = HolidayDateDAO.getInstance();
+        
+        try {
+            DateTime revisionTimestamp = createRevisionTimestamp();
+
+            LeaveRequest oldLr = getLeaveRequest(item.getLeaveRequestId());
+
+            con = WT.getConnection(SERVICE_ID, false);
+
+            OLeaveRequest lr = ManagerUtils.createOLeaveRequest(item);
+            lr.setEmployeeReqTimestamp(revisionTimestamp);
+            
+            // Handle employee cancellation request
+            if (lr.getEmployeeCancReq()) {
+                lr.setEmployeeCancReqTimestamp(revisionTimestamp);
+            }
+
+            // Handle leave request result
+            if (lr.getResult() != null) {
+                lr.setManagerRespTimestamp(revisionTimestamp);
+                lr.setStatus("C");
+                
+                if (lr.getResult() == true) {
+                    createTimetableEvents(con, lr, teDao, epDao, hpDao, lhDao, hdDAO);
+                }
+            }
+            
+            // Handle cancellation result
+            if (lr.getCancResult() != null) {
+                lr.setManagerCancRespTimetamp(revisionTimestamp);
+                if (lr.getCancResult() == true) {
+                    lr.setStatus("D");
+                }
+            }
+
+            lrDao.update(con, lr);
+            
+            // Handle document changes
+            List<LeaveRequestDocument> oldDocs = ManagerUtils.createLeaveRequestDocumentList(
+                docDao.selectByLeaveRequest(con, item.getLeaveRequestId())
+            );
+            CollectionChangeSet<LeaveRequestDocument> changeSet = LangUtils.getCollectionChanges(oldDocs, item.getDocuments());
+
+            for (LeaveRequestDocument doc : changeSet.inserted) {
+                if (!(doc instanceof LeaveRequestDocumentWithStream)) {
+                    throw new IOException("Attachment stream not available [" + doc.getLeaveRequestDocumentId() + "]");
+                }
+                ManagerUtils.doLeaveRequestDocumentInsert(con, lr.getLeaveRequestId(), (LeaveRequestDocumentWithStream)doc);
+            }
+            
+            for (LeaveRequestDocument doc : changeSet.updated) {
+                if (!(doc instanceof LeaveRequestDocumentWithStream)) continue;
+                ManagerUtils.doLeaveRequestDocumentUpdate(con, (LeaveRequestDocumentWithStream)doc);
+            }
+            
+            for (LeaveRequestDocument doc : changeSet.deleted) {
+                docDao.deleteById(con, doc.getLeaveRequestDocumentId());
+            }
+            
+            DbUtils.commitQuietly(con);
+            
+            if (sendMail) {
+                notifyLeaveRequest(lr);
+            }
+            
+            return lr;
+
+        } catch (SQLException | DAOException ex) {
+            DbUtils.rollbackQuietly(con);
+            throw new WTException(ex, "DB error");
+        } catch (IOException ex) {
+            DbUtils.rollbackQuietly(con);
+            throw new WTException(ex, "DB error");
+        } finally {
+            DbUtils.closeQuietly(con);
+        }
+    }
+
 	public LeaveRequest updateCancellationLeaveRequest(int id, Boolean choice) throws WTException, MessagingException, IOException, TemplateException {
 		Connection con = null;
 		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();

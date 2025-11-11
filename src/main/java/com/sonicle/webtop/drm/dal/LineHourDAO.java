@@ -40,10 +40,20 @@ import static com.sonicle.webtop.drm.jooq.Tables.LINE_HOURS;
 import com.sonicle.webtop.drm.jooq.tables.records.LineHoursRecord;
 import java.sql.Connection;
 import java.util.List;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
+import org.joda.time.LocalTime;
 import org.jooq.DSLContext;
 import org.jooq.Field;
+import org.jooq.Record4;
+import org.jooq.Table;
 import org.jooq.impl.DSL;
-
+import static org.jooq.impl.DSL.field;
+import static org.jooq.impl.DSL.name;
+import static org.jooq.impl.DSL.table;
 /**
  *
  * @author lssndrvs
@@ -159,6 +169,94 @@ public class LineHourDAO extends BaseDAO {
 			.execute();
 	}
 	
+	public int selectHourRangeIntersectionWithLineHoursInMinutes(
+			Connection con,
+			Integer hourProfileId,
+			LocalDate d,   // "YYYY-MM-DD"
+			String timeFrom,  // "HH:mm"
+			String timeTo     // "HH:mm"
+	) throws DAOException {
+		return selectHourRangeIntersectionWithLineHoursInMinutes(con, hourProfileId, d, timeFrom, timeTo, DateTimeZone.getDefault());
+	}
+
+	// Overload that allows explicit timezone (helpful around DST transitions)
+	public int selectHourRangeIntersectionWithLineHoursInMinutes(
+			Connection con,
+			Integer hourProfileId,
+			LocalDate d,
+			String timeFrom,
+			String timeTo,
+			DateTimeZone zone
+	) throws DAOException {
+		try {
+			DSLContext dsl = getDSL(con);
+
+			// Parse inputs with Joda
+			final LocalTime pFrom = LocalTime.parse(timeFrom);    // "HH:mm"
+			final LocalTime pTo   = LocalTime.parse(timeTo);      // "HH:mm"
+
+			// 1 = Monday ... 7 = Sunday
+			final int i = d.dayOfWeek().get(); // Joda returns 1..7 with Monday=1
+
+			// jOOQ table/fields
+			final Table<?> LINE_HOURS = table(name("drm", "line_hours"));
+			final Field<Integer> HOUR_PROFILE_ID = field(name("drm", "line_hours", "hour_profile_id"), Integer.class);
+			final Field<Integer> LINE_ID         = field(name("drm", "line_hours", "line_id"), Integer.class);
+			final Field<String>  F_E             = field(name("drm", "line_hours", i + "_e"), String.class);
+			final Field<String>  F_U             = field(name("drm", "line_hours", i + "_u"), String.class);
+
+			// Fetch needed rows
+			final List<Record4<Integer, Integer, String, String>> rows = dsl
+				.select(HOUR_PROFILE_ID, LINE_ID, F_E, F_U)
+				.from(LINE_HOURS)
+				.where(HOUR_PROFILE_ID.eq(hourProfileId))
+				.fetch();
+
+			// Compose permission interval as instants (DateTime) in the chosen zone
+			final LocalDateTime pFromLdt = d.toLocalDateTime(pFrom);
+			final LocalDateTime pToLdt   = (pTo.compareTo(pFrom) >= 0)
+					? d.toLocalDateTime(pTo)
+					: d.plusDays(1).toLocalDateTime(pTo);
+
+			final DateTime pFromTs = pFromLdt.toDateTime(zone);
+			final DateTime pToTs   = pToLdt.toDateTime(zone);
+
+			long totalSeconds = 0L;
+
+			for (Record4<Integer, Integer, String, String> r : rows) {
+				final String sFrom = r.value3();
+				final String sTo   = r.value4();
+				if (sFrom == null || sTo == null) continue; // no range for that line/day
+
+				final LocalTime rFrom = LocalTime.parse(sFrom);
+				final LocalTime rTo   = LocalTime.parse(sTo);
+
+				final LocalDateTime rFromLdt = d.toLocalDateTime(rFrom);
+				final LocalDateTime rToLdt   = (rTo.compareTo(rFrom) >= 0)
+						? d.toLocalDateTime(rTo)
+						: d.plusDays(1).toLocalDateTime(rTo);
+
+				final DateTime rFromTs = rFromLdt.toDateTime(zone);
+				final DateTime rToTs   = rToLdt.toDateTime(zone);
+
+				// Overlap = max(0, min(pTo, rTo) - max(pFrom, rFrom))
+				final DateTime start = (pFromTs.isAfter(rFromTs)) ? pFromTs : rFromTs;
+				final DateTime end   = (pToTs.isBefore(rToTs))     ? pToTs   : rToTs;
+
+				if (end.isAfter(start)) {
+					final Duration dur = new Duration(start, end);
+					totalSeconds += dur.getStandardSeconds();
+				}
+			}
+
+			// Return minutes
+			return (int)(totalSeconds / 60);
+
+		} catch (Exception ex) {
+			throw new DAOException("Error computing hour range intersection (Joda-Time)", ex);
+		}
+	}
+
 	private Field<String> getDayFieldByDayOfWeek(int dayOfWeek){		
 		switch(dayOfWeek){
 			case 1:
