@@ -33,9 +33,8 @@
 package com.sonicle.webtop.drm;
 
 import com.sonicle.commons.EnumUtils;
-import com.sonicle.commons.LangUtils;
+import com.sonicle.commons.beans.ItemsListResult;
 import com.sonicle.commons.cache.AbstractBulkCache;
-import com.sonicle.commons.db.DbUtils;
 import com.sonicle.commons.net.IPUtils;
 import com.sonicle.commons.time.DateTimeUtils;
 import com.sonicle.commons.time.DateTimeWindow;
@@ -56,7 +55,6 @@ import com.sonicle.commons.web.json.extjs.ResultMeta;
 import com.sonicle.webtop.contacts.IContactsManager;
 import com.sonicle.webtop.contacts.model.ContactLookup;
 import com.sonicle.webtop.contacts.model.Grouping;
-import com.sonicle.webtop.contacts.model.ListContactsResult;
 import com.sonicle.webtop.contacts.model.ShowBy;
 import com.sonicle.webtop.core.CoreUserSettings;
 import com.sonicle.webtop.core.app.WT;
@@ -186,12 +184,12 @@ import com.sonicle.webtop.calendar.model.Event;
 import com.sonicle.webtop.calendar.model.EventInstance;
 import com.sonicle.webtop.calendar.model.EventKey;
 import com.sonicle.webtop.calendar.model.UpdateEventTarget;
+import com.sonicle.webtop.contacts.model.ContactQueryUI;
 import com.sonicle.webtop.drm.bol.OActivity;
 import com.sonicle.webtop.contacts.model.ContactType;
 import com.sonicle.webtop.core.app.RunContext;
 import com.sonicle.webtop.core.bol.js.JsWizardData;
 import com.sonicle.webtop.core.model.BaseMasterData;
-import com.sonicle.webtop.core.sdk.WTRuntimeException;
 import com.sonicle.webtop.core.util.LogEntries;
 import com.sonicle.webtop.core.util.LogEntry;
 import com.sonicle.webtop.core.util.MessageLogEntry;
@@ -229,7 +227,6 @@ import com.sonicle.webtop.drm.bol.model.RBExpenseNote;
 import com.sonicle.webtop.drm.bol.model.RBOpportunity;
 import com.sonicle.webtop.drm.bol.model.RBTimetableEncoReport;
 import com.sonicle.webtop.drm.bol.model.RBWorkReportSummary;
-import com.sonicle.webtop.drm.dal.EmployeeProfileDAO;
 import com.sonicle.webtop.drm.model.Activity;
 import com.sonicle.webtop.drm.model.CostType;
 import com.sonicle.webtop.drm.model.ExpenseNote;
@@ -1180,16 +1177,15 @@ public class Service extends BaseService {
 			pattern = StringUtils.isBlank(value) ? null : "%" + value + "%";
 					
 			IContactsManager contactManager = (IContactsManager) WT.getServiceManager("com.sonicle.webtop.contacts", getEnv().getProfileId());
-			categoryIds.addAll(contactManager.listCategoryIds());
+			categoryIds.addAll(contactManager.listMyCategoryIds());
 			categoryIds.addAll(contactManager.listIncomingCategoryIds());
-			ListContactsResult lcr = contactManager.listContacts(categoryIds, ContactType.CONTACT, Grouping.ALPHABETIC, ShowBy.FIRST_LAST, pattern);
-			//ListContactsResult lcr = contactManager.listContacts(categoryIds, ContactType.CONTACT, Grouping.ALPHABETIC, ShowBy.FIRST_LAST, ContactQuery.toCondition(pattern), page, limit, true);
+			ItemsListResult<ContactLookup> ilr = contactManager.listContacts(categoryIds, ContactType.CONTACT, Grouping.ALPHABETIC, ShowBy.FIRST_LAST, ContactQueryUI.build(pattern), null, null, false);
 			
-			for(ContactLookup c: lcr.items){
+			for (ContactLookup c : ilr.getItems()){
 				String fullName = StringUtils.isEmpty(c.getFullName(true)) ? "" : c.getFullName(true);
 				String company = StringUtils.isEmpty(c.getCompanyDescription()) ? "" : c.getCompanyDescription();
 				String info = (fullName.length() > 0 && company.length() > 0) ? fullName + " - " + company : fullName + company;
-				uD = WT.getUserData(c.getCategoryProfileId());
+				uD = WT.getProfileData(c.getCategoryProfileId());
 				contacts.add(new JsSimpleSource(c.getContactId(), info, "[" + uD.getDisplayName() + " / " + c.getCategoryName() + "]"));
 			}
 
