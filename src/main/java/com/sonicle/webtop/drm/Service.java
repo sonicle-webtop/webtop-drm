@@ -1072,8 +1072,8 @@ public class Service extends BaseService {
 			
 			List<JsSimple> types = new ArrayList();
 			
-			types.add(createLeaveRequestJsSimple(OLeaveRequestType.HOLIDAY));
 			types.add(createLeaveRequestJsSimple(OLeaveRequestType.PAID_LEAVE));
+			types.add(createLeaveRequestJsSimple(OLeaveRequestType.HOLIDAY));
 			
 			if (ep != null && ep.getExtraordinary())
 				types.add(createLeaveRequestJsSimple(OLeaveRequestType.OVERTIME));
@@ -2789,11 +2789,8 @@ public class Service extends BaseService {
 					lr.getDocuments().add(doc);
 				}
 
-				//Do not add calendar event for overtime requests
-				if (!lr.getType().equals(EnumUtils.toSerializedName(OLeaveRequestType.OVERTIME))) {
-					String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
-					lr.setEventId(eventId);
-				}
+				String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+				lr.setEventId(eventId);
 				
 				manager.addLeaveRequest(lr, ss.getMedicalVisitsAutomaticallyApproved(), ss.getSicknessAutomaticallyApproved());
 
@@ -2823,10 +2820,8 @@ public class Service extends BaseService {
 					}
 				}
 				
-				if (!lr.getType().equals(EnumUtils.toSerializedName(OLeaveRequestType.OVERTIME))) {
-					String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
-					lr.setEventId(eventId);
-				}
+				String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+				lr.setEventId(eventId);
 
 				manager.updateLeaveRequest(lr, false);
 
@@ -2858,11 +2853,9 @@ public class Service extends BaseService {
 			LeaveRequest lr = manager.getLeaveRequest(ids.get(0));
 			lr.setResult(choice);
 			
-			if (!lr.getType().equals(EnumUtils.toSerializedName(OLeaveRequestType.OVERTIME))) {
-				String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
-				if (!StringUtils.isEmpty(eventId)) lr.setEventId(eventId);
-				else lr.setEventId(null);
-			}
+			String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+			if (!StringUtils.isEmpty(eventId)) lr.setEventId(eventId);
+			else lr.setEventId(null);
 			
 			manager.updateLeaveRequest(lr, true);
 
@@ -2884,10 +2877,8 @@ public class Service extends BaseService {
 			
 			LeaveRequest lr = manager.getLeaveRequest(ids.get(0));
 			
-			if (!lr.getType().equals(EnumUtils.toSerializedName(OLeaveRequestType.OVERTIME))) {
-				String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
-				lr.setEventId(eventId);
-			}
+			String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+			lr.setEventId(eventId);
 
 			new JsonResult().printTo(out);
 		} catch (Exception ex) {
@@ -3425,9 +3416,7 @@ public class Service extends BaseService {
 			String cancellationReason = ServletUtils.getStringParameter(request, "cancellationReason", true);
 
 			LeaveRequest lr=manager.timetableRequestCancellation(id, cancellationReason);
-			if (!lr.getType().equals(EnumUtils.toSerializedName(OLeaveRequestType.OVERTIME))) {
-				manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
-			}
+			manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
 
 			new JsonResult().printTo(out);
 		} catch (Exception ex) {

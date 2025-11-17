@@ -73,7 +73,7 @@ public class JsLeaveChartEvent {
 		this.isAllDay = eventBoundary.allDay;
 		if (leaveRequest != null) {
 			// Remember to update eventTooltipRenderer in TimeTableLeavesChars.js accordingly
-			this.title = WT.lookupResource("com.sonicle.webtop.drm", locale, "leaverequest.type.short." + leaveRequest.getType());
+			this.title = leaveRequest.getType(); // i18n title will be set client-side
 			this.reqType = leaveRequest.getType();
 			this.reqTypeText = WT.lookupResource("com.sonicle.webtop.drm", locale, "leaverequest.type." + leaveRequest.getType());
 			
