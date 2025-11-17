@@ -6700,6 +6700,9 @@ public class DrmManager extends BaseManager implements IDrmManager{
     
     
 	public String createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(LeaveRequest lReq) throws WTException {
+		//Do not add calendar event for overtime requests
+		if (lReq.getType().equals(EnumUtils.toSerializedName(OLeaveRequestType.OVERTIME))) return null;
+		
 		TimetableSetting ts = getTimetableSetting();
  		UserProfileId cupid = null;
  		Integer activityId = null; 
