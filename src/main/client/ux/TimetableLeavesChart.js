@@ -180,13 +180,11 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableLeavesChart', {
 					seconds = SoD.diff(fcEvent.start, SoD.idate(fcEvent.end, fcEvent.start), 'seconds', true),
 					ret = Sonicle.fullcalendar.Panel.appointmentEventContentRenderer.apply(this, arguments),
 					tit = WT.res(me.sid, 'store.leaverequesttype.short.'+fcEvent.extendedProps.reqType),
+					symbols = WTF.durationSymbols('narrow'),
 					dur;
 				
-				dur = SoD.humanReadableDuration(seconds);
-				// Current impl. of humanReadableDuration is not customizable, hack resulting text here
-				if (SoS.contains(dur, ' ')) dur = SoS.replaceAll(dur, 'm', ''); // remove last m (if any)
-				dur = SoS.replaceAll(dur, ' ', '');
-				dur = SoS.replaceAll(dur, ',', '');
+				if (seconds > 3600) symbols[3] = '';
+				dur = SoD.humanReadableDuration(seconds, {units: 'ydhm', symbols: symbols, separator: ''});
 				return ret.replace(/(<div\s+class="so-cal-appo-title">)(.*?)(<\/div>)/g, '$1<span style="font-weight:bold;">' + tit + '</span>&nbsp;' + dur + '$3');
 			},
 			eventTooltipRenderer: function(fcViewType, fcEvent, fcArg, context) {
