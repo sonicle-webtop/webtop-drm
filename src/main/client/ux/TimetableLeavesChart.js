@@ -122,7 +122,7 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableLeavesChart', {
 			extraViewConfig: {
 				monthtimeline: {
 					slotLabelFormat: {day: '2-digit', weekday: 'narrow', omitCommas: true},
-					slotMinWidth: 50
+					slotMinWidth: 55
 				}
 			},
 			toolbarLayout: ['extraItems', '-', 'controlButtons', '->', 'headerText', '->', 'viewButtons'],
@@ -176,9 +176,18 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableLeavesChart', {
 			},
 			eventContentRenderer: function(fcViewType, fcEvent, fcArg, context) {
 				var SoD = Sonicle.Date,
-					ret = Sonicle.fullcalendar.Panel.appointmentEventContentRenderer.apply(this, arguments);
+					SoS = Sonicle.String,
+					seconds = SoD.diff(fcEvent.start, SoD.idate(fcEvent.end, fcEvent.start), 'seconds', true),
+					ret = Sonicle.fullcalendar.Panel.appointmentEventContentRenderer.apply(this, arguments),
+					tit = WT.res(me.sid, 'store.leaverequesttype.short.'+fcEvent.extendedProps.reqType),
+					dur;
 				
-				return ret.replace(/(<\/div>)$/g, ' ' + SoD.humanReadableDuration(SoD.diff(fcEvent.start, SoD.idate(fcEvent.end, fcEvent.start), 'seconds', true)) + '$1');
+				dur = SoD.humanReadableDuration(seconds);
+				// Current impl. of humanReadableDuration is not customizable, hack resulting text here
+				if (SoS.contains(dur, ' ')) dur = SoS.replaceAll(dur, 'm', ''); // remove last m (if any)
+				dur = SoS.replaceAll(dur, ' ', '');
+				dur = SoS.replaceAll(dur, ',', '');
+				return ret.replace(/(<div\s+class="so-cal-appo-title">)(.*?)(<\/div>)/g, '$1<span style="font-weight:bold;">' + tit + '</span>&nbsp;' + dur + '$3');
 			},
 			eventTooltipRenderer: function(fcViewType, fcEvent, fcArg, context) {
 				var ret = Sonicle.fullcalendar.Panel.appointmentEventTooltipRenderer.apply(this, arguments),
@@ -220,6 +229,32 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableLeavesChart', {
 					width: 250
 				}
 			],
+			bbar: [
+				'->',
+				{
+					xtype: 'tbtext',
+					html: me.legendText('H')
+				}, {
+					xtype: 'tbtext',
+					html: me.legendText('P')
+				}, {
+					xtype: 'tbtext',
+					html: me.legendText('U')
+				}, {
+					xtype: 'tbtext',
+					html: me.legendText('M')
+				}, {
+					xtype: 'tbtext',
+					html: me.legendText('C')
+				}, {
+					xtype: 'tbtext',
+					html: me.legendText('S')
+				}, {
+					xtype: 'tbtext',
+					html: me.legendText('W')
+				},
+				'->'
+			],
 			editable: false
 		});
 	},
@@ -234,6 +269,13 @@ Ext.define('Sonicle.webtop.drm.ux.TimetableLeavesChart', {
 	
 	reload: function() {
 		this.fullcalendar().getStore().load();
+	},
+	
+	privates: {
+		legendText: function(id) {
+			var prefix = 'store.leaverequesttype.';
+			return WT.res(this.sid, prefix+'short.'+id) + ': ' + WT.res(this.sid, prefix+id);
+		}
 	}
 });
 
