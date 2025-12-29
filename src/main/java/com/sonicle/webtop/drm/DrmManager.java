@@ -2952,7 +2952,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		
         // If from/to hours are specified, use them
         if (lr.getFromHour() != null && lr.getToHour() != null) {
-			if (hp!=null) {
+			if (!lr.getType().equals("W") && hp!=null) {
 				int minutes = lhDao.selectHourRangeIntersectionWithLineHoursInMinutes(con, hp.getId(), ld, lr.getFromHour(), lr.getToHour());
 				// Convert minutes to hour:minute format
 				int h = minutes / 60;
