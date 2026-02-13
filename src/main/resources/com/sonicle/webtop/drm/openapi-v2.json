@@ -1,0 +1,350 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "WebTop DRM",
+    "contact": {
+      "email": "dev-team@sonicle.com"
+    },
+    "version": "v2",
+    "description": "This is DRM service API enpoint."
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "security": [
+    {
+      "auth-basic": []
+    },
+    {
+      "auth-bearer": []
+    },
+    {
+      "auth-apikey-bearer": [],
+      "auth-apikey-username": []
+    }
+  ],
+  "paths": {
+    "/timetable": {
+      "get": {
+        "summary": "List Timetable Entries",
+        "operationId": "listTimetableEntries",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimetableEntriesResult"
+                }
+              }
+            }
+          }
+        },
+        "description": "List timetable entries for a specific month / year",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "operatorId",
+            "description": "Effective user"
+          },
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "year"
+          },
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "month"
+          }
+        ],
+        "tags": [
+          "me"
+        ]
+      },
+      "post": {
+        "summary": "Punch",
+        "operationId": "punch",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "type",
+            "description": "M = Manual , S = Special"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "location",
+            "description": "O = Office, S = Smart, A = App"
+          }
+        ],
+        "description": "Register a Punch (Clock-in / Clock-out automatic)"
+      }
+    },
+    "/leaveRequests": {
+      "get": {
+        "summary": "List Leave Requests",
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeaveRequestsResult"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "listLeaveRequests",
+        "description": "List Leave Requests",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "startDate"
+          }
+        ]
+      },
+      "parameters": []
+    }
+  },
+  "components": {
+    "schemas": {
+      "TimetableEntry": {
+        "title": "TimetableEntry",
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "tjgxq0x1jwjga"
+            }
+          },
+          "date": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "gxcdxiy42683e"
+            }
+          },
+          "entrance": {
+            "type": "string",
+            "description": "Entrance date/time (ISO date/time YYYYMMDD'T'HHMMSS'Z')"
+          },
+          "exit": {
+            "type": "string",
+            "description": "Exit date/time (ISO date/time YYYYMMDD'T'HHMMSS'Z')"
+          },
+          "location": {
+            "type": "string",
+            "description": "Exit date/time (ISO date/time YYYYMMDD'T'HHMMSS'Z')"
+          },
+          "minutes": {
+            "type": "integer",
+            "x-stoplight": {
+              "id": "p6cw9o2xt6v1z"
+            }
+          }
+        },
+        "required": [
+          "entrance",
+          "exit",
+          "location"
+        ]
+      },
+      "ApiError": {
+        "title": "ApiError",
+        "required": [
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "description": "This general detailed error structure is used throughout this API."
+      },
+      "TimetableEntriesResult": {
+        "title": "TimetableEntriesResult",
+        "x-stoplight": {
+          "id": "mss129ka16usn"
+        },
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TimetableEntry"
+            }
+          }
+        }
+      },
+      "LeaveRequest": {
+        "title": "LeaveRequest",
+        "x-stoplight": {
+          "id": "57xpe5uaa4w7h"
+        },
+        "type": "object",
+        "properties": {
+          "leaveRequestId": {
+            "type": "integer",
+            "x-stoplight": {
+              "id": "015hosf3elqtr"
+            }
+          },
+          "domainId": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "9a931qf8bthip"
+            }
+          },
+          "companyId": {
+            "type": "integer",
+            "x-stoplight": {
+              "id": "mke22xscg7ejj"
+            }
+          },
+          "userId": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "ts2f092apd7ak"
+            }
+          },
+          "user": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "22s9rmjbtf2cu"
+            }
+          },
+          "managerId": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "9xmygt62rwreo"
+            }
+          },
+          "manager": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "f1z4nt60vmqtq"
+            }
+          },
+          "type": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "acz7vdqozy2uo"
+            }
+          },
+          "fromDate": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "w5vhzwg2goi8q"
+            }
+          },
+          "toDate": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "lcz2uslkisazg"
+            }
+          },
+          "fromHour": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "xnuqbd5sqccv4"
+            }
+          },
+          "toHour": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "zasae7pl9redn"
+            }
+          },
+          "status": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "62kyq18aqt8sm"
+            }
+          },
+          "result": {
+            "type": "boolean",
+            "x-stoplight": {
+              "id": "wdpe3cyz1rc7c"
+            }
+          },
+          "employeeCancReq": {
+            "type": "boolean",
+            "x-stoplight": {
+              "id": "o0if6mtb86tow"
+            }
+          }
+        }
+      },
+      "LeaveRequestsResult": {
+        "title": "LeaveRequestsResult",
+        "x-stoplight": {
+          "id": "by5oddjk4o9ip"
+        },
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "x-stoplight": {
+              "id": "h104bx2n7l37q"
+            },
+            "items": {
+              "$ref": "#/components/schemas/LeaveRequest"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "auth-basic": {
+        "type": "http",
+        "scheme": "basic"
+      },
+      "auth-bearer": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "auth-apikey-bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "APIKey",
+        "description": "API-Key Authentication: specifies the secret token (bearer and username are both required)"
+      },
+      "auth-apikey-username": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Auth-Username",
+        "description": "API-Key Authentication: specifies target username (bearer and username are both required)"
+      }
+    }
+  },
+  "x-original-swagger-version": "2.0"
+}
