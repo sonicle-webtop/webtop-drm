@@ -709,10 +709,15 @@ Ext.define('Sonicle.webtop.drm.Service', {
 																	}
 																});
 															}else{
-																var stampingMode = WT.getVar('com.sonicle.webtop.drm',"stampingMode")[WT.getVar("userId")];
-																if (stampingMode == 'S') me.setTimetable("S");
-																else if (stampingMode == 'O') me.setTimetable("O");
-																else if (stampingMode == 'B') {
+																var stampingMode = WT.getVar('com.sonicle.webtop.drm',"stampingMode")[WT.getVar("userId")],
+																	smHasS = Sonicle.String.contains(stampingMode, 'S'),
+																	smHasO = Sonicle.String.contains(stampingMode, 'O');
+																//only S
+																if (smHasS && !smHasO) me.setTimetable("S");
+																//only O
+																else if (!smHasS && smHasO) me.setTimetable("O");
+																//both
+																else if (smHasS && smHasO) {
 																	var wnd = Ext.create('Ext.window.Window', {
 																		title: me.res('gpTimetable.mainstamp.wnd.workplace.lbl'),
 																		height: 135,
@@ -3600,9 +3605,11 @@ Ext.define('Sonicle.webtop.drm.Service', {
 	enablingStampButtons: function () {
 		//Bottoni di timbratura standard
 		var me = this,
-			stampingMode = WT.getVar('com.sonicle.webtop.drm',"stampingMode");
+			vStampingMode = WT.getVar('com.sonicle.webtop.drm',"stampingMode"),
+			stampingMode = vStampingMode ? vStampingMode[WT.getVar('userId')] : '';
 		
-		if (stampingMode && stampingMode[WT.getVar('userId')] === 'N') {
+		//if no stamping mode
+		if (!stampingMode || stampingMode.length == 0) {
 			me.getMainComponent().lookupReference('btnMainStamp').setDisabled(true);
 			me.getMainComponent().lookupReference('btnCompanyStamp').setHidden(true);
 			return;

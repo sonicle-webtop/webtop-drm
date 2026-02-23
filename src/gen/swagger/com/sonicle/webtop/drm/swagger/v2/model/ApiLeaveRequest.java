@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 
 @JsonTypeName("LeaveRequest")
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2026-02-13T16:27:04.844+01:00[Europe/Rome]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2026-02-23T11:21:10.810+01:00[Europe/Rome]")
 public class ApiLeaveRequest   {
   private @Valid Integer leaveRequestId;
   private @Valid String domainId;
@@ -33,6 +33,7 @@ public class ApiLeaveRequest   {
   private @Valid String status;
   private @Valid Boolean result;
   private @Valid Boolean employeeCancReq;
+  private @Valid String notes;
 
   /**
    **/
@@ -319,6 +320,25 @@ public class ApiLeaveRequest   {
     this.employeeCancReq = employeeCancReq;
   }
 
+  /**
+   **/
+  public ApiLeaveRequest notes(String notes) {
+    this.notes = notes;
+    return this;
+  }
+
+  
+  @ApiModelProperty(value = "")
+  @JsonProperty("notes")
+  public String getNotes() {
+    return notes;
+  }
+
+  @JsonProperty("notes")
+  public void setNotes(String notes) {
+    this.notes = notes;
+  }
+
 
   @Override
   public boolean equals(Object o) {
@@ -343,12 +363,13 @@ public class ApiLeaveRequest   {
         Objects.equals(this.toHour, leaveRequest.toHour) &&
         Objects.equals(this.status, leaveRequest.status) &&
         Objects.equals(this.result, leaveRequest.result) &&
-        Objects.equals(this.employeeCancReq, leaveRequest.employeeCancReq);
+        Objects.equals(this.employeeCancReq, leaveRequest.employeeCancReq) &&
+        Objects.equals(this.notes, leaveRequest.notes);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(leaveRequestId, domainId, companyId, userId, user, managerId, manager, type, fromDate, toDate, fromHour, toHour, status, result, employeeCancReq);
+    return Objects.hash(leaveRequestId, domainId, companyId, userId, user, managerId, manager, type, fromDate, toDate, fromHour, toHour, status, result, employeeCancReq, notes);
   }
 
   @Override
@@ -371,6 +392,7 @@ public class ApiLeaveRequest   {
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    result: ").append(toIndentedString(result)).append("\n");
     sb.append("    employeeCancReq: ").append(toIndentedString(employeeCancReq)).append("\n");
+    sb.append("    notes: ").append(toIndentedString(notes)).append("\n");
     sb.append("}");
     return sb.toString();
   }

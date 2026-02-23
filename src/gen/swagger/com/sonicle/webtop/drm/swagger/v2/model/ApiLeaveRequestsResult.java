@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 
 @JsonTypeName("LeaveRequestsResult")
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2026-02-13T16:27:04.844+01:00[Europe/Rome]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2026-02-23T11:21:10.810+01:00[Europe/Rome]")
 public class ApiLeaveRequestsResult   {
   private @Valid List<ApiLeaveRequest> items;
 

@@ -388,15 +388,8 @@ public class Service extends BaseService {
 			HashMap<String, String> mSM = new HashMap<>();
 			List<OEmployeeProfile> oEs = manager.listEmployeeProfiles();
 			for(OEmployeeProfile oE : oEs){
-				if(oE.getMinimumNumberOfHoursPerTicket() == null)
-					mT.put(oE.getUserId(), getDefaultMinimumNumberOfHoursPerTicket());
-				else
-					mT.put(oE.getUserId(), oE.getMinimumNumberOfHoursPerTicket());
-				
-				if (StringUtils.isEmpty(oE.getStampingMode()))
-					mSM.put(oE.getUserId(), getDefaultStampingMode());
-				else
-					mSM.put(oE.getUserId(), oE.getStampingMode());
+				mT.put(oE.getUserId(), manager.getMinimumNumberOfHoursPerTicket(oE));
+				mSM.put(oE.getUserId(), manager.getStampingMode(oE));
 			}
 			vs.put("minimumNumberOfHoursPerTicket", mT);
 			vs.put("stampingMode", mSM);
@@ -2850,14 +2843,7 @@ public class Service extends BaseService {
 			IntegerArray ids = ServletUtils.getObjectParameter(request, "leaveRequestIds", IntegerArray.class, true);
 			Boolean choice = ServletUtils.getBooleanParameter(request, "choice", false);
 
-			LeaveRequest lr = manager.getLeaveRequest(ids.get(0));
-			lr.setResult(choice);
-			
-			String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
-			if (!StringUtils.isEmpty(eventId)) lr.setEventId(eventId);
-			else lr.setEventId(null);
-			
-			manager.updateLeaveRequest(lr, true);
+			manager.approveOrDeclineLeaveRequest(ids.get(0), choice);
 
 			new JsonResult().printTo(out);
 
@@ -2873,12 +2859,7 @@ public class Service extends BaseService {
 			IntegerArray ids = ServletUtils.getObjectParameter(request, "leaveRequestIds", IntegerArray.class, true);
 			Boolean choice = ServletUtils.getBooleanParameter(request, "choice", false);
 			
-			manager.updateCancellationLeaveRequest(ids.get(0), choice);
-			
-			LeaveRequest lr = manager.getLeaveRequest(ids.get(0));
-			
-			String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
-			lr.setEventId(eventId);
+			manager.cancelLeaveRequest(ids.get(0), choice);
 
 			new JsonResult().printTo(out);
 		} catch (Exception ex) {

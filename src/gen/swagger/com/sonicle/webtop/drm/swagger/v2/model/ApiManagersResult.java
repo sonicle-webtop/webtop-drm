@@ -1,8 +1,11 @@
 package com.sonicle.webtop.drm.swagger.v2.model;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.sonicle.webtop.drm.swagger.v2.model.ApiManager;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 
@@ -13,55 +16,48 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-/**
- * This general detailed error structure is used throughout this API.
- **/
-@ApiModel(description = "This general detailed error structure is used throughout this API.")
-@JsonTypeName("ApiError")
+
+
+@JsonTypeName("ManagersResult")
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2026-02-23T11:21:10.810+01:00[Europe/Rome]")
-public class ApiApiError   {
-  private @Valid Integer code;
-  private @Valid String description;
+public class ApiManagersResult   {
+  private @Valid List<ApiManager> items;
 
   /**
    **/
-  public ApiApiError code(Integer code) {
-    this.code = code;
-    return this;
-  }
-
-  
-  @ApiModelProperty(required = true, value = "")
-  @JsonProperty("code")
-  @NotNull
-  public Integer getCode() {
-    return code;
-  }
-
-  @JsonProperty("code")
-  public void setCode(Integer code) {
-    this.code = code;
-  }
-
-  /**
-   **/
-  public ApiApiError description(String description) {
-    this.description = description;
+  public ApiManagersResult items(List<ApiManager> items) {
+    this.items = items;
     return this;
   }
 
   
   @ApiModelProperty(value = "")
-  @JsonProperty("description")
-  public String getDescription() {
-    return description;
+  @JsonProperty("items")
+  public List<ApiManager> getItems() {
+    return items;
   }
 
-  @JsonProperty("description")
-  public void setDescription(String description) {
-    this.description = description;
+  @JsonProperty("items")
+  public void setItems(List<ApiManager> items) {
+    this.items = items;
   }
 
+  public ApiManagersResult addItemsItem(ApiManager itemsItem) {
+    if (this.items == null) {
+      this.items = new ArrayList<>();
+    }
+
+    this.items.add(itemsItem);
+    return this;
+  }
+
+  public ApiManagersResult removeItemsItem(ApiManager itemsItem) {
+    if (itemsItem != null && this.items != null) {
+      this.items.remove(itemsItem);
+    }
+
+    return this;
+  }
 
   @Override
   public boolean equals(Object o) {
@@ -71,23 +67,21 @@ public class ApiApiError   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ApiApiError apiError = (ApiApiError) o;
-    return Objects.equals(this.code, apiError.code) &&
-        Objects.equals(this.description, apiError.description);
+    ApiManagersResult managersResult = (ApiManagersResult) o;
+    return Objects.equals(this.items, managersResult.items);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(code, description);
+    return Objects.hash(items);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ApiApiError {\n");
+    sb.append("class ApiManagersResult {\n");
     
-    sb.append("    code: ").append(toIndentedString(code)).append("\n");
-    sb.append("    description: ").append(toIndentedString(description)).append("\n");
+    sb.append("    items: ").append(toIndentedString(items)).append("\n");
     sb.append("}");
     return sb.toString();
   }

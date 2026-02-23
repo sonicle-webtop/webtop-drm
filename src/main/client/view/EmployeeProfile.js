@@ -39,7 +39,7 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 		title: '{EmployeeProfile.tit}',
 		iconCls: 'wtdrm-icon-configurationEmployeeProfiles',
 		width: 450,
-		height: 400,
+		height: 500,
 		modal: true
 	},
 	fieldTitle: 'description',
@@ -48,6 +48,33 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 	constructor: function (cfg) {
 		var me = this;
 		me.callParent([cfg]);
+		
+		Sonicle.VMUtils.applyFormulas(me.getVM(), {
+			foStampingModeO: WTF.foFieldTwoWay('record', 'stampingMode', 
+				function(v, mo, fieldName) {
+					return Sonicle.String.contains(v, "O");
+				}, function(v, mo, fieldName) {
+					return Sonicle.String.replaceAll(mo.get(fieldName),'O','')+(v ? 'O' : '');					
+				}
+			),
+			foStampingModeS: WTF.foFieldTwoWay('record', 'stampingMode', 
+				function(v, mo, fieldName) {
+					return Sonicle.String.contains(v, "S");
+				}, function(v, mo, fieldName) {
+					return Sonicle.String.replaceAll(mo.get(fieldName),'S','')+(v ? 'S' : '');	
+				}
+			),
+			foStampingModeA: WTF.foFieldTwoWay('record', 'stampingMode', 
+				function(v, mo, fieldName) {
+					return Sonicle.String.contains(v, "A");
+				}, function(v, mo, fieldName) {
+					return Sonicle.String.replaceAll(mo.get(fieldName),'A','')+(v ? 'A' : '');					
+				}
+			),
+			foPswDisabled: WTF.foGetFn('_mode', null, function(val) {
+				return val !== me.MODE_NEW || !me.askForPassword;
+			})
+		});
 	},
     
 	initComponent: function () {
@@ -55,16 +82,17 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 		me.callParent(arguments);
 		me.add({
 			region: 'center',
-			xtype: 'panel',
-			layout: 'vbox',
-			defaults: {
-				labelWidth: 240
-			},
+			xtype: 'tabpanel',
 			items: [
 				{
 					xtype: 'wtform',
 					reference: 'employeeProfileform',
+					title: me.mys.res('timetable.settings.tit'),
 					modelValidation: true,
+					scrollable: true,
+					defaults: {
+						labelWidth: 240
+					},
 					items: [
 						WTF.localCombo('id', 'desc', {
 							bind: '{record.userId}',
@@ -136,19 +164,21 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 							fieldLabel: me.mys.res('EmployeeProfile.fld-minimumNumberOfHoursPerTicket.lbl'),
 							width: 380
 						},
-						WTF.lookupCombo('id', 'desc', {
-							bind: '{record.stampingMode}',
-							store: Ext.create('Sonicle.webtop.drm.store.StampingMode', {
-								autoLoad: true
-							}),
-							triggers: {
-								clear: WTF.clearTrigger()
-							},
-							fieldLabel: me.mys.res('timetable.settings.fld-stampingMode.lbl'),
-							emptyText: me.mys.res('store.stampingMode.'+me.mys.getVar("defaultStampingMode")),
-							selectOnFocus: true,
-							editable: true
-						}),
+						{
+							xtype: 'checkbox',
+							bind: '{foStampingModeO}',
+							boxLabel: me.mys.res('timetable.settings.fld-stampingModeO.lbl')
+						},
+						{
+							xtype: 'checkbox',
+							bind: '{foStampingModeS}',
+							boxLabel: me.mys.res('timetable.settings.fld-stampingModeS.lbl')
+						},
+						{
+							xtype: 'checkbox',
+							bind: '{foStampingModeA}',
+							boxLabel: me.mys.res('timetable.settings.fld-stampingModeA.lbl')
+						},
 						{
 							xtype: 'checkbox',
 							bind: '{record.extraordinary}',

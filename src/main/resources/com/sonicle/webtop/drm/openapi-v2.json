@@ -124,11 +124,204 @@
               "type": "string"
             },
             "in": "query",
+            "name": "userId"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
             "name": "startDate"
+          },
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "leaveRequestId"
+          }
+        ]
+      },
+      "parameters": [],
+      "post": {
+        "summary": "Add new Leave Requesst",
+        "operationId": "addLeaveRequest",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Add a new Leave Request",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeaveRequest"
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update Leave Request",
+        "operationId": "updateLeaveRequests",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Update Leave Request",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeaveRequest"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Leave Request",
+        "operationId": "deleteLeaveRequest",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Delete a Leave Request",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "leaveRequestId"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "delete",
+                "approve",
+                "refuse",
+                "cancel",
+                "requestCancellation"
+              ]
+            },
+            "in": "query",
+            "name": "action"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "text"
+          }
+        ]
+      }
+    },
+    "/managers": {
+      "get": {
+        "summary": "List Managers",
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ManagersResult"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "listManagers",
+        "description": "List Managers of a specific user",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "userId"
+          }
+        ]
+      }
+    },
+    "/companies": {
+      "get": {
+        "summary": "List Companies",
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompaniesResult"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "listCompanies",
+        "description": "List Companies of a specific user",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "userId"
           }
         ]
       },
       "parameters": []
+    },
+    "/employee": {
+      "get": {
+        "summary": "Get Employee Profile",
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Employee"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "getEmployeeProfile",
+        "description": "Get Employee Profile data"
+      }
+    },
+    "/managers/users": {
+      "get": {
+        "summary": "List managed Users by a Manager",
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsersResult"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "listManagedUsers",
+        "description": "List managed Users by a Manager",
+        "parameters": []
+      }
     }
   },
   "components": {
@@ -301,6 +494,12 @@
             "x-stoplight": {
               "id": "o0if6mtb86tow"
             }
+          },
+          "notes": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "dextkc0tou574"
+            }
           }
         }
       },
@@ -318,6 +517,198 @@
             },
             "items": {
               "$ref": "#/components/schemas/LeaveRequest"
+            }
+          }
+        }
+      },
+      "Manager": {
+        "title": "Manager",
+        "x-stoplight": {
+          "id": "yh9bpqqt9b35j"
+        },
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "displayname": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "s4rewoog9tnfq"
+            }
+          }
+        }
+      },
+      "ManagersResult": {
+        "title": "ManagersResult",
+        "x-stoplight": {
+          "id": "bqxurdff8em6c"
+        },
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "x-stoplight": {
+              "id": "ee7uunyhguq24"
+            },
+            "items": {
+              "$ref": "#/components/schemas/Manager"
+            }
+          }
+        }
+      },
+      "Company": {
+        "title": "Company",
+        "x-stoplight": {
+          "id": "uwm6t998n9w6q"
+        },
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "displayname": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "c02dzsrtgshty"
+            }
+          }
+        }
+      },
+      "CompaniesResult": {
+        "title": "CompaniesResult",
+        "x-stoplight": {
+          "id": "pn3k81o0yte29"
+        },
+        "type": "object",
+        "properties": {
+          "items": {
+            "x-stoplight": {
+              "id": "sd6bvesvhxn48"
+            },
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Company"
+            }
+          }
+        }
+      },
+      "Employee": {
+        "title": "Employee",
+        "x-stoplight": {
+          "id": "xkd2308nud21h"
+        },
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "domainId": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "tluvpfwfluaqw"
+            }
+          },
+          "userId": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "h3cct9i63o82k"
+            }
+          },
+          "number": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "ede4eemun6ehm"
+            }
+          },
+          "tolerance": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "a1r51fg8kn09o"
+            }
+          },
+          "extraordinary": {
+            "type": "boolean",
+            "x-stoplight": {
+              "id": "xtp1cfi329y3l"
+            }
+          },
+          "onlyPresence": {
+            "type": "boolean",
+            "x-stoplight": {
+              "id": "qlgacanijj7py"
+            }
+          },
+          "hourProfileId": {
+            "type": "integer",
+            "x-stoplight": {
+              "id": "wvvlfp6v4ulbw"
+            }
+          },
+          "headquartersCode": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "r4c6rryatkonm"
+            }
+          },
+          "noStamping": {
+            "type": "boolean",
+            "x-stoplight": {
+              "id": "0kos2srgduhc9"
+            }
+          },
+          "minimumNumberOfHoursPerTicket": {
+            "type": "integer",
+            "x-stoplight": {
+              "id": "1tbpve3nwm7hd"
+            }
+          },
+          "stampingMode": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "9gzegu8639ei0"
+            }
+          },
+          "isManager": {
+            "type": "boolean",
+            "x-stoplight": {
+              "id": "8vc4d2grc8bkg"
+            }
+          }
+        }
+      },
+      "User": {
+        "title": "User",
+        "x-stoplight": {
+          "id": "bbjj6mzldor9r"
+        },
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "displayname": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "zkreiwi1heqa9"
+            }
+          }
+        }
+      },
+      "UsersResult": {
+        "title": "UsersResult",
+        "x-stoplight": {
+          "id": "1g10mhxoix3t1"
+        },
+        "type": "object",
+        "properties": {
+          "items": {
+            "x-stoplight": {
+              "id": "p53volqj3tip5"
+            },
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
             }
           }
         }

@@ -39,6 +39,36 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingGeneral', {
 		height: 700
 	},
 	modelName: 'Sonicle.webtop.drm.model.TimetableSettingGeneral',
+
+	constructor: function (cfg) {
+		var me = this;
+		me.callParent([cfg]);
+		
+		Sonicle.VMUtils.applyFormulas(me.getVM(), {
+			foStampingModeO: WTF.foFieldTwoWay('record', 'defaultStampingMode', 
+				function(v, mo, fieldName) {
+					return Sonicle.String.contains(v, "O");
+				}, function(v, mo, fieldName) {
+					return Sonicle.String.replaceAll(mo.get(fieldName),'O','')+(v ? 'O' : '');					
+				}
+			),
+			foStampingModeS: WTF.foFieldTwoWay('record', 'defaultStampingMode', 
+				function(v, mo, fieldName) {
+					return Sonicle.String.contains(v, "S");
+				}, function(v, mo, fieldName) {
+					return Sonicle.String.replaceAll(mo.get(fieldName),'S','')+(v ? 'S' : '');	
+				}
+			),
+			foStampingModeA: WTF.foFieldTwoWay('record', 'defaultStampingMode', 
+				function(v, mo, fieldName) {
+					return Sonicle.String.contains(v, "A");
+				}, function(v, mo, fieldName) {
+					return Sonicle.String.replaceAll(mo.get(fieldName),'A','')+(v ? 'A' : '');					
+				}
+			)
+		});
+	},
+    
 	initComponent: function () {
 		var me = this;
 		me.callParent(arguments);
@@ -223,18 +253,21 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingGeneral', {
 							bind: '{record.automaticOvertime}',
 							boxLabel: me.mys.res('timetable.settings.fld-automaticOvertime.lbl')
 						},
-						WTF.lookupCombo('id', 'desc', {
-							bind: '{record.defaultStampingMode}',
-							store: Ext.create('Sonicle.webtop.drm.store.StampingMode', {
-								autoLoad: true
-							}),
-							triggers: {
-								clear: WTF.clearTrigger()
-							},
-							fieldLabel: me.mys.res('timetable.settings.fld-stampingMode.lbl'),
-							selectOnFocus: true,
-							editable: true
-						}),
+						{
+							xtype: 'checkbox',
+							bind: '{foStampingModeO}',
+							boxLabel: me.mys.res('timetable.settings.fld-stampingModeO.lbl')
+						},
+						{
+							xtype: 'checkbox',
+							bind: '{foStampingModeS}',
+							boxLabel: me.mys.res('timetable.settings.fld-stampingModeS.lbl')
+						},
+						{
+							xtype: 'checkbox',
+							bind: '{foStampingModeA}',
+							boxLabel: me.mys.res('timetable.settings.fld-stampingModeA.lbl')
+						}
 					]
 				},
 				{

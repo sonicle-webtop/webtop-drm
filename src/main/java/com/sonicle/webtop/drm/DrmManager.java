@@ -313,6 +313,10 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		dss = new DrmServiceSettings(SERVICE_ID, targetProfileId.getDomainId());
 		tts = getTimetableSetting();
 	}
+	
+	public DrmServiceSettings getServiceSettings() {
+		return dss;
+	}
 
 	private DateTime createRevisionTimestamp() {
 		return DateTime.now(DateTimeZone.UTC);
@@ -3130,6 +3134,34 @@ public class DrmManager extends BaseManager implements IDrmManager{
         }
     }
 
+	public void approveLeaveRequest(int id) throws WTException, MessagingException, TemplateException {
+		approveOrDeclineLeaveRequest(id, true);
+	}
+	
+	public void declineLeaveRequest(int id) throws WTException, MessagingException, TemplateException {
+		approveOrDeclineLeaveRequest(id, false);
+	}
+	
+	public void approveOrDeclineLeaveRequest(int id, Boolean choice) throws WTException, MessagingException, TemplateException {
+		LeaveRequest lr = getLeaveRequest(id);
+		lr.setResult(choice);
+
+		String eventId = createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+		if (!StringUtils.isEmpty(eventId)) lr.setEventId(eventId);
+		else lr.setEventId(null);
+
+		updateLeaveRequest(lr, true);
+	}
+	
+	public void cancelLeaveRequest(int id, Boolean choice) throws WTException, MessagingException, IOException, TemplateException {
+		updateCancellationLeaveRequest(id, choice);
+
+		LeaveRequest lr = getLeaveRequest(id);
+
+		String eventId = createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+		lr.setEventId(eventId);
+	}
+
 	public LeaveRequest updateCancellationLeaveRequest(int id, Boolean choice) throws WTException, MessagingException, IOException, TemplateException {
 		Connection con = null;
 		LeaveRequestDAO lrDao = LeaveRequestDAO.getInstance();
@@ -3630,7 +3662,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		}
 	}
 	
-	List<String> listManagedOperators() throws WTException {
+	public List<String> listManagedOperators() throws WTException {
 		Connection con = null;
 		com.sonicle.webtop.drm.dal.UserDAO userDao = com.sonicle.webtop.drm.dal.UserDAO.getInstance();
 		UserProfileId pid = getTargetProfileId();
@@ -3651,7 +3683,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		}
 	}
 	
-	List<String> listManagersByDomainUser(String userId) throws WTException {
+	public List<String> listManagersByDomainUser(String userId) throws WTException {
 		Connection con = null;
 		DrmUserForManagerDAO lmDao = DrmUserForManagerDAO.getInstance();
 		List<String> managers = null;
@@ -4288,6 +4320,22 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			List<String> userIds = new ArrayList<>();
 			for (OEmployeeProfile ep: eps) userIds.add(ep.getUserId());
 			return userIds;
+
+		} catch (SQLException | DAOException ex) {
+			throw new WTException(ex, "DB error");
+		} finally {
+			DbUtils.closeQuietly(con);
+		}
+	}
+	
+	public boolean isLineManager(String domainId, String userId) throws WTException {
+		Connection con = null;
+		com.sonicle.webtop.drm.dal.UserDAO userDao = com.sonicle.webtop.drm.dal.UserDAO.getInstance();
+		
+		try {
+
+			con = WT.getConnection(SERVICE_ID);
+			return userDao.isLineManager(con, domainId, userId);
 
 		} catch (SQLException | DAOException ex) {
 			throw new WTException(ex, "DB error");
@@ -6892,6 +6940,18 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		else
 			title += lookupResource(locale, "leaverequest.calendar.requesttype.S");
 		return title;
+	}
+	
+	public String getStampingMode(OEmployeeProfile oE) {
+		TimetableSetting tS = getTimetableSetting();
+		if (StringUtils.isEmpty(oE.getStampingMode())) return tS.getDefaultStampingMode();
+		else return oE.getStampingMode();
+	}
+
+	public Integer getMinimumNumberOfHoursPerTicket(OEmployeeProfile oE) {
+		TimetableSetting tS = getTimetableSetting();
+		if (StringUtils.isEmpty(oE.getStampingMode())) return tS.getMinimumNumberOfHoursPerTicket();
+		else return oE.getMinimumNumberOfHoursPerTicket();
 	}
 
 	private String getInitials(String name) { 

@@ -130,4 +130,11 @@ public class UserDAO extends BaseDAO {
 				)
 				.fetchInto(String.class);
 	}
+	
+	public boolean isLineManager(Connection con, String domain, String user) throws DAOException {
+		DSLContext dsl = getDSL(con);
+		int count = dsl.fetchCount(LINE_MANAGERS, LINE_MANAGERS.DOMAIN_ID.equal(domain)
+				.and(LINE_MANAGERS.USER_ID.equal(user)));
+		return count > 0;
+	}
 }
