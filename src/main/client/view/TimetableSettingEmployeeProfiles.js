@@ -194,6 +194,7 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingEmployeeProfiles', {
 		vw.showView(function () {
 			vw.begin('new', {
 				data: {
+					stampingMode: ''
 				}
 			});
 		});

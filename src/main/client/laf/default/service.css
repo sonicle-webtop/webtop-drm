@@ -44,6 +44,7 @@
 .wtdrm-icon-mailto { background-image: url('mailto_16.svg') !important; background-size: contain; }
 .wtdrm-icon-office { background-image: url('configuration-companies_16.svg') !important; background-size: contain; }
 .wtdrm-icon-smartworking { background-image: url('smartworking_16.svg') !important; background-size: contain; }
+.wtdrm-icon-app { background-image: url('device-phone_16.svg') !important; background-size: contain; }
 
 .wtdrm-trash-trigger { background-image: url('trash-trigger.png') !important; }
 .wtdrm-add-trigger { background-image: url('add-trigger.png') !important; }

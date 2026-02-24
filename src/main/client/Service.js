@@ -885,9 +885,14 @@ Ext.define('Sonicle.webtop.drm.Service', {
 											hideable: false,
 											align: 'center',
 											getIconCls: function(v, rec) {
-												if (rec.get('location') === 'S') {
+												var loc = rec.get('location');
+												if (loc === 'S') {
 													return 'wtdrm-icon-smartworking';
-												} else {
+												}
+												else if (loc === 'A') {
+													return 'wtdrm-icon-app';
+												}
+												else {
 													return 'wtdrm-icon-office';
 												}
 											},

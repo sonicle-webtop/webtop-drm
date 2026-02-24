@@ -37,7 +37,8 @@ Ext.define('Sonicle.webtop.drm.store.LocationType', {
 	model: 'WTA.model.Simple',
 	data: [
 		['O',''],
-		['S','']
+		['S',''],
+		['A','']
 	],
 	
 	constructor: function(cfg) {
