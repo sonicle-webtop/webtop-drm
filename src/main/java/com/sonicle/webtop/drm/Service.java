@@ -1059,25 +1059,11 @@ public class Service extends BaseService {
 		try {
 			UserProfileId upid = getEnv().getProfileId();
 			DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID, upid);
-			EmployeeProfile ep = manager.getEmployeeProfile(upid.getDomainId(), upid.getUserId());
 			
-			TimetableSetting ts = manager.getTimetableSetting();
-			
+			List<OLeaveRequestType> olrTypes = manager.listLeaveRequestTypes(upid.getDomainId(), upid.getUserId());
 			List<JsSimple> types = new ArrayList();
 			
-			types.add(createLeaveRequestJsSimple(OLeaveRequestType.PAID_LEAVE));
-			types.add(createLeaveRequestJsSimple(OLeaveRequestType.HOLIDAY));
-			
-			if (ep != null && ep.getExtraordinary())
-				types.add(createLeaveRequestJsSimple(OLeaveRequestType.OVERTIME));
-			
-			if(ts != null){
-				if(ts.getRequestsPermitsNotRemunered())types.add(createLeaveRequestJsSimple(OLeaveRequestType.UNPAID_LEAVE));
-				if(ts.getRequestsPermitsMedicalVisits())types.add(createLeaveRequestJsSimple(OLeaveRequestType.MEDICAL_VISIT));
-				if(ts.getRequestsPermitsContractuals())types.add(createLeaveRequestJsSimple(OLeaveRequestType.CONTRACTUAL));
-				if(ts.getRequestsSickness())types.add(createLeaveRequestJsSimple(OLeaveRequestType.SICKNESS));
-			}
-			if (ep != null && !ep.getNoStamping()) types.add(createLeaveRequestJsSimple(OLeaveRequestType.WORK_ABSENCE));
+			for(OLeaveRequestType olrt: olrTypes) types.add(createLeaveRequestJsSimple(olrt));
 			
 			String selected = types.isEmpty() ? null : (String) types.get(0).id;
 			ResultMeta meta = new LookupMeta().setSelected(selected);

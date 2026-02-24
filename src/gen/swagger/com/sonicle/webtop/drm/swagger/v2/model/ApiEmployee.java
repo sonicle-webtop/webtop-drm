@@ -3,6 +3,8 @@ package com.sonicle.webtop.drm.swagger.v2.model;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 
@@ -16,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 
 @JsonTypeName("Employee")
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2026-02-23T11:21:10.810+01:00[Europe/Rome]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2026-02-24T14:49:06.615+01:00[Europe/Rome]")
 public class ApiEmployee   {
   private @Valid Integer id;
   private @Valid String domainId;
@@ -31,6 +33,7 @@ public class ApiEmployee   {
   private @Valid Integer minimumNumberOfHoursPerTicket;
   private @Valid String stampingMode;
   private @Valid Boolean isManager;
+  private @Valid List<String> leaveRequestTypes;
 
   /**
    **/
@@ -279,6 +282,41 @@ public class ApiEmployee   {
     this.isManager = isManager;
   }
 
+  /**
+   **/
+  public ApiEmployee leaveRequestTypes(List<String> leaveRequestTypes) {
+    this.leaveRequestTypes = leaveRequestTypes;
+    return this;
+  }
+
+  
+  @ApiModelProperty(value = "")
+  @JsonProperty("leaveRequestTypes")
+  public List<String> getLeaveRequestTypes() {
+    return leaveRequestTypes;
+  }
+
+  @JsonProperty("leaveRequestTypes")
+  public void setLeaveRequestTypes(List<String> leaveRequestTypes) {
+    this.leaveRequestTypes = leaveRequestTypes;
+  }
+
+  public ApiEmployee addLeaveRequestTypesItem(String leaveRequestTypesItem) {
+    if (this.leaveRequestTypes == null) {
+      this.leaveRequestTypes = new ArrayList<>();
+    }
+
+    this.leaveRequestTypes.add(leaveRequestTypesItem);
+    return this;
+  }
+
+  public ApiEmployee removeLeaveRequestTypesItem(String leaveRequestTypesItem) {
+    if (leaveRequestTypesItem != null && this.leaveRequestTypes != null) {
+      this.leaveRequestTypes.remove(leaveRequestTypesItem);
+    }
+
+    return this;
+  }
 
   @Override
   public boolean equals(Object o) {
@@ -301,12 +339,13 @@ public class ApiEmployee   {
         Objects.equals(this.noStamping, employee.noStamping) &&
         Objects.equals(this.minimumNumberOfHoursPerTicket, employee.minimumNumberOfHoursPerTicket) &&
         Objects.equals(this.stampingMode, employee.stampingMode) &&
-        Objects.equals(this.isManager, employee.isManager);
+        Objects.equals(this.isManager, employee.isManager) &&
+        Objects.equals(this.leaveRequestTypes, employee.leaveRequestTypes);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, domainId, userId, number, tolerance, extraordinary, onlyPresence, hourProfileId, headquartersCode, noStamping, minimumNumberOfHoursPerTicket, stampingMode, isManager);
+    return Objects.hash(id, domainId, userId, number, tolerance, extraordinary, onlyPresence, hourProfileId, headquartersCode, noStamping, minimumNumberOfHoursPerTicket, stampingMode, isManager, leaveRequestTypes);
   }
 
   @Override
@@ -327,6 +366,7 @@ public class ApiEmployee   {
     sb.append("    minimumNumberOfHoursPerTicket: ").append(toIndentedString(minimumNumberOfHoursPerTicket)).append("\n");
     sb.append("    stampingMode: ").append(toIndentedString(stampingMode)).append("\n");
     sb.append("    isManager: ").append(toIndentedString(isManager)).append("\n");
+    sb.append("    leaveRequestTypes: ").append(toIndentedString(leaveRequestTypes)).append("\n");
     sb.append("}");
     return sb.toString();
   }

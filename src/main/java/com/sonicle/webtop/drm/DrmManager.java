@@ -3369,6 +3369,30 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		}
 	}
 	
+	public List<OLeaveRequestType> listLeaveRequestTypes(String domainId, String userId) throws WTException {
+			EmployeeProfile ep = getEmployeeProfile(domainId, userId);
+			
+			TimetableSetting ts = getTimetableSetting();
+			
+			List<OLeaveRequestType> types = new ArrayList();
+			
+			types.add(OLeaveRequestType.PAID_LEAVE);
+			types.add(OLeaveRequestType.HOLIDAY);
+			
+			if (ep != null && ep.getExtraordinary())
+				types.add(OLeaveRequestType.OVERTIME);
+			
+			if(ts != null){
+				if(ts.getRequestsPermitsNotRemunered())types.add(OLeaveRequestType.UNPAID_LEAVE);
+				if(ts.getRequestsPermitsMedicalVisits())types.add(OLeaveRequestType.MEDICAL_VISIT);
+				if(ts.getRequestsPermitsContractuals())types.add(OLeaveRequestType.CONTRACTUAL);
+				if(ts.getRequestsSickness())types.add(OLeaveRequestType.SICKNESS);
+			}
+			if (ep != null && !ep.getNoStamping()) types.add(OLeaveRequestType.WORK_ABSENCE);
+			
+			return types;
+	}
+	
 	public ArrayList<ODay> generateDaysFromRange(LocalDate fromDate, LocalDate toDate) throws WTException {
 		Connection con = null;
 		UtilityDAO uDao = UtilityDAO.getInstance();

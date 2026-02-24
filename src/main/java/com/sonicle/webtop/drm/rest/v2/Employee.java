@@ -32,12 +32,15 @@
  */
 package com.sonicle.webtop.drm.rest.v2;
 
+import com.sonicle.commons.EnumUtils;
 import com.sonicle.webtop.core.app.RunContext;
 import com.sonicle.webtop.core.app.WT;
 import com.sonicle.webtop.core.sdk.UserProfileId;
 import com.sonicle.webtop.core.sdk.WTException;
 import com.sonicle.webtop.drm.DrmManager;
 import com.sonicle.webtop.drm.bol.OCompany;
+import com.sonicle.webtop.drm.bol.OLeaveRequest;
+import com.sonicle.webtop.drm.bol.OLeaveRequestType;
 import com.sonicle.webtop.drm.model.EmployeeProfile;
 import com.sonicle.webtop.drm.swagger.v2.api.EmployeeApi;
 import com.sonicle.webtop.drm.swagger.v2.model.ApiApiError;
@@ -78,6 +81,10 @@ public class Employee extends EmployeeApi {
 			ae.setTolerance(ep.getTolerance());
 			ae.setUserId(ep.getUserId());
 			ae.setIsManager(manager.isLineManager(domainId, userId));
+			List<OLeaveRequestType> olrTypes = manager.listLeaveRequestTypes(domainId, userId);
+			List<String> olrList = new ArrayList<>();
+			for(OLeaveRequestType olrt: olrTypes) olrList.add(EnumUtils.toSerializedName(olrt));
+			ae.setLeaveRequestTypes(olrList);
 			return respOk(ae);
 		} catch(WTException exc) {
 			logger.error("[{}] getEmployeeProfile({})", currentProfileId, userId, exc);

@@ -674,6 +674,18 @@
             "x-stoplight": {
               "id": "8vc4d2grc8bkg"
             }
+          },
+          "leaveRequestTypes": {
+            "type": "array",
+            "x-stoplight": {
+              "id": "bpm7lzrukfxl5"
+            },
+            "items": {
+              "x-stoplight": {
+                "id": "zraxp0d5vyhh8"
+              },
+              "type": "string"
+            }
           }
         }
       },

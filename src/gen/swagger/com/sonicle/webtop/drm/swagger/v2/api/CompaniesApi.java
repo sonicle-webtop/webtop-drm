@@ -15,7 +15,7 @@ import javax.validation.Valid;
 
 @Path("/companies")
 @Api(description = "the companies API")
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2026-02-23T11:21:10.810+01:00[Europe/Rome]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2026-02-24T14:49:06.615+01:00[Europe/Rome]")
 public abstract class CompaniesApi extends com.sonicle.webtop.core.sdk.BaseRestApiResource {
 
     @GET
