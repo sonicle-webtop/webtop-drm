@@ -85,13 +85,13 @@ public class Managers extends ManagersApi {
 		UserProfileId currentProfileId = RunContext.getRunProfileId();
 		DrmManager manager = getManager();
 		try {
-			List<String> list = manager.listManagedOperators(); 
+			List<DrmManager.Operator> list = manager.listManagedAndSupervisedOperators(); 
 			ApiUsersResult aur = new ApiUsersResult();
 			ArrayList<ApiUser> items = new ArrayList<>();
-			for (String userId: list) {
+			for (DrmManager.Operator op: list) {
 				ApiUser u = new ApiUser();
-				u.setId(userId);
-				u.setDisplayname(WT.getUserData(new UserProfileId(currentProfileId.getDomainId(), userId)).getDisplayName());
+				u.setId(op.usr);
+				u.setDisplayname(op.dn);
 				items.add(u);
 			}
 			aur.setItems(items);

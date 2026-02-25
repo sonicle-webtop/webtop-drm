@@ -592,37 +592,27 @@ public class Service extends BaseService {
 		}
 	}
 	
-	private class Operator {
-		String usr;
-		String dn;
-		
-		Operator(String usr, String dn) {
-			this.usr = usr;
-			this.dn = dn;
-		}
-	}
-	
 	public void processLookupOperators(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			List<JsSimple> jsUser = new ArrayList();
 			Data uD;
 			
-			ArrayList<Operator> ops = new ArrayList<>();
+			ArrayList<DrmManager.Operator> ops = new ArrayList<>();
 			for (String usr : manager.listOperators()) {
 				UserProfile.PersonalInfo pinfo = WT.getProfilePersonalInfo(new UserProfileId(getEnv().getProfileId().getDomain(), usr));
 				if (pinfo!=null) {
-					ops.add(new Operator(usr, pinfo.getLastName()+" "+pinfo.getFirstName()));
+					ops.add(manager.createOperator(usr, pinfo.getLastName()+" "+pinfo.getFirstName()));
 				}
 			}
 			
-			ops.sort(new Comparator<Operator>() {
+			ops.sort(new Comparator<DrmManager.Operator>() {
 				@Override
-				public int compare(Operator op1, Operator op2) {
+				public int compare(DrmManager.Operator op1, DrmManager.Operator op2) {
 					return op1.dn.compareTo(op2.dn);
 				}
 			});
 			
-			for (Operator op : ops) {
+			for (DrmManager.Operator op : ops) {
 				jsUser.add(new JsSimple(op.usr, op.dn));
 			}
 			
@@ -640,22 +630,22 @@ public class Service extends BaseService {
 			List<JsSimple> jsUser = new ArrayList();
 			Data uD;
 			
-			ArrayList<Operator> ops = new ArrayList<>();
+			ArrayList<DrmManager.Operator> ops = new ArrayList<>();
 			for (String usr : manager.listStampingOperators()) {
 				UserProfile.PersonalInfo pinfo = WT.getProfilePersonalInfo(new UserProfileId(getEnv().getProfileId().getDomain(), usr));
 				if (pinfo!=null) {
-					ops.add(new Operator(usr, pinfo.getLastName()+" "+pinfo.getFirstName()));
+					ops.add(manager.createOperator(usr, pinfo.getLastName()+" "+pinfo.getFirstName()));
 				}
 			}
 			
-			ops.sort(new Comparator<Operator>() {
+			ops.sort(new Comparator<DrmManager.Operator>() {
 				@Override
-				public int compare(Operator op1, Operator op2) {
+				public int compare(DrmManager.Operator op1, DrmManager.Operator op2) {
 					return op1.dn.compareTo(op2.dn);
 				}
 			});
 			
-			for (Operator op : ops) {
+			for (DrmManager.Operator op : ops) {
 				jsUser.add(new JsSimple(op.usr, op.dn));
 			}
 			
@@ -671,40 +661,10 @@ public class Service extends BaseService {
 	public void processLookupManagedOperators(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
 		try {
 			List<JsSimple> jsUser = new ArrayList();
-			Data uD;
-			
-			ArrayList<Operator> ops = new ArrayList<>();
-			
-			//add managed users
-			for (String usr : manager.listManagedOperators()) {
-				UserProfile.PersonalInfo pinfo = WT.getProfilePersonalInfo(new UserProfileId(getEnv().getProfileId().getDomain(), usr));
-				if (pinfo!=null) {
-					ops.add(new Operator(usr, pinfo.getLastName()+" "+pinfo.getFirstName()));
-				}
-			}
-			
-			//add supervised users
-			for (String usr : manager.listOperators()) {
-				UserProfile.PersonalInfo pinfo = WT.getProfilePersonalInfo(new UserProfileId(getEnv().getProfileId().getDomain(), usr));
-				if (pinfo!=null) {
-					ops.add(new Operator(usr, pinfo.getLastName()+" "+pinfo.getFirstName()));
-				}
-			}
-			
-			ops.sort(new Comparator<Operator>() {
-				@Override
-				public int compare(Operator op1, Operator op2) {
-					return op1.dn.compareTo(op2.dn);
-				}
-			});
-			
-			//add unique
-			ArrayList<String> added = new ArrayList<>();
-			for (Operator op : ops) {
-				if (!added.contains(op.usr)) {
-					jsUser.add(new JsSimple(op.usr, op.dn));
-					added.add(op.usr);
-				}
+			List<DrmManager.Operator> ops = manager.listManagedAndSupervisedOperators();
+
+			for (DrmManager.Operator op : ops) {
+				jsUser.add(new JsSimple(op.usr, op.dn));
 			}
 			
 			ResultMeta meta = new LookupMeta().setSelected(manager.getTargetProfileId().getUserId());

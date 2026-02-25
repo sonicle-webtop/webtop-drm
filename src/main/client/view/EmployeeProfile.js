@@ -38,8 +38,8 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 	dockableConfig: {
 		title: '{EmployeeProfile.tit}',
 		iconCls: 'wtdrm-icon-configurationEmployeeProfiles',
-		width: 450,
-		height: 500,
+		width: 550,
+		height: 600,
 		modal: true
 	},
 	fieldTitle: 'description',
@@ -108,7 +108,7 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 								proxy: WTF.proxy(me.mys.ID, 'LookupUsers')
 							},
 							fieldLabel: me.mys.res('EmployeeProfile.fld-employee.lbl'),
-                            width: 380
+                            width: 480
 						}),
 						{
 							xtype: 'textfield',
@@ -116,14 +116,14 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 							allowBlank: false,
 							fieldLabel: me.mys.res('EmployeeProfile.fld-number.lbl'),
 							selectOnFocus: true,
-                            width: 260
+                            width: 360
 						},
 						{
 							xtype: 'textfield',
 							bind: '{record.headquartersCode}',
 							fieldLabel: me.mys.res('EmployeeProfile.fld-headquartersCode.lbl'),
 							selectOnFocus: true,
-							width: 300,
+							width: 360,
 							maxLength: 4
 						},
 						{
@@ -136,7 +136,7 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 							minValue: 1,
 							maxValue: 1000,
 							fieldLabel: me.mys.res('EmployeeProfile.fld-tolerance.lbl'),
-                            width: 180
+                            width: 360
 						},
 						WTF.localCombo('id', 'desc', {
 							bind: '{record.hourProfileId}',
@@ -152,7 +152,7 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 								proxy: WTF.proxy(me.mys.ID, 'LookupHourProfiles')
 							},
 							fieldLabel: me.mys.res('EmployeeProfile.fld-hourProfiles.lbl'),
-                            width: 380
+                            width: 480
 						}),
 						{
 							xtype: 'numberfield',
@@ -162,7 +162,7 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 							minValue: 0,
 							maxValue: 12,
 							fieldLabel: me.mys.res('EmployeeProfile.fld-minimumNumberOfHoursPerTicket.lbl'),
-							width: 380
+							width: 480
 						},
 						{
 							xtype: 'checkbox',

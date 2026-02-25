@@ -275,6 +275,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
@@ -3705,6 +3706,56 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		} finally {
 			DbUtils.closeQuietly(con);
 		}
+	}
+	
+	public class Operator {
+		public String usr;
+		public String dn;
+		
+		public Operator(String usr, String dn) {
+			this.usr = usr;
+			this.dn = dn;
+		}
+	}
+	
+	public Operator createOperator(String usr, String dn) {
+		return new Operator(usr, dn);
+	}
+	
+	public List<Operator> listManagedAndSupervisedOperators() throws WTException {
+		ArrayList<Operator> ops = new ArrayList<>();
+		ArrayList<String> added = new ArrayList<>();
+
+		//add managed users
+		for (String usr : listManagedOperators()) {
+			if (!added.contains(usr)) {
+				UserProfile.PersonalInfo pinfo = WT.getProfilePersonalInfo(new UserProfileId(getTargetProfileId().getDomain(), usr));
+				if (pinfo!=null) {
+					ops.add(new Operator(usr, pinfo.getLastName()+" "+pinfo.getFirstName()));
+				}
+				added.add(usr);
+			}
+		}
+
+		//add supervised users
+		for (String usr : listOperators()) {
+			if (!added.contains(usr)) {
+				UserProfile.PersonalInfo pinfo = WT.getProfilePersonalInfo(new UserProfileId(getTargetProfileId().getDomain(), usr));
+				if (pinfo!=null) {
+					ops.add(new Operator(usr, pinfo.getLastName()+" "+pinfo.getFirstName()));
+				}
+				added.add(usr);
+			}
+		}
+
+		ops.sort(new Comparator<Operator>() {
+			@Override
+			public int compare(Operator op1, Operator op2) {
+				return op1.dn.compareTo(op2.dn);
+			}
+		});
+
+		return ops;
 	}
 	
 	public List<String> listManagersByDomainUser(String userId) throws WTException {
