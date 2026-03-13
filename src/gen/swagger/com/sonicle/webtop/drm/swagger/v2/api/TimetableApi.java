@@ -15,7 +15,7 @@ import javax.validation.Valid;
 
 @Path("/timetable")
 @Api(description = "the timetable API")
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2026-02-24T14:49:06.615+01:00[Europe/Rome]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2026-03-03T15:44:48.527+01:00[Europe/Rome]")
 public abstract class TimetableApi extends com.sonicle.webtop.core.sdk.BaseRestApiResource {
 
     @GET

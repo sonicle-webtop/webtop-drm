@@ -500,6 +500,12 @@
             "x-stoplight": {
               "id": "dextkc0tou574"
             }
+          },
+          "cancReason": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "hp5sfutpoa75x"
+            }
           }
         }
       },

@@ -103,6 +103,7 @@ public class LeaveRequests extends LeaveRequestsApi {
 				alr.setResult(lr.getResult());
 				alr.setStatus(lr.getStatus());
 				alr.setNotes(lr.getNotes());
+				alr.setCancReason(lr.getCancReason());
 				alr.setUser(WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getUserId())).getDisplayName());
 				alr.setManager(WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getManagerId())).getDisplayName());
 				items.add(alr);
@@ -124,6 +125,7 @@ public class LeaveRequests extends LeaveRequestsApi {
 					alr.setType(oLR.getType());
 					alr.setUserId(oLR.getUserId());
 					alr.setNotes(oLR.getNotes());
+					alr.setCancReason(oLR.getCancReason());
 					alr.setUser(WT.getUserData(new UserProfileId(oLR.getDomainId(), oLR.getUserId())).getDisplayName());
 					alr.setManager(WT.getUserData(new UserProfileId(oLR.getDomainId(), oLR.getManagerId())).getDisplayName());
 					items.add(alr);
