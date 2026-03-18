@@ -50,21 +50,21 @@ Ext.define('Sonicle.webtop.drm.view.EmployeeProfile', {
 		me.callParent([cfg]);
 		
 		Sonicle.VMUtils.applyFormulas(me.getVM(), {
-			foStampingModeO: WTF.foFieldTwoWay('record', 'stampingMode', 
+			foStampingModeO: WTF.foFieldTwoWay('stampingMode', 
 				function(v, mo, fieldName) {
 					return Sonicle.String.contains(v, "O");
 				}, function(v, mo, fieldName) {
 					return Sonicle.String.replaceAll(mo.get(fieldName),'O','')+(v ? 'O' : '');					
 				}
 			),
-			foStampingModeS: WTF.foFieldTwoWay('record', 'stampingMode', 
+			foStampingModeS: WTF.foFieldTwoWay('stampingMode', 
 				function(v, mo, fieldName) {
 					return Sonicle.String.contains(v, "S");
 				}, function(v, mo, fieldName) {
 					return Sonicle.String.replaceAll(mo.get(fieldName),'S','')+(v ? 'S' : '');	
 				}
 			),
-			foStampingModeA: WTF.foFieldTwoWay('record', 'stampingMode', 
+			foStampingModeA: WTF.foFieldTwoWay('stampingMode', 
 				function(v, mo, fieldName) {
 					return Sonicle.String.contains(v, "A");
 				}, function(v, mo, fieldName) {

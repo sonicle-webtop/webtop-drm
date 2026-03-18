@@ -49,8 +49,8 @@ Ext.define('Sonicle.webtop.drm.view.Profile', {
 		var me = this;
 		me.callParent([cfg]);
 		WTU.applyFormulas(me.getVM(), {
-			foActiveCard: WTF.foDefaultIfEmpty('record', 'type', 'E'),
-			foHiddenCard: WTF.foIsEqual('record', 'type', 'E')
+			foActiveCard: WTF.foFieldOrDefault('type', 'E'),
+			foHiddenCard: WTF.foFieldIsEqual('type', 'E')
 		});
 	},
 	initComponent: function () {

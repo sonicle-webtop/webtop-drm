@@ -45,21 +45,21 @@ Ext.define('Sonicle.webtop.drm.view.TimetableSettingGeneral', {
 		me.callParent([cfg]);
 		
 		Sonicle.VMUtils.applyFormulas(me.getVM(), {
-			foStampingModeO: WTF.foFieldTwoWay('record', 'defaultStampingMode', 
+			foStampingModeO: WTF.foFieldTwoWay('defaultStampingMode', 
 				function(v, mo, fieldName) {
 					return Sonicle.String.contains(v, "O");
 				}, function(v, mo, fieldName) {
 					return Sonicle.String.replaceAll(mo.get(fieldName),'O','')+(v ? 'O' : '');					
 				}
 			),
-			foStampingModeS: WTF.foFieldTwoWay('record', 'defaultStampingMode', 
+			foStampingModeS: WTF.foFieldTwoWay('defaultStampingMode', 
 				function(v, mo, fieldName) {
 					return Sonicle.String.contains(v, "S");
 				}, function(v, mo, fieldName) {
 					return Sonicle.String.replaceAll(mo.get(fieldName),'S','')+(v ? 'S' : '');	
 				}
 			),
-			foStampingModeA: WTF.foFieldTwoWay('record', 'defaultStampingMode', 
+			foStampingModeA: WTF.foFieldTwoWay('defaultStampingMode', 
 				function(v, mo, fieldName) {
 					return Sonicle.String.contains(v, "A");
 				}, function(v, mo, fieldName) {
