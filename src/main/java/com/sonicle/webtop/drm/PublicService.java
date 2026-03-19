@@ -79,7 +79,7 @@ public class PublicService extends BasePublicService {
 		
 		try {
 			BasePublicService.PublicPath path = new BasePublicService.PublicPath(request.getPathInfo());
-			String domainId = WT.findDomainIdByPublicName(path.getDomainPublicName());
+			String domainId = WT.findDomainIdByDomainPublicId(path.getDomainPublicName());
 			if (domainId == null) throw new WTException("Invalid domain public name [{}]", path.getDomainPublicName());
 			
 			try {
