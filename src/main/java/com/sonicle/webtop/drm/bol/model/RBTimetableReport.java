@@ -104,8 +104,8 @@ public class RBTimetableReport {
 		this.detail = otr.getDetail();
 		this.note = otr.getNote();
 		this.targetUserId = otr.getTargetUserId();
-		//this.targetUserDescription = WT.getUserData(new UserProfileId(otr.getDomainId(), otr.getTargetUserId())).getDisplayName();
-		UserProfile.PersonalInfo tergetPinfo=WT.getUserPersonalInfo(new UserProfileId(otr.getDomainId(), otr.getTargetUserId()));
+		//this.targetUserDescription = WT.getProfileData(new UserProfileId(otr.getDomainId(), otr.getTargetUserId())).getDisplayName();
+		UserProfile.PersonalInfo tergetPinfo=WT.getProfilePersonalInfo(new UserProfileId(otr.getDomainId(), otr.getTargetUserId()));
 		this.targetUserDescription = (tergetPinfo.getLastName()+" "+tergetPinfo.getFirstName()).trim();
 		this.workReportHours = convertInMinutes(otr.getWorkReportHours());
 		this.jobHours = convertInMinutes(otr.getJobHours());

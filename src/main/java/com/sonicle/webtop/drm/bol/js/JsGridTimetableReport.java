@@ -96,8 +96,8 @@ public class JsGridTimetableReport {
 		this.hour = tr.getHour();
 		this.detail = tr.getDetail();
 		this.note = tr.getNote();
-		//this.targetUser = WT.getUserData(new UserProfileId(tr.getDomainId(), tr.getTargetUserId())).getDisplayName();
-		PersonalInfo tergetPinfo=WT.getUserPersonalInfo(new UserProfileId(tr.getDomainId(), tr.getTargetUserId()));
+		//this.targetUser = WT.getProfileData(new UserProfileId(tr.getDomainId(), tr.getTargetUserId())).getDisplayName();
+		PersonalInfo tergetPinfo=WT.getProfilePersonalInfo(new UserProfileId(tr.getDomainId(), tr.getTargetUserId()));
 		this.targetUser = (tergetPinfo.getLastName()+" "+tergetPinfo.getFirstName()).trim();
 		this.targetUserId = tr.getTargetUserId();
 		this.workReportHours = tr.getWorkReportHours();
