@@ -80,7 +80,7 @@ public class TplHelper {
 		i18n.put("approveNo", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_EMAIL_REQUEST_APPROVE_NO));
 
 		MapItem req = new MapItem();
-		req.put("user", WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getUserId())).getDisplayName());
+		req.put("user", WT.getProfileData(new UserProfileId(lr.getDomainId(), lr.getUserId())).getDisplayName());
 		req.put("startDate", lr.getFromDate().toString(fmt) + " " + ((lr.getFromHour() != null) ? lr.getFromHour() : ""));
 		req.put("endDate", lr.getToDate().toString(fmt) + " " + ((lr.getToHour() != null) ? lr.getToHour() : ""));
 		req.put("notes", (lr.getNotes() != null) ? lr.getNotes() : "");
@@ -97,7 +97,7 @@ public class TplHelper {
 	
 	public static String buildHRLeaveRequestBody(Locale locale, OLeaveRequest lr, String recipientEmail) throws IOException, TemplateException, AddressException {
 		DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");
-		String managerDN = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getManagerId())).getDisplayName();
+		String managerDN = WT.getProfileData(new UserProfileId(lr.getDomainId(), lr.getManagerId())).getDisplayName();
 		
 		MapItem i18n = new MapItem();
 		i18n.put("whenStart", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_EMAIL_REQUEST_WHEN_START));
@@ -106,7 +106,7 @@ public class TplHelper {
 		i18n.put("approvehr", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_EMAIL_REQUEST_APPROVEHR) + " "+managerDN);
 
 		MapItem req = new MapItem();
-		req.put("user", WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getUserId())).getDisplayName());
+		req.put("user", WT.getProfileData(new UserProfileId(lr.getDomainId(), lr.getUserId())).getDisplayName());
 		req.put("startDate", lr.getFromDate().toString(fmt) + " " + ((lr.getFromHour() != null) ? lr.getFromHour() : ""));
 		req.put("endDate", lr.getToDate().toString(fmt) + " " + ((lr.getToHour() != null) ? lr.getToHour() : ""));
 		req.put("notes", (lr.getNotes() != null) ? lr.getNotes() : "");
@@ -130,7 +130,7 @@ public class TplHelper {
 		i18n.put("approveNo", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_EMAIL_REQUEST_APPROVE_NO));
 
 		MapItem req = new MapItem();
-		req.put("user", WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getUserId())).getDisplayName());
+		req.put("user", WT.getProfileData(new UserProfileId(lr.getDomainId(), lr.getUserId())).getDisplayName());
 		req.put("startDate", lr.getFromDate().toString(fmt) + " " + ((lr.getFromHour() != null) ? lr.getFromHour() : ""));
 		req.put("endDate", lr.getToDate().toString(fmt) + " " + ((lr.getToHour() != null) ? lr.getToHour() : ""));
 		req.put("notes", (lr.getCancReason() != null) ? lr.getCancReason() : "");
@@ -147,7 +147,7 @@ public class TplHelper {
 	
 	public static String buildHRLeaveRequestCancellationBody(Locale locale, OLeaveRequest lr, String recipientEmail) throws IOException, TemplateException, AddressException {
 		DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");
-		String managerDN = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getManagerId())).getDisplayName();
+		String managerDN = WT.getProfileData(new UserProfileId(lr.getDomainId(), lr.getManagerId())).getDisplayName();
 		
 		MapItem i18n = new MapItem();
 		i18n.put("whenStart", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_EMAIL_REQUEST_WHEN_START));
@@ -156,7 +156,7 @@ public class TplHelper {
 		i18n.put("approvehr", WT.lookupResource(SERVICE_ID, locale, DrmLocale.TPL_EMAIL_REQUEST_APPROVEHR) + " "+managerDN);
 
 		MapItem req = new MapItem();
-		req.put("user", WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getUserId())).getDisplayName());
+		req.put("user", WT.getProfileData(new UserProfileId(lr.getDomainId(), lr.getUserId())).getDisplayName());
 		req.put("startDate", lr.getFromDate().toString(fmt) + " " + ((lr.getFromHour() != null) ? lr.getFromHour() : ""));
 		req.put("endDate", lr.getToDate().toString(fmt) + " " + ((lr.getToHour() != null) ? lr.getToHour() : ""));
 		req.put("notes", (lr.getCancReason() != null) ? lr.getCancReason() : "");

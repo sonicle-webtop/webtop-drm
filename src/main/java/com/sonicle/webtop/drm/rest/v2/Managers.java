@@ -69,7 +69,7 @@ public class Managers extends ManagersApi {
 			for (String managerId: list) {
 				ApiManager m = new ApiManager();
 				m.setId(managerId);
-				m.setDisplayname(WT.getUserData(new UserProfileId(currentProfileId.getDomainId(), managerId)).getDisplayName());
+				m.setDisplayname(WT.getProfileData(new UserProfileId(currentProfileId.getDomainId(), managerId)).getDisplayName());
 				items.add(m);
 			}
 			amr.setItems(items);

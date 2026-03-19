@@ -69,7 +69,7 @@ public class RBTimetableEncoReport {
 		this.companyId = otr.getCompanyId();
 		this.companyDescription = drmMgr.getCompany(otr.getCompanyId()).getName();
 		this.userId = otr.getUserId();
-		this.userDescription = WT.getUserData(new UserProfileId(otr.getDomainId(), otr.getUserId())).getDisplayName();
+		this.userDescription = WT.getProfileData(new UserProfileId(otr.getDomainId(), otr.getUserId())).getDisplayName();
 		this.date = concatDate(otr);
 		this.workingHours = convertInMinutes(otr.getWorkingHours());
 		this.overtime = convertInMinutes(otr.getOvertime());

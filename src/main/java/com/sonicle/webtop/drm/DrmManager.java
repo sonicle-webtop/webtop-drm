@@ -5515,9 +5515,9 @@ public class DrmManager extends BaseManager implements IDrmManager{
 	}
 	
 	private void notifyLeaveRequest(OLeaveRequest lr) throws MessagingException, IOException, TemplateException {	
-		UserProfile.Data udFrom = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getUserId()));
+		UserProfile.Data udFrom = WT.getProfileData(new UserProfileId(lr.getDomainId(), lr.getUserId()));
 		InternetAddress from = udFrom.getPersonalEmail();
-		UserProfile.Data udTo = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getManagerId()));
+		UserProfile.Data udTo = WT.getProfileData(new UserProfileId(lr.getDomainId(), lr.getManagerId()));
 		InternetAddress to = udTo.getPersonalEmail();
 		
 		String servicePublicUrl = WT.getServicePublicUrl(lr.getDomainId(), SERVICE_ID);
@@ -5562,9 +5562,9 @@ public class DrmManager extends BaseManager implements IDrmManager{
 	}
 	
 	private void notifyLeaveRequestCancellation(OLeaveRequest lr) throws MessagingException, IOException, TemplateException {
-		UserProfile.Data udFrom = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getUserId()));
+		UserProfile.Data udFrom = WT.getProfileData(new UserProfileId(lr.getDomainId(), lr.getUserId()));
 		InternetAddress from = udFrom.getPersonalEmail();
-		UserProfile.Data udTo = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getManagerId()));
+		UserProfile.Data udTo = WT.getProfileData(new UserProfileId(lr.getDomainId(), lr.getManagerId()));
 		InternetAddress to = udTo.getPersonalEmail();
 		
 		String servicePublicUrl = WT.getServicePublicUrl(lr.getDomainId(), SERVICE_ID);
@@ -6085,9 +6085,9 @@ public class DrmManager extends BaseManager implements IDrmManager{
 	}
 	
 	private void notifyTicket(OViewTicket oVwTckt, String defaultCloseDocStatusId, Boolean close) throws IOException, TemplateException, MessagingException {	
-		UserProfile.Data udFrom = WT.getUserData(new UserProfileId(oVwTckt.getDomainId(), oVwTckt.getFromOperatorId()));
+		UserProfile.Data udFrom = WT.getProfileData(new UserProfileId(oVwTckt.getDomainId(), oVwTckt.getFromOperatorId()));
 		InternetAddress from = udFrom.getPersonalEmail();
-		UserProfile.Data udTo = WT.getUserData(new UserProfileId(oVwTckt.getDomainId(), oVwTckt.getToOperatorId()));
+		UserProfile.Data udTo = WT.getProfileData(new UserProfileId(oVwTckt.getDomainId(), oVwTckt.getToOperatorId()));
 		InternetAddress to = udTo.getPersonalEmail();
 		
 		Session session = getMailSession();
@@ -6917,10 +6917,10 @@ public class DrmManager extends BaseManager implements IDrmManager{
 	private Integer createLeaveRequestCalendar(ICalendarManager cm, final UserProfileId lReqPid, final UserProfileId targetPid, boolean ownCalendar) throws WTException{
 		com.sonicle.webtop.calendar.model.Calendar cal = new com.sonicle.webtop.calendar.model.Calendar();
 		if (ownCalendar) {
-			cal.setName(lookupResource(WT.getUserData(targetPid).getLocale(), "leaverequest.calendar.name"));
+			cal.setName(lookupResource(WT.getProfileData(targetPid).getLocale(), "leaverequest.calendar.name"));
 			cal.setColor("#42D692");
 		} else {
-			cal.setName(WT.getUserData(lReqPid).getDisplayName());
+			cal.setName(WT.getProfileData(lReqPid).getDisplayName());
 			cal.setColor("#42D692");
 		}
 		cal.setProfileId(targetPid);
@@ -6931,7 +6931,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 	}
 	
 	private String createLeaveRequestEvent(UserProfileId upid, ICalendarManager cm, LeaveRequest lReq, int lrCalId, Integer activityId, boolean ownCalendar) throws WTException{
-		DateTimeZone tz = WT.getUserData(upid).getTimeZone();
+		DateTimeZone tz = WT.getProfileData(upid).getTimeZone();
 		Event ev = new Event();
 		
 		ev.setCalendarId(lrCalId);
@@ -6970,7 +6970,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, evI.getKey(), false);
 			return null;
 		} else {
-			DateTimeZone tz = WT.getUserData(upid).getTimeZone();
+			DateTimeZone tz = WT.getProfileData(upid).getTimeZone();
 			if(lReq.getFromDate() != null && lReq.getToDate() != null){			
 				if(lReq.getFromHour() != null && lReq.getToHour() != null){
 					evI.setAllDay(false);
@@ -6994,12 +6994,12 @@ public class DrmManager extends BaseManager implements IDrmManager{
 	
 	private String getLeaveReqestTitle(UserProfileId upid, Event ev, LeaveRequest lReq, boolean ownCalendar) {
 		String title="";
-		Locale locale=WT.getUserData(upid).getLocale();
+		Locale locale=WT.getProfileData(upid).getLocale();
 		
 		if(lReq.getType() != null) {
 			UserProfileId lReqPid=new UserProfileId(upid.getDomainId(), lReq.getUserId());
 			if (!ownCalendar) 
-				title+="["+getInitials(WT.getUserData(lReqPid).getDisplayName())+"] ";
+				title+="["+getInitials(WT.getProfileData(lReqPid).getDisplayName())+"] ";
 			title += "["+lookupResource(locale, "leaverequest.type." + lReq.getType()) + "] ";
 		}
 		//if(lReq.getNotes()!= null) 

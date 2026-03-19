@@ -78,7 +78,7 @@ public class RBOpportunityAction {
 	}
 
 	private String lookupOperator(UserProfileId operatorProfile){
-		UserProfile.Data ud = WT.getUserData(operatorProfile);
+		UserProfile.Data ud = WT.getProfileData(operatorProfile);
 		return (ud != null) ? ud.getDisplayName() : operatorProfile.toString();
 	}
 	

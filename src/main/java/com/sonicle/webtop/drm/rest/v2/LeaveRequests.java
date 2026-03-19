@@ -104,8 +104,8 @@ public class LeaveRequests extends LeaveRequestsApi {
 				alr.setStatus(lr.getStatus());
 				alr.setNotes(lr.getNotes());
 				alr.setCancReason(lr.getCancReason());
-				alr.setUser(WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getUserId())).getDisplayName());
-				alr.setManager(WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getManagerId())).getDisplayName());
+				alr.setUser(WT.getProfileData(new UserProfileId(lr.getDomainId(), lr.getUserId())).getDisplayName());
+				alr.setManager(WT.getProfileData(new UserProfileId(lr.getDomainId(), lr.getManagerId())).getDisplayName());
 				items.add(alr);
 			}
 			else if (startDate!=null) {
@@ -126,8 +126,8 @@ public class LeaveRequests extends LeaveRequestsApi {
 					alr.setUserId(oLR.getUserId());
 					alr.setNotes(oLR.getNotes());
 					alr.setCancReason(oLR.getCancReason());
-					alr.setUser(WT.getUserData(new UserProfileId(oLR.getDomainId(), oLR.getUserId())).getDisplayName());
-					alr.setManager(WT.getUserData(new UserProfileId(oLR.getDomainId(), oLR.getManagerId())).getDisplayName());
+					alr.setUser(WT.getProfileData(new UserProfileId(oLR.getDomainId(), oLR.getUserId())).getDisplayName());
+					alr.setManager(WT.getProfileData(new UserProfileId(oLR.getDomainId(), oLR.getManagerId())).getDisplayName());
 					items.add(alr);
 				}
 			}

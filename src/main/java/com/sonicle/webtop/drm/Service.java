@@ -3991,7 +3991,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 						break;
 					case "executed_with":
 						if(o.getExecutedWith() != null){
-							Data uD =  WT.getUserData(new UserProfileId(o.getDomainId(), o.getExecutedWith()));
+							Data uD =  WT.getProfileData(new UserProfileId(o.getDomainId(), o.getExecutedWith()));
 							if(uD != null)
 								additionalInfo += field.getLabel() + ": " + uD.getDisplayName() + " / ";
 						}
@@ -4022,7 +4022,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 						break;
 					case "signed_by":
 						if(o.getSignedBy() != null){
-							Data uD = WT.getUserData(new UserProfileId(o.getDomainId(), o.getSignedBy()));
+							Data uD = WT.getProfileData(new UserProfileId(o.getDomainId(), o.getSignedBy()));
 							if(uD != null)
 								additionalInfo +=  field.getLabel() + ": " + uD.getDisplayName() + " / ";
 						}

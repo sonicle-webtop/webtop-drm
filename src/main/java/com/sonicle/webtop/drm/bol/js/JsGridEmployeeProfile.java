@@ -60,7 +60,7 @@ public class JsGridEmployeeProfile {
 		this.user = "";
 		UserProfileId upid = new UserProfileId(ep.getDomainId(), ep.getUserId());
 		if (upid != null) {
-			UserProfile.Data ud = WT.getUserData(upid);
+			UserProfile.Data ud = WT.getProfileData(upid);
 			if (ud != null) this.user = ud.getDisplayName();
 		}
 		this.number = ep.getNumber();

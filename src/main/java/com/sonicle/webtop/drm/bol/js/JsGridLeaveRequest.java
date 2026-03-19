@@ -60,8 +60,8 @@ public class JsGridLeaveRequest {
 
 	public JsGridLeaveRequest(OLeaveRequest lr) {
 		this.leaveRequestId = lr.getLeaveRequestId();
-		this.user = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getUserId())).getDisplayName();
-		this.manager = WT.getUserData(new UserProfileId(lr.getDomainId(), lr.getManagerId())).getDisplayName();
+		this.user = WT.getProfileData(new UserProfileId(lr.getDomainId(), lr.getUserId())).getDisplayName();
+		this.manager = WT.getProfileData(new UserProfileId(lr.getDomainId(), lr.getManagerId())).getDisplayName();
 		this.companyId = lr.getCompanyId();
 		this.userId = lr.getUserId();
 		this.managerId = lr.getManagerId();
