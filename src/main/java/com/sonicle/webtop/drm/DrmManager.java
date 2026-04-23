@@ -5610,7 +5610,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 	
 	private void sendLeaveRequestEmail(OLeaveRequest lr, Locale locale, InternetAddress from, InternetAddress to, String msgSubject, String msgBody, String msgBodyHR, String bodyHeader, String source, String because, boolean answer) 
 			throws MessagingException, IOException, TemplateException {
-		Session session = getMailSession();
+		Session session = WT.getGlobalMailSession(lr.getDomainId());
 		InternetAddress tos[] = new InternetAddress[]{ to };
 		InternetAddress ccs[] = null;
 		String hrEmail = getTimetableSetting().getStaffOfficeEmail();
@@ -6090,7 +6090,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		UserProfile.Data udTo = WT.getProfileData(new UserProfileId(oVwTckt.getDomainId(), oVwTckt.getToOperatorId()));
 		InternetAddress to = udTo.getPersonalEmail();
 		
-		Session session = getMailSession();
+		Session session = WT.getGlobalMailSession(oVwTckt.getDomainId());
 
 		try {
 			DrmUserSettings dus = new DrmUserSettings(SERVICE_ID, new UserProfileId(oVwTckt.getDomainId(), oVwTckt.getToOperatorId()));
