@@ -35,6 +35,7 @@ package com.sonicle.webtop.drm;
 import com.sonicle.commons.EnumUtils;
 import com.sonicle.commons.beans.ItemsListResult;
 import com.sonicle.commons.cache.AbstractBulkCache;
+import com.sonicle.commons.flags.BitFlags;
 import com.sonicle.commons.net.IPUtils;
 import com.sonicle.commons.time.DateTimeUtils;
 import com.sonicle.commons.time.DateTimeWindow;
@@ -181,13 +182,16 @@ import org.apache.commons.lang3.StringUtils;
 import com.sonicle.webtop.calendar.ICalendarManager;
 import com.sonicle.webtop.calendar.model.Calendar;
 import com.sonicle.webtop.calendar.model.Event;
+import com.sonicle.webtop.calendar.model.EventBase;
 import com.sonicle.webtop.calendar.model.EventInstance;
+import com.sonicle.webtop.calendar.model.EventInstanceId;
 import com.sonicle.webtop.calendar.model.EventKey;
 import com.sonicle.webtop.calendar.model.UpdateEventTarget;
 import com.sonicle.webtop.contacts.model.ContactQueryUI;
 import com.sonicle.webtop.drm.bol.OActivity;
 import com.sonicle.webtop.contacts.model.ContactType;
 import com.sonicle.webtop.core.app.RunContext;
+import com.sonicle.webtop.core.app.sdk.WTNotFoundException;
 import com.sonicle.webtop.core.bol.js.JsWizardData;
 import com.sonicle.webtop.core.model.BaseMasterData;
 import com.sonicle.webtop.core.util.LogEntries;
@@ -991,16 +995,16 @@ public class Service extends BaseService {
 					Map<String, OLeaveRequest> requestsByEvent = manager.listLeaveRequestsByEvent(dateWindow);
 					
 					DateTimeWindow timeWindow = DateTimeWindow.builder()
-						.withStart(DateTimeUtils.parseYmdHmsWithZone(from, "00:00:00", up.getTimeZone()))
-						.withEnd(DateTimeUtils.parseYmdHmsWithZone(to, "23:59:59", up.getTimeZone()))
+						.withStart(JodaTimeUtils.parseDateTimeYMDHMS(up.getTimeZone(), from, "00:00:00"))
+						.withEnd(JodaTimeUtils.parseDateTimeYMDHMS(up.getTimeZone(), to, "23:59:59"))
 						.build();
 					
 					ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, up.getId());
 					ArrayList<JsLeaveChartEvent> items = new ArrayList<>();
 					
-					for (com.sonicle.webtop.calendar.model.SchedEventInstance instance : cm.listEventInstances(timetableLeavesSharedCalendarCache.getCalendarIds(), timeWindow, utz, false)) {
+					for (com.sonicle.webtop.calendar.model.EventLookupInstance instance : cm.listEventInstances(timetableLeavesSharedCalendarCache.getCalendarIds(), timeWindow, (String)null, false, utz)) {
 						com.sonicle.webtop.calendar.model.Calendar calendar = timetableLeavesSharedCalendarCache.getCalendar(instance.getCalendarId());
-						items.add(new JsLeaveChartEvent(instance, calendar, requestsByEvent.get(instance.getEventId()), utz, up.getLocale()));
+						items.add(new JsLeaveChartEvent(instance, calendar, requestsByEvent.get(instance.getOriginalEventId()), utz, up.getLocale()));
 					}
 					new JsonResult("events", items).printTo(out);
 					
@@ -4084,7 +4088,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 			eventId = WT.runPrivileged(new Callable<String>(){
 				public String call() throws WTException {
 					String eventId = null;
-					Event ev = null;
+					EventInstance ev = null;
 					DrmUserSettings us = new DrmUserSettings(SERVICE_ID, targetPid);
 					Integer wrCalId = us.getWorkReportCalendarId();
 
@@ -4094,7 +4098,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 					}
 
 					if(wrkRpt.getEventId() != null){
-						ev = cm.getEvent(wrkRpt.getEventId());
+						ev = cm.getEventInstance(EventInstanceId.buildSingleInstance(wrkRpt.getEventId()));
 
 						if(ev != null){
 							eventId = updateWorkReportEvent(cm, wrkRpt, ev);
@@ -4115,7 +4119,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 	private String createOrUpdateJobEventIntoJobCalendar(Job job) throws WTException {
 		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
 		String eventId = null;
-		Event ev = null;
+		EventInstance ev = null;
 		
 		if (cm != null) {
 			Integer jobCalId = us.getJobCalendarId();
@@ -4126,7 +4130,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 			}
 			
 			if(job.getEventId() != null){
-				ev = cm.getEvent(job.getEventId());
+				ev = cm.getEventInstance(EventInstanceId.buildSingleInstance(job.getEventId()));
 				
 				if(ev != null){
 					eventId = updateJobEvent(cm, job, ev);
@@ -4167,27 +4171,21 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		DateTimeZone tz = getEnv().getProfile().getTimeZone();
 		Event ev = new Event();
 		String title = "";
-
+		
 		ev.setCalendarId(wrCalId);
+		ev.setRowStatus(EventBase.RowStatus.READ_ONLY);
 		ev.setAllDay(true);
-		ev.setTimezone(tz.getID());
-		ev.setIsPrivate(true);
-		ev.setBusy(false);
+		ev.setVisibility(EventBase.Visibility.PRIVATE);
+		ev.setTransparency(EventBase.Transparency.TRANSPARENT);
 
 		if(wrkRpt.getFromDate() != null) 
-			ev.setStartDate(wrkRpt.getFromDate().toDateTimeAtStartOfDay(tz));
+			ev.setStart(wrkRpt.getFromDate().toDateTimeAtStartOfDay(tz));
 		if(wrkRpt.getToDate() != null)
-			ev.setEndDate(wrkRpt.getToDate().toDateTimeAtStartOfDay(tz));
-		if(wrkRpt.getCausalId() != null)
-			ev.setCausalId(wrkRpt.getCausalId());
+			ev.setEnd(wrkRpt.getToDate().toDateTimeAtStartOfDay(tz));
 		if(wrkRpt.getDescription() != null)
 			ev.setDescription(wrkRpt.getDescription());
 		if(wrkRpt.getReferenceNo()!= null)
 			ev.setTitle(wrkRpt.getReferenceNo());
-		if(wrkRpt.getCustomerId() != null)
-			ev.setMasterDataId(wrkRpt.getCustomerId());
-		if(wrkRpt.getCustomerStatId()!= null)
-			ev.setStatMasterDataId(wrkRpt.getCustomerStatId());
 		if(wrkRpt.getNumber() != null)
 			title += wrkRpt.getNumber() + " ";
 		if(wrkRpt.getYear()!= null)
@@ -4206,15 +4204,15 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		String title = "";
 		
 		ev.setCalendarId(wrCalId);
+		ev.setRowStatus(EventBase.RowStatus.READ_ONLY);
 		ev.setAllDay(false);
-		ev.setIsPrivate(true);
-		ev.setBusy(false);
-		ev.setReadOnly(true);
+		ev.setVisibility(EventBase.Visibility.PRIVATE);
+		ev.setTransparency(EventBase.Transparency.TRANSPARENT);
 
 		if(job.getStartDate() != null) 
-			ev.setStartDate(job.getStartDate());
+			ev.setStart(job.getStartDate());
 		if(job.getEndDate() != null)
-			ev.setEndDate(job.getEndDate());
+			ev.setEnd(job.getEndDate());
 		if(job.getTimezone() != null)
 			ev.setTimezone(job.getTimezone());	
 		if(job.getActivityId() != null)
@@ -4222,10 +4220,6 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 			title += "[" + manager.getActivity(job.getActivityId()).getDescription() + "] ";
 		if(job.getDescription() != null)
 			ev.setDescription(job.getDescription());
-		if(job.getCustomerId() != null)
-			ev.setMasterDataId(job.getCustomerId());
-		if(job.getCustomerStatId()!= null)
-			ev.setStatMasterDataId(job.getCustomerStatId());
 		if(job.getTitle() != null)
 			// ev.setTitle(job.getTitle());
 			title += job.getTitle();
@@ -4237,66 +4231,58 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		return ev.getEventId();
 	}
 	
-	private String updateWorkReportEvent(ICalendarManager cm, WorkReport wrkRpt, Event ev) throws WTException{
-		EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
+	private String updateWorkReportEvent(ICalendarManager cm, WorkReport wrkRpt, EventInstance ev) throws WTException{
 		DateTimeZone tz = getEnv().getProfile().getTimeZone();
 		String title = "";
 		
 		if(wrkRpt.getFromDate() != null) 
-			evI.setStartDate(wrkRpt.getFromDate().toDateTimeAtStartOfDay(tz));
+			ev.setStart(wrkRpt.getFromDate().toDateTimeAtStartOfDay(tz));
 		if(wrkRpt.getToDate() != null)
-			evI.setEndDate(wrkRpt.getToDate().toDateTimeAtStartOfDay(tz));
-		if(wrkRpt.getCausalId() != null)
-			evI.setCausalId(wrkRpt.getCausalId());
+			ev.setEnd(wrkRpt.getToDate().toDateTimeAtStartOfDay(tz));
 		if(wrkRpt.getDescription() != null)
-			evI.setDescription(wrkRpt.getDescription());
+			ev.setDescription(wrkRpt.getDescription());
 		if(wrkRpt.getReferenceNo()!= null)
-			evI.setTitle(wrkRpt.getReferenceNo());
-		if(wrkRpt.getCustomerId() != null)
-			evI.setMasterDataId(wrkRpt.getCustomerId());
-		if(wrkRpt.getCustomerStatId()!= null)
-			evI.setStatMasterDataId(wrkRpt.getCustomerStatId());
+			ev.setTitle(wrkRpt.getReferenceNo());
 		if(wrkRpt.getNumber() != null)
 			title += wrkRpt.getNumber() + " ";
 		if(wrkRpt.getYear()!= null)
 			title += wrkRpt.getYear()+ " ";
 		if(wrkRpt.getReferenceNo()!= null)
 			title += "/ " + wrkRpt.getReferenceNo()+ " ";
-		evI.setTitle(title);
-
-		cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false, false);
+		ev.setTitle(title);
 		
-		return evI.getEventId();
+		BitFlags<ICalendarManager.EventUpdateOption> updateOpts = BitFlags.noneOf(ICalendarManager.EventUpdateOption.class);
+		BitFlags<ICalendarManager.EventNotifyOption> notifyOpts = ICalendarManager.EventNotifyOption.withoutAnyAttendeesNotifications();
+		cm.updateEventInstance(UpdateEventTarget.WHOLE_SERIES, ev.getId(), ev, updateOpts, notifyOpts);
+		
+		return ev.getOriginalEventId();
 	}
 	
-	private String updateJobEvent(ICalendarManager cm, Job job, Event ev) throws WTException{
-		EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
+	private String updateJobEvent(ICalendarManager cm, Job job, EventInstance ev) throws WTException{
 		String title = "";
 		
 		if(job.getStartDate() != null) 
-			evI.setStartDate(job.getStartDate());
+			ev.setStart(job.getStartDate());
 		if(job.getEndDate() != null)
-			evI.setEndDate(job.getEndDate());
+			ev.setEnd(job.getEndDate());
 		if(job.getTimezone() != null)
-			evI.setTimezone(job.getTimezone());
+			ev.setTimezone(job.getTimezone());
 		if(job.getActivityId() != null)
 			// evI.setActivityId(job.getActivityId());
 			title = "[" + manager.getActivity(job.getActivityId()).getDescription() + "] ";
 		if(job.getDescription() != null)
-			evI.setDescription(job.getDescription());
-		if(job.getCustomerId() != null)
-			evI.setMasterDataId(job.getCustomerId());
-		if(job.getCustomerStatId()!= null)
-			evI.setStatMasterDataId(job.getCustomerStatId());
+			ev.setDescription(job.getDescription());
 		if(job.getTitle() != null)
 			// evI.setTitle(job.getTitle());
 			title += job.getTitle();
 		
-		evI.setTitle(title);
+		ev.setTitle(title);
 		
-		cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false, false);
+		BitFlags<ICalendarManager.EventUpdateOption> updateOpts = BitFlags.noneOf(ICalendarManager.EventUpdateOption.class);
+		BitFlags<ICalendarManager.EventNotifyOption> notifyOpts = ICalendarManager.EventNotifyOption.withoutAnyAttendeesNotifications();
+		cm.updateEventInstance(UpdateEventTarget.WHOLE_SERIES, ev.getId(), ev, updateOpts, notifyOpts);
 		
-		return evI.getEventId();
+		return ev.getOriginalEventId();
 	}
 	
 	private void deleteWorkReportEvent(WorkReport wrkRpt) throws WTException{		
@@ -4304,9 +4290,11 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		
 		if (cm != null) {
 			if(wrkRpt.getEventId() != null){
-				Event ev = cm.getEvent(wrkRpt.getEventId());
-				if(ev != null)
-					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(wrkRpt.getEventId(), null), false);
+				try {
+					BitFlags<ICalendarManager.EventNotifyOption> notifyOpts = ICalendarManager.EventNotifyOption.withoutAnyAttendeesNotifications();
+					cm.deleteEventInstance(UpdateEventTarget.WHOLE_SERIES, EventInstanceId.buildSingleInstance(wrkRpt.getEventId()), notifyOpts);
+					
+				} catch (WTNotFoundException ex) { /* Do nothing... */ }
 			}
 		}
 	}
@@ -4316,9 +4304,11 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		
 		if (cm != null) {
 			if(job.getEventId() != null){
-				Event ev = cm.getEvent(job.getEventId());
-				if(ev != null)
-					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(job.getEventId(), null), false);
+				try {
+					BitFlags<ICalendarManager.EventNotifyOption> notifyOpts = ICalendarManager.EventNotifyOption.withoutAnyAttendeesNotifications();
+					cm.deleteEventInstance(UpdateEventTarget.WHOLE_SERIES, EventInstanceId.buildSingleInstance(job.getEventId()), notifyOpts);
+					
+				} catch (WTNotFoundException ex) { /* Do nothing... */ }
 			}
 		}
 	}
@@ -4326,7 +4316,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 	private String createOrUpdateOpportunityEventIntoOpportunityCalendar(Opportunity o) throws WTException {
 		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
 		String eventId = null;
-		Event ev = null;
+		EventInstance ev = null;
 		
 		if (cm != null) {
 			Integer oCalId = us.getOpportunityCalendarId();
@@ -4337,7 +4327,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 			}
 			
 			if(o.getEventId() != null){
-				ev = cm.getEvent(o.getEventId());
+				ev = cm.getEventInstance(EventInstanceId.buildSingleInstance(o.getEventId()));
 				
 				if(ev != null){
 					eventId = updateOpportunityEvent(cm, o, ev);
@@ -4366,30 +4356,24 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 	private String createOpportunityEvent(ICalendarManager cm, Opportunity o, int oCalId) throws WTException{
 		DateTimeZone tz = getEnv().getProfile().getTimeZone();
 		Event ev = new Event();
-
+		
 		ev.setCalendarId(oCalId);
 		ev.setTimezone(tz.getID());
-		ev.setIsPrivate(true);
-		ev.setBusy(false);
+		ev.setVisibility(EventBase.Visibility.PRIVATE);
+		ev.setTransparency(EventBase.Transparency.TRANSPARENT);
 		
 		if(o.getStartDate() != null){			
 				ev.setAllDay(true);
 				
-				ev.setStartDate(o.getStartDate());
-				ev.setEndDate(o.getEndDate());
+				ev.setStart(o.getStartDate());
+				ev.setEnd(o.getEndDate());
 		}
 		if(o.getPlace() != null)
 			ev.setLocation(o.getPlace());
-		if(o.getCausalId() != null)
-			ev.setCausalId(o.getCausalId());
 		if(o.getObjective() != null)
 			ev.setDescription(o.getObjective());
 		if(o.getDescription() != null)
 			ev.setTitle(o.getDescription());
-		if(o.getCustomerId() != null)
-			ev.setMasterDataId(o.getCustomerId());
-		if(o.getCustomerStatId() != null)
-			ev.setStatMasterDataId(o.getCustomerStatId());
 		/*
 		if(o.getActivityId() != null)
 			ev.setActivityId(o.getActivityId());
@@ -4400,38 +4384,28 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		return ev.getEventId();
 	}
 	
-	private String updateOpportunityEvent(ICalendarManager cm, Opportunity o, Event ev) throws WTException{
-		EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
+	private String updateOpportunityEvent(ICalendarManager cm, Opportunity o, EventInstance ev) throws WTException{
 		DateTimeZone tz = getEnv().getProfile().getTimeZone();
 
-		evI.setTimezone(tz.getID());
+		ev.setTimezone(tz.getID());
 		
 		if(o.getStartDate() != null){			
-				evI.setAllDay(true);
-				
-				evI.setStartDate(o.getStartDate());
-				evI.setEndDate(o.getEndDate());
+			ev.setAllDay(true);
+			ev.setStart(o.getStartDate());
+			ev.setEnd(o.getEndDate());
 		}
 		if(o.getPlace() != null)
-			evI.setLocation(o.getPlace());
-		if(o.getCausalId() != null)
-			evI.setCausalId(o.getCausalId());
+			ev.setLocation(o.getPlace());
 		if(o.getObjective() != null)
-			evI.setDescription(o.getObjective());
+			ev.setDescription(o.getObjective());
 		if(o.getDescription() != null)
-			evI.setTitle(o.getDescription());
-		if(o.getCustomerId() != null)
-			evI.setMasterDataId(o.getCustomerId());
-		if(o.getCustomerStatId() != null)
-			evI.setStatMasterDataId(o.getCustomerStatId());
-		/*
-		if(o.getActivityId() != null)
-			evI.setActivityId(o.getActivityId());
-		*/
+			ev.setTitle(o.getDescription());
 		
-		cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false, false);
+		BitFlags<ICalendarManager.EventUpdateOption> updateOpts = BitFlags.noneOf(ICalendarManager.EventUpdateOption.class);
+		BitFlags<ICalendarManager.EventNotifyOption> notifyOpts = ICalendarManager.EventNotifyOption.withoutAnyAttendeesNotifications();
+		cm.updateEventInstance(UpdateEventTarget.WHOLE_SERIES, ev.getId(), ev, updateOpts, notifyOpts);
 		
-		return evI.getEventId();
+		return ev.getOriginalEventId();
 	}
 	
 	private void deleteOpportunityEvent(Opportunity o) throws WTException{		
@@ -4439,9 +4413,11 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		
 		if (cm != null) {
 			if(o.getEventId() != null){
-				Event ev = cm.getEvent(o.getEventId());
-				if(ev != null)
-					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(o.getEventId(), null), false);
+				try {
+					BitFlags<ICalendarManager.EventNotifyOption> notifyOpts = ICalendarManager.EventNotifyOption.withoutAnyAttendeesNotifications();
+					cm.deleteEventInstance(UpdateEventTarget.WHOLE_SERIES, EventInstanceId.buildSingleInstance(o.getEventId()), notifyOpts);
+					
+				} catch (WTNotFoundException ex) { /* Do nothing... */ }
 			}
 		}
 	}
@@ -4449,7 +4425,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 	private String createOrUpdateOpportunityActionEventIntoOpportunityCalendar(OpportunityAction oAct) throws WTException {
 		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
 		String eventId = null;
-		Event ev = null;
+		EventInstance ev = null;
 		
 		Opportunity o = manager.getOpportunity(oAct.getOpportunityId());
 		
@@ -4462,7 +4438,7 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 			}
 			
 			if(oAct.getEventId() != null){
-				ev = cm.getEvent(oAct.getEventId());
+				ev = cm.getEventInstance(EventInstanceId.buildSingleInstance(oAct.getEventId()));
 				
 				if(ev != null){
 					eventId = updateOpportunityActionEvent(cm, oAct, o, ev);
@@ -4484,14 +4460,14 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		
 		ev.setCalendarId(oCalId);
 		ev.setTimezone(tz.getID());
-		ev.setIsPrivate(true);
-		ev.setBusy(false);
+		ev.setVisibility(EventBase.Visibility.PRIVATE);
+		ev.setTransparency(EventBase.Transparency.TRANSPARENT);
 		
 		if(oAct.getStartDate() != null){			
 				ev.setAllDay(true);
 				
-				ev.setStartDate(oAct.getStartDate());
-				ev.setEndDate(oAct.getEndDate());
+				ev.setStart(oAct.getStartDate());
+				ev.setEnd(oAct.getEndDate());
 		}
 		if(o.getDescription() != null)
 			title += o.getDescription() + " > ";
@@ -4517,18 +4493,17 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		return ev.getEventId();
 	}
 	
-	private String updateOpportunityActionEvent(ICalendarManager cm, OpportunityAction oAct, Opportunity o, Event ev) throws WTException{
-		EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
+	private String updateOpportunityActionEvent(ICalendarManager cm, OpportunityAction oAct, Opportunity o, EventInstance ev) throws WTException{
 		DateTimeZone tz = getEnv().getProfile().getTimeZone();
 		String title = "";
 
-		evI.setTimezone(tz.getID());
+		ev.setTimezone(tz.getID());
 		
 		if(oAct.getStartDate() != null){			
-				evI.setAllDay(true);
+				ev.setAllDay(true);
 				
-				evI.setStartDate(oAct.getStartDate());
-				evI.setEndDate(oAct.getEndDate());
+				ev.setStart(oAct.getStartDate());
+				ev.setEnd(oAct.getEndDate());
 		}
 		if(o.getDescription() != null)
 			title += o.getDescription() + " > ";
@@ -4537,25 +4512,27 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		if(oAct.getDescription() != null)
 			title += oAct.getDescription();
 		if(oAct.getPlace() != null)
-			evI.setLocation(oAct.getPlace());
+			ev.setLocation(oAct.getPlace());
 		if(oAct.getSubsequentActions() != null)
-			evI.setDescription(oAct.getSubsequentActions());
+			ev.setDescription(oAct.getSubsequentActions());
 		/*
 		if(oAct.getActivityId() != null)
 			evI.setActivityId(oAct.getActivityId());
 		*/
 		
-		evI.setTitle(title);
+		ev.setTitle(title);
 
-		cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false, false);
+		BitFlags<ICalendarManager.EventUpdateOption> updateOpts = BitFlags.noneOf(ICalendarManager.EventUpdateOption.class);
+		BitFlags<ICalendarManager.EventNotifyOption> notifyOpts = ICalendarManager.EventNotifyOption.withoutAnyAttendeesNotifications();
+		cm.updateEventInstance(UpdateEventTarget.WHOLE_SERIES, ev.getId(), ev, updateOpts, notifyOpts);
 		
-		return evI.getEventId();
+		return ev.getOriginalEventId();
 	}
 	
 	private void updateOpportunityActionEventTitle(OpportunityAction oAct, Opportunity o) throws WTException{
 		ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, getEnv().getProfileId());
 		String title = "";
-		Event ev = null;
+		EventInstance ev = null;
 
 		if (cm != null) {
 			if(o.getDescription() != null)
@@ -4564,12 +4541,12 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 				title += oAct.getDescription();
 			
 			if(oAct.getEventId() != null){
-				ev = cm.getEvent(oAct.getEventId());
+				ev = cm.getEventInstance(EventInstanceId.buildSingleInstance(oAct.getEventId()));
 				
 				if(ev != null){
-					EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
-					evI.setTitle(title);
-					cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false, false);
+					BitFlags<ICalendarManager.EventUpdateOption> updateOpts = BitFlags.noneOf(ICalendarManager.EventUpdateOption.class);
+					BitFlags<ICalendarManager.EventNotifyOption> notifyOpts = ICalendarManager.EventNotifyOption.withoutAnyAttendeesNotifications();
+					cm.updateEventInstance(UpdateEventTarget.WHOLE_SERIES, ev.getId(), ev, updateOpts, notifyOpts);
 				}
 			}
 		}
@@ -4580,9 +4557,11 @@ public void processManageGridTimetableListUsers(HttpServletRequest request, Http
 		
 		if (cm != null) {
 			if(oAct.getEventId() != null){
-				Event ev = cm.getEvent(oAct.getEventId());
-				if(ev != null)
-					cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(oAct.getEventId(), null), false);
+				try {
+					BitFlags<ICalendarManager.EventNotifyOption> notifyOpts = ICalendarManager.EventNotifyOption.withoutAnyAttendeesNotifications();
+					cm.deleteEventInstance(UpdateEventTarget.WHOLE_SERIES, EventInstanceId.buildSingleInstance(oAct.getEventId()), notifyOpts);
+					
+				} catch (WTNotFoundException ex) { /* Do nothing... */ }
 			}
 		}
 	}

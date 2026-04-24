@@ -39,16 +39,20 @@ import com.sonicle.commons.LangUtils.CollectionChangeSet;
 import static com.sonicle.commons.LangUtils.getCollectionChanges;
 import com.sonicle.commons.PathUtils;
 import com.sonicle.commons.db.DbUtils;
+import com.sonicle.commons.flags.BitFlags;
 import com.sonicle.commons.time.DateWindow;
 import com.sonicle.webtop.calendar.ICalendarManager;
 import com.sonicle.webtop.calendar.model.Event;
+import com.sonicle.webtop.calendar.model.EventBase;
 import com.sonicle.webtop.calendar.model.EventInstance;
+import com.sonicle.webtop.calendar.model.EventInstanceId;
 import com.sonicle.webtop.calendar.model.EventKey;
 import com.sonicle.webtop.calendar.model.UpdateEventTarget;
 import com.sonicle.webtop.contacts.IContactsManager;
 import com.sonicle.webtop.contacts.model.Contact;
 import com.sonicle.webtop.core.CoreManager;
 import com.sonicle.webtop.core.app.WT;
+import com.sonicle.webtop.core.app.sdk.WTNotFoundException;
 import com.sonicle.webtop.core.app.util.ExceptionUtils;
 import com.sonicle.webtop.core.bol.OUser;
 import com.sonicle.webtop.core.dal.DAOException;
@@ -6898,7 +6902,7 @@ public class DrmManager extends BaseManager implements IDrmManager{
 					}
 
 					if(lReq.getEventId() != null){
-						Event ev = cm.getEvent(lReq.getEventId());
+						EventInstance ev = cm.getEventInstance(EventInstanceId.buildSingleInstance(lReq.getEventId()));
 
 						if(ev != null){
 							return updateLeaveRequestEvent(targetPid, cm, lReq, ev, ownCalendar);
@@ -6937,10 +6941,8 @@ public class DrmManager extends BaseManager implements IDrmManager{
 		ev.setCalendarId(lrCalId);
 		ev.setAllDay(true);
 		ev.setTimezone(tz.getID());
-		ev.setIsPrivate(false);
-		ev.setBusy(false);
-
-		ev.setActivityId(activityId);
+		ev.setVisibility(EventBase.Visibility.PUBLIC);
+		ev.setTransparency(EventBase.Transparency.TRANSPARENT);
 		
 		if(lReq.getFromDate() != null && lReq.getToDate() != null){			
 			if(lReq.getFromHour() != null && lReq.getToHour() != null){
@@ -6950,49 +6952,54 @@ public class DrmManager extends BaseManager implements IDrmManager{
 			}else{
 				ev.setAllDay(true);
 				
-				ev.setStartDate(lReq.getFromDate().toDateTimeAtStartOfDay(tz));
-				ev.setEndDate(lReq.getToDate().toDateTimeAtStartOfDay(tz).withTime(23, 59, 0, 0));
+				ev.setStart(lReq.getFromDate().toDateTimeAtStartOfDay(tz));
+				ev.setEnd(lReq.getToDate().toDateTimeAtStartOfDay(tz).withTime(23, 59, 0, 0));
 			}
 		}
 		
-		ev.setTitle(getLeaveReqestTitle(upid, ev, lReq, ownCalendar));
+		ev.setTitle(getLeaveReqestTitle(upid, lReq, ownCalendar));
 
 		ev = cm.addEvent(ev, false);
 		
 		return ev.getEventId();
 	}
 	
-	private String updateLeaveRequestEvent(UserProfileId upid, ICalendarManager cm, LeaveRequest lReq, Event ev, boolean ownCalendar) throws WTException{
-		EventInstance evI = new EventInstance(EventKey.buildKey(ev.getEventId(), null), ev);
-
+	private String updateLeaveRequestEvent(UserProfileId upid, ICalendarManager cm, LeaveRequest lReq, EventInstance ev, boolean ownCalendar) throws WTException{
+		
 		//Non approvata o cancellata?
 		if (!LangUtils.value(lReq.getResult(), Boolean.TRUE) || (lReq.getCancResult()!=null && lReq.getCancResult()==true)) {
-			cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, evI.getKey(), false);
+			try {
+				BitFlags<ICalendarManager.EventNotifyOption> notifyOpts = ICalendarManager.EventNotifyOption.withoutAnyAttendeesNotifications();
+				cm.deleteEventInstance(UpdateEventTarget.WHOLE_SERIES, ev.getId(), notifyOpts);
+
+			} catch (WTNotFoundException ex) { /* Do nothing... */ }
 			return null;
 		} else {
 			DateTimeZone tz = WT.getProfileData(upid).getTimeZone();
 			if(lReq.getFromDate() != null && lReq.getToDate() != null){			
 				if(lReq.getFromHour() != null && lReq.getToHour() != null){
-					evI.setAllDay(false);
+					ev.setAllDay(false);
 
-					evI.setDatesAndTimes(false, tz.getID(), lReq.getFromDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(lReq.getFromHour().split(":")[0]), Integer.parseInt(lReq.getFromHour().split(":")[1]), 0, 0), lReq.getToDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(lReq.getToHour().split(":")[0]), Integer.parseInt(lReq.getToHour().split(":")[1]), 0, 0));
+					ev.setDatesAndTimes(false, tz.getID(), lReq.getFromDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(lReq.getFromHour().split(":")[0]), Integer.parseInt(lReq.getFromHour().split(":")[1]), 0, 0), lReq.getToDate().toDateTimeAtStartOfDay(tz).withTime(Integer.parseInt(lReq.getToHour().split(":")[0]), Integer.parseInt(lReq.getToHour().split(":")[1]), 0, 0));
 				}else{
-					evI.setAllDay(true);
+					ev.setAllDay(true);
 
-					evI.setStartDate(lReq.getFromDate().toDateTimeAtStartOfDay(tz));
-					evI.setEndDate(lReq.getToDate().toDateTimeAtStartOfDay(tz).withTime(23, 59, 0, 0));
+					ev.setStart(lReq.getFromDate().toDateTimeAtStartOfDay(tz));
+					ev.setEnd(lReq.getToDate().toDateTimeAtStartOfDay(tz).withTime(23, 59, 0, 0));
 				}
 			}
 
-			evI.setTitle(getLeaveReqestTitle(upid, evI, lReq, ownCalendar));
+			ev.setTitle(getLeaveReqestTitle(upid, lReq, ownCalendar));
+			
+			BitFlags<ICalendarManager.EventUpdateOption> updateOpts = BitFlags.noneOf(ICalendarManager.EventUpdateOption.class);
+			BitFlags<ICalendarManager.EventNotifyOption> notifyOpts = ICalendarManager.EventNotifyOption.withoutAnyAttendeesNotifications();
+			cm.updateEventInstance(UpdateEventTarget.WHOLE_SERIES, ev.getId(), ev, updateOpts, notifyOpts);
 
-			cm.updateEventInstance(UpdateEventTarget.ALL_SERIES, evI, false, false);
-
-			return evI.getEventId();
+			return ev.getOriginalEventId();
 		}
 	}
 	
-	private String getLeaveReqestTitle(UserProfileId upid, Event ev, LeaveRequest lReq, boolean ownCalendar) {
+	private String getLeaveReqestTitle(UserProfileId upid, LeaveRequest lReq, boolean ownCalendar) {
 		String title="";
 		Locale locale=WT.getProfileData(upid).getLocale();
 		
@@ -7071,10 +7078,11 @@ public class DrmManager extends BaseManager implements IDrmManager{
 				WTException exc=WT.runPrivileged(new Callable<WTException>(){
 					public WTException call() {
 						try {
-							Event ev = cm.getEvent(lReq.getEventId());
-							if(ev != null) {
-								cm.deleteEventInstance(UpdateEventTarget.ALL_SERIES, EventKey.buildKey(lReq.getEventId(), null), false);
-							}
+							BitFlags<ICalendarManager.EventNotifyOption> notifyOpts = ICalendarManager.EventNotifyOption.withoutAnyAttendeesNotifications();
+							cm.deleteEventInstance(UpdateEventTarget.WHOLE_SERIES, EventInstanceId.buildSingleInstance(lReq.getEventId()), notifyOpts);
+
+						} catch (WTNotFoundException exc) {
+							/* Do nothing... */ 
 						} catch(WTException exc) {
 							return exc;
 						}

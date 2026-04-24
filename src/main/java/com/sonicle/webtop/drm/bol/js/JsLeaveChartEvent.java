@@ -35,6 +35,7 @@ package com.sonicle.webtop.drm.bol.js;
 import com.sonicle.commons.LangUtils;
 import com.sonicle.commons.time.DateTimeUtils;
 import com.sonicle.webtop.calendar.CalendarUtils;
+import com.sonicle.webtop.calendar.model.EventBounds;
 import com.sonicle.webtop.core.app.WT;
 import com.sonicle.webtop.drm.bol.OLeaveRequest;
 import java.util.Locale;
@@ -62,15 +63,15 @@ public class JsLeaveChartEvent {
 	public Integer calendarId;
 	public String calendarName;
 	
-	public JsLeaveChartEvent(com.sonicle.webtop.calendar.model.SchedEventInstance eventInstance, com.sonicle.webtop.calendar.model.Calendar calendar, OLeaveRequest leaveRequest, DateTimeZone profileTz, Locale locale) {
+	public JsLeaveChartEvent(com.sonicle.webtop.calendar.model.EventLookupInstance eventInstance, com.sonicle.webtop.calendar.model.Calendar calendar, OLeaveRequest leaveRequest, DateTimeZone profileTz, Locale locale) {
 		DateTimeFormatter ymdhmsZoneFmt = DateTimeUtils.createYmdHmsFormatter(profileTz);
-		this.id = eventInstance.getKey();
-		this.eventId = eventInstance.getEventId();
-		CalendarUtils.EventBoundary eventBoundary = CalendarUtils.getEventBoundary(eventInstance);
-		this.startDate = ymdhmsZoneFmt.print(eventBoundary.start);
-		this.endDate = ymdhmsZoneFmt.print(eventBoundary.end);
+		this.id = eventInstance.getId().toString();
+		this.eventId = eventInstance.getOriginalEventId();
+		EventBounds eventBounds = eventInstance.getEventBounds();
+		this.startDate = ymdhmsZoneFmt.print(eventBounds.getStart());
+		this.endDate = ymdhmsZoneFmt.print(eventBounds.getEnd());
 		this.timezone = eventInstance.getTimezone();
-		this.isAllDay = eventBoundary.allDay;
+		this.isAllDay = eventBounds.isAllDay();
 		if (leaveRequest != null) {
 			// Remember to update eventTooltipRenderer in TimeTableLeavesChars.js accordingly
 			this.title = leaveRequest.getType(); // i18n title will be set client-side

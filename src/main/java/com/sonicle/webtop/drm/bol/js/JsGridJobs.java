@@ -34,6 +34,7 @@ package com.sonicle.webtop.drm.bol.js;
 
 import com.sonicle.commons.time.DateTimeUtils;
 import com.sonicle.webtop.calendar.CalendarUtils;
+import com.sonicle.webtop.calendar.model.EventBounds;
 import com.sonicle.webtop.drm.bol.OViewJob;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
@@ -81,10 +82,10 @@ public class JsGridJobs {
 		this.title = job.getTitle();
 		this.ticketId = job.getTicketId();
 		
-		CalendarUtils.EventBoundary eventBoundary = CalendarUtils.toEventBoundaryForRead(false, job.getStartDate(), job.getEndDate(), DateTimeZone.forID(job.getTimezone()));
-		this.startDate = ymdhmsZoneFmt.print(eventBoundary.start);
-		this.endDate = ymdhmsZoneFmt.print(eventBoundary.end);
-		this.timezone = eventBoundary.timezone.getID();
+		EventBounds eventBounds = CalendarUtils.toEventBoundsForRead(false, job.getStartDate(), job.getEndDate(), DateTimeZone.forID(job.getTimezone()));
+		this.startDate = ymdhmsZoneFmt.print(eventBounds.getStart());
+		this.endDate = ymdhmsZoneFmt.print(eventBounds.getEnd());
+		this.timezone = eventBounds.getTimezone();
 		
 		this._profileId = ownerPid;
 

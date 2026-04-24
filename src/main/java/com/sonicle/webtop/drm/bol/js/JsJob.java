@@ -34,6 +34,7 @@ package com.sonicle.webtop.drm.bol.js;
 
 import com.sonicle.commons.time.DateTimeUtils;
 import com.sonicle.webtop.calendar.CalendarUtils;
+import com.sonicle.webtop.calendar.model.EventBounds;
 import com.sonicle.webtop.drm.model.Job;
 import com.sonicle.webtop.drm.model.JobAttachment;
 import java.util.ArrayList;
@@ -79,10 +80,10 @@ public class JsJob {
 		this.customerId = job.getCustomerId();
 		this.customerStatId = job.getCustomerStatId();
 		
-		CalendarUtils.EventBoundary eventBoundary = CalendarUtils.toEventBoundaryForRead(false, job.getStartDate(), job.getEndDate(), DateTimeZone.forID(job.getTimezone()));
-		startDate = ymdhmsZoneFmt.print(eventBoundary.start);
-		endDate = ymdhmsZoneFmt.print(eventBoundary.end);
-		timezone = eventBoundary.timezone.getID();
+		EventBounds eventBounds = CalendarUtils.toEventBoundsForRead(false, job.getStartDate(), job.getEndDate(), DateTimeZone.forID(job.getTimezone()));
+		this.startDate = ymdhmsZoneFmt.print(eventBounds.getStart());
+		this.endDate = ymdhmsZoneFmt.print(eventBounds.getEnd());
+		this.timezone = eventBounds.getTimezone();
 		
 		this.activityId = job.getActivityId();
 		this.title = job.getTitle();
@@ -122,8 +123,8 @@ public class JsJob {
 		DateTime eventStart = DateTimeUtils.parseYmdHmsWithZone(js.startDate, eventTz);
 		DateTime eventEnd = DateTimeUtils.parseYmdHmsWithZone(js.endDate, eventTz);
 		
-		CalendarUtils.EventBoundary eventBoundary = CalendarUtils.toEventBoundaryForWrite(false, eventStart, eventEnd, eventTz);
-		job.setDatesAndTimes(eventBoundary.timezone.getID(), eventBoundary.start, eventBoundary.end);
+		EventBounds eventBounds = CalendarUtils.toEventBoundsForWrite(false, eventStart, eventEnd, eventTz);
+		job.setDatesAndTimes(eventBounds.getTimezone(), eventBounds.getStart(), eventBounds.getEnd());
 		
 		job.setActivityId(js.activityId);
 		job.setTitle(js.title);
