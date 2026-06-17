@@ -103,6 +103,7 @@ public class LeaveRequests extends LeaveRequestsApi {
 				alr.setStatus(lr.getStatus());
 				alr.setNotes(lr.getNotes());
 				alr.setCancReason(lr.getCancReason());
+				alr.setEventId(lr.getEventId());
 				alr.setUser(WT.getProfileData(new UserProfileId(lr.getDomainId(), lr.getUserId())).getDisplayName());
 				alr.setManager(WT.getProfileData(new UserProfileId(lr.getDomainId(), lr.getManagerId())).getDisplayName());
 				items.add(alr);
@@ -125,6 +126,7 @@ public class LeaveRequests extends LeaveRequestsApi {
 					alr.setUserId(oLR.getUserId());
 					alr.setNotes(oLR.getNotes());
 					alr.setCancReason(oLR.getCancReason());
+					alr.setEventId(oLR.getEventId());
 					alr.setUser(WT.getProfileData(new UserProfileId(oLR.getDomainId(), oLR.getUserId())).getDisplayName());
 					alr.setManager(WT.getProfileData(new UserProfileId(oLR.getDomainId(), oLR.getManagerId())).getDisplayName());
 					items.add(alr);
@@ -142,12 +144,14 @@ public class LeaveRequests extends LeaveRequestsApi {
 	public Response addLeaveRequest(ApiLeaveRequest apiLeaveRequest) {
 		UserProfileId currentProfileId = RunContext.getRunProfileId();
 		String userId = currentProfileId.getUserId();
+		String domainId = currentProfileId.getDomainId();
 		DrmManager manager = getManager();
 		DrmServiceSettings dss =  manager.getServiceSettings();
 		try {
 			LeaveRequest lr = new LeaveRequest();
 			lr.setCompanyId(apiLeaveRequest.getCompanyId());
 			lr.setUserId(userId);
+			lr.setDomainId(domainId);
 			lr.setManagerId(apiLeaveRequest.getManagerId());
 			lr.setType(apiLeaveRequest.getType());
 			lr.setFromDate(JodaTimeUtils.parseLocalDate(JodaTimeUtils.ISO_LOCALDATE_FMT, apiLeaveRequest.getFromDate()));
@@ -188,6 +192,9 @@ public class LeaveRequests extends LeaveRequestsApi {
 			lr.setResult(apiLeaveRequest.getResult());
 			lr.setNotes(apiLeaveRequest.getNotes());
 			lr.setCancRequest(false);
+			lr.setEventId(apiLeaveRequest.getEventId());
+			String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+			lr.setEventId(eventId);
 			manager.updateLeaveRequest(lr, true);
 			return respOk();
 		} catch(Exception exc) {
@@ -201,7 +208,13 @@ public class LeaveRequests extends LeaveRequestsApi {
 		UserProfileId currentProfileId = RunContext.getRunProfileId();
 		DrmManager manager = getManager();
 		try {
-			if (action == null || action.equals(ACTION_DELETE)) manager.deleteLeaveRequest(leaveRequestId);
+			if (action == null) throw new Exception("Action cannot be null");
+			
+			if (action.equals(ACTION_DELETE)) {
+				LeaveRequest lr = manager.getLeaveRequest(leaveRequestId);
+				manager.deleteLeaveRequestEvent(lr);
+				manager.deleteLeaveRequest(leaveRequestId);
+			}
 			else if (action.equals(ACTION_REQUEST_CANCELLATION)) {
 				LeaveRequest lr=manager.timetableRequestCancellation(leaveRequestId, text);
 				manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);

@@ -506,6 +506,12 @@
             "x-stoplight": {
               "id": "hp5sfutpoa75x"
             }
+          },
+          "eventId": {
+            "type": "string",
+            "x-stoplight": {
+              "id": "hp5sfutpoa75x"
+            }
           }
         }
       },
