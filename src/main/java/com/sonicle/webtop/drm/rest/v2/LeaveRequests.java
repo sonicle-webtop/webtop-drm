@@ -156,6 +156,8 @@ public class LeaveRequests extends LeaveRequestsApi {
 			lr.setToHour(apiLeaveRequest.getToHour());
 			lr.setStatus(apiLeaveRequest.getStatus());
 			lr.setNotes(apiLeaveRequest.getNotes());
+			String eventId = manager.createOrUpdateLeaveRequestEventIntoLeaveRequestCalendar(lr);
+			lr.setEventId(eventId);
 			manager.addLeaveRequest(lr, dss.getMedicalVisitsAutomaticallyApproved(), dss.getSicknessAutomaticallyApproved());
 			return respOk();
 		} catch(WTException exc) {
