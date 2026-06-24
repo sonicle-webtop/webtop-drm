@@ -80,7 +80,7 @@ public class JsJob {
 		this.customerId = job.getCustomerId();
 		this.customerStatId = job.getCustomerStatId();
 		
-		EventBounds eventBounds = CalendarUtils.toEventBoundsForRead(false, job.getStartDate(), job.getEndDate(), DateTimeZone.forID(job.getTimezone()));
+		EventBounds eventBounds = CalendarUtils.toEventBoundsForUIRead(false, job.getStartDate(), job.getEndDate(), DateTimeZone.forID(job.getTimezone()));
 		this.startDate = ymdhmsZoneFmt.print(eventBounds.getStart());
 		this.endDate = ymdhmsZoneFmt.print(eventBounds.getEnd());
 		this.timezone = eventBounds.getTimezone();
@@ -123,7 +123,7 @@ public class JsJob {
 		DateTime eventStart = DateTimeUtils.parseYmdHmsWithZone(js.startDate, eventTz);
 		DateTime eventEnd = DateTimeUtils.parseYmdHmsWithZone(js.endDate, eventTz);
 		
-		EventBounds eventBounds = CalendarUtils.toEventBoundsForWrite(false, eventStart, eventEnd, eventTz);
+		EventBounds eventBounds = CalendarUtils.toEventBoundsForUIWrite(false, eventStart, eventEnd, eventTz);
 		job.setDatesAndTimes(eventBounds.getTimezone(), eventBounds.getStart(), eventBounds.getEnd());
 		
 		job.setActivityId(js.activityId);

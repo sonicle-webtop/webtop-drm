@@ -82,7 +82,7 @@ public class JsGridJobs {
 		this.title = job.getTitle();
 		this.ticketId = job.getTicketId();
 		
-		EventBounds eventBounds = CalendarUtils.toEventBoundsForRead(false, job.getStartDate(), job.getEndDate(), DateTimeZone.forID(job.getTimezone()));
+		EventBounds eventBounds = CalendarUtils.toEventBoundsForUIRead(false, job.getStartDate(), job.getEndDate(), DateTimeZone.forID(job.getTimezone()));
 		this.startDate = ymdhmsZoneFmt.print(eventBounds.getStart());
 		this.endDate = ymdhmsZoneFmt.print(eventBounds.getEnd());
 		this.timezone = eventBounds.getTimezone();
