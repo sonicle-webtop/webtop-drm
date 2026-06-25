@@ -67,11 +67,11 @@ public class JsLeaveChartEvent {
 		DateTimeFormatter ymdhmsZoneFmt = DateTimeUtils.createYmdHmsFormatter(profileTz);
 		this.id = eventInstance.getId().toString();
 		this.eventId = eventInstance.getOriginalEventId();
-		EventBounds eventBounds = eventInstance.getEventBounds();
-		this.startDate = ymdhmsZoneFmt.print(eventBounds.getStart());
-		this.endDate = ymdhmsZoneFmt.print(eventBounds.getEnd());
-		this.timezone = eventInstance.getTimezone();
-		this.isAllDay = eventBounds.isAllDay();
+		EventBounds bounds = CalendarUtils.toNormalizedEventBounds(eventInstance);
+		this.startDate = ymdhmsZoneFmt.print(bounds.getStart());
+		this.endDate = ymdhmsZoneFmt.print(bounds.getEnd());
+		this.timezone = bounds.getTimezone();
+		this.isAllDay = bounds.isAllDay();
 		if (leaveRequest != null) {
 			// Remember to update eventTooltipRenderer in TimeTableLeavesChars.js accordingly
 			this.title = leaveRequest.getType(); // i18n title will be set client-side
