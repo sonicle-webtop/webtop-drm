@@ -306,9 +306,9 @@ public class Service extends BaseService {
 
 		UserProfileId pid = getEnv().getProfileId();
 
-		manager = (DrmManager) WT.getServiceManager(SERVICE_ID);
+		manager = (DrmManager) WT.getServiceManager(SERVICE_ID, pid);
 		ss = new DrmServiceSettings(SERVICE_ID, pid.getDomainId());
-		us = new DrmUserSettings(SERVICE_ID, new UserProfileId(pid.getDomain(), pid.getUserId()));
+		us = new DrmUserSettings(SERVICE_ID, pid);
 		
 		/*
 		RootProgramNode prog = null;
@@ -710,7 +710,7 @@ public class Service extends BaseService {
 		try {
 			List<JsSimple> hourProfiles = new ArrayList();
 			
-			DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID);
+			DrmManager manager = (DrmManager)WT.getServiceManager(SERVICE_ID, getEnv().getProfileId());
 
 			for (OHourProfile hp : manager.listHourProfiles()) {
 				hourProfiles.add(new JsSimple(hp.getId(), hp.getDescription()));

@@ -58,6 +58,7 @@ import com.sonicle.webtop.core.bol.OUser;
 import com.sonicle.webtop.core.dal.DAOException;
 import com.sonicle.webtop.core.dal.UserDAO;
 import com.sonicle.webtop.core.sdk.BaseManager;
+import com.sonicle.webtop.core.sdk.SharedManager;
 import com.sonicle.webtop.core.sdk.UserProfile;
 import com.sonicle.webtop.core.sdk.UserProfile.PersonalInfo;
 import com.sonicle.webtop.core.sdk.UserProfileId;
@@ -307,18 +308,41 @@ import org.supercsv.prefs.CsvPreference;
  *
  * @author lssndrvs
  */
-public class DrmManager extends BaseManager implements IDrmManager{
+public class DrmManager extends BaseManager implements SharedManager, IDrmManager{
 
 	public static final Logger logger = WT.getLogger(DrmManager.class);
-	private DrmServiceSettings dss;
-	TimetableSetting tts;
-	
+	private final DrmServiceSettings dss;
+	//shared instance: read by every session/REST thread of the user, rebuilt
+	//on demand — volatile guarantees safe publication of the fully-built object
+	private volatile TimetableSetting tts;
+
 	public DrmManager(boolean fastInit, UserProfileId targetProfileId) {
 		super(fastInit, targetProfileId);
 		dss = new DrmServiceSettings(SERVICE_ID, targetProfileId.getDomainId());
 		tts = getTimetableSetting();
 	}
-	
+
+	/**
+	 * SharedManager lifecycle: one instance per (service, target user), serving
+	 * every web session and REST call of that user (incl. supervisors touching
+	 * their operators' instances). No machinery to start: the only cached state
+	 * is the domain-scoped TimetableSetting, loaded in the ctor.
+	 */
+	@Override
+	public void onSharedStartup() {
+		logger.info("[{}] shared DrmManager created", getTargetProfileId());
+	}
+
+	/**
+	 * SharedManager lifecycle: runs at registry eviction or application
+	 * shutdown. Nothing to close; just drop the cached setting.
+	 */
+	@Override
+	public void onSharedShutdown() {
+		logger.info("[{}] shared DrmManager shutting down", getTargetProfileId());
+		tts = null;
+	}
+
 	public DrmServiceSettings getServiceSettings() {
 		return dss;
 	}
