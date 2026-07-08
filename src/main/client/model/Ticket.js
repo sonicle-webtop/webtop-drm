@@ -71,7 +71,7 @@ Ext.define('Sonicle.webtop.drm.model.Ticket', {
 		
 		WTF.roField('_profileId', 'string'),
 		
-		WTF.field('eventId', 'int', true)
+		WTF.field('eventId', 'string', true)
 	],
 	hasMany: [
 		WTF.hasMany('attachments', 'Sonicle.webtop.drm.model.TicketAttachment')

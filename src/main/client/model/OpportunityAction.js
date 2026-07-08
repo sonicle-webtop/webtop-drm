@@ -55,7 +55,7 @@ Ext.define('Sonicle.webtop.drm.model.OpportunityAction', {
 		WTF.field('place', 'string', true),
 		WTF.field('subsequentActions', 'string', false),
 		WTF.field('activityId', 'string', true),
-		WTF.field('eventId', 'int', true)
+		WTF.field('eventId', 'string', true)
 	],
 	hasMany: [
 		WTF.hasMany('actionInterlocutors', 'Sonicle.webtop.drm.model.OpportunityActionInterlocutor'),

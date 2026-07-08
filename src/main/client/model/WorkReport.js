@@ -79,7 +79,7 @@ Ext.define('Sonicle.webtop.drm.model.WorkReport', {
 		
 		WTF.roField('_profileId', 'string'),
 		
-		WTF.field('eventId', 'int', true),
+		WTF.field('eventId', 'string', true),
 		WTF.field('timetableHours', 'float', true, {
 			defaultValue: 0
 		}), // true significa che non è obbligatorio

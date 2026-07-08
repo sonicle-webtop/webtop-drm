@@ -74,7 +74,7 @@ Ext.define('Sonicle.webtop.drm.model.Job', {
 		
 		WTF.roField('_profileId', 'string'),
 		
-		WTF.field('eventId', 'int', true),
+		WTF.field('eventId', 'string', true),
 		
 		WTF.field('requireCustomer', 'boolean', true, {defaultValue: false}),
         
