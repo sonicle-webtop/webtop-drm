@@ -3008,7 +3008,7 @@ public class DrmManager extends BaseManager implements SharedManager, IDrmManage
         String hRange = lhDao.selectSumLineHourByHourProfileIdDayOfWeek(con, hp.getId(), ld.getDayOfWeek());
         
         if (hRange == null || hRange.isEmpty() || hRange.equals("0")) {
-            return "8"; // Default to 8 hours
+            return null;
         }
 
         // Convert minutes to hour:minute format
