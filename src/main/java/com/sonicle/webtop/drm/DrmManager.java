@@ -285,6 +285,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -308,40 +309,51 @@ import org.supercsv.prefs.CsvPreference;
  *
  * @author lssndrvs
  */
-public class DrmManager extends BaseManager implements /*SharedManager,*/ IDrmManager{
+public class DrmManager extends BaseManager implements SharedManager, IDrmManager{
 
 	public static final Logger logger = WT.getLogger(DrmManager.class);
 	private final DrmServiceSettings dss;
-	//shared instance: read by every session/REST thread of the user, rebuilt
-	//on demand — volatile guarantees safe publication of the fully-built object
-	private volatile TimetableSetting tts;
+
+	//TimetableSetting is DOMAIN data: cache it per domain, shared by ALL per-user
+	//manager instances (a per-user copy went stale for every other user whenever
+	//an admin saved changes). Entries are invalidated on update and expire via
+	//TTL to bound staleness for edits performed on other nodes.
+	private static final long TTS_CACHE_TTL_MS = 5 * 60 * 1000L;
+	private static final ConcurrentHashMap<String, TtsCacheEntry> TTS_CACHE = new ConcurrentHashMap<>();
+	private static class TtsCacheEntry {
+		final TimetableSetting setting; //may be null: "no row for this domain" is cached too
+		final long loadedAt;
+		TtsCacheEntry(TimetableSetting setting, long loadedAt) { this.setting = setting; this.loadedAt = loadedAt; }
+	}
 
 	public DrmManager(boolean fastInit, UserProfileId targetProfileId) {
 		super(fastInit, targetProfileId);
 		dss = new DrmServiceSettings(SERVICE_ID, targetProfileId.getDomainId());
-		tts = getTimetableSetting();
+		//NB: no eager getTimetableSetting() here — the registry runs this ctor
+		//under its map bin lock and the getter is lazily self-populating anyway
 	}
 
 	/**
 	 * SharedManager lifecycle: one instance per (service, target user), serving
 	 * every web session and REST call of that user (incl. supervisors touching
 	 * their operators' instances). No machinery to start: the only cached state
-	 * is the domain-scoped TimetableSetting, loaded in the ctor.
+	 * is the domain-scoped TimetableSetting, held in a static per-domain cache
+	 * loaded lazily on first read.
 	 */
-/*	@Override
+	@Override
 	public void onSharedStartup() {
 		logger.info("[{}] shared DrmManager created", getTargetProfileId());
-	}*/
+	}
 
 	/**
 	 * SharedManager lifecycle: runs at registry eviction or application
-	 * shutdown. Nothing to close; just drop the cached setting.
+	 * shutdown. Nothing to close: the timetable-setting cache is static and
+	 * domain-scoped, so it outlives (and is independent of) this instance.
 	 */
-/*	@Override
+	@Override
 	public void onSharedShutdown() {
 		logger.info("[{}] shared DrmManager shutting down", getTargetProfileId());
-		tts = null;
-	}*/
+	}
 
 	public DrmServiceSettings getServiceSettings() {
 		return dss;
@@ -3369,30 +3381,37 @@ public class DrmManager extends BaseManager implements /*SharedManager,*/ IDrmMa
 	}
 	
 	public TimetableSetting getTimetableSetting(boolean doUpdate) {
-		if (!doUpdate && tts != null) return tts;
-		
+		final String domainId = getTargetProfileId().getDomainId();
+		if (!doUpdate) {
+			TtsCacheEntry entry = TTS_CACHE.get(domainId);
+			if (entry != null && (System.currentTimeMillis() - entry.loadedAt) < TTS_CACHE_TTL_MS) return entry.setting;
+		}
+
 		Connection con = null;
 		TimetableSettingDAO tSettDao = TimetableSettingDAO.getInstance();
 		HolidayDateDAO hdDao = HolidayDateDAO.getInstance();
 
 		TimetableSetting setting = null;
-		
+
 		try {
 			con = WT.getConnection(SERVICE_ID);
 
-			setting = ManagerUtils.createTimetableSetting(tSettDao.selectByDomainId(con, getTargetProfileId().getDomainId()));
-			
+			setting = ManagerUtils.createTimetableSetting(tSettDao.selectByDomainId(con, domainId));
+
 			if (setting != null) {
-				for (OHolidayDate oHd : hdDao.selectByDomain(con, getTargetProfileId().getDomainId())) {
+				for (OHolidayDate oHd : hdDao.selectByDomain(con, domainId)) {
 					setting.getHolidayDates().add(ManagerUtils.createHolidayDate(oHd));
 				}
 			}
-			tts = setting;
+			TTS_CACHE.put(domainId, new TtsCacheEntry(setting, System.currentTimeMillis()));
 			return setting;
 
 		} catch (SQLException | DAOException ex) {
 			logger.error("Error creating TimetableSetting", ex);
-			return null;
+			//on a transient DB error serve the expired entry (if any) instead of
+			//null: several callers dereference the result without checking
+			TtsCacheEntry stale = TTS_CACHE.get(domainId);
+			return (stale != null) ? stale.setting : null;
 		} finally {
 			DbUtils.closeQuietly(con);
 		}
@@ -3470,15 +3489,16 @@ public class DrmManager extends BaseManager implements /*SharedManager,*/ IDrmMa
 				tDao.update(con, setting);
 			}
 			DbUtils.commitQuietly(con);
-			
-			//force update
-			getTimetableSetting(true);
 
 		} catch (SQLException | DAOException ex) {
 			throw new WTException(ex, "DB error");
 		} finally {
 			DbUtils.closeQuietly(con);
 		}
+		//invalidate AFTER releasing the tx connection (the old in-try reload
+		//acquired a second pooled connection while con was still open); being
+		//domain-scoped, this refreshes every user's shared instance at once
+		TTS_CACHE.remove(getTargetProfileId().getDomainId());
 	}
 
 	public OWorkReportSetting addWorkReportSetting(WorkReportSetting wrkSett) throws WTException {
@@ -3736,7 +3756,7 @@ public class DrmManager extends BaseManager implements /*SharedManager,*/ IDrmMa
 		}
 	}
 	
-	public class Operator {
+	public static class Operator {
 		public String usr;
 		public String dn;
 		
@@ -3869,7 +3889,7 @@ public class DrmManager extends BaseManager implements /*SharedManager,*/ IDrmMa
 				newENDet.setExpenseNoteId(newEn.getId());
 
 				if (newENDet.getDescription() !=null && newENDet.getDescription().trim().length() > 0)
-					WT.getCoreManager().addServiceStoreEntry(SERVICE_ID, "expenseNoteDescription", newENDet.getDescription().toUpperCase(), newENDet.getDescription());
+					WT.getCoreManager(getTargetProfileId()).addServiceStoreEntry(SERVICE_ID, "expenseNoteDescription", newENDet.getDescription().toUpperCase(), newENDet.getDescription());
 				
 				eNDetDAO.insert(con, newENDet);
 			}
@@ -3925,7 +3945,7 @@ public class DrmManager extends BaseManager implements /*SharedManager,*/ IDrmMa
 				oENDet.setExpenseNoteId(item.getId());
 
 				if (eNDet.getDescription() !=null && eNDet.getDescription().trim().length() > 0)
-					WT.getCoreManager().addServiceStoreEntry(SERVICE_ID, "expenseNoteDescription", eNDet.getDescription().toUpperCase(), eNDet.getDescription());
+					WT.getCoreManager(getTargetProfileId()).addServiceStoreEntry(SERVICE_ID, "expenseNoteDescription", eNDet.getDescription().toUpperCase(), eNDet.getDescription());
 				
 				eNDetDAO.insert(con, oENDet);
 			}
@@ -3939,7 +3959,7 @@ public class DrmManager extends BaseManager implements /*SharedManager,*/ IDrmMa
 				oENDet.setExpenseNoteId(item.getId());
 
 				if (eNDet.getDescription() !=null && eNDet.getDescription().trim().length() > 0)
-					WT.getCoreManager().addServiceStoreEntry(SERVICE_ID, "expenseNoteDescription", eNDet.getDescription().toUpperCase(), eNDet.getDescription());
+					WT.getCoreManager(getTargetProfileId()).addServiceStoreEntry(SERVICE_ID, "expenseNoteDescription", eNDet.getDescription().toUpperCase(), eNDet.getDescription());
 				
 				eNDetDAO.update(con, oENDet);
 			}

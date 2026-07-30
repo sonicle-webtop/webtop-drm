@@ -169,6 +169,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -291,15 +292,19 @@ public class Service extends BaseService {
 	public static final String TIMETABLE_GIS_EXPORT_FILENAME = "GIS_{0}_{1}_{2}.{3}";
 	public static final String TIMETABLE_TS_EXPORT_FILENAME = "TS_{0}_{1}_{2}.{3}";
 
-	private DrmManager manager;
-	private DrmServiceSettings ss;
-	private DrmUserSettings us;
+	private volatile DrmManager manager;
+	private volatile DrmServiceSettings ss;
+	private volatile DrmUserSettings us;
 	private LinkedHashMap<String, RootProgramNode> programs = new LinkedHashMap();
 
 	private LinkedHashMap<String, String> groupCategories = new LinkedHashMap();
 	
-	private CsvExportWizard csvWizard = null;
-	private TxtExportWizard txtWizard = null;
+	//volatile + one field per export flow: a single txtWizard was shared by the
+	//GIS and TS exports, so two concurrent exports (or a download racing another
+	//flow's prepare) could deliver the wrong file
+	private volatile CsvExportWizard csvWizard = null;
+	private volatile TxtExportWizard txtGisWizard = null;
+	private volatile TxtExportWizard txtTsWizard = null;
 	
 	@Override
 	public void initialize() throws Exception {
@@ -911,17 +916,21 @@ public class Service extends BaseService {
 		protected void internalBuildCache() {
 			UserProfile up = getEnv().getProfile();
 			TimetableSetting ts = manager.getTimetableSetting();
-			
+
 			try {
 				logger.debug("[CacheTimetableLeavesSharedCalendar] Building cache...");
-				if (!StringUtils.isBlank(ts.getCalendarUserId())) {
+				//build into a fresh map, then swap: a rebuild can no longer append
+				//onto the previous content, and readers never see a half-built map
+				Map<Integer, com.sonicle.webtop.calendar.model.Calendar> newMap = new HashMap<>();
+				if (ts != null && !StringUtils.isBlank(ts.getCalendarUserId())) {
 					UserProfileId sharedPid = new UserProfileId(up.getDomainId(), ts.getCalendarUserId());
 					ICalendarManager cm = (ICalendarManager)WT.getServiceManager("com.sonicle.webtop.calendar", true, up.getId());
-					
+
 					for (com.sonicle.webtop.calendar.model.CalendarFSFolder folder : cm.listIncomingCalendarFolders(sharedPid).values()) {
-						calendarsById.put(folder.getFolderId(), folder.getCalendar());
+						newMap.put(folder.getFolderId(), folder.getCalendar());
 					}
 				}
+				this.calendarsById = newMap;
 			} catch (Exception ex) {
 				logger.error("[CacheTimetableLeavesSharedCalendar] Unable to build cache", ex);
 			}
@@ -937,17 +946,19 @@ public class Service extends BaseService {
 			this.internalCheckBeforeGetDoNotLockThis();
 			long stamp = this.readLock();
 			try {
-				return this.calendarsById.keySet();
+				//defensive copy: callers iterate AFTER the lock is released
+				return new HashSet<>(this.calendarsById.keySet());
 			} finally {
 				this.unlockRead(stamp);
 			}
 		}
-		
+
 		public Collection<com.sonicle.webtop.calendar.model.Calendar> getCalendars() {
 			this.internalCheckBeforeGetDoNotLockThis();
 			long stamp = this.readLock();
 			try {
-				return this.calendarsById.values();
+				//defensive copy: callers iterate AFTER the lock is released
+				return new ArrayList<>(this.calendarsById.values());
 			} finally {
 				this.unlockRead(stamp);
 			}
@@ -2592,22 +2603,22 @@ public class Service extends BaseService {
 			String title = (trQuery.targetUserId != null) ? trQuery.targetUserId : "tutti";
 			
 			if (op.equals("do")) {			
-				txtWizard = new TxtExportWizard();
-				txtWizard.date = new DateTime();
-				
+				txtGisWizard = new TxtExportWizard();
+				txtGisWizard.date = new DateTime();
+
 				LogEntries log = new LogEntries();
 				File file = WT.createTempFile();
-				
+
 				try {
 					DateTimeFormatter ymdhms = DateTimeUtils.createFormatter("yyyy-MM-dd HH:mm:ss", up.getTimeZone());
-					
+
 					try (FileOutputStream fos = new FileOutputStream(file)) {
 						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Started on {0}", ymdhms.print(new DateTime())));
 						manager.exportTimetableReportGis(log, fos, trQuery);
 						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Ended on {0}", ymdhms.print(new DateTime())));
-						txtWizard.file = file;
-						txtWizard.filename = MessageFormat.format(TIMETABLE_GIS_EXPORT_FILENAME, trQuery.companyDescription, trQuery.monthDescription, title, "txt");
-						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "File ready: {0}", txtWizard.filename));
+						txtGisWizard.file = file;
+						txtGisWizard.filename = MessageFormat.format(TIMETABLE_GIS_EXPORT_FILENAME, trQuery.companyDescription, trQuery.monthDescription, title, "txt");
+						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "File ready: {0}", txtGisWizard.filename));
 						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Operation completed succesfully"));
 						new JsonResult(new JsWizardData(log.print())).printTo(out);
 					}
@@ -2626,16 +2637,16 @@ public class Service extends BaseService {
 	
 	public void processExportTimetableReportGis(HttpServletRequest request, HttpServletResponse response) {
 		try {
-			try(FileInputStream fis = new FileInputStream(txtWizard.file)) {
-				ServletUtils.setFileStreamHeaders(response, "application/octet-stream", DispositionType.ATTACHMENT, txtWizard.filename);
-				ServletUtils.setContentLengthHeader(response, txtWizard.file.length());
+			try(FileInputStream fis = new FileInputStream(txtGisWizard.file)) {
+				ServletUtils.setFileStreamHeaders(response, "application/octet-stream", DispositionType.ATTACHMENT, txtGisWizard.filename);
+				ServletUtils.setContentLengthHeader(response, txtGisWizard.file.length());
 				IOUtils.copy(fis, response.getOutputStream());
 			}
-			
+
 		} catch(Exception ex) {
 			logger.error("Error in ExportTimetableReportGis", ex);
 		} finally {
-			txtWizard = null;
+			txtGisWizard = null;
 		}
 	}
 	
@@ -2654,22 +2665,22 @@ public class Service extends BaseService {
 			String title = (trQuery.targetUserId != null) ? trQuery.targetUserId : "tutti";
 			
 			if (op.equals("do")) {			
-				txtWizard = new TxtExportWizard();
-				txtWizard.date = new DateTime();
-				
+				txtTsWizard = new TxtExportWizard();
+				txtTsWizard.date = new DateTime();
+
 				LogEntries log = new LogEntries();
 				File file = WT.createTempFile();
-				
+
 				try {
 					DateTimeFormatter ymdhms = DateTimeUtils.createFormatter("yyyy-MM-dd HH:mm:ss", up.getTimeZone());
-					
+
 					try (FileOutputStream fos = new FileOutputStream(file)) {
 						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Started on {0}", ymdhms.print(new DateTime())));
 						manager.exportTimetableReportTS(log, fos, trQuery);
 						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Ended on {0}", ymdhms.print(new DateTime())));
-						txtWizard.file = file;
-						txtWizard.filename = MessageFormat.format(TIMETABLE_TS_EXPORT_FILENAME, trQuery.companyDescription, trQuery.monthDescription, title, "txt");
-						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "File ready: {0}", txtWizard.filename));
+						txtTsWizard.file = file;
+						txtTsWizard.filename = MessageFormat.format(TIMETABLE_TS_EXPORT_FILENAME, trQuery.companyDescription, trQuery.monthDescription, title, "txt");
+						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "File ready: {0}", txtTsWizard.filename));
 						log.addMaster(new MessageLogEntry(LogEntry.Level.INFO, "Operation completed succesfully"));
 						new JsonResult(new JsWizardData(log.print())).printTo(out);
 					}
@@ -2688,16 +2699,16 @@ public class Service extends BaseService {
 	
 	public void processExportTimetableReportTS(HttpServletRequest request, HttpServletResponse response) {
 		try {
-			try(FileInputStream fis = new FileInputStream(txtWizard.file)) {
-				ServletUtils.setFileStreamHeaders(response, "application/octet-stream", DispositionType.ATTACHMENT, txtWizard.filename);
-				ServletUtils.setContentLengthHeader(response, txtWizard.file.length());
+			try(FileInputStream fis = new FileInputStream(txtTsWizard.file)) {
+				ServletUtils.setFileStreamHeaders(response, "application/octet-stream", DispositionType.ATTACHMENT, txtTsWizard.filename);
+				ServletUtils.setContentLengthHeader(response, txtTsWizard.file.length());
 				IOUtils.copy(fis, response.getOutputStream());
 			}
-			
+
 		} catch(Exception ex) {
-			logger.error("Error in ExportTimetableReportGis", ex);
+			logger.error("Error in ExportTimetableReportTS", ex);
 		} finally {
-			txtWizard = null;
+			txtTsWizard = null;
 		}
 	}
 	
