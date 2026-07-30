@@ -308,7 +308,7 @@ import org.supercsv.prefs.CsvPreference;
  *
  * @author lssndrvs
  */
-public class DrmManager extends BaseManager implements SharedManager, IDrmManager{
+public class DrmManager extends BaseManager implements /*SharedManager,*/ IDrmManager{
 
 	public static final Logger logger = WT.getLogger(DrmManager.class);
 	private final DrmServiceSettings dss;
@@ -328,20 +328,20 @@ public class DrmManager extends BaseManager implements SharedManager, IDrmManage
 	 * their operators' instances). No machinery to start: the only cached state
 	 * is the domain-scoped TimetableSetting, loaded in the ctor.
 	 */
-	@Override
+/*	@Override
 	public void onSharedStartup() {
 		logger.info("[{}] shared DrmManager created", getTargetProfileId());
-	}
+	}*/
 
 	/**
 	 * SharedManager lifecycle: runs at registry eviction or application
 	 * shutdown. Nothing to close; just drop the cached setting.
 	 */
-	@Override
+/*	@Override
 	public void onSharedShutdown() {
 		logger.info("[{}] shared DrmManager shutting down", getTargetProfileId());
 		tts = null;
-	}
+	}*/
 
 	public DrmServiceSettings getServiceSettings() {
 		return dss;
