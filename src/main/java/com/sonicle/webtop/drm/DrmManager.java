@@ -309,6 +309,10 @@ import org.supercsv.prefs.CsvPreference;
  *
  * @author lssndrvs
  */
+//Hybrid scope: web sessions keep PRIVATE per-session DrmManagers (re-login =
+//fresh); only sessionless consumers (REST, cross-profile supervisor lookups)
+//share the registry instance. Remove the annotation for everyone-shares-one.
+@com.sonicle.webtop.core.sdk.SharedManagerScope(com.sonicle.webtop.core.sdk.SharedManagerScope.Scope.SESSIONLESS_ONLY)
 public class DrmManager extends BaseManager implements SharedManager, IDrmManager{
 
 	public static final Logger logger = WT.getLogger(DrmManager.class);
