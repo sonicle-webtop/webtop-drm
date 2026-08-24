@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>com.sonicle.webtop</groupId>
 		<artifactId>webtop-superpom-service</artifactId>
-		<version>11</version>
+		<version>12</version>
 	</parent>
 	
     <properties>
@@ -44,13 +44,13 @@
 		<dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>webtop-contacts-api</artifactId>
-            <version>LATEST</version>
+            <version>[5.0,6.0-alpha)</version>
 			<scope>provided</scope>
         </dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>webtop-calendar-api</artifactId>
-			<version>LATEST</version>
+			<version>[5.0,6.0-alpha)</version>
 			<scope>provided</scope>
 		</dependency>
     </dependencies>
